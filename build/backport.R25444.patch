@@ -1,0 +1,117 @@
+commit c64b47f55237a78b6d74baa1503e7218b94811e4
+Author: yangguo <yangguo@chromium.org>
+Date:   Thu Nov 20 08:20:48 2014 -0800
+
+    When optimizing deserialized code, make sure IC state is preserved.
+    
+    R=jkummerow@chromium.org
+    
+    Review URL: https://codereview.chromium.org/737373003
+    
+    Cr-Commit-Position: refs/heads/master@{#25444}
+
+diff --git a/src/compiler.cc b/src/compiler.cc
+index 3b612c1..33d88d7 100644
+--- node/deps/v8/src/compiler.cc
++++ node/deps/v8/src/compiler.cc
+@@ -384,13 +384,21 @@
+     if (FLAG_hydrogen_stats) {
+       timer.Start();
+     }
+-    CompilationInfoWithZone unoptimized(info()->shared_info());
++    Handle<SharedFunctionInfo> shared = info()->shared_info();
++    CompilationInfoWithZone unoptimized(shared);
+     // Note that we use the same AST that we will use for generating the
+     // optimized code.
+     unoptimized.SetFunction(info()->function());
+     unoptimized.PrepareForCompilation(info()->scope());
+     unoptimized.SetContext(info()->context());
+     if (should_recompile) unoptimized.EnableDeoptimizationSupport();
++    // If the current code has reloc info for serialization, also include
++    // reloc info for serialization for the new code, so that deopt support
++    // can be added without losing IC state.
++    if (shared->code()->kind() == Code::FUNCTION &&
++        shared->code()->has_reloc_info_for_serialization()) {
++      unoptimized.PrepareForSerializing();
++    }
+     bool succeeded = FullCodeGenerator::MakeCode(&unoptimized);
+     if (should_recompile) {
+       if (!succeeded) return SetLastStatus(FAILED);
+diff --git a/src/flag-definitions.h b/src/flag-definitions.h
+index 535dcd2..0d7363e 100644
+--- node/deps/v8/src/flag-definitions.h
++++ node/deps/v8/src/flag-definitions.h
+@@ -427,7 +427,8 @@
+ DEFINE_BOOL(trace_stub_failures, false,
+             "trace deoptimization of generated code stubs")
+ 
+-DEFINE_BOOL(serialize_toplevel, false, "enable caching of toplevel scripts")
++DEFINE_BOOL(serialize_toplevel, true, "enable caching of toplevel scripts")
++DEFINE_BOOL(serialize_inner, true, "enable caching of inner functions")
+ DEFINE_BOOL(trace_code_serializer, false, "trace code serializer")
+ 
+ // compiler.cc
+diff --git a/src/full-codegen.cc b/src/full-codegen.cc
+index e32c59f..cb8f4aa 100644
+--- node/deps/v8/src/full-codegen.cc
++++ node/deps/v8/src/full-codegen.cc
+@@ -321,6 +321,7 @@
+   cgen.PopulateDeoptimizationData(code);
+   cgen.PopulateTypeFeedbackInfo(code);
+   code->set_has_deoptimization_support(info->HasDeoptimizationSupport());
++  code->set_has_reloc_info_for_serialization(info->will_serialize());
+   code->set_handler_table(*cgen.handler_table());
+   code->set_compiled_optimizable(info->IsOptimizable());
+   code->set_allow_osr_at_loop_nesting_level(0);
+diff --git a/src/objects-inl.h b/src/objects-inl.h
+index 3dd6fed..108f9f6 100644
+--- node/deps/v8/src/objects-inl.h
++++ node/deps/v8/src/objects-inl.h
+@@ -4794,6 +4794,21 @@
+ }
+ 
+ 
++bool Code::has_reloc_info_for_serialization() {
++  DCHECK_EQ(FUNCTION, kind());
++  byte flags = READ_BYTE_FIELD(this, kFullCodeFlags);
++  return FullCodeFlagsHasRelocInfoForSerialization::decode(flags);
++}
++
++
++void Code::set_has_reloc_info_for_serialization(bool value) {
++  DCHECK_EQ(FUNCTION, kind());
++  byte flags = READ_BYTE_FIELD(this, kFullCodeFlags);
++  flags = FullCodeFlagsHasRelocInfoForSerialization::update(flags, value);
++  WRITE_BYTE_FIELD(this, kFullCodeFlags, flags);
++}
++
++
+ int Code::allow_osr_at_loop_nesting_level() {
+   DCHECK_EQ(FUNCTION, kind());
+   int fields = READ_UINT32_FIELD(this, kKindSpecificFlags2Offset);
+diff --git a/src/objects.h b/src/objects.h
+index 678dcb2..9569de9 100644
+--- node/deps/v8/src/objects.h
++++ node/deps/v8/src/objects.h
+@@ -5597,6 +5597,12 @@
+   inline bool is_compiled_optimizable();
+   inline void set_compiled_optimizable(bool value);
+ 
++  // [has_reloc_info_for_serialization]: For FUNCTION kind, tells if its
++  // reloc info includes runtime and external references to support
++  // serialization/deserialization.
++  inline bool has_reloc_info_for_serialization();
++  inline void set_has_reloc_info_for_serialization(bool value);
++
+   // [allow_osr_at_loop_nesting_level]: For FUNCTION kind, tells for
+   // how long the function has been marked for OSR and therefore which
+   // level of loop nesting we are willing to do on-stack replacement
+@@ -5873,6 +5879,8 @@
+       public BitField<bool, 0, 1> {};  // NOLINT
+   class FullCodeFlagsHasDebugBreakSlotsField: public BitField<bool, 1, 1> {};
+   class FullCodeFlagsIsCompiledOptimizable: public BitField<bool, 2, 1> {};
++  class FullCodeFlagsHasRelocInfoForSerialization
++      : public BitField<bool, 3, 1> {};
+ 
+   static const int kProfilerTicksOffset = kFullCodeFlags + 1;
+ 

@@ -1,0 +1,38 @@
+commit 33dc53f9cc709862de641d32c9a412cf7cfce953
+Author: yangguo@chromium.org <yangguo@chromium.org>
+Date:   Mon Oct 13 07:50:21 2014 +0000
+
+    Always include full reloc info to stubs for serialization.
+    
+    R=mvstanton@chromium.org
+    
+    Review URL: https://codereview.chromium.org/641643006
+    
+    git-svn-id: https://v8.googlecode.com/svn/branches/bleeding_edge@24543 ce2b1a6d-e550-0410-aec6-3dcde31c8c00
+
+diff --git a/src/code-stubs-hydrogen.cc b/src/code-stubs-hydrogen.cc
+index 80fff3f..63488dc 100644
+--- node/deps/v8/src/code-stubs-hydrogen.cc
++++ node/deps/v8/src/code-stubs-hydrogen.cc
+@@ -233,6 +233,8 @@ Handle<Code> HydrogenCodeStub::GenerateLightweightMissCode(
+ 
+     // Generate the code for the stub.
+     masm.set_generating_stub(true);
++    // TODO(yangguo): remove this once we can serialize IC stubs.
++    masm.enable_serializer();
+     NoCurrentFrameScope scope(&masm);
+     GenerateLightweightMiss(&masm, miss);
+   }
+diff --git a/src/code-stubs.cc b/src/code-stubs.cc
+index 357324b..9832650 100644
+--- node/deps/v8/src/code-stubs.cc
++++ node/deps/v8/src/code-stubs.cc
+@@ -111,6 +111,8 @@ Handle<Code> PlatformCodeStub::GenerateCode() {
+ 
+     // Generate the code for the stub.
+     masm.set_generating_stub(true);
++    // TODO(yangguo): remove this once we can serialize IC stubs.
++    masm.enable_serializer();
+     NoCurrentFrameScope scope(&masm);
+     Generate(&masm);
+   }

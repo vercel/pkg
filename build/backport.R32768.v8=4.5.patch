@@ -1,0 +1,272 @@
+commit eb67f85439dcc273501e9fba5a9e883585505aa8
+Author: adamk <adamk@chromium.org>
+Date:   Thu Dec 10 11:18:54 2015 -0800
+
+    Fix FuncNameInferrer usage in ParseAssignmentExpression
+    
+    Without this fix, AssignmentExpressions that happen to be arrow functions
+    would lead to unbalanced Enter/Leave calls on the fni_, causing thrashing
+    while trying to infer function names. Symptoms include slow parsing
+    or OOM (when we create too many AstConsStrings).
+    
+    To try to keep this from happening in the future, added an RAII helper
+    class to handle Entering/Leaving FNI state.
+    
+    The included regression test crashes on my workstation without the patch.
+    Note that it's too slow in debug mode (as well as under TurboFan),
+    so I've skipped it there.
+    
+    BUG=v8:4595
+    LOG=y
+    
+    Review URL: https://codereview.chromium.org/1507283003
+    
+    Cr-Commit-Position: refs/heads/master@{#32768}
+
+diff --git a/src/func-name-inferrer.h b/src/func-name-inferrer.h
+index 8b077f9..1be6332 100644
+--- node/deps/v8/src/func-name-inferrer.h
++++ node/deps/v8/src/func-name-inferrer.h
+@@ -28,21 +28,33 @@ class FunctionLiteral;
+ // a name.
+ class FuncNameInferrer : public ZoneObject {
+  public:
+   FuncNameInferrer(AstValueFactory* ast_value_factory, Zone* zone);
+ 
++  // To enter function name inference state, put a FuncNameInferrer::State
++  // on the stack.
++  class State {
++   public:
++    explicit State(FuncNameInferrer* fni) : fni_(fni) {
++      if (fni_ != nullptr) fni_->Enter();
++    }
++    ~State() {
++      if (fni_ != nullptr) fni_->Leave();
++    }
++
++   private:
++    FuncNameInferrer* fni_;
++
++    DISALLOW_COPY_AND_ASSIGN(State);
++  };
++
+   // Returns whether we have entered name collection state.
+   bool IsOpen() const { return !entries_stack_.is_empty(); }
+ 
+   // Pushes an enclosing the name of enclosing function onto names stack.
+   void PushEnclosingName(const AstRawString* name);
+ 
+-  // Enters name collection state.
+-  void Enter() {
+-    entries_stack_.Add(names_stack_.length(), zone());
+-  }
+-
+   // Pushes an encountered name onto names stack when in collection state.
+   void PushLiteralName(const AstRawString* name);
+ 
+   void PushVariableName(const AstRawString* name);
+ 
+@@ -65,18 +77,10 @@ class FuncNameInferrer : public ZoneObject {
+     if (!funcs_to_infer_.is_empty()) {
+       InferFunctionsNames();
+     }
+   }
+ 
+-  // Leaves names collection state.
+-  void Leave() {
+-    DCHECK(IsOpen());
+-    names_stack_.Rewind(entries_stack_.RemoveLast());
+-    if (entries_stack_.is_empty())
+-      funcs_to_infer_.Clear();
+-  }
+-
+  private:
+   enum NameType {
+     kEnclosingConstructorName,
+     kLiteralName,
+     kVariableName
+@@ -85,10 +89,18 @@ class FuncNameInferrer : public ZoneObject {
+     Name(const AstRawString* name, NameType type) : name(name), type(type) {}
+     const AstRawString* name;
+     NameType type;
+   };
+ 
++  void Enter() { entries_stack_.Add(names_stack_.length(), zone()); }
++
++  void Leave() {
++    DCHECK(IsOpen());
++    names_stack_.Rewind(entries_stack_.RemoveLast());
++    if (entries_stack_.is_empty()) funcs_to_infer_.Clear();
++  }
++
+   Zone* zone() const { return zone_; }
+ 
+   // Constructs a full name in dotted notation from gathered names.
+   const AstString* MakeNameFromStack();
+ 
+diff --git a/src/parser.cc b/src/parser.cc
+index aa0ec10..b09286b 100644
+--- node/deps/v8/src/parser.cc
++++ node/deps/v8/src/parser.cc
+@@ -2466,11 +2466,11 @@ void Parser::ParseVariableDeclarations(VariableDeclarationContext var_context,
+ 
+   bool first_declaration = true;
+   int bindings_start = peek_position();
+   bool is_for_iteration_variable;
+   do {
+-    if (fni_ != NULL) fni_->Enter();
++    FuncNameInferrer::State fni_state(fni_);
+ 
+     // Parse name.
+     if (!first_declaration) Consume(Token::COMMA);
+ 
+     Expression* pattern;
+@@ -2541,11 +2541,10 @@ void Parser::ParseVariableDeclarations(VariableDeclarationContext var_context,
+     // Make sure that 'const x' and 'let x' initialize 'x' to undefined.
+     if (value == NULL && parsing_result->descriptor.needs_init) {
+       value = GetLiteralUndefined(position());
+     }
+ 
+-    if (single_name && fni_ != NULL) fni_->Leave();
+     parsing_result->declarations.Add(DeclarationParsingResult::Declaration(
+         pattern, initializer_position, value));
+     first_declaration = false;
+   } while (peek() == Token::COMMA);
+ 
+@@ -4504,11 +4503,11 @@ ClassLiteral* Parser::ParseClassLiteral(const AstRawString* name,
+   Expect(Token::LBRACE, CHECK_OK);
+ 
+   const bool has_extends = extends != nullptr;
+   while (peek() != Token::RBRACE) {
+     if (Check(Token::SEMICOLON)) continue;
+-    if (fni_ != NULL) fni_->Enter();
++    FuncNameInferrer::State fni_state(fni_);
+     const bool in_class = true;
+     const bool is_static = false;
+     bool is_computed_name = false;  // Classes do not care about computed
+                                     // property names here.
+     ExpressionClassifier classifier;
+@@ -4522,14 +4521,11 @@ ClassLiteral* Parser::ParseClassLiteral(const AstRawString* name,
+       DCHECK_NOT_NULL(constructor);
+     } else {
+       properties->Add(property, zone());
+     }
+ 
+-    if (fni_ != NULL) {
+-      fni_->Infer();
+-      fni_->Leave();
+-    }
++    if (fni_ != NULL) fni_->Infer();
+   }
+ 
+   Expect(Token::RBRACE, CHECK_OK);
+   int end_pos = scanner()->location().end_pos;
+ 
+diff --git a/src/preparser.h b/src/preparser.h
+index d9ef1ea..4141cd6 100644
+--- node/deps/v8/src/preparser.h
++++ node/deps/v8/src/preparser.h
+@@ -2646,11 +2646,11 @@ typename ParserBase<Traits>::ExpressionT ParserBase<Traits>::ParseObjectLiteral(
+   ObjectLiteralChecker checker(this);
+ 
+   Expect(Token::LBRACE, CHECK_OK);
+ 
+   while (peek() != Token::RBRACE) {
+-    if (fni_ != nullptr) fni_->Enter();
++    FuncNameInferrer::State fni_state(fni_);
+ 
+     const bool in_class = false;
+     const bool is_static = false;
+     const bool has_extends = false;
+     bool is_computed_name = false;
+@@ -2677,14 +2677,11 @@ typename ParserBase<Traits>::ExpressionT ParserBase<Traits>::ParseObjectLiteral(
+     if (peek() != Token::RBRACE) {
+       // Need {} because of the CHECK_OK macro.
+       Expect(Token::COMMA, CHECK_OK);
+     }
+ 
+-    if (fni_ != nullptr) {
+-      fni_->Infer();
+-      fni_->Leave();
+-    }
++    if (fni_ != nullptr) fni_->Infer();
+   }
+   Expect(Token::RBRACE, CHECK_OK);
+ 
+   // Computation of literal_index must happen before pre parse bailout.
+   int literal_index = function_state_->NextMaterializedLiteralIndex();
+@@ -2781,11 +2778,11 @@ ParserBase<Traits>::ParseAssignmentExpression(bool accept_IN,
+ 
+   if (peek() == Token::YIELD && is_generator()) {
+     return this->ParseYieldExpression(classifier, ok);
+   }
+ 
+-  if (fni_ != NULL) fni_->Enter();
++  FuncNameInferrer::State fni_state(fni_);
+   ParserBase<Traits>::Checkpoint checkpoint(this);
+   ExpressionClassifier arrow_formals_classifier(classifier->duplicate_finder());
+   bool parenthesized_formals = peek() == Token::LPAREN;
+   if (!parenthesized_formals) {
+     ArrowFormalParametersUnexpectedToken(&arrow_formals_classifier);
+@@ -2811,21 +2808,23 @@ ParserBase<Traits>::ParseAssignmentExpression(bool accept_IN,
+       arrow_formals_classifier.RecordDuplicateFormalParameterError(
+           duplicate_loc);
+     }
+     expression = this->ParseArrowFunctionLiteral(
+         parsing_state, arrow_formals_classifier, CHECK_OK);
++
++    if (fni_ != nullptr) fni_->Infer();
++
+     return expression;
+   }
+ 
+   // "expression" was not itself an arrow function parameter list, but it might
+   // form part of one.  Propagate speculative formal parameter error locations.
+   classifier->Accumulate(arrow_formals_classifier,
+                          ExpressionClassifier::StandardProductions |
+                              ExpressionClassifier::FormalParametersProductions);
+ 
+   if (!Token::IsAssignmentOp(peek())) {
+-    if (fni_ != NULL) fni_->Leave();
+     // Parsed conditional expression only (no assignment).
+     return expression;
+   }
+ 
+   if (!allow_harmony_destructuring()) {
+@@ -2871,11 +2870,10 @@ ParserBase<Traits>::ParseAssignmentExpression(bool accept_IN,
+         && (!right->IsCall() && !right->IsCallNew())) {
+       fni_->Infer();
+     } else {
+       fni_->RemoveLastFunction();
+     }
+-    fni_->Leave();
+   }
+ 
+   return factory()->NewAssignment(op, expression, right, pos);
+ }
+ 
+@@ -3324,11 +3322,11 @@ ParserBase<Traits>::ParseStrongInitializationExpression(
+     ExpressionClassifier* classifier, bool* ok) {
+   // InitializationExpression ::  (strong mode)
+   //  'this' '.' IdentifierName '=' AssignmentExpression
+   //  'this' '[' Expression ']' '=' AssignmentExpression
+ 
+-  if (fni_ != NULL) fni_->Enter();
++  FuncNameInferrer::State fni_state(fni_);
+ 
+   Consume(Token::THIS);
+   int pos = position();
+   function_state_->set_this_location(scanner()->location());
+   ExpressionT this_expr = this->ThisExpression(scope_, factory(), pos);
+@@ -3383,11 +3381,10 @@ ParserBase<Traits>::ParseStrongInitializationExpression(
+     if (!right->IsCall() && !right->IsCallNew()) {
+       fni_->Infer();
+     } else {
+       fni_->RemoveLastFunction();
+     }
+-    fni_->Leave();
+   }
+ 
+   if (function_state_->return_location().IsValid()) {
+     ReportMessageAt(function_state_->return_location(),
+                     MessageTemplate::kStrongConstructorReturnMisplaced);

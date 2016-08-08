@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <script src="checklist.js"></script>
+</head><body>
+</body>
+<script>
+
+  var add = "<table>";
+  var columns = [];
+  add = add + "<tr>";
+  add = add + "<td></td>";
+
+  Object.keys(table).forEach(function(row_key) {
+    var row = table[row_key];
+    Object.keys(row).forEach(function(cell_key) {
+      if (columns.indexOf(cell_key) < 0) {
+        var narrow = cell_key.replace(/\//g, "<br>")
+          .replace(/win32/g, "win")
+          .replace(/linux/g, "lnx")
+          .replace(/darwin/g, "dwn");
+        add = add + "<td>" + narrow + "</td>";
+        columns.push(cell_key);
+      }
+    });
+  });
+
+  add = add + "</tr>";
+
+  Object.keys(table).forEach(function(row_key) {
+    var row = table[row_key];
+    add = add + "<tr>";
+    add = add + "<td>" + row_key + "</td>";
+    columns.forEach(function(column) {
+      var cell = row[column];
+      if (typeof cell === "undefined") cell = "n/a";
+      cell = cell.split(",")[0];
+      cell = cell.replace(/error/g, "err");
+      var bcolor = "red"; var fcolor = "white";
+      if (cell === "ok") bcolor = "green";
+      if (cell === "nop") bcolor = "blue";
+      if (cell === "n/a") { cell = "n/a"; bcolor = "white"; fcolor = "black"; }
+      var style = "background-color:" + bcolor;
+      style = style + ";color:" + fcolor;
+      add = add + "<td style='" + style + "'>" + cell + "</td>";
+    });
+    add = add + "</tr>";
+  });
+
+  add = add + "</table>";
+  document.body.innerHTML = add;
+
+</script>

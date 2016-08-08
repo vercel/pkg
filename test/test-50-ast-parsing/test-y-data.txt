@@ -1,0 +1,152 @@
+function helluu(a, b, c) {
+
+        require.resolve();
+  /***/ require.resolve("barbos1");
+  /***/ require.resolve("barbos1", "dont-enclose1");
+  /***/ require.resolve("barbos1", "can-ignore1");
+  /***/ require.resolve("barbos1", "unknown1");
+
+        require();
+  /***/ require("barbos2");
+  /***/ require("barbos2", "dont-enclose2");
+  /***/ require("barbos2", "can-ignore2");
+  /***/ require("barbos2", "unknown2");
+
+        path.join();
+        path.join(__dirname);
+  /***/ path.join(__dirname, "file");
+
+  // TODO path.join(__dirname + "/file");
+
+  return {
+    result: a + b - c
+  };
+
+}
+
+function hellee(a, b, c) {
+
+  return {
+    result: function() {
+
+      var require = {};
+      var path = {};
+
+            require.resolve();
+      /***/ require.resolve("barbos1");
+      /***/ require.resolve("barbos1", "dont-enclose1");
+      /***/ require.resolve("barbos1", "can-ignore1");
+      /***/ require.resolve("barbos1", "unknown1");
+
+            require();
+      /***/ require("barbos2");
+      /***/ require("barbos2", "dont-enclose2");
+      /***/ require("barbos2", "can-ignore2");
+      /***/ require("barbos2", "unknown2");
+
+            path.join();
+            path.join(__dirname);
+      /***/ path.join(__dirname, "file");
+
+      // TODO path.join(__dirname + "/file");
+
+      return {
+        result: a + b - c
+      };
+
+    }
+  }
+
+}
+
+function helluuTry(a, b, c) {
+
+        try { require.resolve(); } catch (_) {}
+  /***/ try { require.resolve("barbos1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "dont-enclose1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "can-ignore1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
+
+        try { require(); } catch (_) {}
+  /***/ try { require("barbos2"); } catch (_) {}
+  /***/ try { require("barbos2", "dont-enclose2"); } catch (_) {}
+  /***/ try { require("barbos2", "can-ignore2"); } catch (_) {}
+  /***/ try { require("barbos2", "unknown2"); } catch (_) {}
+
+        try { path.join(); } catch (_) {}
+        try { path.join(__dirname); } catch (_) {}
+  /***/ try { path.join(__dirname, "file"); } catch (_) {}
+
+  // TODO path.join(__dirname + "/file");
+
+  return {
+    result: a + b - c
+  };
+
+}
+
+function helleeTry(a, b, c) {
+
+  return {
+    result: function() {
+
+      var require = {};
+      var path = {};
+
+            try { require.resolve(); } catch (_) {}
+      /***/ try { require.resolve("barbos1"); } catch (_) {}
+      /***/ try { require.resolve("barbos1", "dont-enclose1"); } catch (_) {}
+      /***/ try { require.resolve("barbos1", "can-ignore1"); } catch (_) {}
+      /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
+
+            try { require(); } catch (_) {}
+      /***/ try { require("barbos2"); } catch (_) {}
+      /***/ try { require("barbos2", "dont-enclose2"); } catch (_) {}
+      /***/ try { require("barbos2", "can-ignore2"); } catch (_) {}
+      /***/ try { require("barbos2", "unknown2"); } catch (_) {}
+
+            try { path.join(); } catch (_) {}
+            try { path.join(__dirname); } catch (_) {}
+      /***/ try { path.join(__dirname, "file"); } catch (_) {}
+
+      // TODO path.join(__dirname + "/file");
+
+      return {
+        result: a + b - c
+      };
+
+    }
+  }
+
+}
+
+console.log(
+  helluu(1, 2, 3).result,
+  hellee(4, 5, 6).result
+);
+
+var inheritedDataKeys = (function() {
+  var obj = {};
+  function hasProp(o, k) {
+    return true;
+  }
+  enumeration: for (var key in obj) {
+    if (!hasProp.call(obj, key)) {
+      continue enumeration;
+    }
+  }
+})();
+
+var INFINITY = 1 / 0;
+var NEGATIVE_INFINITY = -1 / 0;
+
+var group_names = [
+  , 'whitespace' // INTENTIONAL COMMA!
+  , 'terminator'
+  , 'string'
+  , 'comment'
+  , 'identifier'
+  , 'preprocess'
+  , 'operator'
+  , 'invalid'
+];

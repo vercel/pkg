@@ -1,0 +1,3 @@
+module.exports = {
+  what: "test-y-resolve.any.body"
+};

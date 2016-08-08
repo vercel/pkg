@@ -1,0 +1,217 @@
+commit 3a3d5e741a4329641fa45f7293220e8dfd7a8f15
+Author: yangguo@chromium.org <yangguo@chromium.org>
+Date:   Fri Oct 31 14:43:21 2014 +0000
+
+    Break allocations in the code serializer into correct chunk sizes.
+    
+    This change has been inspired by Slava Chigrin <vchigrin@yandex-team.ru> (https://codereview.chromium.org/689663002/)
+    
+    R=mvstanton@chromium.org, vchigrin@yandex-team.ru
+    
+    Review URL: https://codereview.chromium.org/686103004
+    
+    Cr-Commit-Position: refs/heads/master@{#25039}
+    git-svn-id: https://v8.googlecode.com/svn/branches/bleeding_edge@25039 ce2b1a6d-e550-0410-aec6-3dcde31c8c00
+
+diff --git a/src/heap/heap.cc b/src/heap/heap.cc
+index 94c8937..93e00d2 100644
+--- node/deps/v8/src/heap/heap.cc
++++ node/deps/v8/src/heap/heap.cc
+@@ -939,6 +939,8 @@ bool Heap::ReserveSpace(Reservation* reservations) {
+         for (auto& chunk : *reservation) {
+           AllocationResult allocation;
+           int size = chunk.size;
++          DCHECK_LE(size, MemoryAllocator::PageAreaSize(
++                              static_cast<AllocationSpace>(space)));
+           if (space == NEW_SPACE) {
+             allocation = new_space()->AllocateRaw(size);
+           } else {
+diff --git a/src/heap/spaces.cc b/src/heap/spaces.cc
+index 85281aa..430f31d 100644
+--- node/deps/v8/src/heap/spaces.cc
++++ node/deps/v8/src/heap/spaces.cc
+@@ -892,19 +892,15 @@ void MemoryChunk::IncrementLiveBytesFromMutator(Address address, int by) {
+ // -----------------------------------------------------------------------------
+ // PagedSpace implementation
+ 
+-PagedSpace::PagedSpace(Heap* heap, intptr_t max_capacity, AllocationSpace id,
++PagedSpace::PagedSpace(Heap* heap, intptr_t max_capacity, AllocationSpace space,
+                        Executability executable)
+-    : Space(heap, id, executable),
++    : Space(heap, space, executable),
+       free_list_(this),
+       swept_precisely_(true),
+       unswept_free_bytes_(0),
+       end_of_unswept_pages_(NULL),
+       emergency_memory_(NULL) {
+-  if (id == CODE_SPACE) {
+-    area_size_ = heap->isolate()->memory_allocator()->CodePageAreaSize();
+-  } else {
+-    area_size_ = Page::kPageSize - Page::kObjectStartOffset;
+-  }
++  area_size_ = MemoryAllocator::PageAreaSize(space);
+   max_capacity_ =
+       (RoundDown(max_capacity, Page::kPageSize) / Page::kPageSize) * AreaSize();
+   accounting_stats_.Clear();
+diff --git a/src/heap/spaces.h b/src/heap/spaces.h
+index 5be9c3a..1944464 100644
+--- node/deps/v8/src/heap/spaces.h
++++ node/deps/v8/src/heap/spaces.h
+@@ -1104,6 +1104,12 @@ class MemoryAllocator {
+     return CodePageAreaEndOffset() - CodePageAreaStartOffset();
+   }
+ 
++  static int PageAreaSize(AllocationSpace space) {
++    DCHECK_NE(LO_SPACE, space);
++    return (space == CODE_SPACE) ? CodePageAreaSize()
++                                 : Page::kMaxRegularHeapObjectSize;
++  }
++
+   MUST_USE_RESULT bool CommitExecutableMemory(base::VirtualMemory* vm,
+                                               Address start, size_t commit_size,
+                                               size_t reserved_size);
+diff --git a/src/serialize.cc b/src/serialize.cc
+index 86045d3..df62adb 100644
+--- node/deps/v8/src/serialize.cc
++++ node/deps/v8/src/serialize.cc
+@@ -1258,10 +1258,15 @@ Serializer::Serializer(Isolate* isolate, SnapshotByteSink* sink)
+       external_reference_encoder_(new ExternalReferenceEncoder(isolate)),
+       root_index_map_(isolate),
+       code_address_map_(NULL),
++      large_objects_total_size_(0),
+       seen_large_objects_index_(0) {
+   // The serializer is meant to be used only to generate initial heap images
+   // from a context in which there is only one isolate.
+-  for (int i = 0; i < kNumberOfSpaces; i++) pending_chunk_[i] = 0;
++  for (int i = 0; i < kNumberOfPreallocatedSpaces; i++) {
++    pending_chunk_[i] = 0;
++    max_chunk_size_[i] = static_cast<uint32_t>(
++        MemoryAllocator::PageAreaSize(static_cast<AllocationSpace>(i)));
++  }
+ }
+ 
+ 
+@@ -1336,8 +1341,7 @@ void Serializer::VisitPointers(Object** start, Object** end) {
+ 
+ 
+ void Serializer::FinalizeAllocation() {
+-  DCHECK_EQ(0, completed_chunks_[LO_SPACE].length());  // Not yet finalized.
+-  for (int i = 0; i < kNumberOfSpaces; i++) {
++  for (int i = 0; i < kNumberOfPreallocatedSpaces; i++) {
+     // Complete the last pending chunk and if there are no completed chunks,
+     // make sure there is at least one empty chunk.
+     if (pending_chunk_[i] > 0 || completed_chunks_[i].length() == 0) {
+@@ -1906,17 +1910,17 @@ AllocationSpace Serializer::SpaceOfObject(HeapObject* object) {
+ uint32_t Serializer::AllocateLargeObject(int size) {
+   // Large objects are allocated one-by-one when deserializing. We do not
+   // have to keep track of multiple chunks.
+-  pending_chunk_[LO_SPACE] += size;
++  large_objects_total_size_ += size;
+   return seen_large_objects_index_++;
+ }
+ 
+ 
+ uint32_t Serializer::Allocate(int space, int size) {
+   CHECK(space >= 0 && space < kNumberOfPreallocatedSpaces);
+-  DCHECK(size > 0 && size <= Page::kMaxRegularHeapObjectSize);
++  DCHECK(size > 0 && size <= static_cast<int>(max_chunk_size(space)));
+   uint32_t new_chunk_size = pending_chunk_[space] + size;
+   uint32_t allocation;
+-  if (new_chunk_size > static_cast<uint32_t>(Page::kMaxRegularHeapObjectSize)) {
++  if (new_chunk_size > max_chunk_size(space)) {
+     // The new chunk size would not fit onto a single page. Complete the
+     // current chunk and start a new one.
+     completed_chunks_[space].Add(pending_chunk_[space]);
+@@ -1929,15 +1933,6 @@ BackReference Serializer::Allocate(AllocationSpace space, int size) {
+ }
+ 
+ 
+-int Serializer::SpaceAreaSize(int space) {
+-  if (space == CODE_SPACE) {
+-    return isolate_->memory_allocator()->CodePageAreaSize();
+-  } else {
+-    return Page::kPageSize - Page::kObjectStartOffset;
+-  }
+-}
+-
+-
+ void Serializer::Pad() {
+   // The non-branching GetInt will read up to 3 bytes too far, so we need
+   // to pad the snapshot to make sure we don't read over the end.
+@@ -2273,9 +2268,6 @@ SerializedCodeData::SerializedCodeData(const List<byte>& payload,
+   for (int i = 0; i < SerializerDeserializer::kNumberOfSpaces; i++) {
+     Vector<const uint32_t> chunks = cs->FinalAllocationChunks(i);
+     for (int j = 0; j < chunks.length(); j++) {
+-      DCHECK(i == LO_SPACE ||
+-             chunks[j] <=
+-                 static_cast<uint32_t>(Page::kMaxRegularHeapObjectSize));
+       uint32_t chunk = ChunkSizeBits::encode(chunks[j]) |
+                        IsLastChunkBits::encode(j == chunks.length() - 1);
+       reservations.Add(chunk);
+diff --git a/src/serialize.h b/src/serialize.h
+index 2aa55ea..9c56118 100644
+--- node/deps/v8/src/serialize.h
++++ node/deps/v8/src/serialize.h
+@@ -404,8 +404,6 @@ class Deserializer: public SerializerDeserializer {
+   void AddReservation(int space, uint32_t chunk) {
+     DCHECK(space >= 0);
+     DCHECK(space < kNumberOfSpaces);
+-    DCHECK(space == LO_SPACE ||
+-           chunk <= static_cast<uint32_t>(Page::kMaxRegularHeapObjectSize));
+     Heap::Chunk c = { chunk, NULL, NULL }; reservations_[space].Add(c);
+   }
+ 
+@@ -498,9 +496,12 @@ class Serializer : public SerializerDeserializer {
+   void FinalizeAllocation();
+ 
+   Vector<const uint32_t> FinalAllocationChunks(int space) const {
+-    DCHECK_EQ(1, completed_chunks_[LO_SPACE].length());  // Already finalized.
+-    DCHECK_EQ(0, pending_chunk_[space]);                 // No pending chunks.
+-    return completed_chunks_[space].ToConstVector();
++    if (space == LO_SPACE) {
++      return Vector<const uint32_t>(&large_objects_total_size_, 1);
++    } else {
++      DCHECK_EQ(0, pending_chunk_[space]);  // No pending chunks.
++      return completed_chunks_[space].ToConstVector();
++    }
+   }
+ 
+   Isolate* isolate() const { return isolate_; }
+@@ -496,20 +496,25 @@
+     return external_reference_encoder_->Encode(addr);
+   }
+ 
+-  int SpaceAreaSize(int space);
+-
+   // Some roots should not be serialized, because their actual value depends on
+   // absolute addresses and they are reset after deserialization, anyway.
+   bool ShouldBeSkipped(Object** current);
+ 
++  uint32_t max_chunk_size(int space) const {
++    DCHECK_LE(0, space);
++    DCHECK_LT(space, kNumberOfSpaces);
++    return max_chunk_size_[space];
++  }
++
+   Isolate* isolate_;
+ 
+   // Objects from the same space are put into chunks for bulk-allocation
+   // when deserializing. We have to make sure that each chunk fits into a
+   // page. So we track the chunk size in pending_chunk_ of a space, but
+   // when it exceeds a page, we complete the current chunk and start a new one.
+-  uint32_t pending_chunk_[kNumberOfSpaces];
+-  List<uint32_t> completed_chunks_[kNumberOfSpaces];
++  uint32_t pending_chunk_[kNumberOfPreallocatedSpaces];
++  List<uint32_t> completed_chunks_[kNumberOfPreallocatedSpaces];
++  uint32_t max_chunk_size_[kNumberOfPreallocatedSpaces];
+ 
+   SnapshotByteSink* sink_;
+   ExternalReferenceEncoder* external_reference_encoder_;
+@@ -529,6 +534,7 @@
+   CodeAddressMap* code_address_map_;
+   // We map serialized large objects to indexes for back-referencing.
+   uint32_t seen_large_objects_index_;
++  uint32_t large_objects_total_size_;
+   DISALLOW_COPY_AND_ASSIGN(Serializer);
+ };
+ 

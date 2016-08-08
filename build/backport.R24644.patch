@@ -1,0 +1,29 @@
+commit 8949d5f58002c5d058064e9047a6247119e725bf
+Author: jkummerow@chromium.org <jkummerow@chromium.org>
+Date:   Wed Oct 15 15:04:09 2014 +0000
+
+    Fix compilation some more after r24639
+    
+    Third time's a charm...
+    
+    TBR=yangguo@chromium.org
+    
+    Review URL: https://codereview.chromium.org/655223003
+    
+    git-svn-id: https://v8.googlecode.com/svn/branches/bleeding_edge@24644 ce2b1a6d-e550-0410-aec6-3dcde31c8c00
+
+diff --git a/src/serialize.cc b/src/serialize.cc
+index b980940..4933a19 100644
+--- node/deps/v8/src/serialize.cc
++++ node/deps/v8/src/serialize.cc
+@@ -2213,7 +2213,9 @@ SerializedCodeData::SerializedCodeData(List<byte>* payload, CodeSerializer* cs)
+   for (int i = 0; i < SerializerDeserializer::kNumberOfSpaces; i++) {
+     Vector<const uint32_t> chunks = cs->FinalAllocationChunks(i);
+     for (int j = 0; j < chunks.length(); j++) {
+-      DCHECK(i == LO_SPACE || chunks[j] < Page::kMaxRegularHeapObjectSize);
++      DCHECK(i == LO_SPACE ||
++             chunks[j] <
++                 static_cast<uint32_t>(Page::kMaxRegularHeapObjectSize));
+       uint32_t chunk = ChunkSizeBits::encode(chunks[j]) |
+                        IsLastChunkBits::encode(j == chunks.length() - 1);
+       reservations.Add(chunk);

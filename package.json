@@ -1,0 +1,27 @@
+{
+  "bin": "./bin/enclose.js",
+  "main": "./bin/enclose.js",
+  "version": "9.9.9",
+  "private": true,
+  "dependencies": {
+    "async": "^1.5.2",
+    "chalk": "^1.1.1",
+    "globby": "^4.0.0",
+    "minimatch": "^3.0.0",
+    "mkdirp": "^0.5.1",
+    "optionator": "^0.8.1",
+    "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4",
+    "rimraf": "^2.5.0",
+    "sha.js": "^2.4.4"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.2.30",
+    "enclose-eslint": "igorklopov/enclose-eslint#5edac6a3e469a768711a89a7b6dece705d450a4d",
+    "json-stable-stringify": "^1.0.1"
+  },
+  "scripts": {
+    "build": "cd build && node 90-BATCH-BUILD.js",
+    "build-all": "cd build && node 90-BATCH-BUILD.js all",
+    "lint": "node lint.js"
+  }
+}

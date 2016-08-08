@@ -1,0 +1,84 @@
+#toggles {
+  padding: 10px;
+  width: 440px;
+  float: left;
+}
+/*#toggles ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+*/
+#toggles * {
+  cursor: pointer;
+}
+#vertical-badge {
+  width: 39px;
+  text-align: center;
+}
+#horizontal-badge {
+  width: 406px;
+  height: 65px;
+}
+#vertical-badge img {
+  /*margin-bottom: -2px;*/
+}
+#horizontal-badge img:not(:first-child) {
+  width: 32px;
+  height: 64px;
+}
+#vertical-badge img:not(:first-child) {
+  width: 38px;
+  height: 32px;
+  margin-top: -3px;
+}
+.badges {
+  /*margin: 0 10px 10px 10px;
+  padding: 10px;*/
+}
+.badges,
+#toggles li {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.badges img {
+  padding: 0;
+  margin: 0;
+  /*-webkit-transition: opacity 0.4s ease-in-out;*/
+}
+.badges img.hidden {
+  /*opacity: 0;*/
+  display: none;
+}
+/* The following selector does NOT work in Safari 5 */
+/*.badges img:not(:first-child):not(:last-child):hover {
+  opacity: 0.5;
+  cursor: pointer;
+}*/
+#badge-code {
+  font-family: "Courier New", Courier;
+  width: 440px;
+  height: 75px;
+  padding: 5px 10px;
+  outline: none;
+  margin-left: 24px;
+  background-color: #eee;
+  /*-webkit-box-shadow: 0 0 15px black inset;*/
+}
+#badge-builder ::-webkit-scrollbar {
+  width: 7px;
+  height: 5px;
+  background-color: #eee;
+}
+#badge-builder ::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0, 0.4);
+}
+#badge-builder ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0,0,0, 0.6);
+}
+
+#badge-builder-submit {
+	margin-left: 24px;
+	padding: 5px 10px;
+}

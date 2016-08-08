@@ -1,0 +1,8 @@
+/bin/binaries.json
+/bin/house*
+/bin/enclose*.exe
+/bin/enclose-*-linux-*
+/bin/enclose-*-darwin-*
+/build/node
+/node_modules
+/node_repository

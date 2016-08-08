@@ -1,0 +1,211 @@
+commit b324d0bb99045fcfe80397a978eb2ce29af4990f
+Author: igorklopov <igor@klopov.com>
+Date:   Mon Aug 17 11:31:50 2015 +0400
+
+    U2
+
+diff --git a/src/code-stubs.cc b/src/code-stubs.cc
+index 0e68ab8..92aca16 100644
+--- node/deps/v8/src/code-stubs.cc
++++ node/deps/v8/src/code-stubs.cc
+@@ -252,6 +252,172 @@ void CodeStub::PrintName(OStream& os) const {  // NOLINT
+ }
+ 
+ 
++void CheckCodeStub(CodeStub* pstub, CodeStub::Major MajorKey, int MinorKey) {
++  if (pstub->MajorKey() != MajorKey) fprintf(stderr, "MajorKey %d != %d in %s\n", pstub->MajorKey(), MajorKey, pstub->MajorName(MajorKey, false));
++  if (pstub->MinorKey() != MinorKey) fprintf(stderr, "MinorKey %d != %d in %s\n", pstub->MinorKey(), MinorKey, pstub->MajorName(MajorKey, false));
++  // if (pstub->MajorKey() == MajorKey) fprintf(stderr, "correct MajorKey in %s\n", pstub->MajorName(MajorKey, false));
++  // if (pstub->MinorKey() == MinorKey) fprintf(stderr, "correct MinorKey in %s\n", pstub->MajorName(MajorKey, false));
++}
++
++
++void CodeStub::Dispatch(Isolate* isolate, uint32_t key, void** value_out,
++                        DispatchedCall call) {
++  CodeStub::Major MajorKey = MajorKeyFromKey(key);
++  int MinorKey = MinorKeyFromKey(key);
++  switch (MajorKey) {
++    case CEntry: {
++      // int result = (save_doubles_ == kSaveFPRegs) ? 1 : 0;
++      int result_size = (MinorKey & 0x02) ? 2 : 1;
++      // return result | ((result_size_ == 1) ? 0 : 2);
++      SaveFPRegsMode save_doubles = (MinorKey & 0x01) ? kSaveFPRegs : kDontSaveFPRegs;
++      CEntryStub stub(isolate, result_size, save_doubles);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case CallConstruct: {
++      // int MinorKey() const { return flags_; }
++      CallConstructorFlags flags = (CallConstructorFlags) MinorKey;
++      CallConstructStub stub(isolate, flags);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case FastNewContext: {
++      // int NotMissMinorKey() const V8_OVERRIDE { return slots_; }
++      int slots = MinorKey;
++      FastNewContextStub stub(isolate, slots);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case FastNewClosure: {
++      // class StrictModeBits: public BitField<bool, 0, 1> {};
++      StrictMode strict_mode = (StrictMode) (MinorKey & 0x01);
++      // class IsGeneratorBits: public BitField<bool, 1, 1> {};
++      bool is_generator = MinorKey & 0x02;
++      FastNewClosureStub stub(isolate, strict_mode, is_generator);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case RecordWrite: {
++    #if V8_TARGET_ARCH_IA32
++      // class ObjectBits: public BitField<int, 0, 3> {};
++      Register object = Register::from_code(MinorKey & 0x07);
++      // class ValueBits: public BitField<int, 3, 3> {};
++      Register value = Register::from_code((MinorKey >> 3) & 0x07);
++      // class AddressBits: public BitField<int, 6, 3> {};
++      Register address = Register::from_code((MinorKey >> 6) & 0x07);
++      // class RememberedSetActionBits: public BitField<RememberedSetAction, 9, 1> {};
++      RememberedSetAction remembered_set_action = (RememberedSetAction) ((MinorKey >> 9) & 0x01);
++      // class SaveFPRegsModeBits: public BitField<SaveFPRegsMode, 10, 1> {};
++      SaveFPRegsMode fp_mode = (SaveFPRegsMode) ((MinorKey >> 10) & 0x01);
++      RecordWriteStub stub(isolate, object, value, address, remembered_set_action, fp_mode);
++    #endif
++    #if V8_TARGET_ARCH_X64
++      // class ObjectBits: public BitField<int, 0, 4> {};
++      Register object = Register::from_code(MinorKey & 0x0F);
++      // class ValueBits: public BitField<int, 4, 4> {};
++      Register value = Register::from_code((MinorKey >> 4) & 0x0F);
++      // class AddressBits: public BitField<int, 8, 4> {};
++      Register address = Register::from_code((MinorKey >> 8) & 0x0F);
++      // class RememberedSetActionBits: public BitField<RememberedSetAction, 12, 1> {};
++      RememberedSetAction remembered_set_action = (RememberedSetAction) ((MinorKey >> 12) & 0x01);
++      // class SaveFPRegsModeBits: public BitField<SaveFPRegsMode, 13, 1> {};
++      SaveFPRegsMode fp_mode = (SaveFPRegsMode) ((MinorKey >> 13) & 0x01);
++      RecordWriteStub stub(isolate, object, value, address, remembered_set_action, fp_mode);
++    #endif
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case ToNumber: {
++      ToNumberStub stub(isolate);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case ArgumentsAccess: {
++      // int MinorKey() const { return type_; }
++      ArgumentsAccessStub::Type type = (ArgumentsAccessStub::Type) MinorKey;
++      ArgumentsAccessStub stub(isolate, type);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case FastCloneShallowArray: {
++      // class AllocationSiteModeBits: public BitField<AllocationSiteMode, 0, 1> {};
++      AllocationSiteMode allocation_site_mode = (AllocationSiteMode) (MinorKey & 0x01);
++      FastCloneShallowArrayStub stub(isolate, allocation_site_mode);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case StoreArrayLiteralElement: {
++      StoreArrayLiteralElementStub stub(isolate);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case CallFunction: {
++      // class FlagBits: public BitField<CallFunctionFlags, 0, 2> {};
++      CallFunctionFlags flags = (CallFunctionFlags) (MinorKey & 0x03);
++      // class ArgcBits : public BitField<unsigned, 2, Code::kArgumentsBits> {};
++      unsigned argc = MinorKey >> 2;
++      CallFunctionStub stub(isolate, argc, flags);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case Instanceof: {
++      // int MinorKey() const { return static_cast<int>(flags_); }
++      InstanceofStub::Flags flags = (InstanceofStub::Flags) MinorKey;
++      InstanceofStub stub(isolate, flags);
++      CodeStub* pstub = &stub;
++      CheckCodeStub(pstub, MajorKey, MinorKey);
++      call(pstub, value_out);
++      break;
++    }
++    case NUMBER_OF_IDS:
++      UNREACHABLE();
++    case NoCache:
++      *value_out = NULL;
++      break;
++    default: {
++      fprintf(stderr, "unhandled MajorKey: %s (%d)\n", MajorName(MajorKey, false), MajorKey);
++      UNREACHABLE();
++    }
++  }
++}
++
++
++void CodeStub::GetCodeDispatchCall(CodeStub* stub, void** value_out) {
++  Handle<Code>* code_out = reinterpret_cast<Handle<Code>*>(value_out);
++  // Code stubs with special cache cannot be recreated from stub key.
++  *code_out = stub->UseSpecialCache() ? Handle<Code>() : stub->GetCode();
++}
++
++
++MaybeHandle<Code> CodeStub::GetCode(Isolate* isolate, uint32_t key) {
++  HandleScope scope(isolate);
++  Handle<Code> code;
++  void** value_out = reinterpret_cast<void**>(&code);
++  Dispatch(isolate, key, value_out, &GetCodeDispatchCall);
++  return scope.CloseAndEscape(code);
++}
++
++
+ // static
+ void BinaryOpICStub::GenerateAheadOfTime(Isolate* isolate) {
+   // Generate the uninitialized versions of the stub.
+diff --git a/src/code-stubs.h b/src/code-stubs.h
+index c1d051b..9cc12df 100644
+--- node/deps/v8/src/code-stubs.h
++++ node/deps/v8/src/code-stubs.h
+@@ -179,6 +179,8 @@ class CodeStub BASE_EMBEDDED {
+   // Lookup the code in the (possibly custom) cache.
+   bool FindCodeInCache(Code** code_out);
+ 
++  static MaybeHandle<Code> GetCode(Isolate* isolate, uint32_t key);
++
+   // Returns information for computing the number key.
+   virtual Major MajorKey() const = 0;
+   virtual int MinorKey() const = 0;
+@@ -242,6 +244,14 @@ class CodeStub BASE_EMBEDDED {
+   // If a stub uses a special cache override this.
+   virtual bool UseSpecialCache() { return false; }
+ 
++  // We use this dispatch to statically instantiate the correct code stub for
++  // the given stub key and call the passed function with that code stub.
++  typedef void (*DispatchedCall)(CodeStub* stub, void** value_out);
++  static void Dispatch(Isolate* isolate, uint32_t key, void** value_out,
++                       DispatchedCall call);
++
++  static void GetCodeDispatchCall(CodeStub* stub, void** value_out);
++
+   STATIC_ASSERT(NUMBER_OF_IDS < (1 << kStubMajorKeyBits));
+   class MajorKeyBits: public BitField<uint32_t, 0, kStubMajorKeyBits> {};
+   class MinorKeyBits: public BitField<uint32_t,
