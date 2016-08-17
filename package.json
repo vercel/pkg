@@ -1,6 +1,6 @@
 {
-  "bin": "./bin/enclose.js",
-  "main": "./bin/enclose.js",
+  "bin": "./bin/enclose-exe.js",
+  "main": "./bin/enclose-exe.js",
   "version": "9.9.9",
   "private": true,
   "dependencies": {

@@ -67,7 +67,9 @@ async.waterfall([
   },
   function(stripe, next) {
 
-    pkgCache.need().then(function(fabricatorName) {
+    pkgCache.need({
+      nodeRange: cli.version
+    }).then(function(fabricatorName) {
 
       producer({
         stripe: stripe,
