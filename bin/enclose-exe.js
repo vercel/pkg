@@ -8,6 +8,7 @@ var fs = require("fs");
 var path = require("path");
 var async = require("async");
 var windows = process.platform === "win32";
+var pkgCache = require("pkg-cache");
 
 var bundler = require("../lib/bundler.js");
 var producer = require("../lib/producer.js");
@@ -66,12 +67,13 @@ async.waterfall([
   },
   function(stripe, next) {
 
-    var pathToHouseSize = path.join(__dirname, "house.size");
-    var houseSize = fs.readFileSync(pathToHouseSize, "utf8") | 0;
+    pkgCache.need().then(function(fabricatorName) {
 
-    producer({
-      stripe: stripe,
-      houseSize: houseSize
+      producer({
+        stripe: stripe,
+        fabricatorName: fabricatorName
+      }, next);
+
     }, next);
 
   },
