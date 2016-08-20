@@ -8,9 +8,9 @@ var body = fs.readFileSync("./test-y-data.txt", "utf8");
 
 detector.detect(
   body,
-  function(name, value, trying) {
+  function(node, trying) {
     var p;
-    p = detector.visitor_SUCCESSFUL(name, value, true);
+    p = detector.visitor_SUCCESSFUL(node, true);
     if (p) {
       if (trying) {
         console.log("try { " + p + "; } catch (_) {}");

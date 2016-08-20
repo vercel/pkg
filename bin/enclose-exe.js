@@ -108,7 +108,7 @@ async.waterfall([
 
   if (error) {
     if (error.wasReported) return;
-    throw error;
+    reporter.report("", "error", [ error.stack ], error);
   }
 
 });
