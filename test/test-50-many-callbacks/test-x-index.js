@@ -1,106 +1,105 @@
 #!/usr/bin/env node
-"use strict";
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-setTimeout(function() {
-console.log("test");
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+setTimeout(function () {
+console.log('test');
 }, 0);
 }, 0);
 }, 0);

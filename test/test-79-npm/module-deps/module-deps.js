@@ -1,7 +1,5 @@
-"use strict";
-
-var Deps = require("module-deps");
-var deps = new Deps();
+let Deps = require('module-deps');
+let deps = new Deps();
 if (deps.parseDeps) {
-  console.log("ok");
+  console.log('ok');
 }

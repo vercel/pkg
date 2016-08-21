@@ -1,3 +1,1 @@
-"use strict";
-
-require("./negotiator.js");
+require('./negotiator.js');

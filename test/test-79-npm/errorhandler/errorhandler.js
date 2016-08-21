@@ -1,17 +1,15 @@
-"use strict";
+let errorhandler = require('errorhandler');
+let noop = function () {};
+let req = { headers: { Accept: 'text/html' } };
+let res = { setHeader: noop, end: noop };
 
-var errorhandler = require("errorhandler");
-var noop = function() {};
-var req = { headers: { Accept: "text/html" } };
-var res = { setHeader: noop, end: noop };
+let middleware = errorhandler();
+let wasCalled = false;
 
-var middleware = errorhandler();
-var wasCalled = false;
-
-middleware("Message", req, res, function() {
+middleware('Message', req, res, function () {
   wasCalled = true;
 });
 
-setTimeout(function() {
-  if (!wasCalled) console.log("ok");
+setTimeout(function () {
+  if (!wasCalled) console.log('ok');
 }, 200);

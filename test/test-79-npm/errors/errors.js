@@ -1,4 +1,2 @@
-"use strict";
-
-require("errors");
-console.log("ok");
+require('errors');
+console.log('ok');

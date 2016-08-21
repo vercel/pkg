@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/bson/**/*.js"
+    'lib/bson/**/*.js'
   ]
 
 };

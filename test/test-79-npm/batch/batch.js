@@ -1,31 +1,29 @@
-"use strict";
-
-var Batch = require("batch");
-var batch = new Batch();
+let Batch = require('batch');
+let batch = new Batch();
 
 batch.concurrency(4);
 
-var ids = [ 4, 7, 12, 25 ];
+let ids = [ 4, 7, 12, 25 ];
 
-ids.forEach(function() {
-  batch.push(function(done) {
-    setTimeout(function() {
+ids.forEach(function () {
+  batch.push(function (done) {
+    setTimeout(function () {
       done();
     }, 100);
   });
 });
 
-var passed = 0;
+let passed = 0;
 
-batch.on("progress", function() {
+batch.on('progress', function () {
   passed += 1;
 });
 
-batch.end(function(error) {
+batch.end(function (error) {
   if (error) {
     throw error;
   }
   if (passed > 3) {
-    console.log("ok");
+    console.log('ok');
   }
 });

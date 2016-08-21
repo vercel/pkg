@@ -1,6 +1,4 @@
-"use strict";
-
-var pg = require("pg");
+let pg = require('pg');
 if (pg.connect) {
-  console.log("ok");
+  console.log('ok');
 }

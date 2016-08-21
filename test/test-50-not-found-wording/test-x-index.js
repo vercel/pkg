@@ -1,10 +1,8 @@
 /* eslint-disable no-useless-concat */
 
-"use strict";
-
-var fs = require("fs");
-var path = require("path");
-var name = path.join(__dirname, "not" + "exists");
+let fs = require('fs');
+let path = require('path');
+let name = path.join(__dirname, 'not' + 'exists');
 
 try {
   fs.readFileSync(name);
@@ -12,10 +10,10 @@ try {
   console.log(e.message);
 }
 
-console.log("*****");
+console.log('*****');
 
 try {
-  require("not-exists");
+  require('not-exists');
 } catch (e) {
   console.log(e.message);
 }

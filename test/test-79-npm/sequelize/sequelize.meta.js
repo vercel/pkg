@@ -1,10 +1,8 @@
-"use strict";
+let home = require('../home.js');
 
-var home = require("../home.js");
-
-module.exports = function(stamp) {
+module.exports = function (stamp) {
   return {
     allow: home(stamp),
-    moons: [ "mysql", "pg", "pg-hstore", "sqlite3", "tedious" ]
+    moons: [ 'mysql', 'pg', 'pg-hstore', 'sqlite3', 'tedious' ]
   };
 };

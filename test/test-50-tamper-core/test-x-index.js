@@ -1,16 +1,14 @@
-"use strict";
-
-var fsname = "fs";
-var fs = require(fsname);
-var pathname = "path";
-var pathp = require.resolve(pathname);
-var path = require(pathp);
+let fsname = 'fs';
+let fs = require(fsname);
+let pathname = 'path';
+let pathp = require.resolve(pathname);
+let path = require(pathp);
 
 console.log([
 
   typeof fs,
-  fs ? typeof fs.statSync : "empty",
+  fs ? typeof fs.statSync : 'empty',
   typeof path,
-  path ? typeof path.basename : "empty"
+  path ? typeof path.basename : 'empty'
 
-].join("\n"));
+].join('\n'));

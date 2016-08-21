@@ -1,6 +1,4 @@
-"use strict";
-
-var passport = require("passport");
+let passport = require('passport');
 if (passport.Strategy) {
-  console.log("ok");
+  console.log('ok');
 }

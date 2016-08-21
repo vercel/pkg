@@ -1,8 +1,6 @@
-"use strict";
-
 module.exports = {
   scripts: [
-    "controllers/*.js",
-    "routes/*.js"
+    'controllers/*.js',
+    'routes/*.js'
   ]
 };

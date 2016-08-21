@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   assets: [
-    "lib/static/*"
+    'lib/static/*'
   ]
 
 };

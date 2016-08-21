@@ -16,12 +16,12 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.2.30",
-    "enclose-eslint": "igorklopov/enclose-eslint#5edac6a3e469a768711a89a7b6dece705d450a4d",
-    "json-stable-stringify": "^1.0.1"
+    "json-stable-stringify": "^1.0.1",
+    "klopov-eslint": "0.6.2"
   },
   "scripts": {
     "build": "cd build && node 90-BATCH-BUILD.js",
     "build-all": "cd build && node 90-BATCH-BUILD.js all",
-    "lint": "node lint.js"
+    "lint": "klopov-eslint . || true"
   }
 }

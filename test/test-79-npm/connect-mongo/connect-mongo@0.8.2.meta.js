@@ -1,3 +1,1 @@
-"use strict";
-
-module.exports = require("./connect-mongo.meta.js");
+module.exports = require('./connect-mongo.meta.js');

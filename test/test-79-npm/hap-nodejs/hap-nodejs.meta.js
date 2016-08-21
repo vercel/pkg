@@ -1,9 +1,7 @@
-"use strict";
+let home = require('../home.js');
 
-var home = require("../home.js");
-
-module.exports = function(stamp) {
+module.exports = function (stamp) {
   return {
-    allow: home(stamp) && (stamp.p !== "win32") // dependencies require OpenSSL
+    allow: home(stamp) && (stamp.p !== 'win32') // dependencies require OpenSSL
   };
 };

@@ -1,3 +1,1 @@
-"use strict";
-
-require("./connect-redis.js");
+require('./connect-redis.js');

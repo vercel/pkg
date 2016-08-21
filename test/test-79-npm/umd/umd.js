@@ -1,6 +1,4 @@
-"use strict";
-
-var umd = require("umd");
+let umd = require('umd');
 if (umd.prelude) {
-  console.log("ok");
+  console.log('ok');
 }

@@ -1,3 +1,1 @@
-"use strict";
-
-require("./ejs.js");
+require('./ejs.js');

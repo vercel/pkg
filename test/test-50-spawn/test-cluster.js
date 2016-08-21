@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-"use strict";
-
-var assert = require("assert");
-var cluster = require("cluster");
-var child;
+let assert = require('assert');
+let cluster = require('cluster');
+let child;
 
 if (process.send) {
-  require("./test-cluster-child.js");
+  require('./test-cluster-child.js');
   return;
 }
 
@@ -19,13 +17,13 @@ try {
   console.log(e.message);
 }
 
-child.on("message", function(value) {
+child.on('message', function (value) {
   console.log(value.toString());
   child.send(value);
 });
 
 child.send(2);
 
-cluster.on("exit", function() {
-  console.log("Cluster worker exited");
+cluster.on('exit', function () {
+  console.log('Cluster worker exited');
 });

@@ -1,3 +1,1 @@
-"use strict";
-
-require("./log4js.js");
+require('./log4js.js');

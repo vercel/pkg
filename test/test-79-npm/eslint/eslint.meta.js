@@ -1,7 +1,5 @@
-"use strict";
-
-module.exports = function() {
+module.exports = function () {
   return {
-    take: "last-line"
+    take: 'last-line'
   };
 };

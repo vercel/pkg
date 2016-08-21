@@ -1,13 +1,11 @@
-"use strict";
+let override = require('method-override');
+let req = { method: 'GET', headers: { } };
+let res = {};
 
-var override = require("method-override");
-var req = { method: "GET", headers: { } };
-var res = {};
+let middleware = override();
 
-var middleware = override();
-
-middleware(req, res, function() {
-  if (req.originalMethod === "GET") {
-    console.log("ok");
+middleware(req, res, function () {
+  if (req.originalMethod === 'GET') {
+    console.log('ok');
   }
 });

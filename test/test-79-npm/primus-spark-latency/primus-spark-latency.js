@@ -1,6 +1,4 @@
-"use strict";
-
-var latency = require("primus-spark-latency");
+let latency = require('primus-spark-latency');
 if (latency.server) {
-  console.log("ok");
+  console.log('ok');
 }

@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   assets: [
-    "lib/jute/specification.json"
+    'lib/jute/specification.json'
   ]
 
 };

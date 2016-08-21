@@ -1,7 +1,5 @@
-"use strict";
-
-module.exports = function() {
+module.exports = function () {
   return {
-    moons: [ "user-home" ]
+    moons: [ 'user-home' ]
   };
 };

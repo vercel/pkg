@@ -1,6 +1,4 @@
-"use strict";
-
-var later = require("later");
+let later = require('later');
 if (later.schedule) {
-  console.log("ok");
+  console.log('ok');
 }

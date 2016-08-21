@@ -1,7 +1,5 @@
-"use strict";
-
-var optimist = require("optimist");
-var argv = optimist.argv;
+let optimist = require('optimist');
+let argv = optimist.argv;
 if (argv.$0) {
-  console.log("ok");
+  console.log('ok');
 }

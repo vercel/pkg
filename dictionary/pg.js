@@ -1,16 +1,14 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/**/*.js"
+    'lib/**/*.js'
   ],
 
   patches: {
 
-    "lib/native/index.js": [
-      "require('pg-native')",
-      "require('pg-native', 'can-ignore')"
+    'lib/native/index.js': [
+      'require(\'pg-native\')',
+      'require(\'pg-native\', \'can-ignore\')'
     ]
 
   }

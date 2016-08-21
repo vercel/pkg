@@ -1,3 +1,1 @@
-"use strict";
-
-require("./pg.js.js");
+require('./pg.js.js');

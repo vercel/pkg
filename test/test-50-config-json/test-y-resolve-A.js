@@ -1,3 +1,1 @@
-"use strict";
-
-module.exports = "test-y-resolve-A";
+module.exports = 'test-y-resolve-A';

@@ -1,3 +1,1 @@
-"use strict";
-
-module.exports = require("./kerberos.meta.js");
+module.exports = require('./kerberos.meta.js');

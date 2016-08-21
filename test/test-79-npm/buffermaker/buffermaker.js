@@ -1,7 +1,5 @@
-"use strict";
-
-var Buffermaker = require("buffermaker");
-var buffermaker = new Buffermaker();
+let Buffermaker = require('buffermaker');
+let buffermaker = new Buffermaker();
 if (buffermaker.plan) {
-  console.log("ok");
+  console.log('ok');
 }

@@ -1,3 +1,1 @@
-"use strict";
-
-require("./sinon.js");
+require('./sinon.js');

@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = {
 
   patches: {
@@ -11,9 +9,9 @@ module.exports = {
     // THIS IS BECAUSE NODE 5+ (NPM 3+) HAS FLAT NODE_MODULES
     // AND NATIVE ADDON IS NOT 2 LEVELS UP ANYMORE, BUT NEARBY
 
-    "bindings.js": [
-      "return fileName",
-      "return dirname(__dirname)" // <- 2 levels up
+    'bindings.js': [
+      'return fileName',
+      'return dirname(__dirname)' // <- 2 levels up
     ]
 
   }

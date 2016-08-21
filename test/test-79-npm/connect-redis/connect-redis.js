@@ -1,14 +1,12 @@
-"use strict";
-
-function Store() {
-  this.emit = function() {};
+function Store () {
+  this.emit = function () {};
 }
 
-function MemoryStore() {
+function MemoryStore () {
 }
 
-var session = { Store: Store, MemoryStore: MemoryStore };
-var RedisStore = require("connect-redis")(session);
-if (typeof RedisStore === "function") {
-  console.log("ok");
+let session = { Store: Store, MemoryStore: MemoryStore };
+let RedisStore = require('connect-redis')(session);
+if (typeof RedisStore === 'function') {
+  console.log('ok');
 }

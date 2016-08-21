@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/mongodb/**/*.js"
+    'lib/mongodb/**/*.js'
   ]
 
 };

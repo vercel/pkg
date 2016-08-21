@@ -1,6 +1,4 @@
-"use strict";
-
-var writer = require("etcher-image-write");
+let writer = require('etcher-image-write');
 if (writer.write) {
-  console.log("ok");
+  console.log('ok');
 }

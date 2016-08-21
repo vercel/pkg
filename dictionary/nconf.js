@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/nconf/stores/*.js"
+    'lib/nconf/stores/*.js'
   ]
 
 };

@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/drivers/node-mongodb-native/*.js"
+    'lib/drivers/node-mongodb-native/*.js'
   ]
 
 };

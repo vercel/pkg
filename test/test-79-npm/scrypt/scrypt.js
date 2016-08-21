@@ -1,6 +1,4 @@
-"use strict";
-
-var scrypt = require("scrypt");
+let scrypt = require('scrypt');
 if (scrypt.hashSync) {
-  console.log("ok");
+  console.log('ok');
 }

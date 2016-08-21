@@ -1,3 +1,1 @@
-"use strict";
-
-require("./npm-shy.js");
+require('./npm-shy.js');

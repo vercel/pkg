@@ -1,13 +1,11 @@
 /* eslint-disable no-process-env */
 
-"use strict";
-
 // 1
 
-var error1;
+let error1;
 
-function func1() {
-  require.resolve("not-exists-1", "can-ignore");
+function func1 () {
+  require.resolve('not-exists-1', 'can-ignore');
 }
 
 try {
@@ -18,10 +16,10 @@ try {
 
 // 2
 
-var error2;
+let error2;
 
-function func2() {
-  require.resolve("not-exists-2", "can-ignore");
+function func2 () {
+  require.resolve('not-exists-2', 'can-ignore');
 }
 
 try {
@@ -32,21 +30,21 @@ try {
 
 // 3
 
-var error3;
+let error3;
 
 try {
-  require.resolve("not-exists-3");
+  require.resolve('not-exists-3');
 } catch (e) {
   error3 = e;
 }
 
 // 4
 
-var error4;
+let error4;
 
 try {
-  if (process.env.HELLO !== "WORLD") {
-    require.resolve("not-exists-4");
+  if (process.env.HELLO !== 'WORLD') {
+    require.resolve('not-exists-4');
   }
 } catch (e) {
   error4 = e;
@@ -67,4 +65,4 @@ console.log([
   error4.code,
   JSON.stringify(error4)
 
-].join("\n"));
+].join('\n'));

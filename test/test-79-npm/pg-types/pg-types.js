@@ -1,6 +1,4 @@
-"use strict";
-
-require("pg-types");
-var scriptToCheck = "pg-types/lib/textParsers.js";
-require(scriptToCheck, "dont-enclose");
-console.log("ok");
+require('pg-types');
+let scriptToCheck = 'pg-types/lib/textParsers.js';
+require(scriptToCheck, 'dont-enclose');
+console.log('ok');

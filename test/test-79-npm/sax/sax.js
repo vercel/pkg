@@ -1,12 +1,10 @@
-"use strict";
+let sax = require('sax');
+let parser = sax.parser(true);
 
-var sax = require("sax");
-var parser = sax.parser(true);
-
-parser.onopentag = function(node) {
-  if (node.name === "hello") {
-    console.log("ok");
+parser.onopentag = function (node) {
+  if (node.name === 'hello') {
+    console.log('ok');
   }
 };
 
-parser.write("<hello>World!</hello>").close();
+parser.write('<hello>World!</hello>').close();

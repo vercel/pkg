@@ -1,37 +1,35 @@
 #!/usr/bin/env node
 
-"use strict";
-
-var fs = require("fs");
-var path = require("path");
-var assert = require("assert");
-var utils = require("../../utils.js");
-var enclose = require("../../").exec;
+let fs = require('fs');
+let path = require('path');
+let assert = require('assert');
+let utils = require('../../utils.js');
+let enclose = require('../../').exec;
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-var flags = process.argv.slice(2);
-var input = "./test-x-index.js";
-var output = "./test-output.exe";
-var data = "./test-y-data.txt";
+let flags = process.argv.slice(2);
+let input = './test-x-index.js';
+let output = './test-output.exe';
+let data = './test-y-data.txt';
 
-var left, right;
+let left, right;
 
 left = fs.readFileSync(
-  data, "utf8"
-).split("\n").filter(function(line) {
-  return line.indexOf("/***/ ") >= 0;
-}).map(function(line) {
-  return line.split("/***/ ")[1];
-}).join("\n") + "\n";
+  data, 'utf8'
+).split('\n').filter(function (line) {
+  return line.indexOf('/***/ ') >= 0;
+}).map(function (line) {
+  return line.split('/***/ ')[1];
+}).join('\n') + '\n';
 
 enclose.sync(flags.concat([
-  "--output", output, input
+  '--output', output, input
 ]));
 
 right = utils.spawn.sync(
-  "./" + path.basename(output), [],
+  './' + path.basename(output), [],
   { cwd: path.dirname(output) }
 );
 

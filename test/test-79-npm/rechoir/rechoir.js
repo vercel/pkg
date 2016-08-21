@@ -1,10 +1,8 @@
-"use strict";
+let config = require('interpret').extensions;
+let rechoir = require('rechoir');
+rechoir.prepare(config, './fixture.coffee');
+let coffee = require('./fixture.coffee', 'dont-enclose');
 
-var config = require("interpret").extensions;
-var rechoir = require("rechoir");
-rechoir.prepare(config, "./fixture.coffee");
-var coffee = require("./fixture.coffee", "dont-enclose");
-
-if (typeof coffee.root === "function") {
-  console.log("ok");
+if (typeof coffee.root === 'function') {
+  console.log('ok');
 }

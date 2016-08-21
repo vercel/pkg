@@ -1,9 +1,7 @@
-"use strict";
-
 module.exports = {
 
   scripts: [
-    "lib/winston/transports/*.js"
+    'lib/winston/transports/*.js'
   ]
 
 };

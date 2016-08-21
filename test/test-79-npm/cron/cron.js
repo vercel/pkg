@@ -1,14 +1,12 @@
-"use strict";
+let CronJob = require('cron').CronJob;
 
-var CronJob = require("cron").CronJob;
+let counter = 0;
 
-var counter = 0;
-
-new CronJob("* * * * * *", function() { // eslint-disable-line no-new
+new CronJob('* * * * * *', function () { // eslint-disable-line no-new
   counter += 1;
-}, null, true, "America/Los_Angeles");
+}, null, true, 'America/Los_Angeles');
 
-setTimeout(function() {
-  if (counter === 4) console.log("ok");
+setTimeout(function () {
+  if (counter === 4) console.log('ok');
   process.exit();
 }, 4500);

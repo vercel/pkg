@@ -1,3 +1,1 @@
-"use strict";
-
-require("./hoek.js");
+require('./hoek.js');
