@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-module.exports.index = function(req, res, next) {
-  res.send("Hello world!");
+module.exports.index = function (req, res, next) {
+  res.send('Hello world!');
   if (next) return next();
 };

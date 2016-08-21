@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-"use strict";
+'use strict';
 
 global.y = 84;
 console.log(y);

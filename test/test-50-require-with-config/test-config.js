@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  scripts: "test-z-*.js",
-  assets: "test-*.txt"
+  scripts: 'test-z-*.js',
+  assets: 'test-*.txt'
 };

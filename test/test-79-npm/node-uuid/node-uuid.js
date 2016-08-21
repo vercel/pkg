@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var uuid = require("node-uuid");
+let uuid = require('node-uuid');
 if (uuid.v1().length === 36) {
-  console.log("ok");
+  console.log('ok');
 }

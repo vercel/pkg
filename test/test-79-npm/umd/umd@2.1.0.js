@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./umd.js");
+require('./umd.js');

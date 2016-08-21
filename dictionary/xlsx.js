@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   patches: {
 
-    "xlsx.js": [
-      "require('js'+'zip')",
-      "require('jszip')",
-      "require('./od' + 's')",
-      "require('./ods')"
+    'xlsx.js': [
+      'require(\'js\'+\'zip\')',
+      'require(\'jszip\')',
+      'require(\'./od\' + \'s\')',
+      'require(\'./ods\')'
     ]
 
   }

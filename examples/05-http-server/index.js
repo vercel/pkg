@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-var port = 1337;
-var http = require("http");
+let port = 1337;
+let http = require('http');
 
-http.createServer(function(req, res) {
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Hello World\n");
-}).listen(port, "127.0.0.1");
+http.createServer(function (req, res) {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello World\n');
+}).listen(port, '127.0.0.1');
 
-console.log("Port " + port.toString() + "...");
+console.log('Port ' + port.toString() + '...');

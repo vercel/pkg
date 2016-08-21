@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  scripts: "./views/**/*"
+  scripts: './views/**/*'
 };

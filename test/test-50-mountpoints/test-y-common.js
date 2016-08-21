@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-module.exports = function(s) {
+module.exports = function (s) {
   console.log(s);
 };

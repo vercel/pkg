@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var request = require("request");
+let request = require('request');
 if (request.get) {
-  console.log("ok");
+  console.log('ok');
 }

@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./mongoose.js");
+require('./mongoose.js');

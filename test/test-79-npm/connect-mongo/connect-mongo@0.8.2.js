@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./connect-mongo.js");
+require('./connect-mongo.js');

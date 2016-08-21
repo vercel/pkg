@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-module.exports = function() {
+module.exports = function () {
   return {
     allow: false,
-    moons: [ "gulp-concat" ]
+    moons: [ 'gulp-concat' ]
   };
 };

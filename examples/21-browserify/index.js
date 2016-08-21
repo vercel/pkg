@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-require("browserify/bin/cmd.js");
+require('browserify/bin/cmd.js');

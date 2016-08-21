@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = require("./scrypt.meta.js");
+module.exports = require('./scrypt.meta.js');

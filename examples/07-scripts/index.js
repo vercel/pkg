@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-var nonLiteralInRequire = "./views/profile.js";
-var profile = require(nonLiteralInRequire);
+let nonLiteralInRequire = './views/profile.js';
+let profile = require(nonLiteralInRequire);
 console.log(profile);

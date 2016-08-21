@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var bindings = require("bindings");
-if (typeof bindings === "function") {
-  console.log("ok");
+let bindings = require('bindings');
+if (typeof bindings === 'function') {
+  console.log('ok');
 }

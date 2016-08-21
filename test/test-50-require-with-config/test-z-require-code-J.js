@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports.v = "test-z-require-code-J-compile-time";
+module.exports.v = 'test-z-require-code-J-compile-time';

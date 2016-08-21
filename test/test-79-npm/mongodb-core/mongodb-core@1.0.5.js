@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./mongodb-core.js");
+require('./mongodb-core.js');

@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  assets: "sub/*"
+  assets: 'sub/*'
 };

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-require("npm/bin/npm-cli.js");
+require('npm/bin/npm-cli.js');

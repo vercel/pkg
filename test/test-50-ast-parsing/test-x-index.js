@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-var fs = require("fs");
-var detector = require("../../lib/detector.js");
-var body = fs.readFileSync("./test-y-data.txt", "utf8");
+let fs = require('fs');
+let detector = require('../../lib/detector.js');
+let body = fs.readFileSync('./test-y-data.txt', 'utf8');
 
 detector.detect(
   body,
-  function(node, trying) {
-    var p;
+  function (node, trying) {
+    let p;
     p = detector.visitor_SUCCESSFUL(node, true);
     if (p) {
       if (trying) {
-        console.log("try { " + p + "; } catch (_) {}");
+        console.log('try { ' + p + '; } catch (_) {}');
       } else {
-        console.log(p + ";");
+        console.log(p + ';');
       }
       return false;
     }

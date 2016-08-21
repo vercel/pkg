@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var hap = require("hap-nodejs");
+let hap = require('hap-nodejs');
 if (hap.Service) {
-  console.log("ok");
+  console.log('ok');
 }

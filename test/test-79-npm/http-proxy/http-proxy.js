@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
-require("http-proxy");
-console.log("ok");
+require('http-proxy');
+console.log('ok');

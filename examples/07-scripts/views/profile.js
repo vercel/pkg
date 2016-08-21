@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = "'profile.js' is ok";
+module.exports = '\'profile.js\' is ok';

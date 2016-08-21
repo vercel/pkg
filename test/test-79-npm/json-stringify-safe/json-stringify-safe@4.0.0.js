@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./json-stringify-safe.js");
+require('./json-stringify-safe.js');

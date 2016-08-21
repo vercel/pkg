@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
-require("nodemailer-sendmail-transport");
-console.log("ok");
+require('nodemailer-sendmail-transport');
+console.log('ok');

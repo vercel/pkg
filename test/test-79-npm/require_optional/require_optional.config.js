@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 module.exports = {
   assets: [
-    "package.json"
+    'package.json'
   ]
 };

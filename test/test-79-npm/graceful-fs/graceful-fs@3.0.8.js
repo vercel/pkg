@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./graceful-fs.js");
+require('./graceful-fs.js');

@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var Server = require("mongodb-core").Server;
-if (typeof Server === "function") {
-  console.log("ok");
+let Server = require('mongodb-core').Server;
+if (typeof Server === 'function') {
+  console.log('ok');
 }

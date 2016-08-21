@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./passport-local.js");
+require('./passport-local.js');

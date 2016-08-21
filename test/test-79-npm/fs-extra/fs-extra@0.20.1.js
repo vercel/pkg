@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./fs-extra.js");
+require('./fs-extra.js');

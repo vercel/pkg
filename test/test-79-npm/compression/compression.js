@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
-var compression = require("compression");
-var req = { headers: { } };
-var res = {};
+let compression = require('compression');
+let req = { headers: { } };
+let res = {};
 
-var middleware = compression();
+let middleware = compression();
 
-middleware(req, res, function() {
-  console.log("ok");
+middleware(req, res, function () {
+  console.log('ok');
 });

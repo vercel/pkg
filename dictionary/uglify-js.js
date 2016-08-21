@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
@@ -6,8 +6,8 @@ module.exports = {
   // load_global (readFileSync + runInContext)
 
   assets: [
-    "lib/**/*.js",
-    "tools/*.js"
+    'lib/**/*.js',
+    'tools/*.js'
   ]
 
 };

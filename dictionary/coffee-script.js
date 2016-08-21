@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   scripts: [
-    "lib/coffee-script/*.js"
+    'lib/coffee-script/*.js'
   ],
 
   patches: {
 
-    "lib/coffee-script/grammar.js": [
-      "require('jison')",
-      "require('jison', 'can-ignore')"
+    'lib/coffee-script/grammar.js': [
+      'require(\'jison\')',
+      'require(\'jison\', \'can-ignore\')'
     ]
 
   }

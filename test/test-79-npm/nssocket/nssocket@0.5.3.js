@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./nssocket.js");
+require('./nssocket.js');

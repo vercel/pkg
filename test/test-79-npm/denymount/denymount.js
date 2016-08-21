@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var denymount = require("denymount");
-if (typeof denymount === "function") {
-  console.log("ok");
+let denymount = require('denymount');
+if (typeof denymount === 'function') {
+  console.log('ok');
 }

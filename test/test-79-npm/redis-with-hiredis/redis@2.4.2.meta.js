@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = require("./redis.meta.js");
+module.exports = require('./redis.meta.js');

@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
-var throng = require("throng");
+let throng = require('throng');
 
-throng(8, function(id) {
+throng(8, function (id) {
   if (id === 7) {
-    console.log("ok");
+    console.log('ok');
   }
 });
 
-setTimeout(function() {
+setTimeout(function () {
   process.exit();
 }, 5000);

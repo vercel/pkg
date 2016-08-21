@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-console.log("ok");
+console.log('ok');

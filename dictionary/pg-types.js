@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   scripts: [
-    "lib/arrayParser.js"
+    'lib/arrayParser.js'
   ]
 
 };

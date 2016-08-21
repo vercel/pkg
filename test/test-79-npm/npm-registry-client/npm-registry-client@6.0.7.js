@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./npm-registry-client.js");
+require('./npm-registry-client.js');

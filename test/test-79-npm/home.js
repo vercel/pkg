@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var o = require("./stamp.js");
+let o = require('./stamp.js');
 
-module.exports = function(stamp) {
+module.exports = function (stamp) {
   return (
     o.p === stamp.p &&
     o.a === stamp.a &&

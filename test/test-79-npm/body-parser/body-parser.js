@@ -1,17 +1,17 @@
-"use strict";
+'use strict';
 
-var parser = require("body-parser");
-var req = { headers: { } };
-var res = {};
+let parser = require('body-parser');
+let req = { headers: { } };
+let res = {};
 
-var middleware = parser.json();
+let middleware = parser.json();
 
-middleware(req, res, function() {
-  var middleware2 = parser.urlencoded({ extended: true });
-  middleware2(req, res, function() {
-    var middleware3 = parser.urlencoded({ extended: false });
-    middleware3(req, res, function() {
-      console.log("ok");
+middleware(req, res, function () {
+  let middleware2 = parser.urlencoded({ extended: true });
+  middleware2(req, res, function () {
+    let middleware3 = parser.urlencoded({ extended: false });
+    middleware3(req, res, function () {
+      console.log('ok');
     });
   });
 });

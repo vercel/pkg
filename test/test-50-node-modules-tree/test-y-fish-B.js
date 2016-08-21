@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = "test-y-fish-B-supfile";
+module.exports = 'test-y-fish-B-supfile';

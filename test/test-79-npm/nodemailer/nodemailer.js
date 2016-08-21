@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var nodemailer = require("nodemailer");
-var transporter = nodemailer.createTransport("smtps://user%40gmail.com:pass@smtp.gmail.com");
+let nodemailer = require('nodemailer');
+let transporter = nodemailer.createTransport('smtps://user%40gmail.com:pass@smtp.gmail.com');
 if (transporter.transporter) {
-  console.log("ok");
+  console.log('ok');
 }

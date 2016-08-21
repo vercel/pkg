@@ -2,104 +2,104 @@
 
 /* eslint-disable no-process-env */
 
-"use strict";
+'use strict';
 
-var UPM = false; // USE_PREINSTALLED_MODULES
+let UPM = false; // USE_PREINSTALLED_MODULES
 
-var fs = require("fs");
-var path = require("path");
-var assert = require("assert");
-var globby = require("globby");
-var utils = require("../../utils.js");
-var enclose = require("../../").exec;
+let fs = require('fs');
+let path = require('path');
+let assert = require('assert');
+let globby = require('globby');
+let utils = require('../../utils.js');
+let enclose = require('../../').exec;
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-var flags = process.argv.slice(2);
-var windows = process.platform === "win32";
+let flags = process.argv.slice(2);
+let windows = process.platform === 'win32';
 
-function applyMetaToRight(right, meta) {
-  right = (meta.take === "stderr" ? right.stderr : right.stdout);
-  if (meta.take === "last-line") right = right.split("\n").slice(-2).join("\n");
-  if (right.slice(-2) === "\r\n") right = right.slice(0, -2);
-  if (right.slice(-1) === "\n") right = right.slice(0, -1);
+function applyMetaToRight (right, meta) {
+  right = (meta.take === 'stderr' ? right.stderr : right.stdout);
+  if (meta.take === 'last-line') right = right.split('\n').slice(-2).join('\n');
+  if (right.slice(-2) === '\r\n') right = right.slice(0, -2);
+  if (right.slice(-1) === '\n') right = right.slice(0, -1);
   return right;
 }
 
-var stamp = {};
+let stamp = {};
 
-var checklist = fs.readFileSync("checklist.js", "utf-8");
-var table = checklist.split("var table = ")[1].split(";")[0];
+let checklist = fs.readFileSync('checklist.js', 'utf-8');
+let table = checklist.split('var table = ')[1].split(';')[0];
 table = JSON.parse(table);
-var changes = checklist.split("var changes = ")[1].split(";")[0];
+let changes = checklist.split('var changes = ')[1].split(';')[0];
 changes = JSON.parse(changes);
 
-function save() {
-  var t = utils.stringify(table, null, 2);
-  var c = utils.stringify(changes, null, 2);
-  if (c === "[]") c = "[\n]";
-  fs.writeFileSync("checklist.js",
-    "/* eslint-disable no-unused-vars */\n" +
-    "\"use strict\";\n" +
-    "var table = " + t + ";\n" +
-    "var changes = " + c + ";\n"
+function save () {
+  let t = utils.stringify(table, null, 2);
+  let c = utils.stringify(changes, null, 2);
+  if (c === '[]') c = '[\n]';
+  fs.writeFileSync('checklist.js',
+    '/* eslint-disable no-unused-vars */\n' +
+    '"use strict";\n' +
+    'var table = ' + t + ';\n' +
+    'var changes = ' + c + ';\n'
   );
 }
 
-function stamp2string(s) {
+function stamp2string (s) {
   // platform, arch, modules
-  return s.p + "/" + s.a + "/m" + s.m.toString();
+  return s.p + '/' + s.a + '/m' + s.m.toString();
 }
 
-function update(p, n) {
+function update (p, n) {
   if (!table[p]) table[p] = {};
-  var row = table[p];
-  var ss = stamp2string(stamp);
-  var o = row[ss];
+  let row = table[p];
+  let ss = stamp2string(stamp);
+  let o = row[ss];
   row[ss] = n;
-  var nr = n.split(",")[0];
-  var or = o ? o.split(",")[0] : "";
-  if ((!o) && (nr !== "ok")) {
-    changes.push(p + "," + ss + ": new " + n);
+  let nr = n.split(',')[0];
+  let or = o ? o.split(',')[0] : '';
+  if ((!o) && (nr !== 'ok')) {
+    changes.push(p + ',' + ss + ': new ' + n);
   } else
-  if ((or !== nr) && (nr !== "ok")) {
-    changes.push(p + "," + ss + ": " + o + " -> " + n);
+  if ((or !== nr) && (nr !== 'ok')) {
+    changes.push(p + ',' + ss + ': ' + o + ' -> ' + n);
   }
   save();
 }
 
 if (!UPM) {
 
-  console.log("Cleaning cache...");
+  console.log('Cleaning cache...');
 
   if (windows) {
     utils.vacuum.sync(path.join(
-      process.env.APPDATA, "npm-cache"
+      process.env.APPDATA, 'npm-cache'
     ));
     utils.mkdirp.sync(path.join(
-      process.env.APPDATA, "npm-cache"
+      process.env.APPDATA, 'npm-cache'
     ));
   } else {
     utils.exec.sync(
-      "npm cache clean"
+      'npm cache clean'
     );
   }
 
-  utils.mkdirp.sync("z-isolator");
+  utils.mkdirp.sync('z-isolator');
 
 }
 
-(function() {
+(function () {
 
-  console.log("Getting stamp...");
+  console.log('Getting stamp...');
 
-  var input = path.resolve("stamp.js");
-  var lucky = path.basename(input).slice(0, -3);
-  var output = path.join("z-isolator", lucky + ".exe");
+  let input = path.resolve('stamp.js');
+  let lucky = path.basename(input).slice(0, -3);
+  let output = path.join('z-isolator', lucky + '.exe');
 
   enclose.sync(flags.concat([
-    "--output", output, input
+    '--output', output, input
   ]));
 
   stamp = utils.spawn.sync(
@@ -108,49 +108,49 @@ if (!UPM) {
 
   stamp = JSON.parse(stamp);
   utils.vacuum.sync(output);
-  console.log("Stamp is " + JSON.stringify(stamp));
-  console.log("Waiting...");
+  console.log('Stamp is ' + JSON.stringify(stamp));
+  console.log('Waiting...');
   utils.pause(5);
 
 }());
 
-var dickies = globby.sync([
-  "./*/*.js",
-  "!./*/*.config.js",
-  "!./*/*.meta.js",
-  "!./*/gulpfile.js",
-  "!./*/*fixture*"
+let dickies = globby.sync([
+  './*/*.js',
+  '!./*/*.config.js',
+  '!./*/*.meta.js',
+  '!./*/gulpfile.js',
+  '!./*/*fixture*'
 ]);
 
-dickies.some(function(dicky) {
+dickies.some(function (dicky) {
 
-  var input = path.resolve(dicky);
+  let input = path.resolve(dicky);
 
-  var foldy = path.dirname(input);
-  var foldyName = path.basename(foldy);
+  let foldy = path.dirname(input);
+  let foldyName = path.basename(foldy);
 
-  var packy = path.basename(input).slice(0, -3);
-  var packyName = packy.split("@")[0];
-  var packyWildcard = packy.split("@")[1];
+  let packy = path.basename(input).slice(0, -3);
+  let packyName = packy.split('@')[0];
+  let packyWildcard = packy.split('@')[1];
 
-  var wordy = packy;
+  let wordy = packy;
   if (packyName !== foldyName) {
-    wordy = foldyName + "/" + wordy;
+    wordy = foldyName + '/' + wordy;
   }
 
-  var output = path.join("z-isolator", packy + ".exe");
+  let output = path.join('z-isolator', packy + '.exe');
 
   console.log();
-  console.log("*********************************************************");
-  console.log("*********************************************************");
-  console.log("*********************************************************");
+  console.log('*********************************************************');
+  console.log('*********************************************************');
+  console.log('*********************************************************');
 
-  console.log("Testing " + wordy + "...");
+  console.log('Testing ' + wordy + '...');
 
-  var metajs = path.join(foldy, packy + ".meta.js");
+  let metajs = path.join(foldy, packy + '.meta.js');
   metajs = fs.existsSync(metajs) ? require(metajs) : null;
 
-  var meta;
+  let meta;
 
   if (metajs) {
     meta = metajs(stamp);
@@ -158,9 +158,9 @@ dickies.some(function(dicky) {
     meta = {};
   }
 
-  var allow;
+  let allow;
 
-  if (typeof meta.allow !== "undefined") {
+  if (typeof meta.allow !== 'undefined') {
     allow = meta.allow;
   } else {
     allow = true;
@@ -168,139 +168,139 @@ dickies.some(function(dicky) {
 
   if (!allow) {
 
-    update(wordy, "nop");
-    console.log(wordy + " not allowed here!");
+    update(wordy, 'nop');
+    console.log(wordy + ' not allowed here!');
     return;
 
   }
 
-  var version = "";
+  let version = '';
 
   if (!UPM) {
 
-    var build = meta.build;
-    var earth = packy.replace("-shy", "");
-    var moons = meta.moons || [];
-    var planets = moons.concat([ earth ]);
+    let build = meta.build;
+    let earth = packy.replace('-shy', '');
+    let moons = meta.moons || [];
+    let planets = moons.concat([ earth ]);
     assert(planets.length > 0);
-    planets.some(function(planet) {
-      console.log("Installing " + planet + "...");
-      var successful = false, counter = 10;
+    planets.some(function (planet) {
+      console.log('Installing ' + planet + '...');
+      let successful = false, counter = 10;
       while ((!successful) && (counter > 0)) {
         successful = true;
         try {
-          var command = "npm install " + planet;
-          if (build) command += " --build-from-source=" + build;
-          command += " --unsafe-perm";
+          let command = 'npm install ' + planet;
+          if (build) command += ' --build-from-source=' + build;
+          command += ' --unsafe-perm';
           utils.exec.sync(command, { cwd: foldy });
         } catch (__) {
           assert(__);
-          utils.vacuum.sync(path.join(foldy, "node_modules"));
+          utils.vacuum.sync(path.join(foldy, 'node_modules'));
           successful = false;
           counter -= 1;
         }
       }
     });
 
-    var packyVersion = JSON.parse(fs.readFileSync(
-      path.join(foldy, "node_modules", earth.split("@")[0], "package.json"), "utf8"
+    let packyVersion = JSON.parse(fs.readFileSync(
+      path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
     )).version;
 
-    console.log("Version of " + packy + " is " + packyVersion);
-    version = "," + packyVersion;
+    console.log('Version of ' + packy + ' is ' + packyVersion);
+    version = ',' + packyVersion;
 
     if (packyWildcard) {
-      assert.equal(packyWildcard.split(".").length, 3);
+      assert.equal(packyWildcard.split('.').length, 3);
       assert.equal(packyVersion, packyWildcard);
     }
 
   }
 
-  var right;
+  let right;
 
-  console.log("Running non-enclosed " + wordy + "...");
+  console.log('Running non-enclosed ' + wordy + '...');
 
   try {
     right = utils.spawn.sync(
-      "node", [ input ],
+      'node', [ input ],
       { cwd: path.dirname(input),
-        stdio: "super-pipe" }
+        stdio: 'super-pipe' }
     );
   } catch (___) {
     right = {
-      stdout: "",
+      stdout: '',
       stderr: ___.toString()
     };
   }
 
   right = applyMetaToRight(right, meta);
 
-  console.log("Result is '" + right + "'");
+  console.log('Result is \'' + right + '\'');
 
-  if (right !== "ok") {
-    update(wordy, "error" + version);
+  if (right !== 'ok') {
+    update(wordy, 'error' + version);
   } else {
 
-    console.log("Compiling " + wordy + "...");
+    console.log('Compiling ' + wordy + '...');
 
-    var config = path.join(foldy, packy + ".config.js");
-    config = fs.existsSync(config) ? [ "--config", config ] : [];
+    let config = path.join(foldy, packy + '.config.js');
+    config = fs.existsSync(config) ? [ '--config', config ] : [];
 
     enclose.sync(flags.concat([
-      "--output", output, input
+      '--output', output, input
     ]).concat(config));
 
-    console.log("Copying addons...");
+    console.log('Copying addons...');
 
-    var addons = globby.sync(
-      path.join(foldy, "node_modules", "**", "*.node")
+    let addons = globby.sync(
+      path.join(foldy, 'node_modules', '**', '*.node')
     );
 
-    addons.some(function(addon) {
+    addons.some(function (addon) {
       fs.writeFileSync(
         path.join(path.dirname(output), path.basename(addon)),
         fs.readFileSync(addon)
       );
     });
 
-    console.log("Running enclosed " + wordy + "...");
+    console.log('Running enclosed ' + wordy + '...');
 
     try {
       right = utils.spawn.sync(
-        "./" + path.basename(output), [],
+        './' + path.basename(output), [],
         { cwd: path.dirname(output),
-          stdio: "super-pipe" }
+          stdio: 'super-pipe' }
       );
     } catch (___) {
       right = {
-        stdout: "",
+        stdout: '',
         stderr: ___.toString()
       };
     }
 
     right = applyMetaToRight(right, meta);
-    console.log("Result is '" + right + "'");
+    console.log('Result is \'' + right + '\'');
 
-    if (right !== "ok") {
-      update(wordy, "error" + version);
+    if (right !== 'ok') {
+      update(wordy, 'error' + version);
     } else {
-      update(wordy, "ok" + version);
+      update(wordy, 'ok' + version);
     }
 
   }
 
-  var rubbishes = globby.sync(
-    path.join(path.dirname(output), "**", "*")
+  let rubbishes = globby.sync(
+    path.join(path.dirname(output), '**', '*')
   );
 
-  rubbishes.some(function(rubbish) {
+  rubbishes.some(function (rubbish) {
     utils.vacuum.sync(rubbish);
   });
 
   if (!UPM) {
 
-    console.log("Cleanup...");
-    utils.vacuum.sync(path.join(foldy, "node_modules"));
+    console.log('Cleanup...');
+    utils.vacuum.sync(path.join(foldy, 'node_modules'));
 
   }
 

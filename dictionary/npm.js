@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   scripts: [
-    "lib/*.js"
+    'lib/*.js'
   ],
 
   patches: {
 
-    "lib/help.js": [
-      "path.dirname(__dirname)",
-      "path.dirname(process.argv[1])"
+    'lib/help.js': [
+      'path.dirname(__dirname)',
+      'path.dirname(process.argv[1])'
     ]
 
   }

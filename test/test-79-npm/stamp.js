@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-var o = {
+let o = {
   p: process.platform,
-  a: require("../../bin/enclose.js").arch(),
+  a: require('../../bin/enclose.js').arch(),
   m: parseInt(process.versions.modules, 10)
 };
 

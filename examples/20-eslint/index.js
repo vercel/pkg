@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-require("eslint/bin/eslint.js");
+require('eslint/bin/eslint.js');

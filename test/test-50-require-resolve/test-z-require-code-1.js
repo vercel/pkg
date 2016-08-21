@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  what: "test-z-require-code1.js.body"
+  what: 'test-z-require-code1.js.body'
 };

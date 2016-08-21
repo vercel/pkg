@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
-var colors = require("colors");
+let colors = require('colors');
 
-if (typeof colors.green === "function") {
-  var gopd = Object.getOwnPropertyDescriptor;
-  var grass = gopd(String.prototype, "green");
-  if (grass && (typeof grass.get === "function")) {
-    console.log("ok");
+if (typeof colors.green === 'function') {
+  let gopd = Object.getOwnPropertyDescriptor;
+  let grass = gopd(String.prototype, 'green');
+  if (grass && (typeof grass.get === 'function')) {
+    console.log('ok');
   }
 }

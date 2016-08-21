@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var tmp = require("tmp");
+let tmp = require('tmp');
 if (tmp.fileSync) {
-  console.log("ok");
+  console.log('ok');
 }

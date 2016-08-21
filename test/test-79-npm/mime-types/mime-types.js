@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var mime = require("mime-types");
-if (mime.lookup("html") === "text/html") {
-  console.log("ok");
+let mime = require('mime-types');
+if (mime.lookup('html') === 'text/html') {
+  console.log('ok');
 }

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 module.exports = {
   assets: [
-    "fixture.coffee"
+    'fixture.coffee'
   ]
 };

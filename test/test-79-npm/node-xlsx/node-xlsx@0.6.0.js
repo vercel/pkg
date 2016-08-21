@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./node-xlsx.js");
+require('./node-xlsx.js');

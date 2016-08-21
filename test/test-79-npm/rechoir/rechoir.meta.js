@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-module.exports = function() {
+module.exports = function () {
   return {
-    moons: [ "coffee-script", "interpret" ]
+    moons: [ 'coffee-script', 'interpret' ]
   };
 };

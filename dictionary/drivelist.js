@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   assets: [
-    "scripts/*"
+    'scripts/*'
   ],
 
   patches: {
 
-    "build/scripts.js": [
-      "path.join(__dirname, '..', 'scripts')",
-      "path.join(path.dirname(process.execPath), 'scripts')"
+    'build/scripts.js': [
+      'path.join(__dirname, \'..\', \'scripts\')',
+      'path.join(path.dirname(process.execPath), \'scripts\')'
     ]
 
   }

@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   scripts: [
-    "locale/*.js"
+    'locale/*.js'
   ]
 
 };

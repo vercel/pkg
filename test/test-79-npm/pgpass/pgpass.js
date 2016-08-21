@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-var pgpass = require("pgpass");
+let pgpass = require('pgpass');
 
-var connection = {
-  "host": "pgserver",
-  "user": "the_user_name"
+let connection = {
+  'host': 'pgserver',
+  'user': 'the_user_name'
 };
 
-pgpass(connection, function() {
-  console.log("ok");
+pgpass(connection, function () {
+  console.log('ok');
 });

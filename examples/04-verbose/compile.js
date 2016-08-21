@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-var flags = [];
-var enclose = require("../../").exec;
-flags.push("--loglevel", "info");
-flags.push("./index.js");
+let flags = [];
+let enclose = require('../../').exec;
+flags.push('--loglevel', 'info');
+flags.push('./index.js');
 enclose(flags);

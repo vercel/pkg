@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var emitter = require("primus-emitter");
+let emitter = require('primus-emitter');
 if (emitter.Emitter) {
-  console.log("ok");
+  console.log('ok');
 }

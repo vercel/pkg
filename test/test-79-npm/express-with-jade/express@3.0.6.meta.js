@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = require("./express.meta.js");
+module.exports = require('./express.meta.js');

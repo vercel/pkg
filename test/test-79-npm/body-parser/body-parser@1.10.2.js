@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./body-parser.js");
+require('./body-parser.js');

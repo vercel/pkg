@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var hoek = require("hoek");
-if (typeof hoek.applyToDefaults === "function") {
-  console.log("ok");
+let hoek = require('hoek');
+if (typeof hoek.applyToDefaults === 'function') {
+  console.log('ok');
 }
 

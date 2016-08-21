@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./socket.io-client.js");
+require('./socket.io-client.js');

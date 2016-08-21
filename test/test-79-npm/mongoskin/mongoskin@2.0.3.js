@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
-require("mongoskin");
-console.log("ok");
+require('mongoskin');
+console.log('ok');

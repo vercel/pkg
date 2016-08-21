@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  scripts: "./data.json"
+  scripts: './data.json'
 };

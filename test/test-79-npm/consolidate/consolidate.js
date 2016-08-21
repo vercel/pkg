@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
-require("consolidate");
-console.log("ok");
+require('consolidate');
+console.log('ok');

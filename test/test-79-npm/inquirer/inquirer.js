@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var inquirer = require("inquirer");
+let inquirer = require('inquirer');
 if (inquirer.prompt) {
-  console.log("ok");
+  console.log('ok');
 }

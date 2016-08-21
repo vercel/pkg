@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
-var common = require("../test-y-common.js");
+let common = require('../test-y-common.js');
 
-common("I am C");
+common('I am C');

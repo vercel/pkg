@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var sinon = require("sinon");
-var callback = sinon.spy();
+let sinon = require('sinon');
+let callback = sinon.spy();
 callback();
 if (callback.called) {
-  console.log("ok");
+  console.log('ok');
 }

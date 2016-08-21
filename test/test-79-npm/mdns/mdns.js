@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var mdns = require("mdns");
+let mdns = require('mdns');
 if (mdns.dns_sd) {
-  console.log("ok");
+  console.log('ok');
 }

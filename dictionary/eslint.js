@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   scripts: [
-    "lib/rules/*.js",
-    "lib/formatters/*.js"
+    'lib/rules/*.js',
+    'lib/formatters/*.js'
   ]
 
 };

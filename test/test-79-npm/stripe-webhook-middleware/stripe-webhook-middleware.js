@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-var StripeWebhook = require("stripe-webhook-middleware");
-var req = { headers: { }, body: { id: "hello" } };
-var res = { status: function() {
+let StripeWebhook = require('stripe-webhook-middleware');
+let req = { headers: { }, body: { id: 'hello' } };
+let res = { status: function () {
   return this;
-}, end: function() {
-  console.log("ok");
+}, end: function () {
+  console.log('ok');
 } };
 
-var middleware = (new StripeWebhook()).middleware;
-middleware(req, res, function() {});
+let middleware = (new StripeWebhook()).middleware;
+middleware(req, res, function () {});

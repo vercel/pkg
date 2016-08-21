@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-var usage = require("usage");
-var pid = process.pid;
-usage.lookup(pid, function(error, result) {
+let usage = require('usage');
+let pid = process.pid;
+usage.lookup(pid, function (error, result) {
   if (result.memory) {
-    console.log("ok");
+    console.log('ok');
   }
 });

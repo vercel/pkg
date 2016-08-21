@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
-var fs = require("fs");
-var path = require("path");
-var spawn = require("cross-spawn-async");
-var bin = path.join(__dirname, "fixture.js");
-var args = [];
+let fs = require('fs');
+let path = require('path');
+let spawn = require('cross-spawn-async');
+let bin = path.join(__dirname, 'fixture.js');
+let args = [];
 
 if (process.enclose) {
-  args.unshift("--entrypoint", bin);
+  args.unshift('--entrypoint', bin);
   bin = process.execPath;
 } else {
   fs.chmodSync(bin, 511);
 }
 
-spawn(bin, args, { stdio: "inherit" });
+spawn(bin, args, { stdio: 'inherit' });

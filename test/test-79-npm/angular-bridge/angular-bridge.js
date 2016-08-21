@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var Bridge = require("angular-bridge");
-if (typeof Bridge === "function") {
-  console.log("ok");
+let Bridge = require('angular-bridge');
+if (typeof Bridge === 'function') {
+  console.log('ok');
 }

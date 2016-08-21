@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
-module.exports = function(app) {
+module.exports = function (app) {
   return app.controllers.fixture.index;
 };

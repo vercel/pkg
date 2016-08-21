@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var pmx = require("pmx");
+let pmx = require('pmx');
 if (pmx.http) {
-  console.log("ok");
+  console.log('ok');
 }

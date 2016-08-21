@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./kerberos.js");
+require('./kerberos.js');

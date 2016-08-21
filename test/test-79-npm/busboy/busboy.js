@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var busboy = require("busboy");
-if (typeof busboy === "function") {
-  console.log("ok");
+let busboy = require('busboy');
+if (typeof busboy === 'function') {
+  console.log('ok');
 }

@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./babel-core.js");
+require('./babel-core.js');

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var yargs = require("yargs");
-var argv = yargs.argv;
+let yargs = require('yargs');
+let argv = yargs.argv;
 if (argv.$0) {
-  console.log("ok");
+  console.log('ok');
 }

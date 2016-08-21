@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
 module.exports = {
 
   patches: {
 
-    "epoll.js": [
-      "require('bindings')('epoll.node')",
-      "require('bindings')({ bindings: 'epoll.node', module_root: __dirname })"
+    'epoll.js': [
+      'require(\'bindings\')(\'epoll.node\')',
+      'require(\'bindings\')({ bindings: \'epoll.node\', module_root: __dirname })'
     ]
 
   }

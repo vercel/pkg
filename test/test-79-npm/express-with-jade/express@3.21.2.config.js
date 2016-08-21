@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-module.exports = require("./express.config.js");
+module.exports = require('./express.config.js');

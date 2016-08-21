@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./bson.js");
+require('./bson.js');

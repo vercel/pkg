@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require("./shelljs.js");
+require('./shelljs.js');

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-setTimeout(function() {
-  console.log("ok");
+setTimeout(function () {
+  console.log('ok');
 }, 3000);
