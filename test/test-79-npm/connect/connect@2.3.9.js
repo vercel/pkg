@@ -1,5 +1,3 @@
-'use strict';
-
 let connect = require('connect');
 let noop = function () {};
 let req = { headers: { }, url: '/', originalUrl: '/' };

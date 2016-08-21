@@ -1,5 +1,3 @@
-'use strict';
-
 let fs = require('fs');
 let heapdump = require('heapdump');
 let name = './heapdump.heapsnapshot';

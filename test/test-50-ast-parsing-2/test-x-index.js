@@ -3,8 +3,6 @@
 /* eslint-disable no-path-concat */
 /* eslint-disable no-process-env */
 
-'use strict';
-
 let path = require('path');
 let async = 'async';
 let config = 'config';

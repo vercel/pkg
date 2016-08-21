@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let p = process;
 let suffix = p.platform + '-' + p.arch;
 let addon = './serialport.' + suffix + '.node';

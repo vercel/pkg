@@ -1,5 +1,3 @@
-'use strict';
-
 let parser = require('body-parser');
 let req = { headers: { } };
 let res = {};

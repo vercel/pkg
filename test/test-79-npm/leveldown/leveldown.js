@@ -1,5 +1,3 @@
-'use strict';
-
 let Leveldown = require('leveldown');
 let db = new Leveldown('dbname');
 let rimraf = require('../../../node_modules/rimraf');

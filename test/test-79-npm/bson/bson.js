@@ -1,5 +1,3 @@
-'use strict';
-
 let bson = require('bson');
 
 let pure = {};

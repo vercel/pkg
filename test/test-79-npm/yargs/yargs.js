@@ -1,5 +1,3 @@
-'use strict';
-
 let yargs = require('yargs');
 let argv = yargs.argv;
 if (argv.$0) {

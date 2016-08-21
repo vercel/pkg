@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let port = 1337;
 let http = require('http');
 

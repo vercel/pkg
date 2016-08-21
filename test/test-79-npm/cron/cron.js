@@ -1,5 +1,3 @@
-'use strict';
-
 let CronJob = require('cron').CronJob;
 
 let counter = 0;

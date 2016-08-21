@@ -1,5 +1,3 @@
-'use strict';
-
 let chokidar = require('chokidar');
 
 let watcher = chokidar.watch('./chokidar.js', {

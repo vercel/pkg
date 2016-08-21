@@ -1,7 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 
-'use strict';
-
 process.stdout._write_ = process.stdout.write;
 process.stdout.write = function (m) {
   process.stdout._write_(m.slice(m.indexOf(': ') + 2));

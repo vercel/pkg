@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let fs = require('fs');
 let detector = require('../../lib/detector.js');
 let body = fs.readFileSync('./test-y-data.txt', 'utf8');

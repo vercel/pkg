@@ -2,8 +2,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-statements-per-line */
 
-'use strict';
-
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');

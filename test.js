@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let path = require('path');
 let globby = require('globby');
 let utils = require('./utils.js');

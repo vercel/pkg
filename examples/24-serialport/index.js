@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 // INFORMATION!
 // you can place "serialport.node" near executable file
 // and erase "node_modules" directory - and it will work

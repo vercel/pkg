@@ -1,5 +1,3 @@
-'use strict';
-
 let cors = require('cors');
 let req = { method: 'OPTIONS', headers: { } };
 let res = { headers: {}, setHeader: function (name, value) {

@@ -1,5 +1,3 @@
-'use strict';
-
 let compression = require('compression');
 let req = { headers: { } };
 let res = {};

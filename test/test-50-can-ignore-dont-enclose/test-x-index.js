@@ -5,8 +5,6 @@
 /* eslint-disable max-statements-per-line */
 /* eslint-disable no-empty */
 
-'use strict';
-
 try { require.resolve('some-s'); } catch (_) {}
 try { require.resolve('some-s-ci', 'can-ignore'); } catch (_) {}
 try { require.resolve('some-s-de', 'dont-enclose'); } catch (_) {}

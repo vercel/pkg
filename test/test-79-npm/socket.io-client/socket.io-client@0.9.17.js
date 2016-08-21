@@ -1,5 +1,3 @@
-'use strict';
-
 let fs = require('fs');
 let client = require('socket.io-client');
 if (typeof client.protocol === 'number') {

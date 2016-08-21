@@ -1,5 +1,3 @@
-'use strict';
-
 let mkdirp = require('mkdirp');
 let rimraf = require('rimraf');
 let execSync = require('child_process').execSync;

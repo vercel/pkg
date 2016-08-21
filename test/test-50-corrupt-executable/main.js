@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 return; // TODO
 /* eslint-disable no-unreachable */
 

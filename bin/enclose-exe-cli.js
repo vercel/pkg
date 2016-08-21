@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let path = require('path');
 let windows = process.platform === 'win32';
 let reporter = require('../lib/reporter.js');

@@ -1,5 +1,3 @@
-'use strict';
-
 let sequelize = require('sequelize');
 if (typeof sequelize.and !== 'function') return;
 

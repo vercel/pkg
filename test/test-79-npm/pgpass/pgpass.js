@@ -1,5 +1,3 @@
-'use strict';
-
 let pgpass = require('pgpass');
 
 let connection = {

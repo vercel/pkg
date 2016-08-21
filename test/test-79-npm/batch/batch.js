@@ -1,5 +1,3 @@
-'use strict';
-
 let Batch = require('batch');
 let batch = new Batch();
 

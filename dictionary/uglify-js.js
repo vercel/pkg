@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
 
   // assets, not scripts because of custom

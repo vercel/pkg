@@ -1,5 +1,3 @@
-'use strict';
-
 let transformers = require('transformers');
 
 try {

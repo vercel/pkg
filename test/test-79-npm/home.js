@@ -1,5 +1,3 @@
-'use strict';
-
 let o = require('./stamp.js');
 
 module.exports = function (stamp) {

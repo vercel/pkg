@@ -1,5 +1,3 @@
-'use strict';
-
 let shell = require('shelljs');
 let windows = process.platform === 'win32';
 let result = shell.exec(windows ? 'dir' : 'ls', { silent: true });

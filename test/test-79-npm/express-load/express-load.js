@@ -1,5 +1,3 @@
-'use strict';
-
 let load = require('express-load');
 
 let app = {};

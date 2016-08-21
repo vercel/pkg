@@ -1,5 +1,3 @@
-'use strict';
-
 let fs = require('fs');
 let path = require('path');
 let spawn = require('cross-spawn-async');

@@ -1,5 +1,3 @@
-'use strict';
-
 let minimatch = require('minimatch');
 if (minimatch('bar.foo', '*.foo') &&
     !minimatch('bar.foo', '*.bar')) {

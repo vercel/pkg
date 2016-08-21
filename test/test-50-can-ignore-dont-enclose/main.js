@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let assert = require('assert');
 let utils = require('../../utils.js');
 let enclose = require('../../').exec;

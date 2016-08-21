@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 let s = 'console.log("test");\n';
 
 for (let i = 0; i < 100; i += 1) {

@@ -1,5 +1,3 @@
-'use strict';
-
 let stringify = require('json-stringify-safe');
 let circularObj = {};
 circularObj.circularRef = circularObj;

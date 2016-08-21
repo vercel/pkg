@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-'use strict';
 setTimeout(function () {
 setTimeout(function () {
 setTimeout(function () {

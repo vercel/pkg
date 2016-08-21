@@ -1,7 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 
-'use strict';
-
 let gulp = require('gulp');
 let concat = require('gulp-concat');
 

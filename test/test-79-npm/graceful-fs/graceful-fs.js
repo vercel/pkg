@@ -1,5 +1,3 @@
-'use strict';
-
 // only enclosed run supposed
 if (!process.enclose) {
   console.log('ok');

@@ -1,5 +1,3 @@
-'use strict';
-
 function isModuleNotFoundError (error) {
   return ((error.code === 'MODULE_NOT_FOUND') &&
           (error.message.indexOf('build/Release/kerberos') >= 0));

@@ -1,5 +1,3 @@
-'use strict';
-
 let nconf = require('nconf');
 nconf.argv();
 let foo = nconf.get('foo');

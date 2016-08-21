@@ -1,5 +1,3 @@
-'use strict';
-
 let session = require('express-session');
 let req = { url: '/', headers: { } };
 let res = {};

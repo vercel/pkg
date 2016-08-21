@@ -3,8 +3,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-multi-spaces */
 
-'use strict';
-
 let fs = require('fs');
 let path = require('path');
 

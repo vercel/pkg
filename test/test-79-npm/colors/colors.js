@@ -1,5 +1,3 @@
-'use strict';
-
 let colors = require('colors');
 
 if (typeof colors.green === 'function') {

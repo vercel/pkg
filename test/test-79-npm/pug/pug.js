@@ -1,5 +1,3 @@
-'use strict';
-
 // see also express.js
 
 let file =

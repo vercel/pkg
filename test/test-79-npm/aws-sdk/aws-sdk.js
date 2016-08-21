@@ -1,5 +1,3 @@
-'use strict';
-
 let aws = require('aws-sdk');
 
 let s3 = new aws.S3({
