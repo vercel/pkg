@@ -6,3 +6,4 @@
 /build/node
 /node_modules
 /node_repository
+npm-debug.log
