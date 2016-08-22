@@ -1,27 +1,45 @@
 {
-  "bin": "./bin/enclose-exe.js",
-  "main": "./bin/enclose-exe.js",
-  "version": "9.9.9",
-  "private": true,
+  "name": "pkg",
+  "version": "3.0.0-beta.0",
+  "description": "Compile your Node.js project into executable",
+  "readme": "",
+  "main": "lib-es5/index.js",
+  "bin": "lib-es5/bin.js",
+  "babel": {
+    "plugins": [
+      "transform-async-to-generator",
+      "transform-runtime"
+    ],
+    "presets": [
+      "es2015"
+    ]
+  },
   "dependencies": {
     "async": "^1.5.2",
+    "babel-runtime": "6.11.6",
     "chalk": "^1.1.1",
     "globby": "^4.0.0",
     "minimatch": "^3.0.0",
+    "minimist": "1.2.0",
     "mkdirp": "^0.5.1",
     "optionator": "^0.8.1",
+    "progress": "1.1.8",
     "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4",
     "rimraf": "^2.5.0",
     "sha.js": "^2.4.4"
   },
   "devDependencies": {
-    "aws-sdk": "^2.2.30",
+    "babel-cli": "6.11.4",
+    "babel-plugin-transform-async-to-generator": "6.8.0",
+    "babel-plugin-transform-runtime": "6.12.0",
+    "babel-preset-es2015": "6.13.2",
+    "babel-register": "6.9.0",
     "json-stable-stringify": "^1.0.1",
     "klopov-eslint": "0.6.2"
   },
   "scripts": {
-    "build": "cd build && node 90-BATCH-BUILD.js",
-    "build-all": "cd build && node 90-BATCH-BUILD.js all",
+    "babel": "babel lib --out-dir lib-es5",
+    "bin": "node lib-es5/bin.js",
     "lint": "klopov-eslint . || true"
   }
 }

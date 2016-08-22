@@ -4,6 +4,7 @@
 /bin/enclose-*-linux-*
 /bin/enclose-*-darwin-*
 /build/node
+/lib-es5
 /node_modules
 /node_repository
 npm-debug.log
