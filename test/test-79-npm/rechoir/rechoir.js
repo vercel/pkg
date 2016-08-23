@@ -1,3 +1,5 @@
+'use strict';
+
 let config = require('interpret').extensions;
 let rechoir = require('rechoir');
 rechoir.prepare(config, './fixture.coffee');

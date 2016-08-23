@@ -1,3 +1,5 @@
+'use strict';
+
 let PouchDB = require('pouchdb');
 let db = new PouchDB('dbname');
 let rimraf = require('../../../node_modules/rimraf');

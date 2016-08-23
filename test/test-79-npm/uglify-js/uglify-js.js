@@ -1,3 +1,5 @@
+'use strict';
+
 let ujs = require('uglify-js');
 let code = '40 + 2';
 let ast = ujs.parse(code, {});

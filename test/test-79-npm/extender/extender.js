@@ -1,3 +1,5 @@
+'use strict';
+
 let extender = require('extender');
 
 let e = extender.define({

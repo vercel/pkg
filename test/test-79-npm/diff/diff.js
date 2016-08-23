@@ -1,3 +1,5 @@
+'use strict';
+
 let jsdiff = require('diff');
 let one = 'beep boop';
 let other = 'beep boob blah';

@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+'use strict';
 let table = {
   'angular-bridge': {
     'darwin/x64/m14': 'ok,0.5.0',

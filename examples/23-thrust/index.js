@@ -2,6 +2,8 @@
 
 /* eslint-disable camelcase */
 
+'use strict';
+
 require('node-thrust')(function (error, api) {
   let w = api.window({
     root_url: 'http://enclosejs.com'

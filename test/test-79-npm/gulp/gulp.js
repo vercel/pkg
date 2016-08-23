@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
+'use strict';
+
 process.stdout._write_ = process.stdout.write;
 process.stdout.write = function () {};
 console._log_ = function (m) {

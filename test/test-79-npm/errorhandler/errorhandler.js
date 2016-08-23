@@ -1,3 +1,5 @@
+'use strict';
+
 let errorhandler = require('errorhandler');
 let noop = function () {};
 let req = { headers: { Accept: 'text/html' } };

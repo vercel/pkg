@@ -1,3 +1,5 @@
+'use strict';
+
 let ejs = require('ejs');
 
 let s = '<% if (user) { %>' +

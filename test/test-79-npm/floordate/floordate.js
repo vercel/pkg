@@ -1,3 +1,5 @@
+'use strict';
+
 let floordate = require('floordate');
 let d = new Date();
 let v = floordate(d, 'year').getFullYear();

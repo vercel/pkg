@@ -1,3 +1,5 @@
+'use strict';
+
 let NRP = require('node-redis-pubsub');
 let config = { port: 6379, scope: 'demo' };
 new NRP(config); // eslint-disable-line no-new

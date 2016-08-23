@@ -1,5 +1,7 @@
 /* eslint-disable no-process-env */
 
+'use strict';
+
 // 1
 
 let error1;

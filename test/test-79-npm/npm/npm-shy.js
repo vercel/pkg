@@ -1,3 +1,5 @@
+'use strict';
+
 console.log = function () {
   process.stdout.write('ok\n');
 };

@@ -1,3 +1,5 @@
+'use strict';
+
 function Store () {
   this.emit = function () {};
 }

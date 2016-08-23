@@ -1,3 +1,5 @@
+'use strict';
+
 let assert = require('assert');
 let common = require('../test-y-common.js');
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let o = {
   p: process.platform,
   a: require('../../bin/enclose.js').arch(),

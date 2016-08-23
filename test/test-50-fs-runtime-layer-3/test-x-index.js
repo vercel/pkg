@@ -2,6 +2,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-statements-per-line */
 
+'use strict';
+
 let fs = require('fs');
 let path = require('path');
 let the_file = path.join(__dirname, 'test-z-asset.css');

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
 
   // declare.js имеет грязный хак.

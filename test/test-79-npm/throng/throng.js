@@ -1,3 +1,5 @@
+'use strict';
+
 let throng = require('throng');
 
 throng(8, function (id) {

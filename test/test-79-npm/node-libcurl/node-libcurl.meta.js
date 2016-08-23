@@ -1,3 +1,5 @@
+'use strict';
+
 // in win32 must manually
 // "git clone curl-for-windows"
 // in debian there is a bug

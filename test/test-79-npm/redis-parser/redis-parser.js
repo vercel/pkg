@@ -1,3 +1,5 @@
+'use strict';
+
 let Parser = require('redis-parser');
 let parser = new Parser({
   name: 'auto',

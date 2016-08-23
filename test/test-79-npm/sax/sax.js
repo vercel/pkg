@@ -1,3 +1,5 @@
+'use strict';
+
 let sax = require('sax');
 let parser = sax.parser(true);
 

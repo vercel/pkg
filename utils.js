@@ -1,3 +1,5 @@
+'use strict';
+
 let mkdirp = require('mkdirp');
 let path = require('path');
 let rimraf = require('rimraf');

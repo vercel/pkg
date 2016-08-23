@@ -1,3 +1,5 @@
+'use strict';
+
 let cookieParser = require('cookie-parser');
 let req = { headers: { cookie: 'MyCookie=Hello' } };
 let res = {};

@@ -1,3 +1,5 @@
+'use strict';
+
 let sinon = require('sinon');
 let callback = sinon.spy();
 callback();

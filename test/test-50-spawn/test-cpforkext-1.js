@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let assert = require('assert');
 let path = require('path');
 let cp = require('child_process');

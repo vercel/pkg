@@ -1,3 +1,5 @@
+'use strict';
+
 let StripeWebhook = require('stripe-webhook-middleware');
 let req = { headers: { }, body: { id: 'hello' } };
 let res = { status: function () {

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let s = 'function EventEmitter() {\n' +
         '  this.listeners = [];\n' +
         '}\n' +

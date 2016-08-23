@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let path = require('path');
 let assert = require('assert');
 let utils = require('../../utils.js');

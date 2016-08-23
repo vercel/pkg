@@ -5,6 +5,8 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-useless-concat */
 
+'use strict';
+
 let fs = require('fs');
 let path = require('path');
 

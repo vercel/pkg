@@ -1,3 +1,5 @@
+'use strict';
+
 // apt-get install libcurl4-openssl-dev
 
 // IF YOU USE 32-BIT NODEJS:

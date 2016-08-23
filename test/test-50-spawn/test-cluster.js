@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let assert = require('assert');
 let cluster = require('cluster');
 let child;

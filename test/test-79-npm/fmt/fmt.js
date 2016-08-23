@@ -1,3 +1,5 @@
+'use strict';
+
 let fmt = require('fmt');
 
 let save;

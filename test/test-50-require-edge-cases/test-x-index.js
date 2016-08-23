@@ -1,3 +1,5 @@
+'use strict';
+
 console.log([
 
   require('./test-y-require-false.js'),

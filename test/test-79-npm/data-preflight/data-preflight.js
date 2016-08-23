@@ -1,3 +1,5 @@
+'use strict';
+
 let path = require('path');
 let PreflightFile = require('data-preflight/src/js/preflightFile.js');
 let rimraf = require('../../../node_modules/rimraf');

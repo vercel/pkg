@@ -2,6 +2,8 @@
 
 /* eslint-disable no-bitwise */
 
+'use strict';
+
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');

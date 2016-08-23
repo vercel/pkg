@@ -1,5 +1,7 @@
 /* eslint-disable no-useless-concat */
 
+'use strict';
+
 let fs = require('fs');
 let path = require('path');
 let name = path.join(__dirname, 'not' + 'exists');

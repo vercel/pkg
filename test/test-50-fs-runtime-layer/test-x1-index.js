@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-path-concat */
 
+'use strict';
+
 let fs = require('fs');
 let path = require('path');
 let windows = process.platform === 'win32';

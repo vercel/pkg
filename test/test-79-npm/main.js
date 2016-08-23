@@ -2,6 +2,8 @@
 
 /* eslint-disable no-process-env */
 
+'use strict';
+
 let UPM = false; // USE_PREINSTALLED_MODULES
 
 let fs = require('fs');

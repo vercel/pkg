@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
 
   // колдуй только в fork ввиду недоступности

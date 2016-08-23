@@ -1,3 +1,5 @@
+'use strict';
+
 let name = 'not-exists';
 let error1, error2;
 

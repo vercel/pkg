@@ -1,3 +1,5 @@
+'use strict';
+
 let muri = require('muri');
 // console.log(muri.version);
 let o = muri('mongodb://user:pass@local,remote:27018,japan:27019/neatdb?replicaSet=myreplset&journal=true&w=2&wtimeoutMS=50');

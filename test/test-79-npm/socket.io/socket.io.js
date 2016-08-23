@@ -1,3 +1,5 @@
+'use strict';
+
 let http = require('http');
 let io = require('socket.io')();
 io.on('connection', function () {});

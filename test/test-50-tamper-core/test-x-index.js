@@ -1,3 +1,5 @@
+'use strict';
+
 let fsname = 'fs';
 let fs = require(fsname);
 let pathname = 'path';

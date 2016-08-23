@@ -1,3 +1,5 @@
+'use strict';
+
 let Negotiator = require('negotiator');
 let availableMediaTypes = [ 'text/html', 'text/plain', 'application/json' ];
 let request = { headers: { } };

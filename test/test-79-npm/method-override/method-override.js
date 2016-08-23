@@ -1,3 +1,5 @@
+'use strict';
+
 let override = require('method-override');
 let req = { method: 'GET', headers: { } };
 let res = {};

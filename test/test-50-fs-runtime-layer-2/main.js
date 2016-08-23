@@ -2,6 +2,8 @@
 
 /* eslint-disable no-bitwise */
 
+'use strict';
+
 let path = require('path');
 let assert = require('assert');
 let utils = require('../../utils.js');

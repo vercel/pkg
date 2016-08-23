@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 let flags = [];
 let platform = process.platform;
 let enclose = require('../../').exec;
