@@ -11,24 +11,24 @@
 
 'use strict';
 
-let common = {};
+var common = {};
 REQUIRE_COMMON(common); // eslint-disable-line new-cap
 
-let STORE_CODE = common.STORE_CODE;
-let STORE_CONTENT = common.STORE_CONTENT;
-let STORE_LINKS = common.STORE_LINKS;
-let STORE_STAT = common.STORE_STAT;
+var STORE_CODE = common.STORE_CODE;
+var STORE_CONTENT = common.STORE_CONTENT;
+var STORE_LINKS = common.STORE_LINKS;
+var STORE_STAT = common.STORE_STAT;
 
-let normalizePath = common.normalizePath;
-let insideTheBox = common.insideTheBox;
-let stripTheBox = common.stripTheBox;
+var normalizePath = common.normalizePath;
+var insideTheBox = common.insideTheBox;
+var stripTheBox = common.stripTheBox;
 
-let ENTRYPOINT;
-let FLAG_FORK_WAS_CALLED = false;
-let FLAG_DISABLE_DOT_NODE = false;
-let NODE_VERSION = process.version;
+var ENTRYPOINT;
+var FLAG_FORK_WAS_CALLED = false;
+var FLAG_DISABLE_DOT_NODE = false;
+var NODE_VERSION = process.version;
 if (NODE_VERSION.slice(0, 1) === 'v') NODE_VERSION = NODE_VERSION.slice(1);
-let NODE_VERSION_MAJOR = NODE_VERSION.split('.')[0] | 0;
+var NODE_VERSION_MAJOR = NODE_VERSION.split('.')[0] | 0;
 
 // /////////////////////////////////////////////////////////////////
 // ENTRYPOINT //////////////////////////////////////////////////////
@@ -50,16 +50,16 @@ if (!insideTheBox(ENTRYPOINT)) {
 // MOUNTPOINTS /////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-let mountpoints = [];
+var mountpoints = [];
 
 function insideMountpoint (f) {
   if (!insideTheBox(f)) return null;
-  let file = normalizePath(f);
-  let found = mountpoints.map(function (mountpoint) {
-    let interior = mountpoint.interior;
-    let exterior = mountpoint.exterior;
+  var file = normalizePath(f);
+  var found = mountpoints.map(function (mountpoint) {
+    var interior = mountpoint.interior;
+    var exterior = mountpoint.exterior;
     if (interior === file) return exterior;
-    let left = interior + require('path').sep;
+    var left = interior + require('path').sep;
     if (file.slice(0, left.length) !== left) return null;
     return exterior + file.slice(left.length - 1);
   }).filter(function (result) {
@@ -81,7 +81,7 @@ function readdirMountpoints (path) {
 }
 
 function translate (f) {
-  let result = insideMountpoint(f);
+  var result = insideMountpoint(f);
   if (!result) throw new Error('UNEXPECTED-05');
   return result;
 }
@@ -91,7 +91,7 @@ function cloneArgs (args_) {
 }
 
 function translateNth (args_, index, f) {
-  let args = cloneArgs(args_);
+  var args = cloneArgs(args_);
   args[index] = translate(f);
   return args;
 }
@@ -159,7 +159,7 @@ function projectToNearby (f) {
 function findNativeAddon (path) {
   if (!insideTheBox(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
-  let projector = projectToFilesystem(path);
+  var projector = projectToFilesystem(path);
   if (require('fs').existsSync(projector)) return projector;
   if (FLAG_DISABLE_DOT_NODE) return null; // FLAG influences only nearby
   projector = projectToNearby(path);
@@ -171,15 +171,15 @@ function findNativeAddon (path) {
 // NATIVE ADDON IAT ////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-let modifyNativeAddonWin32 = (function () {
+var modifyNativeAddonWin32 = (function () {
 
-  let fs = require('fs');
+  var fs = require('fs');
 
   return function (addon) {
 
-    let modifiedAddon;
+    var modifiedAddon;
 
-    let newExeName = require('path').basename(process.execPath);
+    var newExeName = require('path').basename(process.execPath);
     // sometimes there is "index.EXE"
     if (newExeName.slice(-4).toLowerCase() === '.exe') {
       newExeName = newExeName.slice(0, -4) + '.exe';
@@ -201,16 +201,16 @@ let modifyNativeAddonWin32 = (function () {
     // http://www.pelib.com/resources/luevel.txt
     // http://www.zotteljedi.de/pub/pe.txt
 
-    let f = fs.readFileSync(addon);
-    let peHeader = f.readInt32LE(0x3C);
-    let numberOfSections = f.readInt16LE(peHeader + 0x06);
-    let ia32 = (f.readInt16LE(peHeader + 0x18) !== 0x020B); // ia32 or x64
-    let optHeaderSize = f.readInt16LE(peHeader + 0x14);
-    let firstSection = peHeader + 0x18 + optHeaderSize;
+    var f = fs.readFileSync(addon);
+    var peHeader = f.readInt32LE(0x3C);
+    var numberOfSections = f.readInt16LE(peHeader + 0x06);
+    var ia32 = (f.readInt16LE(peHeader + 0x18) !== 0x020B); // ia32 or x64
+    var optHeaderSize = f.readInt16LE(peHeader + 0x14);
+    var firstSection = peHeader + 0x18 + optHeaderSize;
 
     function readStringToZero (p_) {
       if (p_ === 0) return '';
-      let s = '', c, p = p_;
+      var s = '', c, p = p_;
       while (true) {
         c = f[p];
         if (c === 0) break;
@@ -222,15 +222,15 @@ let modifyNativeAddonWin32 = (function () {
     }
 
     function writeString (p, s) {
-      let b = (new Buffer(s + '\x00'));
+      var b = (new Buffer(s + '\x00'));
       b.copy(f, p);
       return b.length;
     }
 
-    let sections = [];
+    var sections = [];
 
     (function () {
-      let pos = firstSection, section;
+      var pos = firstSection, section;
       while (true) {
         if (sections.length === numberOfSections) break;
         section = {};
@@ -249,7 +249,7 @@ let modifyNativeAddonWin32 = (function () {
     }());
 
     function rva2section (rva) {
-      let result = null;
+      var result = null;
       sections.some(function (section) {
         if ((rva >= section.virtualAddress) &&
             (rva < section.virtualAddress + section.virtualSize)) {
@@ -261,7 +261,7 @@ let modifyNativeAddonWin32 = (function () {
     }
 
     function rva2raw (rva) {
-      let section = rva2section(rva);
+      var section = rva2section(rva);
       return rva - section.virtualAddress + section.rawAddress;
     }
 
@@ -269,13 +269,13 @@ let modifyNativeAddonWin32 = (function () {
       return raw + section.virtualAddress - section.rawAddress;
     }
 
-    let firstRva = f.readInt32LE(peHeader + (ia32 ? 0x80 : 0x90));
-    let firstRaw = rva2raw(firstRva);
+    var firstRva = f.readInt32LE(peHeader + (ia32 ? 0x80 : 0x90));
+    var firstRaw = rva2raw(firstRva);
 
-    let imps = [];
+    var imps = [];
 
     (function () {
-      let pos = firstRaw, imp;
+      var pos = firstRaw, imp;
       while (true) {
         imp = {};
         imp.pos = pos;
@@ -304,12 +304,12 @@ let modifyNativeAddonWin32 = (function () {
 
     imps.some(function (imp) {
 
-      let firstThunkRaw = imp.firstThunkRaw;
+      var firstThunkRaw = imp.firstThunkRaw;
 
-      let thunks = [];
+      var thunks = [];
       (function () {
-        let posLink = firstThunkRaw;
-        let pos, posHi, posRva, posRaw, thunk;
+        var posLink = firstThunkRaw;
+        var pos, posHi, posRva, posRaw, thunk;
         while (true) {
           pos = f.readUInt32LE(posLink);
           if (!ia32) {
@@ -342,7 +342,7 @@ let modifyNativeAddonWin32 = (function () {
 
     });
 
-    let impNode = imps.filter(function (imp) {
+    var impNode = imps.filter(function (imp) {
       return imp.thunks.some(function (thunk) {
         return (thunk.name === 'node_module_register');
       });
@@ -359,9 +359,9 @@ let modifyNativeAddonWin32 = (function () {
       return addon;
     }
 
-    let placeSection = impNode.name.section;
-    let place = placeSection.rawAddress + placeSection.virtualSize;
-    let written = writeString(place, newExeName);
+    var placeSection = impNode.name.section;
+    var place = placeSection.rawAddress + placeSection.virtualSize;
+    var written = writeString(place, newExeName);
     placeSection.virtualSize += written;
     placeSection.writeBack();
     impNode.name.posRaw = place;
@@ -394,11 +394,11 @@ let modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  let path = require('path');
+  var path = require('path');
 
   process.enclose.path = {};
   process.enclose.path.resolve = function () {
-    let args = cloneArgs(arguments);
+    var args = cloneArgs(arguments);
     args.unshift(path.dirname(ENTRYPOINT));
     return path.resolve.apply(path, args);
   };
@@ -411,8 +411,8 @@ let modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  let fs = require('fs');
-  let ancestor = {};
+  var fs = require('fs');
+  var ancestor = {};
   ancestor.openSync =         fs.openSync;
   ancestor.open =             fs.open;
   ancestor.readSync =         fs.readSync;
@@ -440,12 +440,12 @@ let modifyNativeAddonWin32 = (function () {
   ancestor.accessSync =       fs.accessSync;
   ancestor.access =           fs.access;
 
-  let windows = process.platform === 'win32';
+  var windows = process.platform === 'win32';
 
-  let docks = {};
-  let ENOTDIR = windows ? 4052 : 20;
-  let ENOENT = windows ? 4058 : 2;
-  let EISDIR = windows ? 4068 : 21;
+  var docks = {};
+  var ENOTDIR = windows ? 4052 : 20;
+  var ENOENT = windows ? 4058 : 2;
+  var EISDIR = windows ? 4068 : 21;
 
   function assertEncoding (encoding) {
     if (encoding && !Buffer.isEncoding(encoding)) {
@@ -460,12 +460,12 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function maybeCallback (args) {
-    let cb = args[args.length - 1];
+    var cb = args[args.length - 1];
     return typeof cb === 'function' ? cb : rethrow();
   }
 
   function error_ENOENT (fileOrDirectory, path) { // eslint-disable-line camelcase
-    let error = new Error(
+    var error = new Error(
       fileOrDirectory + ' \'' + stripTheBox(path) + '\' ' +
       'was not included into executable at compilation stage. ' +
       'Please recompile adding it as asset or script.'
@@ -478,7 +478,7 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function error_EISDIR (path) { // eslint-disable-line camelcase
-    let error = new Error(
+    var error = new Error(
       'EISDIR: illegal operation on a directory, read'
     );
     error.errno = -EISDIR;
@@ -489,7 +489,7 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function error_ENOTDIR (path) { // eslint-disable-line camelcase
-    let error = new Error(
+    var error = new Error(
       'ENOTDIR: not a directory, scandir \'' + path + '\''
     );
     error.errno = -ENOTDIR;
@@ -505,13 +505,13 @@ let modifyNativeAddonWin32 = (function () {
 
   function openFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("openFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
-    let nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
-    let fd = ancestor.openSync.call(fs, nullDevice, 'r');
-    let dock = docks[fd] = {};
+    var nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
+    var fd = ancestor.openSync.call(fs, nullDevice, 'r');
+    var dock = docks[fd] = {};
     dock.fd = fd;
     dock.path = path;
     dock.entity = entity;
@@ -542,9 +542,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.open.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = openFromTheBox(path);
+      var r = openFromTheBox(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -562,11 +562,11 @@ let modifyNativeAddonWin32 = (function () {
 
   function readFromTheBoxSub (dock, entityContent, buffer, offset, length, position) {
 
-    let p = position;
+    var p = position;
     if ((p === null) || (typeof p === 'undefined')) p = dock.position;
     if (p >= entityContent.length) return 0;
-    let end = p + length;
-    let result = entityContent.copy(buffer, offset, p, end);
+    var end = p + length;
+    var result = entityContent.copy(buffer, offset, p, end);
     dock.position = end;
     return result;
 
@@ -579,11 +579,11 @@ let modifyNativeAddonWin32 = (function () {
     if (offset >= buffer.length) throw new Error('Offset is out of bounds');
     if (offset + length > buffer.length) throw new Error('Length extends beyond buffer');
 
-    let dock = docks[fd];
-    let entity = dock.entity;
-    let entityContent = entity[STORE_CONTENT];
+    var dock = docks[fd];
+    var entity = dock.entity;
+    var entityContent = entity[STORE_CONTENT];
     if (entityContent) return readFromTheBoxSub(dock, entityContent, buffer, offset, length, position);
-    let entityLinks = entity[STORE_LINKS];
+    var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(dock.path);
     throw new Error('UNEXPECTED-15');
 
@@ -605,9 +605,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.read.apply(fs, arguments);
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = readFromTheBox(
+      var r = readFromTheBox(
         fd, buffer, offset, length, position
       );
       process.nextTick(function () {
@@ -647,9 +647,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.write.apply(fs, arguments);
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = writeToTheBox();
+      var r = writeToTheBox();
       process.nextTick(function () {
         callback(null, r, buffer);
       });
@@ -688,9 +688,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.close.apply(fs, arguments);
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = closeFromTheBox(fd);
+      var r = closeFromTheBox(fd);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -718,11 +718,11 @@ let modifyNativeAddonWin32 = (function () {
 
   function readFileFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("readFileFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File', path);
-    let entityCode = entity[STORE_CODE];
+    var entityCode = entity[STORE_CODE];
     if (entityCode) return new Buffer('source-code-not-available');
 
     // why return empty buffer?
@@ -737,9 +737,9 @@ let modifyNativeAddonWin32 = (function () {
     //     at startup (node.js:140:18)
     //     at node.js:1001:3
 
-    let entityContent = entity[STORE_CONTENT];
+    var entityContent = entity[STORE_CONTENT];
     if (entityContent) return new Buffer(entityContent); // clone to prevent mutating store
-    let entityLinks = entity[STORE_LINKS];
+    var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(path);
     throw new Error('UNEXPECTED-20');
 
@@ -758,15 +758,15 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.readFileSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let options = readFileOptions(options_, false);
+    var options = readFileOptions(options_, false);
 
     if (!options) {
       return ancestor.readFileSync.apply(fs, arguments);
     }
 
-    let encoding = options.encoding;
+    var encoding = options.encoding;
     assertEncoding(encoding);
-    let buffer = readFileFromTheBox(path);
+    var buffer = readFileFromTheBox(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
 
@@ -781,18 +781,18 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.readFile.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let options = readFileOptions(options_, true);
+    var options = readFileOptions(options_, true);
 
     if (!options) {
       return ancestor.readFile.apply(fs, arguments);
     }
 
-    let encoding = options.encoding;
+    var encoding = options.encoding;
     assertEncoding(encoding);
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let buffer = readFileFromTheBox(path);
+      var buffer = readFileFromTheBox(path);
       if (encoding) buffer = buffer.toString(encoding);
       process.nextTick(function () {
         callback(null, buffer);
@@ -818,15 +818,15 @@ let modifyNativeAddonWin32 = (function () {
 
   function readdirFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("readdirFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('Directory', path);
-    let entityLinks = entity[STORE_LINKS];
+    var entityLinks = entity[STORE_LINKS];
     if (entityLinks) return entityLinks.concat(readdirMountpoints(path)); // immutable concat to prevent mutating store
-    let entityCode = entity[STORE_CODE];
+    var entityCode = entity[STORE_CODE];
     if (entityCode) throw error_ENOTDIR(path);
-    let entityContent = entity[STORE_CONTENT];
+    var entityContent = entity[STORE_CONTENT];
     if (entityContent) throw error_ENOTDIR(path);
     throw new Error('UNEXPECTED-25');
 
@@ -854,9 +854,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.readdir.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = readdirFromTheBox(path);
+      var r = readdirFromTheBox(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -874,7 +874,7 @@ let modifyNativeAddonWin32 = (function () {
 
   function realpathFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("realpathFromTheBox", path);
     return path;
 
@@ -902,8 +902,8 @@ let modifyNativeAddonWin32 = (function () {
       // app should not know real file name
     }
 
-    let callback = maybeCallback(arguments);
-    let r = realpathFromTheBox(path);
+    var callback = maybeCallback(arguments);
+    var r = realpathFromTheBox(path);
     process.nextTick(function () {
       callback(null, r);
     });
@@ -945,20 +945,20 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function findNativeAddonForStat (path_) {
-    let path = findNativeAddon(path_);
+    var path = findNativeAddon(path_);
     if (!path) throw error_ENOENT('File or directory', path_);
     return ancestor.statSync.call(fs, path);
   }
 
   function statFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("statFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForStat(path);
-    let entityStat = entity[STORE_STAT];
+    var entityStat = entity[STORE_STAT];
     if (!entityStat) throw new Error('UNEXPECTED-35');
-    let restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
+    var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
     restoreStat(restore);
     return restore;
 
@@ -986,9 +986,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.stat.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = statFromTheBox(path);
+      var r = statFromTheBox(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1026,9 +1026,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.lstat.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = statFromTheBox(path);
+      var r = statFromTheBox(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1046,11 +1046,11 @@ let modifyNativeAddonWin32 = (function () {
 
   function fstatFromTheBox (fd) {
 
-    let dock = docks[fd];
-    let entity = dock.entity;
-    let entityStat = entity[STORE_STAT];
+    var dock = docks[fd];
+    var entity = dock.entity;
+    var entityStat = entity[STORE_STAT];
     if (!entityStat) throw new Error('UNEXPECTED-40');
-    let restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
+    var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
     restoreStat(restore);
     return restore;
 
@@ -1072,9 +1072,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.fstat.apply(fs, arguments);
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = fstatFromTheBox(fd);
+      var r = fstatFromTheBox(fd);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1092,9 +1092,9 @@ let modifyNativeAddonWin32 = (function () {
 
   function existsFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("existsFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return false;
     return true;
 
@@ -1122,8 +1122,8 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.exists.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
-    let r = existsFromTheBox(path);
+    var callback = maybeCallback(arguments);
+    var r = existsFromTheBox(path);
     process.nextTick(function () {
       callback(r);
     });
@@ -1136,9 +1136,9 @@ let modifyNativeAddonWin32 = (function () {
 
   function accessFromTheBox (path_) {
 
-    let path = normalizePath(path_);
+    var path = normalizePath(path_);
     // console.log("accessFromTheBox", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
     return undefined; // eslint-disable-line no-undefined
 
@@ -1166,9 +1166,9 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor.access.apply(fs, translateNth(arguments, 0, path));
     }
 
-    let callback = maybeCallback(arguments);
+    var callback = maybeCallback(arguments);
     try {
-      let r = accessFromTheBox(path);
+      var r = accessFromTheBox(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1194,7 +1194,7 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function findNativeAddonForInternalModuleStat (path_) {
-    let path = findNativeAddon(path_);
+    var path = findNativeAddon(path_);
     if (!path) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(path));
   }
@@ -1206,7 +1206,7 @@ let modifyNativeAddonWin32 = (function () {
     // a file, 1 when it's a directory or < 0 on error (usually -ENOENT).
     // The speedup comes from not creating thousands of Stat and Error objects.
 
-    let path = revertMakingLong(long);
+    var path = revertMakingLong(long);
 
     if (!insideTheBox(path)) {
       return process.binding('fs').internalModuleStat(long);
@@ -1217,9 +1217,9 @@ let modifyNativeAddonWin32 = (function () {
 
     path = normalizePath(path);
     // console.log("internalModuleStat", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForInternalModuleStat(path);
-    let entityStat = entity[STORE_STAT];
+    var entityStat = entity[STORE_STAT];
     if (!entityStat) return -ENOENT;
     if (entityStat.isFileValue) return 0;
     if (entityStat.isDirectoryValue) return 1;
@@ -1234,7 +1234,7 @@ let modifyNativeAddonWin32 = (function () {
     // a string or undefined when the file cannot be opened. The speedup
     // comes from not creating Error objects on failure.
 
-    let path = revertMakingLong(long);
+    var path = revertMakingLong(long);
 
     if (!insideTheBox(path)) {
       return process.binding('fs').internalModuleReadFile(long);
@@ -1245,9 +1245,9 @@ let modifyNativeAddonWin32 = (function () {
 
     path = normalizePath(path);
     // console.log("internalModuleReadFile", path);
-    let entity = VIRTUAL_FILESYSTEM[path];
+    var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return undefined; // eslint-disable-line no-undefined
-    let entityContent = entity[STORE_CONTENT];
+    var entityContent = entity[STORE_CONTENT];
     if (!Buffer.isBuffer(entityContent)) return undefined; // eslint-disable-line no-undefined
     return entityContent.toString();
 
@@ -1261,8 +1261,8 @@ let modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  let Module = require('module');
-  let ancestor = {};
+  var Module = require('module');
+  var ancestor = {};
   ancestor.require =          Module.prototype.require;
   ancestor._compile =         Module.prototype._compile;
   ancestor._resolveFilename = Module._resolveFilename;
@@ -1294,11 +1294,11 @@ let modifyNativeAddonWin32 = (function () {
     }
   };
 
-  let makeRequireFunction;
+  var makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
     makeRequireFunction = function () {
-      let self = this; // eslint-disable-line consistent-this,no-invalid-this
+      var self = this; // eslint-disable-line consistent-this,no-invalid-this
       function rqfn (path) {
         return self.require(path);
       }
@@ -1326,23 +1326,23 @@ let modifyNativeAddonWin32 = (function () {
       return ancestor._compile.apply(this, arguments);
     }
 
-    let filename = normalizePath(filename_);
+    var filename = normalizePath(filename_);
     // console.log("_compile", filename);
-    let entity = VIRTUAL_FILESYSTEM[filename];
+    var entity = VIRTUAL_FILESYSTEM[filename];
 
     if (!entity) {
-      // let user try to "_compile" a packaged file
+      // var user try to "_compile" a packaged file
       return ancestor._compile.apply(this, arguments);
     }
 
-    let entityCode = entity[STORE_CODE];
-    let entityContent = entity[STORE_CONTENT];
+    var entityCode = entity[STORE_CODE];
+    var entityContent = entity[STORE_CONTENT];
 
     if (entityCode) {
       if (entityContent) throw new Error('UNEXPECTED-45');
-      let dirname = require('path').dirname(filename);
-      let rqfn = makeRequireFunction.call(this);
-      let args = [ this.exports, rqfn, this, filename, dirname ];
+      var dirname = require('path').dirname(filename);
+      var rqfn = makeRequireFunction.call(this);
+      var args = [ this.exports, rqfn, this, filename, dirname ];
       return entityCode.apply(this.exports, args);
     }
 
@@ -1359,12 +1359,12 @@ let modifyNativeAddonWin32 = (function () {
 
   Module._resolveFilename = function (request) {
 
-    let filename;
+    var filename;
 
-    let reqDotNode = (request.slice(-5) === '.node'); // bindings.js: opts.bindings += '.node'
-    let reqLeftSlash = (request.indexOf('\\') >= 0);  // heapdump: require('../build/Release/addon')
-    let reqRightSlash = (request.indexOf('/') >= 0);  // slash means that non-package is required ...
-    let enable = reqDotNode || reqLeftSlash || reqRightSlash; // ... (had a problem in levelup/pouchdb)
+    var reqDotNode = (request.slice(-5) === '.node'); // bindings.js: opts.bindings += '.node'
+    var reqLeftSlash = (request.indexOf('\\') >= 0);  // heapdump: require('../build/Release/addon')
+    var reqRightSlash = (request.indexOf('/') >= 0);  // slash means that non-package is required ...
+    var enable = reqDotNode || reqLeftSlash || reqRightSlash; // ... (had a problem in levelup/pouchdb)
 
     FLAG_DISABLE_DOT_NODE = !enable;
     try {
@@ -1380,7 +1380,7 @@ let modifyNativeAddonWin32 = (function () {
       return filename;
     }
 
-    let found = findNativeAddon(filename);
+    var found = findNativeAddon(filename);
     if (found) filename = found;
 
     return filename;
@@ -1389,7 +1389,7 @@ let modifyNativeAddonWin32 = (function () {
 
   Module._extensions['.node'] = function (module, filename_) {
 
-    let filename = filename_;
+    var filename = filename_;
 
     if (!insideTheBox(filename)) {
       try {
@@ -1430,8 +1430,8 @@ let modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  let cluster = require('cluster');
-  let ancestor = {};
+  var cluster = require('cluster');
+  var ancestor = {};
   ancestor.fork = cluster.fork;
 
   if (ancestor.fork) {
@@ -1453,8 +1453,8 @@ let modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  let childProcess = require('child_process');
-  let ancestor = {};
+  var childProcess = require('child_process');
+  var ancestor = {};
   ancestor.fork = childProcess.fork;
   ancestor.spawn = childProcess.spawn;
 
@@ -1469,20 +1469,20 @@ let modifyNativeAddonWin32 = (function () {
 
   function filterBadOptions (args) {
     return args.filter(function (arg) {
-      let name = arg.split('=')[0];
+      var name = arg.split('=')[0];
       return name !== '--debug-port';
     });
   }
 
   function makeRuntimeArgs (args) {
-    let noBad = filterBadOptions(args);
+    var noBad = filterBadOptions(args);
     if (!noBad.length) return [];
     return [ '--runtime' ].concat(noBad);
   }
 
   function rearrangeFork (args) {
-    let scriptPos = -1;
-    for (let i = 0; i < args.length; i += 1) {
+    var scriptPos = -1;
+    for (var i = 0; i < args.length; i += 1) {
       if (args[i].slice(0, 2) !== '--') {
         scriptPos = i;
         break;
@@ -1520,7 +1520,7 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function rearrangeSpawn (args) {
-    let scriptPos = 0;
+    var scriptPos = 0;
     if (args[scriptPos] === process.argv[1]) {
       return [].concat(
         args.slice(scriptPos + 1)
@@ -1531,20 +1531,20 @@ let modifyNativeAddonWin32 = (function () {
   }
 
   function extractEntrypoint (args) {
-    let i = args.indexOf('--entrypoint');
+    var i = args.indexOf('--entrypoint');
     if (i < 0) return null;
     return args[i + 1];
   }
 
   childProcess.spawn = function () {
 
-    let args = cloneArgs(arguments);
+    var args = cloneArgs(arguments);
 
     if ((args[0] && args[1] &&
          args[1].unshift && args[2])) {
 
-      let callsNode = (args[0] === 'node');
-      let callsExecPath = (args[0] === process.execPath);
+      var callsNode = (args[0] === 'node');
+      var callsExecPath = (args[0] === process.execPath);
 
       if (callsNode || callsExecPath) {
 
@@ -1554,7 +1554,7 @@ let modifyNativeAddonWin32 = (function () {
           args[1] = rearrangeSpawn(args[1]);
         }
 
-        let entrypoint = extractEntrypoint(args[1]);
+        var entrypoint = extractEntrypoint(args[1]);
         if (callsNode && insideTheBox(entrypoint)) {
           // pm2 calls "node" with __dirname-based
           // thebox-script. force execPath instead of "node"

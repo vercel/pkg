@@ -2,7 +2,7 @@
 
 'use strict';
 
-let path = require('path');
+var path = require('path');
 
 exports.STORE_CODE = 0;
 exports.STORE_CONTENT = 1;
@@ -12,16 +12,16 @@ exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
 function uppercaseDriveLetter (f) {
-  let file = f;
+  var file = f;
   if (file.slice(1, 3) === ':\\') {
-    let fs01 = file.slice(0, 1);
+    var fs01 = file.slice(0, 1);
     file = fs01.toUpperCase() + file.slice(1);
   }
   return file;
 }
 
 function removeTrailingSlashes (f) {
-  let file = f;
+  var file = f;
   if (file === '/') {
     return file; // dont remove from "/"
   }
@@ -29,7 +29,7 @@ function removeTrailingSlashes (f) {
     return file; // dont remove from "d:\\"
   }
   while (true) {
-    let s = file.slice(-1);
+    var s = file.slice(-1);
     if (s === '\\') {
       file = file.slice(0, -1);
     } else
@@ -43,7 +43,7 @@ function removeTrailingSlashes (f) {
 }
 
 function normalizePath (f) {
-  let file = f;
+  var file = f;
   file = path.normalize(file);
   file = uppercaseDriveLetter(file);
   file = removeTrailingSlashes(file);
@@ -106,7 +106,7 @@ exports.theboxify = function (file, slash) {
 
 function insideTheBox (f) {
   if (typeof f !== 'string') return false;
-  let file = normalizePath(f);
+  var file = normalizePath(f);
   return (file.slice(2, 10) === '\\thebox\\') ||
          (file.slice(0, 8) === '/thebox/');
 }
@@ -115,7 +115,7 @@ exports.insideTheBox = insideTheBox;
 
 exports.stripTheBox = function (f) {
   if (!insideTheBox(f)) return f;
-  let file = normalizePath(f);
+  var file = normalizePath(f);
   if (file.slice(2, 10) === '\\thebox\\') {
     return file.slice(0, 2) + file.slice(9);
   } else {

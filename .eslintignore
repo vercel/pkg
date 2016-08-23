@@ -4,5 +4,6 @@
 /lib-es5
 /node_modules
 /node_repository
+/runtime
 /test/test-50-many-arrow-functions/test-x-index.js
 /test/test-50-no-super-in-constructor/test-x-index.js
