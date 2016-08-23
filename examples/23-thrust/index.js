@@ -5,6 +5,7 @@
 'use strict';
 
 require('node-thrust')(function (error, api) {
+  if (error) throw error;
   let w = api.window({
     root_url: 'http://enclosejs.com'
   });

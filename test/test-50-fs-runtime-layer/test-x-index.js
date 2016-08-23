@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+
 'use strict';
 
 require('./test-x1-index.js');

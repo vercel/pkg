@@ -13,7 +13,6 @@ diff.forEach(function (part) {
   join += color + ':[' + part.value + ']';
 });
 
-
 if (join === 'grey:[beep boo]red:[p]green:[b blah]') {
   console.log('ok');
 }

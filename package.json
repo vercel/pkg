@@ -35,12 +35,20 @@
     "babel-plugin-transform-runtime": "6.12.0",
     "babel-preset-es2015": "6.13.2",
     "babel-register": "6.9.0",
-    "json-stable-stringify": "^1.0.1",
-    "klopov-eslint": "0.6.2"
+    "eslint-config-klopov": "0.8.0",
+    "json-stable-stringify": "^1.0.1"
   },
   "scripts": {
     "babel": "babel lib --out-dir lib-es5",
     "bin": "node lib-es5/bin.js",
-    "lint": "klopov-eslint . || true"
+    "lint": "eslint-klopov . || true"
+  },
+  "eslintConfig": {
+    "extends": "klopov",
+    "parser": "babel-eslint",
+    "rules": {
+      "one-var": "off",
+      "padded-blocks": "off"
+    }
   }
 }
