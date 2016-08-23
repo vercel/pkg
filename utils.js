@@ -1,7 +1,9 @@
 let mkdirp = require('mkdirp');
+let path = require('path');
 let rimraf = require('rimraf');
 let execSync = require('child_process').execSync;
 let spawnSync = require('child_process').spawnSync;
+let existsSync = require('fs').existsSync;
 let stableStringify = require('json-stable-stringify');
 
 module.exports.mkdirp = mkdirp;
@@ -101,6 +103,19 @@ module.exports.spawn.sync = function (command, args, opts) {
 
 };
 
+const es5path = path.resolve(__dirname, './lib-es5/bin.js');
+const es7path = path.resolve(__dirname, './lib/bin.js');
+
+module.exports.make = function (args) {
+  args = args.slice(0);
+  const es5 = existsSync(es5path);
+  const binPath = es5 ? es5path : es7path;
+  args.unshift(binPath);
+  if (!es5) args.unshift('-r', 'babel-register');
+  const opts = { stdio: 'inherit' };
+  module.exports.spawn.sync('node', args, opts);
+};
+
 module.exports.stringify = function (obj, replacer, space) {
-  return stableStringify(obj, { replacer: replacer, space: space });
+  return stableStringify(obj, { replacer, space });
 };

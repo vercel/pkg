@@ -1,4 +1,4 @@
-function helluu(a, b, c) {
+function hellee(a, b, c) {
 
         require.resolve();
   /***/ require.resolve("barbos1");
@@ -24,7 +24,33 @@ function helluu(a, b, c) {
 
 }
 
-function hellee(a, b, c) {
+function helleeTry(a, b, c) {
+
+        try { require.resolve(); } catch (_) {}
+  /***/ try { require.resolve("barbos1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "dont-enclose1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "can-ignore1"); } catch (_) {}
+  /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
+
+        try { require(); } catch (_) {}
+  /***/ try { require("barbos2"); } catch (_) {}
+  /***/ try { require("barbos2", "dont-enclose2"); } catch (_) {}
+  /***/ try { require("barbos2", "can-ignore2"); } catch (_) {}
+  /***/ try { require("barbos2", "unknown2"); } catch (_) {}
+
+        try { path.join(); } catch (_) {}
+        try { path.join(__dirname); } catch (_) {}
+  /***/ try { path.join(__dirname, "file"); } catch (_) {}
+
+  // TODO path.join(__dirname + "/file");
+
+  return {
+    result: a + b - c
+  };
+
+}
+
+function helluu(a, b, c) {
 
   return {
     result: function() {
@@ -61,32 +87,6 @@ function hellee(a, b, c) {
 
 function helluuTry(a, b, c) {
 
-        try { require.resolve(); } catch (_) {}
-  /***/ try { require.resolve("barbos1"); } catch (_) {}
-  /***/ try { require.resolve("barbos1", "dont-enclose1"); } catch (_) {}
-  /***/ try { require.resolve("barbos1", "can-ignore1"); } catch (_) {}
-  /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
-
-        try { require(); } catch (_) {}
-  /***/ try { require("barbos2"); } catch (_) {}
-  /***/ try { require("barbos2", "dont-enclose2"); } catch (_) {}
-  /***/ try { require("barbos2", "can-ignore2"); } catch (_) {}
-  /***/ try { require("barbos2", "unknown2"); } catch (_) {}
-
-        try { path.join(); } catch (_) {}
-        try { path.join(__dirname); } catch (_) {}
-  /***/ try { path.join(__dirname, "file"); } catch (_) {}
-
-  // TODO path.join(__dirname + "/file");
-
-  return {
-    result: a + b - c
-  };
-
-}
-
-function helleeTry(a, b, c) {
-
   return {
     result: function() {
 
@@ -121,8 +121,8 @@ function helleeTry(a, b, c) {
 }
 
 console.log(
-  helluu(1, 2, 3).result,
-  hellee(4, 5, 6).result
+  hellee(1, 2, 3).result,
+  helluu(4, 5, 6).result
 );
 
 var inheritedDataKeys = (function() {

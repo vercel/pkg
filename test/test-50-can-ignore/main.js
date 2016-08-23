@@ -3,7 +3,6 @@
 let path = require('path');
 let assert = require('assert');
 let utils = require('../../utils.js');
-let enclose = require('../../').exec;
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -20,7 +19,7 @@ left = utils.spawn.sync(
   { cwd: path.dirname(input) }
 );
 
-enclose.sync(flags.concat([
+utils.make(flags.concat([
   '--output', output, input
 ]));
 

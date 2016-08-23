@@ -4,7 +4,6 @@ let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
 let utils = require('../../utils.js');
-let enclose = require('../../').exec;
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -24,7 +23,7 @@ left = fs.readFileSync(
   return line.split('/***/ ')[1];
 }).join('\n') + '\n';
 
-enclose.sync(flags.concat([
+utils.make(flags.concat([
   '--output', output, input
 ]));
 
