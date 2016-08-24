@@ -2,8 +2,8 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
+var fs = require('fs');
+var path = require('path');
 
 console.log([
 

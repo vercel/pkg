@@ -5,8 +5,7 @@
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
-let utils = require('../../utils.js');
-let enclose = require('../../').exec;
+let utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -24,7 +23,7 @@ fs.writeFileSync(
                 fs.readFileSync('./plugins-D-ext/test-y-require-D.js')
 );
 
-enclose.sync(flags.concat([
+utils.pkg.sync(flags.concat([
   '--output', output, input
 ]));
 

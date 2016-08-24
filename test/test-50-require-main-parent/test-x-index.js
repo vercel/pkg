@@ -2,7 +2,7 @@
 
 'use strict';
 
-let fs = require('fs');
+var fs = require('fs');
 
 console.log([
   typeof process.argv[0],

@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-var */
+
 'use strict';
 
-let o = {
+var o = {
   p: process.platform,
-  a: require('../../bin/enclose.js').arch(),
+  a: process.arch,
   m: parseInt(process.versions.modules, 10)
 };
 

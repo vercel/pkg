@@ -10,8 +10,7 @@ let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
 let globby = require('globby');
-let utils = require('../../utils.js');
-let enclose = require('../../').exec;
+let utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -30,9 +29,9 @@ function applyMetaToRight (right, meta) {
 let stamp = {};
 
 let checklist = fs.readFileSync('checklist.js', 'utf-8');
-let table = checklist.split('var table = ')[1].split(';')[0];
+let table = checklist.split('const table = ')[1].split(';')[0];
 table = JSON.parse(table);
-let changes = checklist.split('var changes = ')[1].split(';')[0];
+let changes = checklist.split('const changes = ')[1].split(';')[0];
 changes = JSON.parse(changes);
 
 function save () {
@@ -42,8 +41,8 @@ function save () {
   fs.writeFileSync('checklist.js',
     '/* eslint-disable no-unused-vars */\n' +
     '"use strict";\n' +
-    'var table = ' + t + ';\n' +
-    'var changes = ' + c + ';\n'
+    'const table = ' + t + ';\n' +
+    'const changes = ' + c + ';\n'
   );
 }
 
@@ -98,7 +97,7 @@ if (!UPM) {
   let lucky = path.basename(input).slice(0, -3);
   let output = path.join('z-isolator', lucky + '.exe');
 
-  enclose.sync(flags.concat([
+  utils.pkg.sync(flags.concat([
     '--output', output, input
   ]));
 
@@ -218,7 +217,7 @@ dickies.some(function (dicky) {
 
   let right;
 
-  console.log('Running non-enclosed ' + wordy + '...');
+  console.log('Running non-compiled ' + wordy + '...');
 
   try {
     right = utils.spawn.sync(
@@ -246,7 +245,7 @@ dickies.some(function (dicky) {
     let config = path.join(foldy, packy + '.config.js');
     config = fs.existsSync(config) ? [ '--config', config ] : [];
 
-    enclose.sync(flags.concat([
+    utils.pkg.sync(flags.concat([
       '--output', output, input
     ]).concat(config));
 
@@ -263,7 +262,7 @@ dickies.some(function (dicky) {
       );
     });
 
-    console.log('Running enclosed ' + wordy + '...');
+    console.log('Running compiled ' + wordy + '...');
 
     try {
       right = utils.spawn.sync(

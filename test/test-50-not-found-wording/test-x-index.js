@@ -2,9 +2,9 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let name = path.join(__dirname, 'not' + 'exists');
+var fs = require('fs');
+var path = require('path');
+var name = path.join(__dirname, 'not' + 'exists');
 
 try {
   fs.readFileSync(name);

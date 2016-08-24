@@ -4,7 +4,7 @@
 
 // 1
 
-let error1;
+var error1;
 
 function func1 () {
   require.resolve('not-exists-1', 'can-ignore');
@@ -18,7 +18,7 @@ try {
 
 // 2
 
-let error2;
+var error2;
 
 function func2 () {
   require.resolve('not-exists-2', 'can-ignore');
@@ -32,7 +32,7 @@ try {
 
 // 3
 
-let error3;
+var error3;
 
 try {
   require.resolve('not-exists-3');
@@ -42,7 +42,7 @@ try {
 
 // 4
 
-let error4;
+var error4;
 
 try {
   if (process.env.HELLO !== 'WORLD') {

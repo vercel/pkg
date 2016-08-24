@@ -7,7 +7,9 @@ let path = require('path');
 let assert = require('assert');
 
 let dicts = fs.readdirSync('../../dictionary');
-dicts = dicts.map(function (dict) {
+dicts = dicts.filter(function (dict) {
+  return dict !== '.eslintrc.json';
+}).map(function (dict) {
   assert.equal(dict.slice(-3), '.js');
   return dict.slice(0, -3);
 });

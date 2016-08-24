@@ -1,7 +1,7 @@
 'use strict';
 
-let name = 'not-exists';
-let error1, error2;
+var name = 'not-exists';
+var error1, error2;
 
 try {
   require.resolve(name);

@@ -4,8 +4,7 @@
 
 let path = require('path');
 let assert = require('assert');
-let utils = require('../../utils.js');
-let enclose = require('../../').exec;
+let utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -17,7 +16,7 @@ let output = './run-time/test-output.exe';
 let right;
 utils.mkdirp.sync(path.dirname(output));
 
-enclose.sync(flags.concat([
+utils.pkg.sync(flags.concat([
   '--output', output, input
 ]));
 

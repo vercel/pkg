@@ -5,8 +5,8 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
+var fs = require('fs');
+var path = require('path');
 
 /*
 var the_rs_A =    require.resolve("./test-y-resolve-A.txt");
@@ -22,15 +22,15 @@ var the_rs_G_path =               "./test-y-resolve-G.txt"; var the_rs_G = requi
 var the_rs_H_path =               "./test-y-resolve-H.txt"; var the_rs_H = require.resolve(the_rs_H_path, "dont-enclose");
 var the_rs_H2_path =              "./test-y-resolve-H.txt"; var the_rs_H = require.resolve(the_rs_H_path, "can-ignore");
 */
-let the_rqcd_I =                                require('./test-z-require-code-I.js');
-let the_rqcd_J =                                require('./test-z-require-code-J.js', 'dont-enclose');
-let the_rqcd_J2 =                               require('./test-z-require-code-J.js', 'can-ignore');
-let the_rqcnt_K =                       fs.readFileSync('./test-z-require-content-K.txt');
-let the_rqcnt_L =                       fs.readFileSync('./test-z-require-content-L.txt', null, 'dont-enclose');
-let the_rqcnt_L2 =                      fs.readFileSync('./test-z-require-content-L.txt', null, 'can-ignore');
-let the_rqcnt_M =  fs.readFileSync(path.join(__dirname, './test-z-require-content-M.txt'));
-let the_rqcnt_N =  fs.readFileSync(path.join(__dirname, './test-z-require-content-N.txt'), null, 'dont-enclose');
-let the_rqcnt_N2 = fs.readFileSync(path.join(__dirname, './test-z-require-content-N.txt'), null, 'can-ignore');
+var the_rqcd_I =                                require('./test-z-require-code-I.js');
+var the_rqcd_J =                                require('./test-z-require-code-J.js', 'dont-enclose');
+var the_rqcd_J2 =                               require('./test-z-require-code-J.js', 'can-ignore');
+var the_rqcnt_K =                       fs.readFileSync('./test-z-require-content-K.txt');
+var the_rqcnt_L =                       fs.readFileSync('./test-z-require-content-L.txt', null, 'dont-enclose');
+var the_rqcnt_L2 =                      fs.readFileSync('./test-z-require-content-L.txt', null, 'can-ignore');
+var the_rqcnt_M =  fs.readFileSync(path.join(__dirname, './test-z-require-content-M.txt'));
+var the_rqcnt_N =  fs.readFileSync(path.join(__dirname, './test-z-require-content-N.txt'), null, 'dont-enclose');
+var the_rqcnt_N2 = fs.readFileSync(path.join(__dirname, './test-z-require-content-N.txt'), null, 'can-ignore');
 
 console.log([
 //  fs.readFileSync(the_rs_A).toString(),

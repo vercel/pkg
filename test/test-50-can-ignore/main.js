@@ -4,7 +4,7 @@
 
 let path = require('path');
 let assert = require('assert');
-let utils = require('../../utils.js');
+let utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -21,7 +21,7 @@ left = utils.spawn.sync(
   { cwd: path.dirname(input) }
 );
 
-utils.make(flags.concat([
+utils.pkg.sync(flags.concat([
   '--output', output, input
 ]));
 

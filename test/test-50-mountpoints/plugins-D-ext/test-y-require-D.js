@@ -1,7 +1,7 @@
 'use strict';
 
-let assert = require('assert');
-let common = require('../test-y-common.js');
+var assert = require('assert');
+var common = require('../test-y-common.js');
 
 if (__dirname.indexOf('thebox') < 0) {
   console.log(__dirname);

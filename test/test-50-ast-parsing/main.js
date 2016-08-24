@@ -5,7 +5,7 @@
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
-let utils = require('../../utils.js');
+let utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -14,6 +14,10 @@ let flags = process.argv.slice(2);
 let input = './test-x-index.js';
 let output = './test-output.exe';
 let data = './test-y-data.txt';
+
+let version = process.version;
+if (/^v?0.12/.test(version)) return;
+if (/^v?4/.test(version)) return;
 
 let left, right;
 
@@ -25,7 +29,7 @@ left = fs.readFileSync(
   return line.split('/***/ ')[1];
 }).join('\n') + '\n';
 
-utils.make(flags.concat([
+utils.pkg.sync(flags.concat([
   '--output', output, input
 ]));
 

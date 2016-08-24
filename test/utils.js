@@ -105,10 +105,14 @@ module.exports.spawn.sync = function (command, args, opts) {
 
 };
 
-const es5path = path.resolve(__dirname, './lib-es5/bin.js');
-const es7path = path.resolve(__dirname, './lib/bin.js');
+module.exports.pkg = function () {
+  throw new Error('Async pkg not implemented');
+};
 
-module.exports.make = function (args) {
+const es5path = path.resolve(__dirname, '../lib-es5/bin.js');
+const es7path = path.resolve(__dirname, '../lib/bin.js');
+
+module.exports.pkg.sync = function (args) {
   args = args.slice(0);
   const es5 = existsSync(es5path);
   const binPath = es5 ? es5path : es7path;

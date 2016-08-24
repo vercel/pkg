@@ -2,14 +2,12 @@
 
 'use strict';
 
-return; // TODO
-/* eslint-disable no-unreachable */
+if (process) return; // TODO ENABLE
 
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
-let utils = require('../../utils.js');
-let enclose = require('../../').exec;
+let utils = require('../utils.js');
 let a2o = require('../../').argsToObject;
 
 assert(!module.parent);
@@ -20,11 +18,11 @@ let input = './test-x-index.js';
 let output = './test-output.exe';
 
 let version = a2o(flags).version;
-if (/^v?0.12./.test(version)) return;
+if (/^v?0.12/.test(version)) return;
 
 let right;
 
-enclose.sync(flags.concat([
+utils.pkg.sync(flags.concat([
   '--output', output, input
 ]));
 

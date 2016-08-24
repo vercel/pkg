@@ -1,10 +1,10 @@
 'use strict';
 
-let fsname = 'fs';
-let fs = require(fsname);
-let pathname = 'path';
-let pathp = require.resolve(pathname);
-let path = require(pathp);
+var fsname = 'fs';
+var fs = require(fsname);
+var pathname = 'path';
+var pathp = require.resolve(pathname);
+var path = require(pathp);
 
 console.log([
 

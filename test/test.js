@@ -8,8 +8,8 @@ let utils = require('./utils.js');
 
 function main (args) {
   let flags = args;
-  let testDirectory = path.join(__dirname, 'test/*/main.js');
-  globby.sync(testDirectory).sort().some(function (file) {
+  let files = path.join(__dirname, '*/main.js');
+  globby.sync(files).sort().some(function (file) {
     file = path.resolve(file);
     try {
       utils.spawn.sync(
