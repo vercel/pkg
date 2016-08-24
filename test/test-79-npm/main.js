@@ -224,7 +224,7 @@ dickies.some(function (dicky) {
     right = utils.spawn.sync(
       'node', [ input ],
       { cwd: path.dirname(input),
-        stdio: 'super-pipe' }
+        stdio: 'pipe' }
     );
   } catch (___) {
     right = {
@@ -270,7 +270,7 @@ dickies.some(function (dicky) {
       right = utils.spawn.sync(
         './' + path.basename(output), [],
         { cwd: path.dirname(output),
-          stdio: 'super-pipe' }
+          stdio: 'pipe' }
       );
     } catch (___) {
       right = {

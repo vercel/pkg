@@ -12,15 +12,9 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 let target = process.argv[2];
-let a2o = require('../../').argsToObject;
-let o2a = require('../../').objectToArgs;
 let input = './test-x-index.js';
 let output = './test-output.exe';
 let standard = 'stdout';
-
-let argo = a2o(flags);
-argo.loglevel = 'info';
-flags = o2a(argo);
 
 let left, right;
 
@@ -38,6 +32,7 @@ let inspect = (standard === 'stdout')
 
 let c = utils.pkg.sync([
   '--target', target,
+  '--loglevel', 'info',
   '--output', output, input
 ], inspect);
 

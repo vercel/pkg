@@ -4,8 +4,6 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 let path = require('path');
 let assert = require('assert');
 let utils = require('../utils.js');
@@ -14,7 +12,6 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 let target = process.argv[2];
-let a2o = require('../../').argsToObject;
 let input = './test-x-index.js';
 let output = './run-time/test-output.exe';
 
@@ -27,7 +24,7 @@ function bitty (version) {
 }
 
 let version1 = process.version;
-let version2 = a2o(flags).version;
+let version2 = target;
 if (bitty(version1) !== bitty(version2)) return;
 
 let left, right;

@@ -14,16 +14,15 @@ assert(__dirname === process.cwd());
 
 let target = process.argv[2];
 let windows = process.platform === 'win32';
-let a2o = require('../../').argsToObject;
 let input = './test-x-index.js';
 let output = './run-time/test-output.exe';
 
 if (!windows) return;
-let arch = a2o(flags).arch;
+let arch = 'x64'; // a2o(flags).arch; // TODO?
 if (arch !== 'x64') return;
 let version1 = process.version;
 if (!(/^v?4/.test(version1))) return;
-let version2 = a2o(flags).version;
+let version2 = target;
 if (!(/^v?4/.test(version2))) return;
 
 let left, right;

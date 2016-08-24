@@ -1,12 +1,12 @@
 'use strict';
 
-let mkdirp = require('mkdirp');
-let path = require('path');
-let rimraf = require('rimraf');
-let execSync = require('child_process').execSync;
-let spawnSync = require('child_process').spawnSync;
-let existsSync = require('fs').existsSync;
-let stableStringify = require('json-stable-stringify');
+const mkdirp = require('mkdirp');
+const path = require('path');
+const rimraf = require('rimraf');
+const execSync = require('child_process').execSync;
+const spawnSync = require('child_process').spawnSync;
+const existsSync = require('fs').existsSync;
+const stableStringify = require('json-stable-stringify');
 
 module.exports.mkdirp = mkdirp;
 
@@ -23,7 +23,7 @@ module.exports.vacuum = function () {
 };
 
 module.exports.vacuum.sync = function (p) {
-  let limit = 5;
+  const limit = 5;
   let hasError;
   for (let i = 0; i < limit; i += 1) {
     hasError = null;
@@ -48,7 +48,7 @@ module.exports.exec = function () {
 
 module.exports.exec.sync = function (command, opts) {
 
-  let child = execSync(command, opts);
+  const child = execSync(command, opts);
   return child.toString();
 
 };
@@ -60,28 +60,22 @@ module.exports.spawn = function () {
 module.exports.spawn.sync = function (command, args, opts) {
 
   if (!opts) opts = {};
-  opts = JSON.parse(JSON.stringify(opts)); // change own copy
-  let p = 'pipe', i = 'inherit';
+  opts = Object.assign({}, opts); // change own copy
 
-  let d = opts.stdio;
-  if (d === 'super-pipe') {
-    opts.stdio = [ p, p, p ];
-  } else {
-    if (!d) {
-      opts.stdio = [ p, p, p ];
-    } else
-    if (typeof d === 'string') {
-      opts.stdio = [ d, d, d ];
-    }
-    opts.stdio[2] = i;
+  const d = opts.stdio;
+  if (!d) {
+    opts.stdio = [ 'pipe', 'pipe', 'inherit' ];
+  } else
+  if (typeof d === 'string') {
+    opts.stdio = [ d, d, d ];
   }
 
-  let expect = opts.expect || 0;
+  const expect = opts.expect || 0;
   delete opts.expect; // to avoid passing to spawnSync
-  let opts2 = JSON.parse(JSON.stringify(opts)); // 0.12.x spoils
-  let child = spawnSync(command, args, opts2);
+  const opts2 = Object.assign({}, opts); // 0.12.x spoils
+  const child = spawnSync(command, args, opts2);
   if (child.error) throw child.error;
-  let s = child.status;
+  const s = child.status;
   if (s !== expect) {
     throw new Error('Status ' + s.toString() +
       ', expected ' + expect.toString());
@@ -112,14 +106,14 @@ module.exports.pkg = function () {
 const es5path = path.resolve(__dirname, '../lib-es5/bin.js');
 const es7path = path.resolve(__dirname, '../lib/bin.js');
 
-module.exports.pkg.sync = function (args) {
-  args = args.slice(0);
+module.exports.pkg.sync = function (args, opts) {
+  args = args.slice();
   const es5 = existsSync(es5path);
   const binPath = es5 ? es5path : es7path;
   args.unshift(binPath);
   if (!es5) args.unshift('-r', 'babel-register');
-  const opts = { stdio: 'inherit' };
-  module.exports.spawn.sync('node', args, opts);
+  const c = module.exports.spawn.sync('node', args, opts);
+  return c;
 };
 
 module.exports.stringify = function (obj, replacer, space) {

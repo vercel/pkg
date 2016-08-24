@@ -2,12 +2,9 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 let path = require('path');
 let assert = require('assert');
 let utils = require('../utils.js');
-let a2o = require('../../').argsToObject;
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
@@ -20,7 +17,7 @@ let arch = process.arch;
 if (arch === 'arm') return;
 let version1 = process.version;
 if (/^v?0.12/.test(version1)) return;
-let version2 = a2o(flags).version;
+let version2 = target;
 if (/^v?0.12/.test(version2)) return;
 
 let left, right;
