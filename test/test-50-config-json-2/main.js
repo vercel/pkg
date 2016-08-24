@@ -9,7 +9,7 @@ let utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let flags = process.argv.slice(2);
+let target = process.argv[2];
 let input = './src/app.js';
 let output = './run-time/app-output.exe';
 
@@ -21,10 +21,11 @@ left = utils.spawn.sync(
   { cwd: path.dirname(input) }
 );
 
-utils.pkg.sync(flags.concat([
+utils.pkg.sync([
+  '--target', target,
   '--config', './config.js',
   '--output', output, input
-]));
+]);
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],

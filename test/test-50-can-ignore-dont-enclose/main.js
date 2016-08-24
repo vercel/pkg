@@ -10,7 +10,7 @@ let utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let flags = process.argv.slice(2);
+let target = process.argv[2];
 let a2o = require('../../').argsToObject;
 let o2a = require('../../').objectToArgs;
 let input = './test-x-index.js';
@@ -27,9 +27,10 @@ let inspect = (standard === 'stdout')
   ? [ 'inherit', 'pipe', 'inherit' ]
   : [ 'inherit', 'inherit', 'pipe' ];
 
-let c = utils.pkg.sync(flags.concat([
+let c = utils.pkg.sync([
+  '--target', target,
   '--output', output, input
-]), inspect);
+], inspect);
 
 right = c[standard].toString();
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');

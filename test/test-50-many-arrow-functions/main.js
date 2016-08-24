@@ -12,7 +12,7 @@ let a2o = require('../../').argsToObject;
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let flags = process.argv.slice(2);
+let target = process.argv[2];
 let input = './test-x-index.js';
 let output = './test-output.exe';
 
@@ -30,9 +30,10 @@ left = utils.spawn.sync(
   { cwd: path.dirname(input) }
 );
 
-utils.pkg.sync(flags.concat([
+utils.pkg.sync([
+  '--target', target,
   '--output', output, input
-]));
+]);
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],

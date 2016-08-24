@@ -15,7 +15,7 @@ let utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let flags = process.argv.slice(2);
+let target = process.argv[2];
 let windows = process.platform === 'win32';
 
 function applyMetaToRight (right, meta) {
@@ -97,9 +97,10 @@ if (!UPM) {
   let lucky = path.basename(input).slice(0, -3);
   let output = path.join('z-isolator', lucky + '.exe');
 
-  utils.pkg.sync(flags.concat([
+  utils.pkg.sync([
+    '--target', target,
     '--output', output, input
-  ]));
+  ]);
 
   stamp = utils.spawn.sync(
     output
@@ -245,9 +246,10 @@ dickies.some(function (dicky) {
     let config = path.join(foldy, packy + '.config.js');
     config = fs.existsSync(config) ? [ '--config', config ] : [];
 
-    utils.pkg.sync(flags.concat([
+    utils.pkg.sync([
+      '--target', target,
       '--output', output, input
-    ]).concat(config));
+    ].concat(config));
 
     console.log('Copying addons...');
 

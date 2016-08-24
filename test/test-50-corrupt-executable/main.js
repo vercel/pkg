@@ -13,7 +13,7 @@ let a2o = require('../../').argsToObject;
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let flags = process.argv.slice(2);
+let target = process.argv[2];
 let input = './test-x-index.js';
 let output = './test-output.exe';
 
@@ -22,9 +22,10 @@ if (/^v?0.12/.test(version)) return;
 
 let right;
 
-utils.pkg.sync(flags.concat([
+utils.pkg.sync([
+  '--target', target,
   '--output', output, input
-]));
+]);
 
 let spoiler = fs.readFileSync(output);
 spoiler[spoiler.length - 100] += 1;
