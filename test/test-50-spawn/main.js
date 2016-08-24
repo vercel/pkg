@@ -4,8 +4,6 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
