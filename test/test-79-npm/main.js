@@ -133,7 +133,7 @@ dickies.some(function (dicky) {
   const packyName = packy.split('@')[0];
   const packyWildcard = packy.split('@')[1];
 
-  const wordy = packy;
+  let wordy = packy;
   if (packyName !== foldyName) {
     wordy = foldyName + '/' + wordy;
   }

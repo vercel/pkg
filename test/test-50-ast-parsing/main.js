@@ -15,7 +15,7 @@ const input = './test-x-index.js';
 const output = './test-output.exe';
 const data = './test-y-data.txt';
 
-const version = process.version;
+const version = target;
 if (/^v?0/.test(version)) return;
 if (/^v?4/.test(version)) return;
 
