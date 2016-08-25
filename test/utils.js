@@ -75,8 +75,15 @@ module.exports.spawn.sync = function (command, args, opts) {
   const opts2 = Object.assign({}, opts); // 0.12.x spoils
   const child = spawnSync(command, args, opts2);
   if (child.error) throw child.error;
+
   const s = child.status;
   if (s !== expect) {
+    if (opts.stdio[1] === 'pipe') {
+      process.stdout.write(child.stdout);
+    } else
+    if (opts.stdio[2] === 'pipe') {
+      process.stdout.write(child.stderr);
+    }
     throw new Error('Status ' + s.toString() +
       ', expected ' + expect.toString());
   }

@@ -8,7 +8,7 @@ let rst = new Readable();
 rst.wrap(fst);
 
 setTimeout(function () {
-  let test = '"use strict";';
+  let test = '\'use strict\';';
   let c = rst.read(test.length);
   if (c.toString() === test) {
     console.log('ok');

@@ -33,6 +33,11 @@ module.exports = {
       'require(\'oracle\', \'can-ignore\')'
     ],
 
+    'lib/dialects/oracledb/index.js': [
+      'require(\'oracledb\')',
+      'require(\'oracledb\', \'can-ignore\')'
+    ],
+
     'lib/dialects/postgres/index.js': [
       'require(\'pg\')',
       'require(\'pg\', \'can-ignore\')',

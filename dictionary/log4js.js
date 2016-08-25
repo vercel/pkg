@@ -10,7 +10,9 @@ module.exports = {
 
     'lib/appenders/hipchat.js': [
       'require(\'hipchat-client\')',
-      'require(\'hipchat-client\', \'can-ignore\')'
+      'require(\'hipchat-client\', \'can-ignore\')',
+      'require(\'hipchat-notifier\')',
+      'require(\'hipchat-notifier\', \'can-ignore\')'
     ],
 
     'lib/appenders/hookio.js': [

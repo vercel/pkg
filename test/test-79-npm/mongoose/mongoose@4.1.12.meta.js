@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./mongoose@3.9.7.meta.js');
+module.exports = require('./mongoose@4.0.8.meta.js');
