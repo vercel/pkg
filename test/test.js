@@ -22,6 +22,7 @@ globby.sync(files).sort().some(function (file) {
       { cwd: path.dirname(file), stdio: 'inherit' }
     );
   } catch (error) {
+    console.log();
     console.log(`> ${chalk.red('ERR!')} ${error.message}`);
     console.log(`> ${chalk.red('ERR!')} ${file} FAILED`);
     process.exit(2);
