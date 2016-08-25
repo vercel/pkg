@@ -3,7 +3,8 @@
 module.exports = {
 
   assets: [
-    'src/view/**/*'
+    'src/view/**/*',
+    'src/js/view/**/*'
   ]
 
 };
