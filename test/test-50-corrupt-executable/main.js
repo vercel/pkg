@@ -4,20 +4,20 @@
 
 if (process) return; // TODO ENABLE
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './test-output.exe';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './test-output.exe';
 
-let version = target;
-if (/^v?0.12/.test(version)) return;
+const version = target;
+if (/^v?0/.test(version)) return;
 
 let right;
 
@@ -26,7 +26,7 @@ utils.pkg.sync([
   '--output', output, input
 ]);
 
-let spoiler = fs.readFileSync(output);
+const spoiler = fs.readFileSync(output);
 spoiler[spoiler.length - 100] += 1;
 spoiler[spoiler.length - 120] -= 1;
 fs.writeFileSync(output, spoiler);

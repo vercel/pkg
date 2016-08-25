@@ -1,10 +1,10 @@
 'use strict';
 
-let cookieParser = require('cookie-parser');
-let req = { headers: { cookie: 'MyCookie=Hello' } };
-let res = {};
+var cookieParser = require('cookie-parser');
+var req = { headers: { cookie: 'MyCookie=Hello' } };
+var res = {};
 
-let middleware = cookieParser();
+var middleware = cookieParser();
 
 middleware(req, res, function () {
   if (req.cookies) {

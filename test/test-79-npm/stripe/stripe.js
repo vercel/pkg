@@ -1,6 +1,6 @@
 'use strict';
 
-let stripe = require('stripe');
+var stripe = require('stripe');
 if (stripe.DEFAULT_HOST === 'api.stripe.com') {
   console.log('ok');
 }

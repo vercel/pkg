@@ -1,6 +1,6 @@
 'use strict';
 
-let punt = require('punt');
+var punt = require('punt');
 if (punt.bind && punt.connect) {
   console.log('ok');
 }

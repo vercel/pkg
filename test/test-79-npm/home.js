@@ -1,6 +1,6 @@
 'use strict';
 
-let o = require('./stamp.js');
+const o = require('./stamp.js');
 
 module.exports = function (stamp) {
   return (

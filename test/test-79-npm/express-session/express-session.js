@@ -1,14 +1,14 @@
 'use strict';
 
-let session = require('express-session');
-let req = { url: '/', headers: { } };
-let res = {};
+var session = require('express-session');
+var req = { url: '/', headers: { } };
+var res = {};
 
 function genuuid () {
   return 'SESSIONID';
 }
 
-let middleware = session({
+var middleware = session({
   genid: function () {
     return genuuid();
   },

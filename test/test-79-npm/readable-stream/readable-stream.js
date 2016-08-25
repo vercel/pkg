@@ -1,15 +1,15 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let fst = fs.createReadStream(path.join(__dirname, 'readable-stream.js'));
-let Readable = require('readable-stream');
-let rst = new Readable();
+var fs = require('fs');
+var path = require('path');
+var fst = fs.createReadStream(path.join(__dirname, 'readable-stream.js'));
+var Readable = require('readable-stream');
+var rst = new Readable();
 rst.wrap(fst);
 
 setTimeout(function () {
-  let test = '\'use strict\';';
-  let c = rst.read(test.length);
+  var test = '\'use strict\';';
+  var c = rst.read(test.length);
   if (c.toString() === test) {
     console.log('ok');
   }

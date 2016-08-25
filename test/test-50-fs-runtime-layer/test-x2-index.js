@@ -5,11 +5,11 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let the_require_content_A = './test-z-asset-A.css';
-let the_require_content_B = 'test-z-asset-B.css';
+var fs = require('fs');
+var path = require('path');
+var assert = require('assert');
+var the_require_content_A = './test-z-asset-A.css';
+var the_require_content_B = 'test-z-asset-B.css';
 
 function first_lower_case (s) {
   return s.slice(0, 1).toLowerCase() + s.slice(1);

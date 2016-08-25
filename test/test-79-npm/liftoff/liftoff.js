@@ -1,6 +1,6 @@
 'use strict';
 
-let liftoff = require('liftoff');
+var liftoff = require('liftoff');
 if (typeof liftoff === 'function') {
   console.log('ok');
 }

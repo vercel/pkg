@@ -2,16 +2,16 @@
 
 'use strict';
 
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './run-time/test-output.exe';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './run-time/test-output.exe';
 
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
@@ -43,7 +43,7 @@ assert.equal(left.length, right.length);
 assert(left.length > 100);
 
 left.some(function (leftValue, index) {
-  let rightValue = right[index];
+  const rightValue = right[index];
   if (leftValue.slice(1, 3) === ':\\') {
     assert.equal(rightValue.slice(1, 3), ':\\');
     leftValue = leftValue.slice(0, 3) + 'thebox\\' + leftValue.slice(3);

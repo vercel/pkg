@@ -1,6 +1,6 @@
 'use strict';
 
-let home = require('../home.js');
+const home = require('../home.js');
 
 module.exports = function (stamp) {
   return {

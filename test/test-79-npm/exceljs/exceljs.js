@@ -1,7 +1,7 @@
 'use strict';
 
-let Excel = require('exceljs');
-let workbook = new Excel.Workbook();
+var Excel = require('exceljs');
+var workbook = new Excel.Workbook();
 if (workbook.created) {
   console.log('ok');
 }

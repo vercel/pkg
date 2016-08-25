@@ -1,12 +1,12 @@
 'use strict';
 
-let load = require('express-load');
+var load = require('express-load');
 
-let app = {};
+var app = {};
 app.get = function () {};
 app.index = 'Welcome!';
 
-let opts = {};
+var opts = {};
 // opts.verbose = true;
 
 load('controllers', opts).then('routes').into(app);

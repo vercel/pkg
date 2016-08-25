@@ -1,8 +1,8 @@
 'use strict';
 
-let chokidar = require('chokidar');
+var chokidar = require('chokidar');
 
-let watcher = chokidar.watch('./chokidar.js', {
+var watcher = chokidar.watch('./chokidar.js', {
   persistent: true
 });
 

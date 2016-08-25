@@ -1,8 +1,8 @@
 'use strict';
 
-let Levelup = require('levelup');
-let db = new Levelup('dbname');
-let rimraf = require('../../../node_modules/rimraf');
+var Levelup = require('levelup');
+var db = new Levelup('dbname');
+var rimraf = require('../../../node_modules/rimraf');
 
 (function (cb) {
 

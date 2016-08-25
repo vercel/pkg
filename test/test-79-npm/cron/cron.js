@@ -1,8 +1,8 @@
 'use strict';
 
-let CronJob = require('cron').CronJob;
+var CronJob = require('cron').CronJob;
 
-let counter = 0;
+var counter = 0;
 
 new CronJob('* * * * * *', function () { // eslint-disable-line no-new
   counter += 1;

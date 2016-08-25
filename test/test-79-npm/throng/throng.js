@@ -1,6 +1,6 @@
 'use strict';
 
-let throng = require('throng');
+var throng = require('throng');
 
 throng(8, function (id) {
   if (id === 7) {

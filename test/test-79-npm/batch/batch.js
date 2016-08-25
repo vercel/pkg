@@ -1,11 +1,11 @@
 'use strict';
 
-let Batch = require('batch');
-let batch = new Batch();
+var Batch = require('batch');
+var batch = new Batch();
 
 batch.concurrency(4);
 
-let ids = [ 4, 7, 12, 25 ];
+var ids = [ 4, 7, 12, 25 ];
 
 ids.forEach(function () {
   batch.push(function (done) {
@@ -15,7 +15,7 @@ ids.forEach(function () {
   });
 });
 
-let passed = 0;
+var passed = 0;
 
 batch.on('progress', function () {
   passed += 1;

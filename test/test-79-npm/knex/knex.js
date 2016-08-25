@@ -1,6 +1,6 @@
 'use strict';
 
-let knex = require('knex');
+var knex = require('knex');
 if (knex) {
   console.log('ok');
 }

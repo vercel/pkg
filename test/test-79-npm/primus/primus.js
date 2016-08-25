@@ -1,6 +1,6 @@
 'use strict';
 
-let primus = require('primus');
+var primus = require('primus');
 if (primus.transformers) {
   console.log('ok');
 }

@@ -4,19 +4,19 @@
 
 'use strict';
 
-let UPM = false; // USE_PREINSTALLED_MODULES
+const UPM = false; // USE_PREINSTALLED_MODULES
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let globby = require('globby');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const globby = require('globby');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let windows = process.platform === 'win32';
+const target = process.argv[2];
+const windows = process.platform === 'win32';
 
 function applyMetaToRight (right, meta) {
   right = (meta.take === 'stderr' ? right.stderr : right.stdout);
@@ -28,15 +28,15 @@ function applyMetaToRight (right, meta) {
 
 let stamp = {};
 
-let checklist = fs.readFileSync('checklist.js', 'utf-8');
+const checklist = fs.readFileSync('checklist.js', 'utf-8');
 let table = checklist.split('const table = ')[1].split(';')[0];
 table = JSON.parse(table);
 let changes = checklist.split('const changes = ')[1].split(';')[0];
 changes = JSON.parse(changes);
 
 function save () {
-  let t = utils.stringify(table, null, 2);
-  let c = utils.stringify(changes, null, 2);
+  const t = utils.stringify(table, null, 2);
+  const c = utils.stringify(changes, null, 2);
   if (c === '[]') c = '[\n]';
   fs.writeFileSync('checklist.js',
     '/* eslint-disable no-unused-vars */\n' +
@@ -53,12 +53,12 @@ function stamp2string (s) {
 
 function update (p, n) {
   if (!table[p]) table[p] = {};
-  let row = table[p];
-  let ss = stamp2string(stamp);
-  let o = row[ss];
+  const row = table[p];
+  const ss = stamp2string(stamp);
+  const o = row[ss];
   row[ss] = n;
-  let nr = n.split(',')[0];
-  let or = o ? o.split(',')[0] : '';
+  const nr = n.split(',')[0];
+  const or = o ? o.split(',')[0] : '';
   if ((!o) && (nr !== 'ok')) {
     changes.push(p + ',' + ss + ': new ' + n);
   } else
@@ -93,9 +93,9 @@ if (!UPM) {
 
   console.log('Getting stamp...');
 
-  let input = path.resolve('stamp.js');
-  let lucky = path.basename(input).slice(0, -3);
-  let output = path.join('z-isolator', lucky + '.exe');
+  const input = path.resolve('stamp.js');
+  const lucky = path.basename(input).slice(0, -3);
+  const output = path.join('z-isolator', lucky + '.exe');
 
   utils.pkg.sync([
     '--target', target,
@@ -114,7 +114,7 @@ if (!UPM) {
 
 }());
 
-let dickies = globby.sync([
+const dickies = globby.sync([
   './*/*.js',
   '!./*/*.config.js',
   '!./*/*.meta.js',
@@ -124,21 +124,21 @@ let dickies = globby.sync([
 
 dickies.some(function (dicky) {
 
-  let input = path.resolve(dicky);
+  const input = path.resolve(dicky);
 
-  let foldy = path.dirname(input);
-  let foldyName = path.basename(foldy);
+  const foldy = path.dirname(input);
+  const foldyName = path.basename(foldy);
 
-  let packy = path.basename(input).slice(0, -3);
-  let packyName = packy.split('@')[0];
-  let packyWildcard = packy.split('@')[1];
+  const packy = path.basename(input).slice(0, -3);
+  const packyName = packy.split('@')[0];
+  const packyWildcard = packy.split('@')[1];
 
-  let wordy = packy;
+  const wordy = packy;
   if (packyName !== foldyName) {
     wordy = foldyName + '/' + wordy;
   }
 
-  let output = path.join('z-isolator', packy + '.exe');
+  const output = path.join('z-isolator', packy + '.exe');
 
   console.log();
   console.log('*********************************************************');
@@ -178,10 +178,10 @@ dickies.some(function (dicky) {
 
   if (!UPM) {
 
-    let build = meta.build;
-    let earth = packy.replace('-shy', '');
-    let moons = meta.moons || [];
-    let planets = moons.concat([ earth ]);
+    const build = meta.build;
+    const earth = packy.replace('-shy', '');
+    const moons = meta.moons || [];
+    const planets = moons.concat([ earth ]);
     assert(planets.length > 0);
     planets.some(function (planet) {
       console.log('Installing ' + planet + '...');
@@ -202,7 +202,7 @@ dickies.some(function (dicky) {
       }
     });
 
-    let packyVersion = JSON.parse(fs.readFileSync(
+    const packyVersion = JSON.parse(fs.readFileSync(
       path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
     )).version;
 
@@ -253,7 +253,7 @@ dickies.some(function (dicky) {
 
     console.log('Copying addons...');
 
-    let addons = globby.sync(
+    const addons = globby.sync(
       path.join(foldy, 'node_modules', '**', '*.node')
     );
 
@@ -290,7 +290,7 @@ dickies.some(function (dicky) {
 
   }
 
-  let rubbishes = globby.sync(
+  const rubbishes = globby.sync(
     path.join(path.dirname(output), '**', '*')
   );
 

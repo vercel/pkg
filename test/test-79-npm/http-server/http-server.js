@@ -1,6 +1,6 @@
 'use strict';
 
-let http = require('http');
+var http = require('http');
 process.argv.push('--silent');
 require('http-server/bin/http-server');
 setTimeout(function () {

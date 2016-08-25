@@ -1,10 +1,10 @@
 'use strict';
 
-let path = require('path');
-let xlsx = require('xlsx');
+var path = require('path');
+var xlsx = require('xlsx');
 
-let xls = xlsx.readFileSync(path.join(__dirname, 'ketk.xls'));
-let ods = xlsx.readFileSync(path.join(__dirname, 'ffc.ods'));
+var xls = xlsx.readFileSync(path.join(__dirname, 'ketk.xls'));
+var ods = xlsx.readFileSync(path.join(__dirname, 'ffc.ods'));
 
 if ((xls.Strings.length > 50) &&
     (ods.SheetNames.length > 0)) {

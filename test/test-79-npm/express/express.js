@@ -1,6 +1,6 @@
 'use strict';
 
-let express = require('express');
+var express = require('express');
 if (typeof express === 'function') {
   console.log('ok');
 }

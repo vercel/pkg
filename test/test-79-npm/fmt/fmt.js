@@ -1,8 +1,8 @@
 'use strict';
 
-let fmt = require('fmt');
+var fmt = require('fmt');
 
-let save;
+var save;
 console.log = function (s) {
   save = s;
 };

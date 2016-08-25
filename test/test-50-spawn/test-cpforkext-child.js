@@ -2,8 +2,8 @@
 
 'use strict';
 
-let assert = require('assert');
-let cluster = require('cluster');
+var assert = require('assert');
+var cluster = require('cluster');
 
 assert(process.send);
 assert(!cluster.worker);
@@ -16,7 +16,7 @@ process.on('message', function (value) {
   if (value === 128) process.exit();
 });
 
-let fs = require('fs');
+var fs = require('fs');
 
 try {
   console.log(fs.readFileSync('dirty-hack-for-testing-purposes'));

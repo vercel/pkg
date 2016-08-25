@@ -1,8 +1,8 @@
 'use strict';
 
-let nconf = require('nconf');
+var nconf = require('nconf');
 nconf.argv();
-let foo = nconf.get('foo');
+var foo = nconf.get('foo');
 if (typeof foo === 'undefined') {
   console.log('ok');
 }

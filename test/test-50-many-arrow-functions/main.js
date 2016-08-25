@@ -2,23 +2,23 @@
 
 'use strict';
 
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './test-output.exe';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './test-output.exe';
 
-let arch = process.arch;
+const arch = process.arch;
 if (arch === 'arm') return;
-let version1 = process.version;
-if (/^v?0.12/.test(version1)) return;
-let version2 = target;
-if (/^v?0.12/.test(version2)) return;
+const version1 = process.version;
+if (/^v?0/.test(version1)) return;
+const version2 = target;
+if (/^v?0/.test(version2)) return;
 
 let left, right;
 

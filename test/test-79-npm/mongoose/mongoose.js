@@ -1,11 +1,11 @@
 'use strict';
 
-let mongoose = require('mongoose');
+var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/enclose');
 
-let Cat = mongoose.model('Cat', { name: String });
-let name = 'Tuz' + (new Date()).getTime().toString();
-let kitty = new Cat({ name: name });
+var Cat = mongoose.model('Cat', { name: String });
+var name = 'Tuz' + (new Date()).getTime().toString();
+var kitty = new Cat({ name: name });
 
 kitty.save(function (error1) {
   if (error1) return;

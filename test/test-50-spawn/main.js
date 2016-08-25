@@ -4,18 +4,18 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let windows = process.platform === 'win32';
+const target = process.argv[2];
+const windows = process.platform === 'win32';
 
-let pairs = [
+const pairs = [
   { input: './test-cluster.js',
     output: './run-time/test-output.exe' },
   { input: './test-cpfork-1.js',
@@ -42,8 +42,8 @@ if (!windows) {
 }
 
 function chmodPlusX (file) {
-  let stat = fs.statSync(file);
-  let plusx = (stat.mode | 64 | 8).toString(8).slice(-3);
+  const stat = fs.statSync(file);
+  const plusx = (stat.mode | 64 | 8).toString(8).slice(-3);
   fs.chmodSync(file, plusx);
 }
 
@@ -63,8 +63,8 @@ function stripTraceOpt (lines) {
 
 pairs.some(function (pair) {
 
-  let input = pair.input;
-  let output = pair.output;
+  const input = pair.input;
+  const output = pair.output;
 
   let left, right;
   utils.mkdirp.sync(path.dirname(output));

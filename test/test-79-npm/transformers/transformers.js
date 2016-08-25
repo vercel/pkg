@@ -1,6 +1,6 @@
 'use strict';
 
-let transformers = require('transformers');
+var transformers = require('transformers');
 
 try {
   transformers.ejs.loadModule();

@@ -5,7 +5,7 @@ function isModuleNotFoundError (error) {
           (error.message.indexOf('build/Release/kerberos') >= 0));
 }
 
-let kerberos;
+var kerberos;
 
 function hideTryBlockFromBundleDetectorIgnoreFlag () {
   kerberos = require('kerberos');
@@ -20,7 +20,7 @@ try {
   }
 }
 
-let sspi;
+var sspi;
 
 function hideTryBlockFromBundleDetectorIgnoreFlag2 () {
   sspi = require('kerberos/lib/sspi');

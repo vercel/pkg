@@ -1,7 +1,7 @@
 'use strict';
 
-let Parser = require('redis-parser');
-let parser = new Parser({
+var Parser = require('redis-parser');
+var parser = new Parser({
   name: 'auto',
   returnReply: function (reply) {
     console.log(reply);

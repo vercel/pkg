@@ -1,13 +1,13 @@
 'use strict';
 
-let http = require('http');
-let io = require('socket.io')();
+var http = require('http');
+var io = require('socket.io')();
 io.on('connection', function () {});
 io.listen(3000);
 
 setTimeout(function () {
   http.get('http://127.0.0.1:3000/socket.io/socket.io.js', function (res) {
-    let chunks = '';
+    var chunks = '';
     res.on('data', function (chunk) {
       chunks += chunk.toString();
     }).on('end', function () {

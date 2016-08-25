@@ -6,8 +6,8 @@ if (!process.enclose) {
   return;
 }
 
-let fs = require('graceful-fs');
-let hack = 'dirty-hack-for-testing-purposes';
+var fs = require('graceful-fs');
+var hack = 'dirty-hack-for-testing-purposes';
 if (fs.readFileSync(hack) === hack) {
   console.log('ok');
 }

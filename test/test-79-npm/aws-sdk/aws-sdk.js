@@ -1,8 +1,8 @@
 'use strict';
 
-let aws = require('aws-sdk');
+var aws = require('aws-sdk');
 
-let s3 = new aws.S3({
+var s3 = new aws.S3({
   accessKeyId: 'AKIAIVHNVWTSY6A5YGXA',
   secretAccessKey: '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'
 });

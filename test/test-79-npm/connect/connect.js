@@ -1,6 +1,6 @@
 'use strict';
 
-let connect = require('connect');
+var connect = require('connect');
 if (typeof connect === 'function') {
   console.log('ok');
 }

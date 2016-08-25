@@ -2,8 +2,8 @@
 
 'use strict';
 
-let assert = require('assert');
-let cluster = require('cluster');
+var assert = require('assert');
+var cluster = require('cluster');
 
 assert(process.send);
 assert(!cluster.worker);

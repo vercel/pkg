@@ -1,6 +1,6 @@
 'use strict';
 
-let q = require('q');
+var q = require('q');
 if (q.join) {
   console.log('ok');
 }

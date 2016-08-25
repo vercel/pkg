@@ -119,8 +119,7 @@ module.exports.pkg.sync = function (args, opts) {
   const binPath = es5 ? es5path : es7path;
   args.unshift(binPath);
   if (!es5) args.unshift('-r', 'babel-register');
-  const c = module.exports.spawn.sync('node', args, opts);
-  return c;
+  return module.exports.spawn.sync('node', args, opts);
 };
 
 module.exports.stringify = function (obj, replacer, space) {

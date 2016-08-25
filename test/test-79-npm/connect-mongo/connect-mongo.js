@@ -7,8 +7,8 @@ function Store () {
 function MemoryStore () {
 }
 
-let session = { Store: Store, MemoryStore: MemoryStore };
-let MongoStore = require('connect-mongo')(session);
+var session = { Store: Store, MemoryStore: MemoryStore };
+var MongoStore = require('connect-mongo')(session);
 if (typeof MongoStore === 'function') {
   console.log('ok');
 }

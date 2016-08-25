@@ -1,8 +1,8 @@
 'use strict';
 
-let pgpass = require('pgpass');
+var pgpass = require('pgpass');
 
-let connection = {
+var connection = {
   'host': 'pgserver',
   'user': 'the_user_name'
 };

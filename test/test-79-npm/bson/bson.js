@@ -1,8 +1,8 @@
 'use strict';
 
-let bson = require('bson');
+var bson = require('bson');
 
-let pure = {};
+var pure = {};
 pure.Long = bson.pure().Long;
 pure.doc = { long: pure.Long.fromNumber(100) };
 pure.BSON = bson.pure().BSON;
@@ -10,7 +10,7 @@ pure.obj = new (pure.BSON)();
 pure.data = pure.obj.serialize(pure.doc, false, true, false);
 pure.doc2 = pure.obj.deserialize(pure.data);
 
-let natv = {};
+var natv = {};
 natv.Long = bson.native().Long;
 natv.doc = { long: natv.Long.fromNumber(200) };
 natv.BSON = bson.native().BSON;

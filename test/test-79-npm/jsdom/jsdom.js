@@ -1,6 +1,6 @@
 'use strict';
 
-let jsdom = require('jsdom');
+var jsdom = require('jsdom');
 
 jsdom.env(
   '<p><a class="the-link" href="https://github.com/tmpvar/jsdom">jsdom!</a></p>',

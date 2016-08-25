@@ -4,7 +4,7 @@
 
 let s = 'console.log("test");\n';
 
-for (let i = 0; i < 100; i += 1) {
+for (const i = 0; i < 100; i += 1) {
   s = 'setTimeout(function() {\n' + s + '}, 0);\n';
 }
 

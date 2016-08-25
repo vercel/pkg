@@ -2,17 +2,17 @@
 
 'use strict';
 
-let fs = require('fs');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './test-output.exe';
-let standard = 'stdout';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './test-output.exe';
+const standard = 'stdout';
 
 let left, right;
 
@@ -24,7 +24,7 @@ left = fs.readFileSync(
   return line.split('/**/')[1];
 }).join('\n') + '\n';
 
-let inspect = (standard === 'stdout')
+const inspect = (standard === 'stdout')
   ? [ 'inherit', 'pipe', 'inherit' ]
   : [ 'inherit', 'inherit', 'pipe' ];
 
@@ -36,7 +36,7 @@ right = utils.pkg.sync([
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 
-let rightLines = [];
+const rightLines = [];
 right.split('\n').some(function (line) {
   let s = line.split('Cannot resolve \'')[1];
   if (s) {

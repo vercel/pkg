@@ -1,13 +1,13 @@
 'use strict';
 
-let Negotiator = require('negotiator');
-let availableMediaTypes = [ 'text/html', 'text/plain', 'application/json' ];
-let request = { headers: { } };
-let negotiator = new Negotiator(request);
+var Negotiator = require('negotiator');
+var availableMediaTypes = [ 'text/html', 'text/plain', 'application/json' ];
+var request = { headers: { } };
+var negotiator = new Negotiator(request);
 
-let mt1 = negotiator.mediaTypes();
-let mt2 = negotiator.mediaTypes(availableMediaTypes);
-let mt3 = negotiator.mediaType(availableMediaTypes);
+var mt1 = negotiator.mediaTypes();
+var mt2 = negotiator.mediaTypes(availableMediaTypes);
+var mt3 = negotiator.mediaType(availableMediaTypes);
 
 if (mt1.join('+') !== '*/*') return;
 if (mt2.join('+') !== 'text/html+text/plain+application/json') return;

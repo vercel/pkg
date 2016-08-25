@@ -1,16 +1,16 @@
 'use strict';
 
-let connect = require('connect');
-let noop = function () {};
-let req = { headers: { }, url: '/', originalUrl: '/' };
-let res = { setHeader: noop, end: function (s) {
+var connect = require('connect');
+var noop = function () {};
+var req = { headers: { }, url: '/', originalUrl: '/' };
+var res = { setHeader: noop, end: function (s) {
   if (s.length > 100) {
     console.log('ok');
     process.exit();
   }
 } };
 
-let middleware = connect.directory.html;
+var middleware = connect.directory.html;
 
 middleware(req, res, [ 'file-name' ], function () {
   console.log('Error not expected');

@@ -1,7 +1,7 @@
 'use strict';
 
-let Run = require('node-pre-gyp').Run;
-let r = new Run();
+var Run = require('node-pre-gyp').Run;
+var r = new Run();
 
 try {
   r.commands.clean();

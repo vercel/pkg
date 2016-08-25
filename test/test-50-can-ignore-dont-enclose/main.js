@@ -2,40 +2,20 @@
 
 'use strict';
 
-let assert = require('assert');
-let utils = require('../utils.js');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './test-output.exe';
-let standard = 'stdout';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './test-output.exe';
+const standard = 'stdout';
 
-let left, right;
+let right;
 
-left =
-  '  warning  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  warning  Malformed requirement: require.resolve(some_v, some_v)\n' + // TODO implement
-//  '  warning  Malformed requirement: require.resolve(some_v, "can-can")\n' + // TODO implement
-  '  warning  Cannot resolve \'some_v\'\n' +
-
-  '  info  Cannot resolve \'some_v\'\n' +
-//  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  info  Cannot resolve \'some_v\'\n' +
-//  '  info  Cannot resolve \'some_v_ci\'\n' +
-
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  warning  Malformed requirement: require(some_v, some_v)\n' + // TODO implement
-//  '  warning  Malformed requirement: require(some_v, "can-can")\n' + // TODO implement
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n' +
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n';
-
-let inspect = (standard === 'stdout')
+const inspect = (standard === 'stdout')
   ? [ 'inherit', 'pipe', 'inherit' ]
   : [ 'inherit', 'inherit', 'pipe' ];
 
@@ -58,6 +38,25 @@ right = right.split('\n').filter(function (line) {
   } else return line;
 }).join('\n') + '\n';
 
-assert.equal(right, left);
+assert.equal(right,
+  '  warning  Cannot resolve \'some_v\'\n' +
+  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  warning  Malformed requirement: require.resolve(some_v, some_v)\n' + // TODO implement
+//  '  warning  Malformed requirement: require.resolve(some_v, "can-can")\n' + // TODO implement
+  '  warning  Cannot resolve \'some_v\'\n' +
+
+  '  info  Cannot resolve \'some_v\'\n' +
+//  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  info  Cannot resolve \'some_v\'\n' +
+//  '  info  Cannot resolve \'some_v_ci\'\n' +
+
+  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  warning  Malformed requirement: require(some_v, some_v)\n' + // TODO implement
+//  '  warning  Malformed requirement: require(some_v, "can-can")\n' + // TODO implement
+  '  info  Cannot find module \'some-s\'\n' +
+  '  info  Cannot find module \'some-s-ci\'\n' +
+  '  info  Cannot find module \'some-s\'\n' +
+  '  info  Cannot find module \'some-s-ci\'\n'
+);
 
 utils.vacuum.sync(output);

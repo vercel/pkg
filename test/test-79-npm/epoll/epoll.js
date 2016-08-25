@@ -1,6 +1,6 @@
 'use strict';
 
-let Epoll = require('epoll').Epoll;
+var Epoll = require('epoll').Epoll;
 if (Epoll.EPOLLPRI) {
   console.log('ok');
 }

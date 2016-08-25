@@ -7,8 +7,8 @@
 // #define CURL_SIZEOF_LONG 4
 // #define CURL_SIZEOF_CURL_OFF_T 4
 
-let Curl = require('node-libcurl').Curl;
-let curl = new Curl();
+var Curl = require('node-libcurl').Curl;
+var curl = new Curl();
 curl.setOpt('URL', 'www.yandex.ru');
 curl.setOpt('FOLLOWLOCATION', true);
 curl.on('end', function (status) {

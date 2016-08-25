@@ -15,7 +15,7 @@ var addons = [
   './serialport.win32-x64.node'
 ];
 
-if (/^v?0.12/.test(p.version)) {
+if (/^v?0/.test(p.version)) {
   if (suffix === 'win32-ia32') {
     // чтоб система не путала CONTENT и native addon
     path.join(__dirname, 'serialport.win32-ia32.node');

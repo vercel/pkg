@@ -7,8 +7,8 @@ process.stdout.write = function (m) {
   process.stdout._write_(m.slice(m.indexOf(': ') + 2));
 };
 
-let winston = require('winston');
-let Logger = winston.Logger;
-let Console = winston.transports.Console;
+var winston = require('winston');
+var Logger = winston.Logger;
+var Console = winston.transports.Console;
 new Logger({ transports: [ new Console() ] }); // eslint-disable-line no-new
 winston.log('info', 'ok');

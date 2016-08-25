@@ -6,7 +6,7 @@ if (!process.enclose) {
   return;
 }
 
-let callsites = require('callsites');
+var callsites = require('callsites');
 
 try {
   callsites();

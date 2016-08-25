@@ -1,13 +1,13 @@
 'use strict';
 
-let jsdiff = require('diff');
-let one = 'beep boop';
-let other = 'beep boob blah';
-let diff = jsdiff.diffChars(one, other);
-let join = '';
+var jsdiff = require('diff');
+var one = 'beep boop';
+var other = 'beep boob blah';
+var diff = jsdiff.diffChars(one, other);
+var join = '';
 
 diff.forEach(function (part) {
-  let color = 'grey';
+  var color = 'grey';
   if (part.added) color = 'green';
   if (part.removed) color = 'red';
   join += color + ':[' + part.value + ']';

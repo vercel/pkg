@@ -1,6 +1,6 @@
 'use strict';
 
-let async = require('async');
+var async = require('async');
 if (async.waterfall) {
   console.log('ok');
 }

@@ -1,8 +1,8 @@
 'use strict';
 
-let Leveldown = require('leveldown');
-let db = new Leveldown('dbname');
-let rimraf = require('../../../node_modules/rimraf');
+var Leveldown = require('leveldown');
+var db = new Leveldown('dbname');
+var rimraf = require('../../../node_modules/rimraf');
 
 (function (cb) {
 

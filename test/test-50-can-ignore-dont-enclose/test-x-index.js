@@ -14,9 +14,9 @@ try { require('some-s'); } catch (_) {}
 try { require('some-s-ci', 'can-ignore'); } catch (_) {}
 try { require('some-s-de', 'dont-enclose'); } catch (_) {}
 
-let some_v = 'some';
-let some_v_ci = 'some';
-let some_v_de = 'some';
+var some_v = 'some';
+var some_v_ci = 'some';
+var some_v_de = 'some';
 
 try { require.resolve(some_v); } catch (_) {}
 try { require.resolve(some_v_ci, 'can-ignore'); } catch (_) {}

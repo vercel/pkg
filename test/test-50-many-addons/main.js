@@ -2,25 +2,25 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let windows = process.platform === 'win32';
-let input = './test-x-index.js';
-let output = './run-time/test-output.exe';
+const target = process.argv[2];
+const windows = process.platform === 'win32';
+const input = './test-x-index.js';
+const output = './run-time/test-output.exe';
 
 if (!windows) return;
-let arch = process.arch; // TODO extract arch from `target` once it contains
+const arch = process.arch; // TODO extract arch from `target` once it contains
 if (arch !== 'x64') return;
-let version1 = process.version;
+const version1 = process.version;
 if (!(/^v?4/.test(version1))) return;
-let version2 = target;
+const version2 = target;
 if (!(/^v?4/.test(version2))) return;
 
 let left, right;

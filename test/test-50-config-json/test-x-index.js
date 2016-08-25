@@ -3,9 +3,9 @@
 
 'use strict';
 
-let the_A = './test-y-' + 'resolve-A.js';
-let the_B = './test-y-' + 'resolve-B.txt';
-let the_C = './test-y-' + 'resolve-C.json';
+var the_A = './test-y-' + 'resolve-A.js';
+var the_B = './test-y-' + 'resolve-B.txt';
+var the_C = './test-y-' + 'resolve-C.json';
 
 console.log([
   require(the_A).toString(),

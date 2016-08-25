@@ -1,22 +1,22 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let mkdirp = require('../../../node_modules/mkdirp');
-let rimraf = require('../../../node_modules/rimraf');
+var fs = require('fs');
+var path = require('path');
+var mkdirp = require('../../../node_modules/mkdirp');
+var rimraf = require('../../../node_modules/rimraf');
 
 mkdirp.sync('scripts');
 
-let drivelistPath = path.dirname(require.resolve('drivelist'));
-let scriptsPath = path.join(drivelistPath, '..', 'scripts');
+var drivelistPath = path.dirname(require.resolve('drivelist'));
+var scriptsPath = path.join(drivelistPath, '..', 'scripts');
 fs.readdirSync(scriptsPath).some(function (file) {
-  let full = 'scripts/' + file;
-  let source = fs.readFileSync(path.join(scriptsPath, file));
+  var full = 'scripts/' + file;
+  var source = fs.readFileSync(path.join(scriptsPath, file));
   fs.writeFileSync(full, source);
   fs.chmodSync(full, 511); // 777
 });
 
-let drivelist = require('drivelist');
+var drivelist = require('drivelist');
 drivelist.list(function (error, list) {
   if (error) throw error;
   rimraf.sync('scripts');

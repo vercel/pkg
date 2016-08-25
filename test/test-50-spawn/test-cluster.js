@@ -2,9 +2,9 @@
 
 'use strict';
 
-let assert = require('assert');
-let cluster = require('cluster');
-let child;
+var assert = require('assert');
+var cluster = require('cluster');
+var child;
 
 if (process.send) {
   require('./test-cluster-child.js');

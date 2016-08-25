@@ -2,9 +2,9 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
 
 let dicts = fs.readdirSync('../../dictionary');
 dicts = dicts.filter(function (dict) {
@@ -17,7 +17,7 @@ dicts = dicts.filter(function (dict) {
 let tests = fs.readdirSync('../test-79-npm');
 tests = tests.filter(function (test) {
   if (test === 'z-isolator') return false;
-  let full = path.join('../test-79-npm', test);
+  const full = path.join('../test-79-npm', test);
   return fs.statSync(full).isDirectory();
 });
 

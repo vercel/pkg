@@ -6,8 +6,8 @@ if (!process.enclose) {
   return;
 }
 
-let fs = require('fs-extra');
-let hack = 'dirty-hack-for-testing-purposes';
+var fs = require('fs-extra');
+var hack = 'dirty-hack-for-testing-purposes';
 if (fs.readFileSync(hack) === hack) {
   console.log('ok');
 }

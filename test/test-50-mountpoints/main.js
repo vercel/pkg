@@ -2,17 +2,17 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './run-time/test-output.exe';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './run-time/test-output.exe';
 
 let right;
 utils.mkdirp.sync(path.dirname(output));

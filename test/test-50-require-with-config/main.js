@@ -2,18 +2,18 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let utils = require('../utils.js');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const utils = require('../utils.js');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2];
-let input = './test-x-index.js';
-let output = './run-time/test-output.exe';
-let output3 = './run-time-3/dummy';
+const target = process.argv[2];
+const input = './test-x-index.js';
+const output = './run-time/test-output.exe';
+const output3 = './run-time-3/dummy';
 
 let left, right, right3;
 utils.mkdirp.sync(path.dirname(output));
@@ -26,7 +26,7 @@ left = utils.spawn.sync(
 
 fs.readdirSync('./').some(function (file) {
   if (/^test-/.test(file)) {
-    let nf = path.join(
+    const nf = path.join(
       path.dirname(file),
       path.basename(path.dirname(output)),
       path.basename(file)
@@ -37,7 +37,7 @@ fs.readdirSync('./').some(function (file) {
         'compile-time', 'run-time'
       )
     );
-    let nf3 = path.join(
+    const nf3 = path.join(
       path.dirname(file),
       path.basename(path.dirname(output3)),
       path.basename(file)

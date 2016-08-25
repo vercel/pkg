@@ -7,8 +7,8 @@ function Store () {
 function MemoryStore () {
 }
 
-let session = { Store: Store, MemoryStore: MemoryStore };
-let RedisStore = require('connect-redis')(session);
+var session = { Store: Store, MemoryStore: MemoryStore };
+var RedisStore = require('connect-redis')(session);
 if (typeof RedisStore === 'function') {
   console.log('ok');
 }

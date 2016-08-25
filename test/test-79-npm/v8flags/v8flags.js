@@ -1,19 +1,19 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let home = require('user-home');
-let cp = require('child_process');
+var fs = require('fs');
+var path = require('path');
+var home = require('user-home');
+var cp = require('child_process');
 
-let files = fs.readdirSync(home);
+var files = fs.readdirSync(home);
 files.some(function (file) {
   if (/^\.v8flags/.test(file)) {
     fs.unlinkSync(path.join(home, file));
   }
 });
 
-let execFileCalled = false;
-let execFileSave = cp.execFile;
+var execFileCalled = false;
+var execFileSave = cp.execFile;
 
 cp.execFile = function () {
   execFileCalled = true;
@@ -22,7 +22,7 @@ cp.execFile = function () {
 
 setTimeout(function () {
 
-  let v8flags = require('v8flags');
+  var v8flags = require('v8flags');
   v8flags(function (error, results) {
     if (error) return;
     if (!Array.isArray(results)) return;

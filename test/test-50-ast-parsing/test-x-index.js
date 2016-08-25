@@ -2,9 +2,9 @@
 
 'use strict';
 
-let fs = require('fs');
-let detector = require('../../lib/detector.js');
-let body = fs.readFileSync('./test-y-data.txt', 'utf8');
+const fs = require('fs');
+const detector = require('../../lib/detector.js');
+const body = fs.readFileSync('./test-y-data.txt', 'utf8');
 
 detector.detect(
   body,

@@ -1,6 +1,6 @@
 'use strict';
 
-let bignum = require('bignum');
+var bignum = require('bignum');
 if (bignum.div) {
   console.log('ok');
 }

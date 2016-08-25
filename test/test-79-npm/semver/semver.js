@@ -1,6 +1,6 @@
 'use strict';
 
-let semver = require('semver');
+var semver = require('semver');
 if (semver.SEMVER_SPEC_VERSION) {
   console.log('ok');
 }

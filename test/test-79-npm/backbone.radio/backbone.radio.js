@@ -1,6 +1,6 @@
 'use strict';
 
-let br = require('backbone.radio');
+var br = require('backbone.radio');
 if (br.tuneOut) {
   console.log('ok');
 }

@@ -5,10 +5,10 @@
 
 'use strict';
 
-let path = require('path');
-let async = 'async';
-let config = 'config';
-let i = 0;
+var path = require('path');
+var async = 'async';
+var config = 'config';
+var i = 0;
 
 require(/**/async/**/);
 require(/**/async.toString()/**/);

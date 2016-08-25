@@ -1,7 +1,7 @@
 'use strict';
 
-let mongodb = require('mongodb');
-let MongoClient = mongodb.MongoClient;
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
 if (typeof MongoClient === 'function') {
   console.log('ok');
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-let pwd = require('pwd');
+var pwd = require('pwd');
 if (pwd.hash) {
   console.log('ok');
 }

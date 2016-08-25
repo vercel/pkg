@@ -1,6 +1,6 @@
 'use strict';
 
-let websocket = require('faye-websocket');
+var websocket = require('faye-websocket');
 if (websocket.Client) {
   console.log('ok');
 }

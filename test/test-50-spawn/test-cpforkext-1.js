@@ -2,10 +2,10 @@
 
 'use strict';
 
-let assert = require('assert');
-let path = require('path');
-let cp = require('child_process');
-let child;
+var assert = require('assert');
+var path = require('path');
+var cp = require('child_process');
+var child;
 
 assert(!process.send);
 

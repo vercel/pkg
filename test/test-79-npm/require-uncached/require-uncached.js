@@ -6,7 +6,7 @@ if (!process.enclose) {
   return;
 }
 
-let require2 = require('require-uncached');
+var require2 = require('require-uncached');
 
 try {
   require2('async');

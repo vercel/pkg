@@ -2,8 +2,8 @@
 
 'use strict';
 
-let spawn = require('child_process').spawn;
-let child;
+var spawn = require('child_process').spawn;
+var child;
 
 if (process.send) {
   require('./test-spawn-child.js');

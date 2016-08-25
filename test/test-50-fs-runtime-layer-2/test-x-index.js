@@ -4,14 +4,14 @@
 
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let assert = require('assert');
-let the_file = path.join(__dirname, 'test-z-asset.css');
-let the_directory = __dirname;
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const the_file = path.join(__dirname, 'test-z-asset.css');
+const the_directory = __dirname;
 
 function dump_error (error) {
-  let s = error.message;
+  const s = error.message;
   if (s === 'Bad argument') {
     s = 'fd must be a file descriptor';
   } else
@@ -44,11 +44,11 @@ function test01 () {
       fs.fstat(fd, function (error3, fstats) {
         console.log('fs.fstat.error3 === null', error3 === null);
         console.log('fstats.size', fstats.size);
-        let buffer = new Buffer(stats.size);
+        const buffer = new Buffer(stats.size);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytes_read, buffer2) {
           console.log('fs.read.error4 === null', error4 === null);
           assert(buffer === buffer2); // should be same instances
-          let data = buffer.toString('utf8', 0, buffer.length);
+          const data = buffer.toString('utf8', 0, buffer.length);
           console.log('data', data);
           fs.close(fd, function (error5) {
             console.log('fs.close.error5 === null', error5 === null);
@@ -65,15 +65,15 @@ function test02 () {
 
   console.log('<<< test02 >>>');
 
-  let stats = fs.statSync(the_file);
+  const stats = fs.statSync(the_file);
   console.log('stats.size', stats.size);
-  let fd = fs.openSync(the_file, 'r');
-  let fstats = fs.fstatSync(fd);
+  const fd = fs.openSync(the_file, 'r');
+  const fstats = fs.fstatSync(fd);
   console.log('fstats.size', fstats.size);
-  let buffer = new Buffer(stats.size);
-  let bytes_read = fs.readSync(fd, buffer, 0, buffer.length);
+  const buffer = new Buffer(stats.size);
+  const bytes_read = fs.readSync(fd, buffer, 0, buffer.length);
   console.log('bytes_read', bytes_read);
-  let data = buffer.toString('utf8', 0, buffer.length);
+  const data = buffer.toString('utf8', 0, buffer.length);
   console.log('data', data);
   fs.closeSync(fd);
   test03();
@@ -84,13 +84,13 @@ function test03 () {
 
   console.log('<<< test03 >>>');
 
-  let stats = fs.statSync(the_file);
+  const stats = fs.statSync(the_file);
   console.log('stats.size', stats.size);
-  let fd = fs.openSync(the_file, 'r');
-  let fstats = fs.fstatSync(fd);
+  const fd = fs.openSync(the_file, 'r');
+  const fstats = fs.fstatSync(fd);
   console.log('fstats.size', fstats.size);
-  let buffer = new Buffer(6);
-  let bytes_read = fs.readSync(fd, buffer, 0, 6);
+  const buffer = new Buffer(6);
+  const bytes_read = fs.readSync(fd, buffer, 0, 6);
   console.log('bytes_read_a', bytes_read, 'buffer', buffer[0], buffer[1]);
   bytes_read = fs.readSync(fd, buffer, 0, 6);
   console.log('bytes_read_b', bytes_read, 'buffer', buffer[0], buffer[1]);
@@ -127,13 +127,13 @@ function test03 () {
 
 function test04 () {
 
-  let stats = fs.statSync(the_directory);
+  const stats = fs.statSync(the_directory);
   console.log(stats.size);
-  let fd = fs.openSync(the_directory, 'r');
-  let fstats = fs.fstatSync(fd);
+  const fd = fs.openSync(the_directory, 'r');
+  const fstats = fs.fstatSync(fd);
   console.log(fstats.size);
-  let buffer = new Buffer([ 12, 34, 56, 78 ]);
-  let bytes_read;
+  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { bytes_read = fs.readSync(fd, buffer, 6, 0); } catch (error) { dump_error(error); }
@@ -149,9 +149,9 @@ function test04 () {
 
 function test05 () {
 
-  let fd = 'incorrect fd as string';
-  let buffer = new Buffer([ 12, 34, 56, 78 ]);
-  let bytes_read;
+  const fd = 'incorrect fd as string';
+  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { console.log(fs.fstatSync(fd)); } catch (error) { dump_error(error); }
@@ -163,9 +163,9 @@ function test05 () {
 
 function test06 () {
 
-  let fd = 7890;
-  let buffer = new Buffer([ 12, 34, 56, 78 ]);
-  let bytes_read;
+  const fd = 7890;
+  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { console.log(fs.fstatSync(fd)); } catch (error) { dump_error(error); }
@@ -177,14 +177,14 @@ function test06 () {
 
 function test07 () {
 
-  let rs = fs.createReadStream(the_file);
+  const rs = fs.createReadStream(the_file);
 
   rs.on('open', function () {
     console.log('open');
   });
 
   rs.on('readable', function () {
-    let r = rs.read();
+    const r = rs.read();
     if (!r) {
       r = 'null';
     } else
