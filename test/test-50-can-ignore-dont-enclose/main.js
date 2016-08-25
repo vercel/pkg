@@ -2,8 +2,6 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 let assert = require('assert');
 let utils = require('../utils.js');
 
@@ -15,7 +13,27 @@ let input = './test-x-index.js';
 let output = './test-output.exe';
 let standard = 'stdout';
 
-let right;
+let left, right;
+
+left =
+  '  warning  Cannot resolve \'some_v\'\n' +
+  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  warning  Malformed requirement: require.resolve(some_v, some_v)\n' + // TODO implement
+//  '  warning  Malformed requirement: require.resolve(some_v, "can-can")\n' + // TODO implement
+  '  warning  Cannot resolve \'some_v\'\n' +
+
+  '  info  Cannot resolve \'some_v\'\n' +
+//  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  info  Cannot resolve \'some_v\'\n' +
+//  '  info  Cannot resolve \'some_v_ci\'\n' +
+
+  '  info  Cannot resolve \'some_v_ci\'\n' +
+//  '  warning  Malformed requirement: require(some_v, some_v)\n' + // TODO implement
+//  '  warning  Malformed requirement: require(some_v, "can-can")\n' + // TODO implement
+  '  info  Cannot find module \'some-s\'\n' +
+  '  info  Cannot find module \'some-s-ci\'\n' +
+  '  info  Cannot find module \'some-s\'\n' +
+  '  info  Cannot find module \'some-s-ci\'\n';
 
 let inspect = (standard === 'stdout')
   ? [ 'inherit', 'pipe', 'inherit' ]
@@ -40,23 +58,6 @@ right = right.split('\n').filter(function (line) {
   } else return line;
 }).join('\n') + '\n';
 
-assert.equal(right,
-  '  info  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-  '  info  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-  '  warning  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-  '  warning  Malformed requirement: require.resolve(some_v, some_v)\n' +
-  '  warning  Malformed requirement: require.resolve(some_v, "can-can")\n' +
-  '  warning  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-  '  warning  Malformed requirement: require(some_v, some_v)\n' +
-  '  warning  Malformed requirement: require(some_v, "can-can")\n' +
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n' +
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n'
-);
+assert.equal(right, left);
 
 utils.vacuum.sync(output);

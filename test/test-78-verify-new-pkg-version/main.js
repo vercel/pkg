@@ -18,7 +18,7 @@ let output = './test-output.exe';
 let left, right;
 
 let versions = utils.exec.sync(
-  'npm view enclose versions'
+  'npm view pkg versions'
 ).replace(/'/g, '"');
 
 versions = JSON.parse(versions);

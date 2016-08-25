@@ -2,8 +2,6 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 let fs = require('fs');
 let path = require('path');
 let assert = require('assert');
@@ -18,7 +16,7 @@ let input = './test-x-index.js';
 let output = './run-time/test-output.exe';
 
 if (!windows) return;
-let arch = 'x64'; // a2o(flags).arch; // TODO?
+let arch = process.arch; // TODO extract arch from `target` once it contains
 if (arch !== 'x64') return;
 let version1 = process.version;
 if (!(/^v?4/.test(version1))) return;
