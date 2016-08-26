@@ -11,7 +11,7 @@ const the_file = path.join(__dirname, 'test-z-asset.css');
 const the_directory = __dirname;
 
 function dump_error (error) {
-  const s = error.message;
+  let s = error.message;
   if (s === 'Bad argument') {
     s = 'fd must be a file descriptor';
   } else
@@ -90,7 +90,7 @@ function test03 () {
   const fstats = fs.fstatSync(fd);
   console.log('fstats.size', fstats.size);
   const buffer = new Buffer(6);
-  const bytes_read = fs.readSync(fd, buffer, 0, 6);
+  let bytes_read = fs.readSync(fd, buffer, 0, 6);
   console.log('bytes_read_a', bytes_read, 'buffer', buffer[0], buffer[1]);
   bytes_read = fs.readSync(fd, buffer, 0, 6);
   console.log('bytes_read_b', bytes_read, 'buffer', buffer[0], buffer[1]);
@@ -133,7 +133,7 @@ function test04 () {
   const fstats = fs.fstatSync(fd);
   console.log(fstats.size);
   const buffer = new Buffer([ 12, 34, 56, 78 ]);
-  const bytes_read;
+  let bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { bytes_read = fs.readSync(fd, buffer, 6, 0); } catch (error) { dump_error(error); }
@@ -151,7 +151,7 @@ function test05 () {
 
   const fd = 'incorrect fd as string';
   const buffer = new Buffer([ 12, 34, 56, 78 ]);
-  const bytes_read;
+  let bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { console.log(fs.fstatSync(fd)); } catch (error) { dump_error(error); }
@@ -165,7 +165,7 @@ function test06 () {
 
   const fd = 7890;
   const buffer = new Buffer([ 12, 34, 56, 78 ]);
-  const bytes_read;
+  let bytes_read;
   try { bytes_read = fs.readSync(fd, buffer, 0, 6); } catch (error) { dump_error(error); }
   console.log(bytes_read, buffer[0], buffer[1]);
   try { console.log(fs.fstatSync(fd)); } catch (error) { dump_error(error); }
@@ -184,7 +184,7 @@ function test07 () {
   });
 
   rs.on('readable', function () {
-    const r = rs.read();
+    let r = rs.read();
     if (!r) {
       r = 'null';
     } else
