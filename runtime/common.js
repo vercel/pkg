@@ -12,34 +12,17 @@ exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
 function uppercaseDriveLetter (f) {
-  var file = f;
-  if (file.slice(1, 3) === ':\\') {
-    var fs01 = file.slice(0, 1);
-    file = fs01.toUpperCase() + file.slice(1);
-  }
-  return file;
+  if (!(/^.\:\\/.test(f))) return f;
+  return f[0].toUpperCase() + f.slice(1);
 }
 
 function removeTrailingSlashes (f) {
-  var file = f;
-  if (file === '/') {
-    return file; // dont remove from "/"
-  }
-  if (file.slice(1) === ':\\') {
-    return file; // dont remove from "d:\\"
-  }
-  while (true) {
-    var s = file.slice(-1);
-    if (s === '\\') {
-      file = file.slice(0, -1);
-    } else
-    if (s === '/') {
-      file = file.slice(0, -1);
-    } else {
-      break;
-    }
-  }
-  return file;
+  if (f === '/')
+    return f; // dont remove from "/"
+  if (/^.\:\\$/.test(f))
+    return f; // dont remove from "D:\"
+  return f.replace(/\/+$/, '')
+    .replace(/\\+$/, '');
 }
 
 function normalizePath (f) {
@@ -72,12 +55,12 @@ exports.isDotNODE = function (file) {
 };
 
 function replaceSlashes (file, slash) {
-  if (file.slice(1, 3) === ':\\') {
+  if (/^.\:\\/.test(file)) {
     if (slash === '/') {
       return file.slice(2).replace(/\\/g, '/');
     }
   } else
-  if (file.slice(0, 1) === '/') {
+  if (/^\//.test(file)) {
     if (slash === '\\') {
       return 'C:' + file.replace(/\//g, '\\');
     }
@@ -86,29 +69,27 @@ function replaceSlashes (file, slash) {
 }
 
 function insertTheBox (file) {
-  if (file.slice(1, 3) === ':\\') {
+  if (/^.\:\\/.test(file)) {
     // C:\path\to
-    return file.slice(0, 2) +
-           file.slice(2, 3) + 'thebox' +
-           file.slice(2);
+    return file[0] + ':\\thebox' + file.slice(2);
   } else
-  if (file.slice(0, 1) === '/') {
+  if (/^\//.test(file)) {
     // /home/user/project
-    return file.slice(0, 1) + 'thebox' +
-           file.slice(0);
+    return '/thebox' + file;
   }
   return file;
 }
 
 exports.theboxify = function (file, slash) {
-  return insertTheBox(replaceSlashes(file, slash));
+  var f = normalizePath(file);
+  return insertTheBox(replaceSlashes(f, slash));
 };
 
 function insideTheBox (f) {
   if (typeof f !== 'string') return false;
   var file = normalizePath(f);
-  return (file.slice(2, 10) === '\\thebox\\') ||
-         (file.slice(0, 8) === '/thebox/');
+  return (/^.\:\\thebox/.test(file)) ||
+         (/^\/thebox/.test(file));
 }
 
 exports.insideTheBox = insideTheBox;
@@ -116,9 +97,9 @@ exports.insideTheBox = insideTheBox;
 exports.stripTheBox = function (f) {
   if (!insideTheBox(f)) return f;
   var file = normalizePath(f);
-  if (file.slice(2, 10) === '\\thebox\\') {
-    return file.slice(0, 2) + file.slice(9);
-  } else {
-    return file.slice(7);
-  }
+  if (/^.\:\\thebox\\/.test(file))
+    return file[0] + ':' + file.slice(9);
+  if (/^.\:\\thebox/.test(file))
+    return file[0] + ':\\' + file.slice(9);
+  return file.slice(7);
 };
