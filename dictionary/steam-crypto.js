@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  assets: [
-    'public.pub'
-  ]
-
+  pkgConfig: {
+    assets: [
+      'public.pub'
+    ]
+  }
 };

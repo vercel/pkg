@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/mongodb/**/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/mongodb/**/*.js'
+    ]
+  }
 };

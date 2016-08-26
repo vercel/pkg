@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'later.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'later.js'
+    ]
+  }
 };

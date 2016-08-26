@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/winston/transports/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/winston/transports/*.js'
+    ]
+  }
 };

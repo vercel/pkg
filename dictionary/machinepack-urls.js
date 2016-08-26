@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'machines/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'machines/*.js'
+    ]
+  }
 };

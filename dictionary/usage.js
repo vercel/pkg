@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/providers/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/providers/*.js'
+    ]
+  }
 };

@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/bson/**/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/bson/**/*.js'
+    ]
+  }
 };

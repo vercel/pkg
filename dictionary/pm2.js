@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/ProcessContainerFork.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/ProcessContainerFork.js'
+    ]
+  }
 };

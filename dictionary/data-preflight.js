@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = {
-
-  assets: [
-    'src/view/**/*',
-    'src/js/view/**/*'
-  ]
-
+  pkgConfig: {
+    assets: [
+      'src/view/**/*',
+      'src/js/view/**/*'
+    ]
+  }
 };

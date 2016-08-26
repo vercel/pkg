@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  assets: [
-    'lib/jute/specification.json'
-  ]
-
+  pkgConfig: {
+    assets: [
+      'lib/jute/specification.json'
+    ]
+  }
 };

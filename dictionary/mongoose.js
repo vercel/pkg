@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/drivers/node-mongodb-native/*.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/drivers/node-mongodb-native/*.js'
+    ]
+  }
 };

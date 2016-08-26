@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  assets: [
-    'lib/static/*'
-  ]
-
+  pkgConfig: {
+    assets: [
+      'lib/static/*'
+    ]
+  }
 };

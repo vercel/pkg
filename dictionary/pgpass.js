@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/helper.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/helper.js'
+    ]
+  }
 };

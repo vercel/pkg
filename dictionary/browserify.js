@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  assets: [
-    'bin/*.txt'
-  ]
-
+  pkgConfig: {
+    assets: [
+      'bin/*.txt'
+    ]
+  }
 };

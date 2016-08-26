@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = {
-
-  scripts: [
-    'lib/arrayParser.js'
-  ]
-
+  pkgConfig: {
+    scripts: [
+      'lib/arrayParser.js'
+    ]
+  }
 };
