@@ -43,7 +43,6 @@
   },
   "scripts": {
     "babel": "babel lib --out-dir lib-es5",
-    "bin": "node lib-es5/bin.js",
     "lint": "eslint-klopov . || true",
     "test": "node test/test.js v6"
   },
