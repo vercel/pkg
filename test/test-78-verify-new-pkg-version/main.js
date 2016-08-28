@@ -17,7 +17,7 @@ const output = './test-output.exe';
 
 let left, right;
 
-const versions = utils.exec.sync(
+let versions = utils.exec.sync(
   'npm view pkg versions'
 ).replace(/'/g, '"');
 

@@ -1,155 +1,435 @@
 #!/usr/bin/env node
-"use strict";
-function EventEmitter() {
+'use strict';
+function EventEmitter () {
   this.listeners = [];
 }
-EventEmitter.prototype.on = function(name, listener) {
+EventEmitter.prototype.on = function (name, listener) {
   this.listeners.push(listener);
 };
-EventEmitter.prototype.emit = function(name, data) {
+EventEmitter.prototype.emit = function (name, data) {
   this.listeners.some((listener) => {
     listener(data);
   });
 };
-var ee = new EventEmitter();
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.on("message", (data) => { console.log(data); });
-ee.emit("message", "hooray");
+const ee = new EventEmitter();
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.on('message', (data) => {
+  console.log(data);
+});
+ee.emit('message', 'hooray');

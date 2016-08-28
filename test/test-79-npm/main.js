@@ -36,11 +36,12 @@ changes = JSON.parse(changes);
 
 function save () {
   const t = utils.stringify(table, null, 2);
-  const c = utils.stringify(changes, null, 2);
+  let c = utils.stringify(changes, null, 2);
   if (c === '[]') c = '[\n]';
   fs.writeFileSync('checklist.js',
     '/* eslint-disable no-unused-vars */\n' +
-    '"use strict";\n' +
+    '/* eslint-disable quotes */\n' +
+    '\'use strict\';\n' +
     'const table = ' + t + ';\n' +
     'const changes = ' + c + ';\n'
   );

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-multi-spaces */
+
 'use strict';
 
 const assert = require('assert');

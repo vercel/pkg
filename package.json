@@ -50,6 +50,8 @@
     "extends": "klopov",
     "parser": "babel-eslint",
     "rules": {
+      "max-depth": "off",
+      "no-var": "off",
       "one-var": "off",
       "padded-blocks": "off",
       "vars-on-top": "off"
