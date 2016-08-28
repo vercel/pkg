@@ -1,5 +1,13 @@
 'use strict';
 
+// TODO these calls emulate package.json deps
+// implement 'sequelize.config.js' with deps
+require('mysql');
+require('pg');
+require('pg-hstore');
+require('sqlite3');
+require('tedious');
+
 var sequelize = require('sequelize');
 if (typeof sequelize.and !== 'function') return;
 
