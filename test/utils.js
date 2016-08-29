@@ -74,16 +74,22 @@ module.exports.spawn.sync = function (command, args, opts) {
   delete opts.expect; // to avoid passing to spawnSync
   const opts2 = Object.assign({}, opts); // 0.12.x spoils
   const child = spawnSync(command, args, opts2);
-  if (child.error) throw child.error;
-
   const s = child.status;
-  if (s !== expect) {
-    if (opts.stdio[1] === 'pipe') {
+
+  if (child.error || (s !== expect)) {
+    if (opts.stdio[1] === 'pipe' && child.stdout) {
       process.stdout.write(child.stdout);
     } else
-    if (opts.stdio[2] === 'pipe') {
+    if (opts.stdio[2] === 'pipe' && child.stderr) {
       process.stdout.write(child.stderr);
     }
+    console.log('> ' + command + ' ' + args.join(' '));
+  }
+
+  if (child.error) {
+    throw child.error;
+  }
+  if (s !== expect) {
     throw new Error('Status ' + s.toString() +
       ', expected ' + expect.toString());
   }

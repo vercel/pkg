@@ -1,5 +1,5 @@
 'use strict';
 
-var dataPath = '../data.json';
+var dataPath = '../test-y-data.json';
 var data = require(dataPath);
 console.log(data);

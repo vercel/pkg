@@ -10,8 +10,8 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const target = process.argv[2];
-const input = './sub/test-x-index.js';
-const output = './run-time/test-output.exe';
+const input = './test-x-index.js';
+const output = './test-output.exe';
 
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
@@ -23,7 +23,6 @@ left = utils.spawn.sync(
 
 utils.pkg.sync([
   '--target', target,
-  '--config', './test-config.js',
   '--output', output, input
 ]);
 
@@ -33,4 +32,4 @@ right = utils.spawn.sync(
 );
 
 assert.equal(left, right);
-utils.vacuum.sync(path.dirname(output));
+utils.vacuum.sync(output);
