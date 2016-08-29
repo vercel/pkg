@@ -6,7 +6,15 @@ module.exports = {
       'lib/*.js'
     ],
     patches: {
-      'lib/*.js': [
+      'lib/info.js': [
+        'require("aws-sdk")',
+        'require("aws-sdk", "can-ignore")'
+      ],
+      'lib/publish.js': [
+        'require("aws-sdk")',
+        'require("aws-sdk", "can-ignore")'
+      ],
+      'lib/unpublish.js': [
         'require("aws-sdk")',
         'require("aws-sdk", "can-ignore")'
       ]
