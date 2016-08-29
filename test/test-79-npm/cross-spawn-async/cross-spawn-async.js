@@ -6,7 +6,7 @@ var spawn = require('cross-spawn-async');
 var bin = path.join(__dirname, 'fixture.js');
 var args = [];
 
-if (process.enclose) {
+if (process.pkg) {
   args.unshift('--entrypoint', bin);
   bin = process.execPath;
 } else {

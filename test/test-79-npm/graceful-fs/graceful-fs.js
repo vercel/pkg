@@ -1,7 +1,7 @@
 'use strict';
 
-// only enclosed run supposed
-if (!process.enclose) {
+// only pkg-ed run
+if (!process.pkg) {
   console.log('ok');
   return;
 }

@@ -9,9 +9,9 @@ module.exports = {
       ],
       'lib/view.js': [
         'path = join(this.root, path)',
-        'path = process.enclose.path.resolve(this.root, path)', // for 3.x
+        'path = process.pkg.path.resolve(this.root, path)', // for 3.x
         'loc = resolve(root, name)',
-        'loc = process.enclose.path.resolve(root, name)' // for 4.x
+        'loc = process.pkg.path.resolve(root, name)' // for 4.x
       ]
     }
   }

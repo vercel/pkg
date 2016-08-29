@@ -19,7 +19,7 @@ module.exports = {
       'lib/hooks/grunt/index.js': [
         'var child = ChildProcess.fork(', '\n' +
         'sails.log.warn(\'*******************************************************************\');\n' +
-        'sails.log.warn(\'** EncloseJS: Grunt hook is temporarily disabled in enclosed app **\');\n' +
+        'sails.log.warn(\'** Pkg: Grunt hook is temporarily disabled in pkg-ed app         **\');\n' +
         'sails.log.warn(\'** Instead it should be run before compilation to prepare files  **\');\n' +
         'sails.log.warn(\'*******************************************************************\');\n' +
         'sails.emit(\'hook:grunt:done\');\n' +

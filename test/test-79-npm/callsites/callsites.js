@@ -1,7 +1,7 @@
 'use strict';
 
-// only enclosed run supposed
-if (!process.enclose) {
+// only pkg-ed run
+if (!process.pkg) {
   console.log('ok');
   return;
 }
@@ -11,7 +11,7 @@ var callsites = require('callsites');
 try {
   callsites();
 } catch (error) {
-  if (error.message.indexOf('EncloseJS') >= 0) {
+  if (error.message.indexOf('Pkg') >= 0) {
     console.log('ok');
   }
 }

@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'lib/express-load.js': [
         'entity = path.resolve(',
-        'entity = process.enclose.path.resolve('
+        'entity = process.pkg.path.resolve('
       ]
     }
   }

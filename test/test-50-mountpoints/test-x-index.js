@@ -11,7 +11,7 @@ require('./plugins-C-int/test-y-require-C.js');
 
 var myDirectory = path.dirname(process.argv[1]);
 
-process.enclose.mount(
+process.pkg.mount(
   path.join(__dirname, 'plugins-D-ext'),
   path.join(myDirectory, 'plugins-D-ext')
 );

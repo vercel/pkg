@@ -3,5 +3,5 @@
 'use strict';
 
 console.log(
-  process.versions.enclose
+  process.versions.pkg
 );

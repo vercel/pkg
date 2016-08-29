@@ -380,11 +380,11 @@ var modifyNativeAddonWin32 = (function () {
 
 (function () {
 
-  process.enclose = {};
+  process.pkg = {};
   process.argv[1] = process.execPath;
-  process.versions.enclose = '2.2.0';
-  process.enclose.mount = createMountpoint;
-  process.enclose.DEFAULT_ENTRYPOINT = DEFAULT_ENTRYPOINT;
+  process.versions.pkg = '3.0.0-beta.0'; // TODO test to match with version from package.json?
+  process.pkg.mount = createMountpoint;
+  process.pkg.DEFAULT_ENTRYPOINT = DEFAULT_ENTRYPOINT;
 
 }());
 
@@ -396,8 +396,8 @@ var modifyNativeAddonWin32 = (function () {
 
   var path = require('path');
 
-  process.enclose.path = {};
-  process.enclose.path.resolve = function () {
+  process.pkg.path = {};
+  process.pkg.path.resolve = function () {
     var args = cloneArgs(arguments);
     args.unshift(path.dirname(ENTRYPOINT));
     return path.resolve.apply(path, args);

@@ -12,9 +12,9 @@ kitty.save(function (error1) {
   Cat.find({}).$where(function () {
     return (this.name.slice(0, 3) === 'Tuz'); // eslint-disable-line no-invalid-this
   }).exec(function (error2, cats) {
-    if (process.enclose) {
+    if (process.pkg) {
       if (cats) return;
-      if (error2.message.indexOf('EncloseJS') >= 0) {
+      if (error2.message.indexOf('Pkg') >= 0) {
         console.log('ok');
         mongoose.disconnect();
       }
