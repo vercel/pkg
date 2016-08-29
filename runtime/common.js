@@ -40,10 +40,7 @@ exports.isPackageJson = function (file) {
 };
 
 exports.isDotJS = function (file) {
-  // exceljs/lib/xlsx/.rels
-  // http-server/bin/http-server
-  return (path.basename(file).indexOf('.') < 0) ||
-         (path.extname(file) === '.js');
+  return path.extname(file) === '.js';
 };
 
 exports.isDotJSON = function (file) {
