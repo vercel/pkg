@@ -2,6 +2,10 @@
 
 'use strict';
 
+// too many problems when treating
+// 'files' as scripts. TODO clarify one day
+if (process) return;
+
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
