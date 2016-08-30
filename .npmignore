@@ -1,1 +1,4 @@
-*
+/lib
+/test
+.eslintignore
+.gitignore
