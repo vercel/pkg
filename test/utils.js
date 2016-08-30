@@ -49,7 +49,7 @@ module.exports.exec = function () {
 module.exports.exec.sync = function (command, opts) {
 
   const child = execSync(command, opts);
-  return child.toString();
+  return (child || '').toString();
 
 };
 
