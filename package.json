@@ -1,10 +1,12 @@
 {
   "name": "pkg",
-  "version": "3.0.0-beta.0",
+  "version": "3.0.0-beta.2",
   "description": "",
   "readme": "",
   "main": "lib-es5/index.js",
-  "bin": "lib-es5/bin.js",
+  "bin": {
+    "pkg": "lib-es5/bin.js"
+  },
   "babel": {
     "plugins": [
       "transform-async-to-generator",
