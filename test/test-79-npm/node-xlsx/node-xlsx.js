@@ -3,7 +3,7 @@
 var path = require('path');
 var xlsx = require('node-xlsx');
 
-var xls = xlsx.parse(path.join(__dirname, 'ketk.xls'));
+var xls = xlsx.parse(path.join(__dirname, 'registry.xls'));
 var ods = xlsx.parse(path.join(__dirname, 'ffc.ods'));
 
 var data = [
