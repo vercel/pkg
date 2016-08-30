@@ -1,7 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/enclose');
+mongoose.connect('mongodb://localhost/pkg-test');
 
 var Cat = mongoose.model('Cat', { name: String });
 var name = 'Tuz' + (new Date()).getTime().toString();

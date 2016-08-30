@@ -473,7 +473,7 @@ var modifyNativeAddonWin32 = (function () {
     error.errno = -ENOENT;
     error.code = 'ENOENT';
     error.path = path;
-    error.enclose = true;
+    error.pkg = true;
     return error;
   }
 
@@ -484,7 +484,7 @@ var modifyNativeAddonWin32 = (function () {
     error.errno = -EISDIR;
     error.code = 'EISDIR';
     error.path = path;
-    error.enclose = true;
+    error.pkg = true;
     return error;
   }
 
@@ -495,7 +495,7 @@ var modifyNativeAddonWin32 = (function () {
     error.errno = -ENOTDIR;
     error.code = 'ENOTDIR';
     error.path = path;
-    error.enclose = true;
+    error.pkg = true;
     return error;
   }
 
@@ -1277,13 +1277,13 @@ var modifyNativeAddonWin32 = (function () {
            (error.code === 'MODULE_NOT_FOUND')) &&
           (!insideTheBox(path)) &&
           (!require('path').isAbsolute(path))) {
-        if (!error.enclose) {
-          error.enclose = true;
+        if (!error.pkg) {
+          error.pkg = true;
           error.message += '\n' +
-            '1) If you want to enclose the package/file into ' +
+            '1) If you want to compile the package/file into ' +
             'executable, please pay attention to compilation ' +
             'warnings and specify a literal in \'require\' call. ' +
-            '2) If you don\'t want to enclose the package/file ' +
+            '2) If you don\'t want to compile the package/file ' +
             'into executable and want to \'require\' it from ' +
             'filesystem (likely plugin), specify an absolute ' +
             'path in \'require\' call using process.cwd() or ' +

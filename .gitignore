@@ -1,10 +1,3 @@
-/bin/binaries.json
-/bin/house*
-/bin/enclose*.exe
-/bin/enclose-*-linux-*
-/bin/enclose-*-darwin-*
-/build/node
 /lib-es5
 /node_modules
-/node_repository
 npm-debug.log

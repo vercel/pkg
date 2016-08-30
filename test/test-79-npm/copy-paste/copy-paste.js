@@ -1,6 +1,6 @@
 'use strict';
 
 var ncp = require('copy-paste');
-ncp.copy('hello from enclose', function () {
+ncp.copy('hello from pkg', function () {
   console.log('ok');
 });

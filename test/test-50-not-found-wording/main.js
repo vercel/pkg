@@ -31,7 +31,7 @@ assert(
 );
 
 assert(
-  right.split('*****')[1].indexOf('you want to enclose the package') >= 0
+  right.split('*****')[1].indexOf('you want to compile the package') >= 0
 );
 
 utils.vacuum.sync(path.dirname(output));
