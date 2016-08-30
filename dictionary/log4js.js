@@ -8,29 +8,29 @@ module.exports = {
     patches: {
       'lib/appenders/hipchat.js': [
         'require(\'hipchat-client\')',
-        'require(\'hipchat-client\', \'can-ignore\')',
+        'require(\'hipchat-client\', \'may-exclude\')',
         'require(\'hipchat-notifier\')',
-        'require(\'hipchat-notifier\', \'can-ignore\')'
+        'require(\'hipchat-notifier\', \'may-exclude\')'
       ],
       'lib/appenders/hookio.js': [
         'require(\'hook.io\')',
-        'require(\'hook.io\', \'can-ignore\')'
+        'require(\'hook.io\', \'may-exclude\')'
       ],
       'lib/appenders/loggly.js': [
         'require(\'loggly\')',
-        'require(\'loggly\', \'can-ignore\')'
+        'require(\'loggly\', \'may-exclude\')'
       ],
       'lib/appenders/mailgun.js': [
         'require(\'mailgun-js\')',
-        'require(\'mailgun-js\', \'can-ignore\')'
+        'require(\'mailgun-js\', \'may-exclude\')'
       ],
       'lib/appenders/smtp.js': [
         'require("nodemailer")',
-        'require("nodemailer", "can-ignore")'
+        'require("nodemailer", "may-exclude")'
       ],
       'lib/appenders/slack.js': [
         'require(\'slack-node\')',
-        'require(\'slack-node\', \'can-ignore\')'
+        'require(\'slack-node\', \'may-exclude\')'
       ]
     }
   }

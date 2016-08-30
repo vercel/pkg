@@ -8,11 +8,11 @@ module.exports = {
     patches: {
       'lib/native/index.js': [
         'require(\'pg-native\')',
-        'require(\'pg-native\', \'can-ignore\')',
+        'require(\'pg-native\', \'may-exclude\')',
         'require(\'semver\')',
-        'require(\'semver\', \'can-ignore\')',
+        'require(\'semver\', \'may-exclude\')',
         'require(\'bindings\')',
-        'require(\'bindings\', \'can-ignore\')' // for 3.6.2
+        'require(\'bindings\', \'may-exclude\')' // for 3.6.2
       ]
     }
   }

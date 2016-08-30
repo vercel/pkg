@@ -11,15 +11,15 @@ module.exports = {
     patches: {
       'index.js': [
         'require(\'./lib-cov/connect\')',
-        'require(\'./lib-cov/connect\', \'can-ignore\')' // for connect@2.3
+        'require(\'./lib-cov/connect\', \'may-exclude\')' // for connect@2.3
       ],
       'lib/middleware/compiler.js': [
         'require(\'sass\')',
-        'require(\'sass\', \'can-ignore\')',
+        'require(\'sass\', \'may-exclude\')',
         'require(\'less\')',
-        'require(\'less\', \'can-ignore\')',
+        'require(\'less\', \'may-exclude\')',
         'require(\'coffee-script\')',
-        'require(\'coffee-script\', \'can-ignore\')'
+        'require(\'coffee-script\', \'may-exclude\')'
       ]
     }
   }

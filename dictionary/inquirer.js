@@ -8,7 +8,7 @@ module.exports = {
       // TODO убери когда шлютер поправит
       'lib/ui/bottom-bar.js': [
         'require("through")',
-        'require("through", "can-ignore")'
+        'require("through", "may-exclude")'
       ]
     }
   }

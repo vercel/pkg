@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'voc.js': [
         'require(\'coffee-script\')',
-        'require(\'coffee-script\', \'can-ignore\')'
+        'require(\'coffee-script\', \'may-exclude\')'
       ]
     }
   }

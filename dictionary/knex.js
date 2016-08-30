@@ -8,41 +8,41 @@ module.exports = {
     patches: {
       'lib/dialects/maria/index.js': [
         'require(\'mariasql\')',
-        'require(\'mariasql\', \'can-ignore\')'
+        'require(\'mariasql\', \'may-exclude\')'
       ],
       'lib/dialects/mssql/index.js': [
         'require(\'mssql\')',
-        'require(\'mssql\', \'can-ignore\')'
+        'require(\'mssql\', \'may-exclude\')'
       ],
       'lib/dialects/mysql/index.js': [
         'require(\'mysql\')',
-        'require(\'mysql\', \'can-ignore\')'
+        'require(\'mysql\', \'may-exclude\')'
       ],
       'lib/dialects/mysql2/index.js': [
         'require(\'mysql2\')',
-        'require(\'mysql2\', \'can-ignore\')'
+        'require(\'mysql2\', \'may-exclude\')'
       ],
       'lib/dialects/oracle/index.js': [
         'require(\'oracle\')',
-        'require(\'oracle\', \'can-ignore\')'
+        'require(\'oracle\', \'may-exclude\')'
       ],
       'lib/dialects/oracledb/index.js': [
         'require(\'oracledb\')',
-        'require(\'oracledb\', \'can-ignore\')'
+        'require(\'oracledb\', \'may-exclude\')'
       ],
       'lib/dialects/postgres/index.js': [
         'require(\'pg\')',
-        'require(\'pg\', \'can-ignore\')',
+        'require(\'pg\', \'may-exclude\')',
         'require(\'pg-query-stream\')',
-        'require(\'pg-query-stream\', \'can-ignore\')'
+        'require(\'pg-query-stream\', \'may-exclude\')'
       ],
       'lib/dialects/sqlite3/index.js': [
         'require(\'sqlite3\')',
-        'require(\'sqlite3\', \'can-ignore\')'
+        'require(\'sqlite3\', \'may-exclude\')'
       ],
       'lib/dialects/strong-oracle/index.js': [
         'require(\'strong-oracle\')',
-        'require(\'strong-oracle\', \'can-ignore\')'
+        'require(\'strong-oracle\', \'may-exclude\')'
       ]
     }
   }

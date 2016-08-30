@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'lib/hiredis.js': [
         'require(\'hiredis\')',
-        'require(\'hiredis\', \'can-ignore\')'
+        'require(\'hiredis\', \'may-exclude\')'
       ]
     }
   }

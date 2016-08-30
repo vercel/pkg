@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'index.js': [
         'require(\'./lib-cov/express\')',
-        'require(\'./lib-cov/express\', \'can-ignore\')'
+        'require(\'./lib-cov/express\', \'may-exclude\')'
       ],
       'lib/view.js': [
         'path = join(this.root, path)',

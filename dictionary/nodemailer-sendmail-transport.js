@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'src/sendmail-transport.js': [
         'require(\'readable-stream\')',
-        'require(\'readable-stream\', \'can-ignore\')'
+        'require(\'readable-stream\', \'may-exclude\')'
       ]
     }
   }

@@ -8,7 +8,7 @@ module.exports = {
     patches: {
       'lib/coffee-script/grammar.js': [
         'require(\'jison\')',
-        'require(\'jison\', \'can-ignore\')'
+        'require(\'jison\', \'may-exclude\')'
       ]
     }
   }

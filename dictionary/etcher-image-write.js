@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'lib/win32.js': [
         'require(\'diskpart\')',
-        'require(\'diskpart\', \'can-ignore\')'
+        'require(\'diskpart\', \'may-exclude\')'
       ]
     }
   }

@@ -7,7 +7,7 @@
 var error1;
 
 function func1 () {
-  require.resolve('not-exists-1', 'can-ignore');
+  require.resolve('not-exists-1', 'may-exclude');
 }
 
 try {
@@ -21,7 +21,7 @@ try {
 var error2;
 
 function func2 () {
-  require.resolve('not-exists-2', 'can-ignore');
+  require.resolve('not-exists-2', 'may-exclude');
 }
 
 try {
