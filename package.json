@@ -15,12 +15,12 @@
     ]
   },
   "dependencies": {
-    "acorn": "^3.3.0",
+    "acorn": "3.3.0",
     "babel-runtime": "6.11.6",
-    "chalk": "^1.1.1",
-    "escodegen": "^1.8.1",
+    "chalk": "1.1.1",
+    "escodegen": "1.8.1",
     "fs-promise": "0.5.0",
-    "globby": "^4.0.0",
+    "globby": "4.0.0",
     "minimist": "1.2.0",
     "progress": "1.1.8",
     "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4"
