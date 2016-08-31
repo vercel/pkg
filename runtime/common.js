@@ -88,8 +88,10 @@ exports.theboxify = function (file, slash) {
 function insideTheBox (f) {
   if (typeof f !== 'string') return false;
   var file = normalizePath(f);
-  return (/^.:\\thebox/.test(file)) ||
-         (/^\/thebox/.test(file));
+  return (/^.:\\thebox$/.test(file)) ||
+         (/^.:\\thebox\\/.test(file)) ||
+         (/^\/thebox$/.test(file)) ||
+         (/^\/thebox\//.test(file));
 }
 
 exports.insideTheBox = insideTheBox;
