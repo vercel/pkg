@@ -4,6 +4,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
+/* eslint-disable strict */
 
 /* global REQUIRE_COMMON */
 /* global VIRTUAL_FILESYSTEM */

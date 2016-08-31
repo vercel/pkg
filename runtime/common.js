@@ -1,4 +1,5 @@
 /* eslint-enable no-param-reassign */
+/* eslint-disable strict */
 
 'use strict';
 
@@ -12,15 +13,17 @@ exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
 function uppercaseDriveLetter (f) {
-  if (!(/^.\:\\/.test(f))) return f;
+  if (!(/^.:\\/.test(f))) return f;
   return f[0].toUpperCase() + f.slice(1);
 }
 
 function removeTrailingSlashes (f) {
-  if (f === '/')
+  if (f === '/') {
     return f; // dont remove from "/"
-  if (/^.\:\\$/.test(f))
+  }
+  if (/^.:\\$/.test(f)) {
     return f; // dont remove from "D:\"
+  }
   return f.replace(/\/+$/, '')
     .replace(/\\+$/, '');
 }
@@ -52,7 +55,7 @@ exports.isDotNODE = function (file) {
 };
 
 function replaceSlashes (file, slash) {
-  if (/^.\:\\/.test(file)) {
+  if (/^.:\\/.test(file)) {
     if (slash === '/') {
       return file.slice(2).replace(/\\/g, '/');
     }
@@ -66,7 +69,7 @@ function replaceSlashes (file, slash) {
 }
 
 function insertTheBox (file) {
-  if (/^.\:\\/.test(file)) {
+  if (/^.:\\/.test(file)) {
     // C:\path\to
     return file[0] + ':\\thebox' + file.slice(2);
   } else
@@ -85,7 +88,7 @@ exports.theboxify = function (file, slash) {
 function insideTheBox (f) {
   if (typeof f !== 'string') return false;
   var file = normalizePath(f);
-  return (/^.\:\\thebox/.test(file)) ||
+  return (/^.:\\thebox/.test(file)) ||
          (/^\/thebox/.test(file));
 }
 
@@ -94,9 +97,11 @@ exports.insideTheBox = insideTheBox;
 exports.stripTheBox = function (f) {
   if (!insideTheBox(f)) return f;
   var file = normalizePath(f);
-  if (/^.\:\\thebox\\/.test(file))
+  if (/^.:\\thebox\\/.test(file)) {
     return file[0] + ':' + file.slice(9);
-  if (/^.\:\\thebox/.test(file))
+  }
+  if (/^.:\\thebox/.test(file)) {
     return file[0] + ':\\' + file.slice(9);
+  }
   return file.slice(7);
 };
