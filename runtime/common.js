@@ -97,13 +97,18 @@ function insideTheBox (f) {
 exports.insideTheBox = insideTheBox;
 
 exports.stripTheBox = function (f) {
-  if (!insideTheBox(f)) return f;
   var file = normalizePath(f);
+  if (/^.:\\thebox$/.test(file)) {
+    return file[0] + ':\\';
+  }
   if (/^.:\\thebox\\/.test(file)) {
     return file[0] + ':' + file.slice(9);
   }
-  if (/^.:\\thebox/.test(file)) {
-    return file[0] + ':\\' + file.slice(9);
+  if (/^\/thebox$/.test(file)) {
+    return '/';
   }
-  return file.slice(7);
+  if (/^\/thebox\//.test(file)) {
+    return file.slice(7);
+  }
+  return f; // not inside
 };
