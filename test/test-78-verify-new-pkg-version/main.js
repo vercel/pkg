@@ -2,6 +2,8 @@
 
 'use strict';
 
+if (process) return; // TODO ENABLE - make it work only in prepublish. also use semver
+
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');

@@ -39,24 +39,25 @@ right = right.split('\n').filter(function (line) {
 }).join('\n') + '\n';
 
 assert.equal(right,
-  '  warning  Cannot resolve \'some_v\'\n' +
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  warning  Malformed requirement: require.resolve(some_v, some_v)\n' + // TODO implement
-//  '  warning  Malformed requirement: require.resolve(some_v, "can-can")\n' + // TODO implement
-  '  warning  Cannot resolve \'some_v\'\n' +
+  '  warning  Cannot resolve \'rr_some_v\'\n' +
+  '  info  Cannot resolve \'rr_some_v_ci\'\n' +
+  '  warning  Malformed requirement \'rr_some_v\'\n' +
+  '  warning  Malformed requirement \'rr_some_v\'\n' +
 
-  '  info  Cannot resolve \'some_v\'\n' +
-//  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  info  Cannot resolve \'some_v\'\n' +
-//  '  info  Cannot resolve \'some_v_ci\'\n' +
+  '  warning  Cannot resolve \'r_some_v\'\n' +
+  '  info  Cannot resolve \'r_some_v_ci\'\n' +
+  '  warning  Malformed requirement \'r_some_v\'\n' +
+  '  warning  Malformed requirement \'r_some_v\'\n' +
 
-  '  info  Cannot resolve \'some_v_ci\'\n' +
-//  '  warning  Malformed requirement: require(some_v, some_v)\n' + // TODO implement
-//  '  warning  Malformed requirement: require(some_v, "can-can")\n' + // TODO implement
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n' +
-  '  info  Cannot find module \'some-s\'\n' +
-  '  info  Cannot find module \'some-s-ci\'\n'
+  '  info  Cannot resolve \'try_rr_some_v\'\n' +
+  '  info  Cannot resolve \'try_rr_some_v_ci\'\n' +
+  '  info  Cannot resolve \'try_r_some_v\'\n' +
+  '  info  Cannot resolve \'try_r_some_v_ci\'\n' +
+
+  '  info  Cannot find module \'rr-some-s\'\n' +
+  '  info  Cannot find module \'rr-some-s-ci\'\n' +
+  '  info  Cannot find module \'r-some-s\'\n' +
+  '  info  Cannot find module \'r-some-s-ci\'\n'
 );
 
 utils.vacuum.sync(output);

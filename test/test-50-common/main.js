@@ -42,6 +42,6 @@ if (process.platform === 'win32') {
 
 } else {
 
-  // TODO
+  assert(false);
 
 }
