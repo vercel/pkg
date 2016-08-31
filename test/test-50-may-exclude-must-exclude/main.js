@@ -20,16 +20,16 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
+  '--debug',
   '--target', target,
-  '--loglevel', 'info',
   '--output', output, input
 ], inspect);
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 
 right = right.split('\n').filter(function (line) {
-  return (line.indexOf('  info  ') >= 0) ||
-         (line.indexOf('  warning  ') >= 0);
+  return (line.indexOf(' [debug] ') >= 0) ||
+         (line.indexOf(' Warning ') >= 0);
 }).filter(function (line) {
   return line.indexOf('was included') < 0;
 }).map(function (line) {
@@ -39,25 +39,25 @@ right = right.split('\n').filter(function (line) {
 }).join('\n') + '\n';
 
 assert.equal(right,
-  '  warning  Cannot resolve \'rr_some_v\'\n' +
-  '  info  Cannot resolve \'rr_some_v_ci\'\n' +
-  '  warning  Malformed requirement \'rr_some_v\'\n' +
-  '  warning  Malformed requirement \'rr_some_v\'\n' +
+  '> Warning Cannot resolve \'rr_some_v\'\n' +
+  '> [debug] Cannot resolve \'rr_some_v_ci\'\n' +
+  '> Warning Malformed requirement \'rr_some_v\'\n' +
+  '> Warning Malformed requirement \'rr_some_v\'\n' +
 
-  '  warning  Cannot resolve \'r_some_v\'\n' +
-  '  info  Cannot resolve \'r_some_v_ci\'\n' +
-  '  warning  Malformed requirement \'r_some_v\'\n' +
-  '  warning  Malformed requirement \'r_some_v\'\n' +
+  '> Warning Cannot resolve \'r_some_v\'\n' +
+  '> [debug] Cannot resolve \'r_some_v_ci\'\n' +
+  '> Warning Malformed requirement \'r_some_v\'\n' +
+  '> Warning Malformed requirement \'r_some_v\'\n' +
 
-  '  info  Cannot resolve \'try_rr_some_v\'\n' +
-  '  info  Cannot resolve \'try_rr_some_v_ci\'\n' +
-  '  info  Cannot resolve \'try_r_some_v\'\n' +
-  '  info  Cannot resolve \'try_r_some_v_ci\'\n' +
+  '> [debug] Cannot resolve \'try_rr_some_v\'\n' +
+  '> [debug] Cannot resolve \'try_rr_some_v_ci\'\n' +
+  '> [debug] Cannot resolve \'try_r_some_v\'\n' +
+  '> [debug] Cannot resolve \'try_r_some_v_ci\'\n' +
 
-  '  info  Cannot find module \'rr-some-s\'\n' +
-  '  info  Cannot find module \'rr-some-s-ci\'\n' +
-  '  info  Cannot find module \'r-some-s\'\n' +
-  '  info  Cannot find module \'r-some-s-ci\'\n'
+  '> [debug] Cannot find module \'rr-some-s\'\n' +
+  '> [debug] Cannot find module \'rr-some-s-ci\'\n' +
+  '> [debug] Cannot find module \'r-some-s\'\n' +
+  '> [debug] Cannot find module \'r-some-s-ci\'\n'
 );
 
 utils.vacuum.sync(output);

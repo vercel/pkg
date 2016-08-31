@@ -29,8 +29,8 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
+  '--debug',
   '--target', target,
-  '--loglevel', 'info',
   '--output', output, input
 ], inspect);
 

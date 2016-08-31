@@ -18,8 +18,8 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
+  '--debug',
   '--target', target,
-  '--loglevel', 'info',
   '--output', 'no-output', '12345'
 ], { stdio: inspect, expect: 2 });
 

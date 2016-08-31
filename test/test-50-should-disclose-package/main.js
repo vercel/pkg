@@ -21,8 +21,8 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
+  '--debug',
   '--target', target,
-  '--loglevel', 'info',
   '--output', output, input
 ], inspect);
 
@@ -34,10 +34,10 @@ right = right.split('\n');
 right.some(function (line, index) {
   if ((line.indexOf('Cannot resolve') >= 0) ||
       (line.indexOf('The file was included') >= 0)) {
-    let name = path.basename(right[index - 1]);
-    if (right[index].indexOf('  warning  ') >= 0) name += ' (w)';
+    let name = path.basename(right[index + 1]);
+    if (right[index].indexOf(' Warning ') >= 0) name += ' (w)';
     let value = right[index].split(' as ')[1] || '';
-    value = value || right[index].split('  warning  ')[1];
+    value = value || right[index].split(' Warning ')[1];
     if (mappy[name]) assert.equal(mappy[name], value);
     mappy[name] = value;
   }
@@ -48,15 +48,15 @@ const lines = Object.keys(mappy).sort().map(function (key) {
 }).join('\n') + '\n';
 
 assert.equal(lines,
-  'connect.js = DISCLOSED code\n' +
-  'has-no-license.js = compiled code\n' +
+  'connect.js = DISCLOSED code (with sources)\n' +
+  'has-no-license.js = compiled code (no sources)\n' +
   'has-no-license.js (w) = Cannot resolve \'hasNoLicenseNonLiteral\'\n' +
-  'has-permissive-license.js = DISCLOSED code\n' +
+  'has-permissive-license.js = DISCLOSED code (with sources)\n' +
   'has-permissive-license.js (w) = Cannot resolve \'hasPermissiveLicenseNonLiteral\'\n' +
-  'has-strict-license.js = compiled code\n' +
+  'has-strict-license.js = compiled code (no sources)\n' +
   'has-strict-license.js (w) = Cannot resolve \'hasStrictLicenseNonLiteral\'\n' +
-  'package.json = DISCLOSED code\n' +
-  'test-x-index.js = compiled code\n'
+  'package.json = DISCLOSED code (with sources)\n' +
+  'test-x-index.js = compiled code (no sources)\n'
 );
 
 utils.vacuum.sync(output);
