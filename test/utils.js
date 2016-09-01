@@ -126,8 +126,13 @@ module.exports.pkg.sync = function (args, opts) {
   args.unshift(binPath);
   if (!es5) args.unshift('-r', 'babel-register');
   if (Array.isArray(opts)) opts = { stdio: opts };
-  const ss = module.exports.spawn.sync;
-  return ss('node', args, opts);
+  try {
+    const ss = module.exports.spawn.sync;
+    return ss('node', args, opts);
+  } catch (error) {
+    console.log(`> ${error.message}`);
+    process.exit(2);
+  }
 };
 
 module.exports.stringify = function (obj, replacer, space) {

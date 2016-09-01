@@ -43,7 +43,7 @@
   "scripts": {
     "babel": "babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "test": "node test/test.js v6"
+    "test": "node test/test.js"
   },
   "eslintConfig": {
     "extends": "klopov",

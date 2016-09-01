@@ -6,12 +6,7 @@ const chalk = require('chalk');
 const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
-
-const target = process.argv[2];
-if (!target) {
-  console.log(`> ${chalk.red('ERR!')} Specify a target 'v4', 'v6' etc`);
-  process.exit(2);
-}
+const target = process.argv[2] || 'latest';
 
 const files = path.join(__dirname, '*/main.js');
 globby.sync(files).sort().some(function (file) {
@@ -23,8 +18,8 @@ globby.sync(files).sort().some(function (file) {
     );
   } catch (error) {
     console.log();
-    console.log(`> ${chalk.red('ERR!')} ${error.message}`);
-    console.log(`> ${chalk.red('ERR!')} ${file} FAILED`);
+    console.log(`> ${chalk.red('Error!')} ${error.message}`);
+    console.log(`> ${chalk.red('Error!')} ${file} FAILED`);
     process.exit(2);
   }
   console.log(file, 'ok');

@@ -12,7 +12,7 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2];
+const target = process.argv[2] || 'latest';
 const windows = process.platform === 'win32';
 
 const pairs = [
