@@ -16,8 +16,8 @@ const output = './test-output.exe';
 const data = './test-y-data.txt';
 
 const version = target;
-if (/^v?0/.test(version)) return;
-if (/^v?4/.test(version)) return;
+if (/^(node|v)?0/.test(version)) return;
+if (/^(node|v)?4/.test(version)) return;
 
 let left, right;
 

@@ -18,9 +18,9 @@ const output = './run-time/test-output.exe';
 // see readFromTheBox "NODE_VERSION_MAJOR"
 
 function bitty (version) {
-  return (2 * (/^v?4/.test(version))) |
-         (2 * (/^v?5/.test(version))) |
-         (4 * (/^v?6/.test(version)));
+  return (2 * (/^(node|v)?4/.test(version))) |
+         (2 * (/^(node|v)?5/.test(version))) |
+         (4 * (/^(node|v)?6/.test(version)));
 }
 
 const version1 = process.version;

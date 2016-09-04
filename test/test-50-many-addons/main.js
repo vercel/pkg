@@ -19,9 +19,9 @@ if (!windows) return;
 const arch = process.arch; // TODO extract arch from `target` once it contains
 if (arch !== 'x64') return;
 const version1 = process.version;
-if (!(/^v?4/.test(version1))) return;
+if (!(/^(node|v)?4/.test(version1))) return;
 const version2 = target;
-if (!(/^v?4/.test(version2))) return;
+if (!(/^(node|v)?4/.test(version2))) return;
 
 let left, right;
 utils.mkdirp.sync(path.dirname(output));

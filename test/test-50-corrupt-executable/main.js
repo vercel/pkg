@@ -17,7 +17,7 @@ const input = './test-x-index.js';
 const output = './test-output.exe';
 
 const version = target;
-if (/^v?0/.test(version)) return;
+if (/^(node|v)?0/.test(version)) return;
 
 let right;
 
