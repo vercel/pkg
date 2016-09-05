@@ -14,7 +14,6 @@ const input = './test-x-index.js';
 const output = './test-output.exe';
 
 let left, right;
-utils.mkdirp.sync(path.dirname(output));
 
 left = utils.spawn.sync(
   'node', [ path.basename(input) ],

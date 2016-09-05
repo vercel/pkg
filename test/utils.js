@@ -1,5 +1,7 @@
 'use strict';
 
+const assert = require('assert');
+const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const rimraf = require('rimraf');
@@ -137,4 +139,32 @@ module.exports.pkg.sync = function (args, opts) {
 
 module.exports.stringify = function (obj, replacer, space) {
   return stableStringify(obj, { replacer, space });
+};
+
+module.exports.filesBefore = function (n) {
+  for (const ni of n) {
+    module.exports.vacuum.sync(ni);
+  }
+  const b = fs.readdirSync('.');
+  return b;
+};
+
+module.exports.filesAfter = function (b, n) {
+  const a = fs.readdirSync('.');
+  for (const bi of b) {
+    if (a.indexOf(bi) < 0) {
+      assert(false, `${bi} disappeared!?`);
+    }
+  }
+  const d = [];
+  for (const ai of a) {
+    if (b.indexOf(ai) < 0) {
+      d.push(ai);
+    }
+  }
+  assert(d.length === n.length, JSON.stringify([ d, n ]));
+  for (const ni of n) {
+    assert(d.indexOf(ni) >= 0, JSON.stringify([ d, n ]));
+    module.exports.vacuum.sync(ni);
+  }
 };
