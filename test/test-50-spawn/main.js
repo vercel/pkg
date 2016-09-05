@@ -15,29 +15,33 @@ assert(__dirname === process.cwd());
 const target = process.argv[2] || 'latest';
 const windows = process.platform === 'win32';
 
+function rnd () {
+  return Math.random().toString().slice(-6);
+}
+
 const pairs = [
   { input: './test-cluster.js',
-    output: './run-time/test-output.exe' },
+    output: './run-time/test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-1.js',
-    output: './run-time/test-output.exe' },
+    output: './run-time/test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-2.js',
-    output: './run-time/test-output.exe' },
+    output: './run-time/test-output-' + rnd() + '.exe' },
   { input: './test-cpforkext-1.js',
-    output: './test-output.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpforkext-2.js',
-    output: './test-output.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawnexp-1.js',
-    output: './run-time/test-output.exe' },
+    output: './run-time/test-output-' + rnd() + '.exe' },
   { input: './test-spawnexp-2.js',
-    output: './run-time/test-output.exe' }
+    output: './run-time/test-output-' + rnd() + '.exe' }
 ];
 
 if (!windows) {
   pairs.push(
     { input: './test-spawn-1.js',
-      output: './run-time/test-output.exe' },
+      output: './run-time/test-output-' + rnd() + '.exe' },
     { input: './test-spawn-2.js',
-      output: './run-time/test-output.exe' }
+      output: './run-time/test-output-' + rnd() + '.exe' }
   );
 }
 
