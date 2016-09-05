@@ -13,7 +13,7 @@ const target = process.argv[2] || 'latest';
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-const arch = process.arch;
+const { arch } = process; // TODO extract arch from `target` once it contains
 if (arch === 'arm') return;
 const version1 = process.version;
 if (/^(node|v)?0/.test(version1)) return;
