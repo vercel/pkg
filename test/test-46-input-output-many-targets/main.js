@@ -9,20 +9,21 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
+const latest = 'node6';
 const input = './test-x-index.js';
 let { arch } = process; // TODO extract arch from `target` once it contains
 arch = { ia32: 'x86' }[arch] || arch;
 
 const newcomers = [
-  `test-output-${target}-linux-${arch}`,
-  `test-output-${target}-osx-${arch}`,
-  `test-output-${target}-win-${arch}.exe`
+  `test-output-${latest}-linux-${arch}`,
+  `test-output-${latest}-osx-${arch}`,
+  `test-output-${latest}-win-${arch}.exe`
 ];
 
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
-  '--target', `${target}-linux,${target}-osx,${target}-win`,
+  '--target', `linux,osx,win`,
   '--output', 'test-output', input
 ]);
 
