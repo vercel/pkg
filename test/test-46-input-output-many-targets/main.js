@@ -15,13 +15,14 @@ arch = { ia32: 'x86' }[arch] || arch;
 
 const newcomers = [
   `test-output-${target}-linux-${arch}`,
+  `test-output-${target}-osx-${arch}`,
   `test-output-${target}-win-${arch}.exe`
 ];
 
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
-  '--target', `${target}-linux,${target}-win`,
+  '--target', `${target}-linux,${target}-osx,${target}-win`,
   '--output', 'test-output', input
 ]);
 
