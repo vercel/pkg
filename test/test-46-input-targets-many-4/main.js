@@ -14,9 +14,9 @@ let arch = process.arch; // TODO extract arch from `target` once it contains
 arch = { ia32: 'x86' }[arch] || arch;
 
 const newcomers = [
-  `test-x-index.js-${target}-linux-${arch}`,
-  `test-x-index.js-${target}-osx-${arch}`,
-  `test-x-index.js-${target}-win-${arch}.exe`
+  `test-x-index-${target}-linux-${arch}`,
+  `test-x-index-${target}-osx-${arch}`,
+  `test-x-index-${target}-win-${arch}.exe`
 ];
 
 const before = utils.filesBefore(newcomers);

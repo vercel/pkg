@@ -10,7 +10,7 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
 const input = './test-x-index.js';
-const newcomers = [ 'test-x-index.js.exe' ];
+const newcomers = [ 'test-x-index.exe' ];
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
