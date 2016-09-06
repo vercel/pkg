@@ -1,10 +1,10 @@
 'use strict';
 
 const assert = require('assert');
-const fs = require('fs');
-const mkdirp = require('mkdirp');
 const path = require('path');
+const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
+const globby = require('globby');
 const execSync = require('child_process').execSync;
 const spawnSync = require('child_process').spawnSync;
 const existsSync = require('fs').existsSync;
@@ -145,12 +145,12 @@ module.exports.filesBefore = function (n) {
   for (const ni of n) {
     module.exports.vacuum.sync(ni);
   }
-  const b = fs.readdirSync('.');
+  const b = globby.sync('**/*', { nodir: true }).sort();
   return b;
 };
 
 module.exports.filesAfter = function (b, n) {
-  const a = fs.readdirSync('.');
+  const a = globby.sync('**/*', { nodir: true }).sort();
   for (const bi of b) {
     if (a.indexOf(bi) < 0) {
       assert(false, `${bi} disappeared!?`);
