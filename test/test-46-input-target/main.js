@@ -10,12 +10,12 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
 const input = './test-x-index';
-const newcomers = [ 'test-output.exe' ];
+const newcomers = [ 'test-x-index.exe' ];
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
   '--target', target,
-  '--output', 'test-output.exe', input
+  input
 ]);
 
 utils.filesAfter(before, newcomers);

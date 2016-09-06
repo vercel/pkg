@@ -8,15 +8,15 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const latest = `node${process.version[1]}`;
+const current = `node${process.version[1]}`;
 const input = './test-x-index';
 let arch = process.arch; // TODO extract arch from `target` once it contains
 arch = { ia32: 'x86' }[arch] || arch;
 
 const newcomers = [
-  `test-x-index-${latest}-linux-${arch}`,
-  `test-x-index-${latest}-osx-${arch}`,
-  `test-x-index-${latest}-win-${arch}.exe`
+  `test-x-index-${current}-linux-${arch}`,
+  `test-x-index-${current}-osx-${arch}`,
+  `test-x-index-${current}-win-${arch}.exe`
 ];
 
 const before = utils.filesBefore(newcomers);
