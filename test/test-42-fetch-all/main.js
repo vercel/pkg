@@ -9,7 +9,7 @@ const items = [];
 for (const nodeRange of [ 'node0', 'node4', 'node6' ]) {
   for (const platform of knownPlatforms) {
     // const archs = (platform === 'linux' ? knownArchs : [ 'x86', 'x64' ]); // TODO armv6/7?
-    const archs = [ 'x64' ]; // TODO 'x86'
+    const archs = [ 'x86', 'x64' ];
     for (const arch of archs) {
       items.push({ nodeRange, platform, arch });
     }
