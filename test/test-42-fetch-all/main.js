@@ -3,8 +3,7 @@
 'use strict';
 
 const fetch = require('pkg-fetch');
-const { need, system } = fetch;
-const { knownPlatforms } = system;
+const knownPlatforms = fetch.system.knownPlatforms;
 const items = [];
 
 for (const nodeRange of [ 'node0', 'node4', 'node6' ]) {
@@ -19,7 +18,7 @@ for (const nodeRange of [ 'node0', 'node4', 'node6' ]) {
 
 let p = Promise.resolve();
 items.forEach((item) => {
-  p = p.then(() => need(item));
+  p = p.then(() => fetch.need(item));
 });
 
 p.catch((error) => {

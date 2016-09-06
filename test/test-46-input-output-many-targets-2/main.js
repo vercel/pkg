@@ -10,7 +10,7 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
 const input = './test-x-index.js';
-let { arch } = process; // TODO extract arch from `target` once it contains
+let arch = process.arch; // TODO extract arch from `target` once it contains
 arch = { ia32: 'x86' }[arch] || arch;
 
 const newcomers = [
