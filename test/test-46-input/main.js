@@ -12,7 +12,7 @@ const input = './test-x-index';
 
 const newcomers = [
   'test-x-index-linux',
-  'test-x-index-osx',
+  'test-x-index-macos',
   'test-x-index-win.exe'
 ];
 
