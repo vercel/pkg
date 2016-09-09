@@ -41,10 +41,7 @@ if (ENTRYPOINT === 'DEFAULT_ENTRYPOINT') {
 }
 
 if (!insideTheBox(ENTRYPOINT)) {
-  // fallback to plain node. need to revert patch to node/lib/module.js
-  require('fs').internalModuleStat =     process.binding('fs').internalModuleStat;
-  require('fs').internalModuleReadFile = process.binding('fs').internalModuleReadFile;
-  return;
+  return { undoPatch: true };
 }
 
 // /////////////////////////////////////////////////////////////////
