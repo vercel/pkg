@@ -31,7 +31,8 @@ right = right.split('\n').filter(function (line) {
   return (line.indexOf(' [debug] ') >= 0) ||
          (line.indexOf(' Warning ') >= 0);
 }).filter(function (line) {
-  return line.indexOf('was included') < 0;
+  return (line.indexOf('Targets:') < 0) &&
+         (line.indexOf('was included') < 0);
 }).map(function (line) {
   if (line.indexOf('Cannot find module') >= 0) {
     return line.split(' from ')[0];
