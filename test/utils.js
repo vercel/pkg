@@ -165,6 +165,8 @@ module.exports.filesAfter = function (b, n) {
   assert(d.length === n.length, JSON.stringify([ d, n ]));
   for (const ni of n) {
     assert(d.indexOf(ni) >= 0, JSON.stringify([ d, n ]));
+  }
+  for (const ni of n) {
     module.exports.vacuum.sync(ni);
   }
 };
