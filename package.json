@@ -47,9 +47,11 @@
     "rimraf": "2.5.0"
   },
   "scripts": {
-    "babel": "babel lib --out-dir lib-es5",
+    "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "test": "node test/test.js"
+    "prepublish": "eslint-klopov . && npm run test:nonpm && npm run babel",
+    "test": "node test/test.js",
+    "test:nonpm": "node test/test.js latest nonpm"
   },
   "eslintConfig": {
     "extends": "klopov",

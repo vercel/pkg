@@ -7,9 +7,17 @@ const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
 const target = process.argv[2] || 'latest';
+const modify = process.argv[3];
 
-const files = path.join(__dirname, '*/main.js');
-globby.sync(files).sort().some(function (file) {
+const list = [ path.join(__dirname, '*/main.js') ];
+
+if (modify === 'nonpm') {
+  list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+}
+
+const files = globby.sync(list);
+
+files.sort().some(function (file) {
   file = path.resolve(file);
   try {
     utils.spawn.sync(
