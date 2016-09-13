@@ -1,5 +1,18 @@
-language: node_js
+language:
+  - node_js
+  - cpp
 sudo: false
+compiler:
+  - gcc
+before_install:
+  - export CXX="g++-4.8" CC="gcc-4.8";
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
 node_js: node
 git:
   depth: 1
