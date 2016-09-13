@@ -13,6 +13,7 @@ addons:
     packages:
       - gcc-4.8
       - g++-4.8
+      - libavahi-compat-libdnssd-dev # npm install mdns
 node_js: node
 git:
   depth: 1
