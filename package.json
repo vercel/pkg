@@ -30,7 +30,7 @@
     "globby": "4.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
-    "pkg-fetch": "1.0.0-beta.0",
+    "pkg-fetch": "1.0.1",
     "progress": "1.1.8",
     "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4"
   },
@@ -50,8 +50,8 @@
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
     "prepublish": "eslint-klopov . && npm run test:nonpm && npm run babel",
-    "test": "node test/test.js",
-    "test:nonpm": "node test/test.js latest nonpm"
+    "test": "node test/test.js node0 nonpm && node test/test.js node4 nonpm && node test/test.js node6",
+    "test:nonpm": "node test/test.js node6 nonpm"
   },
   "eslintConfig": {
     "extends": "klopov",
