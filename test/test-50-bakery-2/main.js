@@ -31,4 +31,4 @@ fetch.need({ nodeRange: target,
 }).catch(function (error) {
   console.error(`> ${error.message}`);
   process.exit(2);
-})
+});
