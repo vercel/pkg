@@ -307,3 +307,7 @@ dickies.some(function (dicky) {
   }
 
 });
+
+console.log(
+  changes.join('\n')
+);
