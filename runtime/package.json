@@ -1,5 +1,0 @@
-{
-  "name": "pkg-runtime",
-  "version": "0.0.1",
-  "description": "Runtime library for `pkg`"
-}

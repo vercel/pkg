@@ -10,7 +10,7 @@
   "files": [
     "lib-es5",
     "dictionary",
-    "runtime"
+    "prelude"
   ],
   "babel": {
     "plugins": [

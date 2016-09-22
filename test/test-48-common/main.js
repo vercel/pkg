@@ -5,7 +5,7 @@
 'use strict';
 
 const assert = require('assert');
-const common = require('../../runtime/common.js');
+const common = require('../../prelude/common.js');
 
 if (process.platform === 'win32') {
 
