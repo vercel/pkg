@@ -5,30 +5,33 @@
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
-const fetch = require('pkg-fetch');
 
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
+const input = './test-x-index.js';
+const output = './run-time/test-output.exe';
 
-let right;
+let left, right;
+utils.mkdirp.sync(path.dirname(output));
 
-fetch.need({ nodeRange: target,
-  platform: fetch.system.hostPlatform,
-  arch: fetch.system.hostArch
-}).then(function (needed) {
+left = utils.spawn.sync(
+  'node', [ '--expose-gc', path.basename(input) ],
+  { cwd: path.dirname(input) }
+);
 
-  right = utils.spawn.sync(
-    './' + path.basename(needed),
-    [ '-e', 'if (global.gc) console.log("ok");',
-      '--runtime', '--expose-gc' ],
-    { cwd: path.dirname(needed) }
-  );
+utils.pkg.sync([
+  '--target', target,
+  '--options', 'expose-gc',
+  '--output', output, input
+]);
 
-  assert.equal(right, 'ok\n');
+right = utils.spawn.sync(
+  './' + path.basename(output), [],
+  { cwd: path.dirname(output) }
+);
 
-}).catch(function (error) {
-  console.error(`> ${error.message}`);
-  process.exit(2);
-});
+assert.equal(left, 'function\n');
+assert.equal(right, 'function\n');
+utils.vacuum.sync(path.dirname(output));

@@ -17,21 +17,21 @@ let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
 left = utils.spawn.sync(
-  'node', [ '--expose-gc', path.basename(input) ],
+  'node', [ '--v8-options' ],
   { cwd: path.dirname(input) }
 );
 
 utils.pkg.sync([
   '--target', target,
-  '--options', 'expose-gc',
   '--output', output, input
 ]);
 
 right = utils.spawn.sync(
-  './' + path.basename(output), [],
+  './' + path.basename(output),
+  [ '--runtime', '--v8-options' ],
   { cwd: path.dirname(output) }
 );
 
-assert.equal(left, 'function\n');
-assert.equal(right, 'function\n');
+assert(left.indexOf('--expose_gc') >= 0);
+assert(right.indexOf('--expose_gc') >= 0);
 utils.vacuum.sync(path.dirname(output));

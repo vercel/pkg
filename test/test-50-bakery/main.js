@@ -27,10 +27,10 @@ utils.pkg.sync([
 ]);
 
 right = utils.spawn.sync(
-  './' + path.basename(output),
-  [ '--runtime', '--expose-gc' ],
+  './' + path.basename(output), [],
   { cwd: path.dirname(output) }
 );
 
-assert.equal(left, right);
+assert.equal(left, 'undefined\n');
+assert.equal(right, 'undefined\n');
 utils.vacuum.sync(path.dirname(output));

@@ -13,18 +13,16 @@ const target = process.argv[2] || 'latest';
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-let right;
-
 utils.pkg.sync([
   '--target', target,
   '--output', output, input
 ]);
 
-right = utils.spawn.sync(
+utils.spawn.sync(
   './' + path.basename(output),
   [ '--runtime', '--debug' ],
-  { cwd: path.dirname(output) }
+  { cwd: path.dirname(output),
+    stdio: 'pipe', expect: 9 }
 );
 
-assert.equal(right, 'ok\n');
 utils.vacuum.sync(output);
