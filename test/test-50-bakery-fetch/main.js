@@ -10,7 +10,8 @@ const fetch = require('pkg-fetch');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'latest';
+let target = process.argv[2] || 'host'; // can not pass 'host' to 'fetch'
+if (target === 'host') target = 'node' + process.version[1];
 
 let right;
 

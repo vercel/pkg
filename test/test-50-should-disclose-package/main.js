@@ -9,7 +9,7 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'latest';
+const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './test-output.exe';
 const standard = 'stdout';
