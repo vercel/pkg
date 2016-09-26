@@ -6,7 +6,7 @@ const fetch = require('pkg-fetch');
 const knownPlatforms = fetch.system.knownPlatforms;
 const items = [];
 
-for (const nodeRange of [ 'node0', 'node4', 'node6' ]) {
+for (const nodeRange of [ 'node0', 'node4', 'node6', 'node7' ]) {
   for (const platform of knownPlatforms) {
     // const archs = (platform === 'linux' ? knownArchs : [ 'x86', 'x64' ]); // TODO armv6/7?
     const archs = [ 'x86', 'x64' ];

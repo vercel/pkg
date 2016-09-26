@@ -310,5 +310,6 @@ dickies.some(function (dicky) {
 
 console.log(
   '\nChanges:\n' +
-  changes.join('\n')
+  changes.join('\n') +
+  '\n'
 );
