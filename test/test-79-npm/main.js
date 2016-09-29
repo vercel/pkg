@@ -41,7 +41,9 @@ function save () {
   fs.writeFileSync('checklist.js',
     '/* eslint-disable no-unused-vars */\n' +
     '/* eslint-disable quotes */\n' +
+    '\n' +
     '\'use strict\';\n' +
+    '\n' +
     'const table = ' + t + ';\n' +
     'const changes = ' + c + ';\n'
   );

@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable quotes */
+
 'use strict';
+
 const table = {
   "angular-bridge": {
     "darwin/x64/m14": "ok,0.5.0",
