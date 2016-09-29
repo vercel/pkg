@@ -1,6 +1,8 @@
 language:
   - node_js
 node_js: 6
+services:
+  - mongodb
 sudo: true
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
