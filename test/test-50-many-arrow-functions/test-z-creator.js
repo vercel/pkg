@@ -24,7 +24,9 @@ for (let i = 0; i < 140; i += 1) {
 s += 'ee.emit(\'message\', \'hooray\');\n';
 
 s = '#!/usr/bin/env node\n' +
-    '\'use strict\';\n' + s;
+    '\n' +
+    '\'use strict\';\n' +
+    '\n' + s;
 
 require('fs').writeFileSync(
   'test-x-index.js', s
