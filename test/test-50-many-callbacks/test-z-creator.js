@@ -10,7 +10,9 @@ for (let i = 0; i < 100; i += 1) {
 
 s = '#!/usr/bin/env node\n' +
     '/* eslint-disable indent */\n' +
-    '\'use strict\';\n' + s;
+    '\n' +
+    '\'use strict\';\n' +
+    '\n' + s;
 
 require('fs').writeFileSync(
   'test-x-index.js', s

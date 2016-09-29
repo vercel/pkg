@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+
 'use strict';
+
 function EventEmitter () {
   this.listeners = [];
 }
