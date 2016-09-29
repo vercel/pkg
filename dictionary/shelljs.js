@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'src/exec.js': [
         'execCommand = JSON.stringify(process.execPath) + \' \' + JSON.stringify(scriptFile)',

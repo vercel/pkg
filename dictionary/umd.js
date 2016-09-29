@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     assets: [
       'template.js' // for 2.1.0
     ],

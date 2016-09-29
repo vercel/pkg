@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'lib/express-load.js': [
         'entity = path.resolve(',

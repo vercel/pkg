@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'j.js': [
         'require(\'xl\'+\'sx\')',

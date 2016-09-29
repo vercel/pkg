@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'graceful-fs.js': [
         { do: 'prepend' },

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     assets: [
       // TODO look at exceljs and implement as
       // many __dirname use cases as possible

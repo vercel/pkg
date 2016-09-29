@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     // assets, not scripts because of custom
     // load_global (readFileSync + runInContext)
     assets: [

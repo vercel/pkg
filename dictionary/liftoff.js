@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'index.js': [
         'resolve.sync(this.moduleName, {basedir: configBase || cwd, paths: paths})',

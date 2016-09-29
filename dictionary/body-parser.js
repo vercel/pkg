@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     scripts: [
       'lib/types/*.js' // for 1.4-1.13
     ]

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       // WARNING! THIS IS A FALLBACK!
       // CREATE A DICTIONARY LIKE LEVELDOWN AND CONTEXTIFY

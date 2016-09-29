@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     scripts: [
       'lib/nconf/stores/*.js'
     ]

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'index.js': [
         'execFile(process.execPath, [\'--v8-options\'],',

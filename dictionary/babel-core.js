@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  pkgConfig: {
+  pkg: {
     patches: {
       'lib/babel/util.js': [
         'path.join(__dirname, "transformation/templates")',
