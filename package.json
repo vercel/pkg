@@ -64,5 +64,8 @@
       "padded-blocks": "off",
       "vars-on-top": "off"
     }
+  },
+  "greenkeeper": {
+    "emails": false
   }
 }
