@@ -13,7 +13,6 @@ assert(__dirname === process.cwd());
 const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './test-output.exe';
-const output2 = './test-output-2.exe';
 
 let right;
 
@@ -38,13 +37,12 @@ spoiler = Buffer.concat([ spoiler, new Buffer([
   0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xfe,
   0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
   0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef ]) ]);
-fs.writeFileSync(output2, spoiler);
+fs.writeFileSync(output, spoiler);
 
 right = utils.spawn.sync(
-  './' + path.basename(output2), [],
-  { cwd: path.dirname(output2) }
+  './' + path.basename(output), [],
+  { cwd: path.dirname(output) }
 );
 
 assert.equal(right, 'ok\n');
 utils.vacuum.sync(output);
-utils.vacuum.sync(output2);
