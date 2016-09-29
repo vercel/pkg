@@ -15,6 +15,7 @@ assert(__dirname === process.cwd());
 const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './test-output.exe';
+const output2 = './test-output-2.exe';
 
 const version = target;
 if (/^(node|v)?0/.test(version)) return;
@@ -29,14 +30,15 @@ utils.pkg.sync([
 const spoiler = fs.readFileSync(output);
 spoiler[spoiler.length - 100] += 1;
 spoiler[spoiler.length - 120] -= 1;
-fs.writeFileSync(output, spoiler);
+fs.writeFileSync(output2, spoiler);
 
 right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output),
+  './' + path.basename(output2), [],
+  { cwd: path.dirname(output2),
     stdio: 'pipe', expect: 2 }
 );
 
 assert.equal(right.stdout, '');
 assert.equal(right.stderr, 'Corrupt executable\n');
 utils.vacuum.sync(output);
+utils.vacuum.sync(output2);
