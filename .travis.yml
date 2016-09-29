@@ -1,5 +1,6 @@
 language:
   - node_js
+node_js: 6
 sudo: true
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
@@ -7,6 +8,5 @@ before_install:
   - sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-4.8 g++-4.8
   - sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install libavahi-compat-libdnssd-dev # npm install mdns
   - export CXX="g++-4.8" CC="gcc-4.8"
-node_js: node
 git:
   depth: 1
