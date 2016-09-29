@@ -6,7 +6,8 @@ const chalk = require('chalk');
 const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
-const target = process.argv[2] || 'host';
+let target = process.argv[2] || 'host'; // can not pass 'host' to 'fetch'
+if (target === 'host') target = 'node' + process.version[1];
 const modify = process.argv[3];
 
 const list = [ path.join(__dirname, '*/main.js') ];
