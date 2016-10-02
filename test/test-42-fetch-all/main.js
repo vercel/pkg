@@ -2,15 +2,24 @@
 
 'use strict';
 
+const assert = require('assert');
 const fetch = require('pkg-fetch');
+const dontBuild = require('pkg-fetch/lib-es5/upload.js').dontBuild;
 const knownPlatforms = fetch.system.knownPlatforms;
 const items = [];
 
+function nodeRangeToNodeVersion (nodeRange) {
+  assert(/^node/.test(nodeRange));
+  return 'v' + nodeRange.slice(4);
+}
+
 for (const nodeRange of [ 'node0', 'node4', 'node6', 'node7' ]) {
+  const nodeVersion = nodeRangeToNodeVersion(nodeRange);
   for (const platform of knownPlatforms) {
-    // const archs = (platform === 'linux' ? knownArchs : [ 'x86', 'x64' ]); // TODO armv6/7?
     const archs = [ 'x86', 'x64' ];
+    if (platform === 'linux') archs.push('armv6', 'armv7');
     for (const arch of archs) {
+      if (dontBuild(nodeVersion, platform, arch)) continue;
       items.push({ nodeRange, platform, arch });
     }
   }
