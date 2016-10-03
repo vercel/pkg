@@ -2,6 +2,7 @@
 
 'use strict';
 
+/*
 const assert = require('assert');
 const utils = require('../utils.js');
 
@@ -9,7 +10,7 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const opposite = {
-  x64: 'x86', x86: 'x64', ia32: 'x64', arm: 'x64'
+  x64: 'armv7', x86: 'armv7', ia32: 'armv7', arm: 'x64'
 };
 
 const target = opposite[process.arch];
@@ -30,3 +31,4 @@ right = utils.pkg.sync([
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.indexOf('Error!') >= 0);
 assert(right.indexOf(target) >= 0);
+*/
