@@ -30,7 +30,7 @@ function removeTrailingSlashes (f) {
 
 function normalizePath (f) {
   var file = f;
-  file = path.normalize(file);
+  if (!(/^.:$/.test(f))) file = path.normalize(file); // 'c:' -> 'c:.'
   file = uppercaseDriveLetter(file);
   file = removeTrailingSlashes(file);
   return file;

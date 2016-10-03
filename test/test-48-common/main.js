@@ -9,7 +9,7 @@ const common = require('../../prelude/common.js');
 
 if (process.platform === 'win32') {
 
-  assert.equal('c:.',                  common.normalizePath('c:')); // TODO research
+  assert.equal('c:',                   common.normalizePath('c:'));
   assert.equal('C:\\',                 common.normalizePath('c:\\'));
   assert.equal('C:\\',                 common.normalizePath('c:\\\\'));
   assert.equal('C:\\thebox',           common.normalizePath('c:\\thebox'));
