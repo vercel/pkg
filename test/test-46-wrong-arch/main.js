@@ -9,7 +9,7 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const opposite = {
-  x64: 'x86', x86: 'x64', arm: 'x64'
+  x64: 'x86', x86: 'x64', ia32: 'x64', arm: 'x64'
 };
 
 const target = opposite[process.arch];
