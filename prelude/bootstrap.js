@@ -380,7 +380,7 @@ var modifyNativeAddonWin32 = (function () {
 
   process.pkg = {};
   process.argv[1] = process.execPath;
-  process.versions.pkg = '3.0.0-beta.0'; // TODO test to match with version from package.json?
+  process.versions.pkg = '%PKG_VERSION%';
   process.pkg.mount = createMountpoint;
   process.pkg.DEFAULT_ENTRYPOINT = DEFAULT_ENTRYPOINT;
 
