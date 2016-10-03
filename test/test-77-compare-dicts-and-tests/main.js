@@ -22,12 +22,10 @@ tests = tests.filter(function (test) {
 });
 
 tests.push('etc'); // TODO who creates it?
-tests.push('sails'); // too big to test. TODO
 tests.push('steam-resources'); // absent in npm. installed via github
 
 dicts.push('etc'); // TODO who creates it?
 dicts.push('express-with-jade');
-dicts.push('nodegit'); // too big to test. TODO
 dicts.push('redis-with-hiredis');
 
 let absent = false;
