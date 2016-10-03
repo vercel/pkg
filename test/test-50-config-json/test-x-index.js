@@ -1,14 +1,13 @@
-/* eslint-disable camelcase */
 /* eslint-disable no-useless-concat */
 
 'use strict';
 
-var the_A = './test-y-' + 'resolve-A.js';
-var the_B = './test-y-' + 'resolve-B.txt';
-var the_C = './test-y-' + 'resolve-C.json';
+var theA = './test-y-' + 'resolve-A.js';
+var theB = './test-y-' + 'resolve-B.txt';
+var theC = './test-y-' + 'resolve-C.json';
 
 console.log([
-  require(the_A).toString(),
-  require(the_B).toString(),
-  require(the_C).toString()
+  require(theA).toString(),
+  require(theB).toString(),
+  require(theC).toString()
 ].join('\n'));

@@ -9,6 +9,7 @@ for (let i = 0; i < 100; i += 1) {
 }
 
 s = '#!/usr/bin/env node\n' +
+    '\n' +
     '/* eslint-disable indent */\n' +
     '\n' +
     '\'use strict\';\n' +

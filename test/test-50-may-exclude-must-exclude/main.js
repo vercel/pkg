@@ -40,25 +40,25 @@ right = right.split('\n').filter(function (line) {
 }).join('\n') + '\n';
 
 assert.equal(right,
-  '> Warning Cannot resolve \'rr_some_v\'\n' +
-  '> [debug] Cannot resolve \'rr_some_v_ci\'\n' +
-  '> Warning Malformed requirement \'rr_some_v\'\n' +
-  '> Warning Malformed requirement \'rr_some_v\'\n' +
+  '> Warning Cannot resolve \'reqResSomeVar\'\n' +
+  '> [debug] Cannot resolve \'reqResSomeVarMay\'\n' +
+  '> Warning Malformed requirement \'reqResSomeVar\'\n' +
+  '> Warning Malformed requirement \'reqResSomeVar\'\n' +
 
-  '> Warning Cannot resolve \'r_some_v\'\n' +
-  '> [debug] Cannot resolve \'r_some_v_ci\'\n' +
-  '> Warning Malformed requirement \'r_some_v\'\n' +
-  '> Warning Malformed requirement \'r_some_v\'\n' +
+  '> Warning Cannot resolve \'reqSomeVar\'\n' +
+  '> [debug] Cannot resolve \'reqSomeVarMay\'\n' +
+  '> Warning Malformed requirement \'reqSomeVar\'\n' +
+  '> Warning Malformed requirement \'reqSomeVar\'\n' +
 
-  '> [debug] Cannot resolve \'try_rr_some_v\'\n' +
-  '> [debug] Cannot resolve \'try_rr_some_v_ci\'\n' +
-  '> [debug] Cannot resolve \'try_r_some_v\'\n' +
-  '> [debug] Cannot resolve \'try_r_some_v_ci\'\n' +
+  '> [debug] Cannot resolve \'tryReqResSomeVar\'\n' +
+  '> [debug] Cannot resolve \'tryReqResSomeVarMay\'\n' +
+  '> [debug] Cannot resolve \'tryReqSomeVar\'\n' +
+  '> [debug] Cannot resolve \'tryReqSomeVarMay\'\n' +
 
-  '> [debug] Cannot find module \'rr-some-s\'\n' +
-  '> [debug] Cannot find module \'rr-some-s-ci\'\n' +
-  '> [debug] Cannot find module \'r-some-s\'\n' +
-  '> [debug] Cannot find module \'r-some-s-ci\'\n'
+  '> [debug] Cannot find module \'reqResSomeLit\'\n' +
+  '> [debug] Cannot find module \'reqResSomeLitMay\'\n' +
+  '> [debug] Cannot find module \'reqSomeLit\'\n' +
+  '> [debug] Cannot find module \'reqSomeLitMay\'\n'
 );
 
 utils.vacuum.sync(output);

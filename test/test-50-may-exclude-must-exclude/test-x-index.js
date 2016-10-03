@@ -1,51 +1,50 @@
 #!/usr/bin/env node
 
-/* eslint-disable camelcase */
 /* eslint-disable max-statements-per-line */
 /* eslint-disable no-empty */
 
 'use strict';
 
-try { require.resolve('rr-some-s'); } catch (_) {}
-try { require.resolve('rr-some-s-ci', 'may-exclude'); } catch (_) {}
-try { require.resolve('rr-some-s-de', 'must-exclude'); } catch (_) {}
-try { require('r-some-s'); } catch (_) {}
-try { require('r-some-s-ci', 'may-exclude'); } catch (_) {}
-try { require('r-some-s-de', 'must-exclude'); } catch (_) {}
+try { require.resolve('reqResSomeLit'); } catch (_) {}
+try { require.resolve('reqResSomeLitMay', 'may-exclude'); } catch (_) {}
+try { require.resolve('reqResSomeLitMust', 'must-exclude'); } catch (_) {}
+try { require('reqSomeLit'); } catch (_) {}
+try { require('reqSomeLitMay', 'may-exclude'); } catch (_) {}
+try { require('reqSomeLitMust', 'must-exclude'); } catch (_) {}
 
-var try_rr_some_v = 'some';
-var try_rr_some_v_ci = 'some';
-var try_rr_some_v_de = 'some';
+var tryReqResSomeVar = 'some';
+var tryReqResSomeVarMay = 'some';
+var tryReqResSomeVarMust = 'some';
 
-var try_r_some_v = 'some';
-var try_r_some_v_ci = 'some';
-var try_r_some_v_de = 'some';
+var tryReqSomeVar = 'some';
+var tryReqSomeVarMay = 'some';
+var tryReqSomeVarMust = 'some';
 
-try { require.resolve(try_rr_some_v); } catch (_) {}
-try { require.resolve(try_rr_some_v_ci, 'may-exclude'); } catch (_) {}
-try { require.resolve(try_rr_some_v_de, 'must-exclude'); } catch (_) {}
-try { require(try_r_some_v); } catch (_) {}
-try { require(try_r_some_v_ci, 'may-exclude'); } catch (_) {}
-try { require(try_r_some_v_de, 'must-exclude'); } catch (_) {}
+try { require.resolve(tryReqResSomeVar); } catch (_) {}
+try { require.resolve(tryReqResSomeVarMay, 'may-exclude'); } catch (_) {}
+try { require.resolve(tryReqResSomeVarMust, 'must-exclude'); } catch (_) {}
+try { require(tryReqSomeVar); } catch (_) {}
+try { require(tryReqSomeVarMay, 'may-exclude'); } catch (_) {}
+try { require(tryReqSomeVarMust, 'must-exclude'); } catch (_) {}
 
-var rr_some_v = 'some';
-var rr_some_v_ci = 'some';
-var rr_some_v_de = 'some';
+var reqResSomeVar = 'some';
+var reqResSomeVarMay = 'some';
+var reqResSomeVarMust = 'some';
 
-var r_some_v = 'some';
-var r_some_v_ci = 'some';
-var r_some_v_de = 'some';
+var reqSomeVar = 'some';
+var reqSomeVarMay = 'some';
+var reqSomeVarMust = 'some';
 
-require.resolve(rr_some_v);
-require.resolve(rr_some_v_ci, 'may-exclude');
-require.resolve(rr_some_v_de, 'must-exclude');
-require.resolve(rr_some_v, rr_some_v);
-require.resolve(rr_some_v, 'can-can');
-require(r_some_v);
-require(r_some_v_ci, 'may-exclude');
-require(r_some_v_de, 'must-exclude');
-require(r_some_v, r_some_v);
-require(r_some_v, 'can-can');
+require.resolve(reqResSomeVar);
+require.resolve(reqResSomeVarMay, 'may-exclude');
+require.resolve(reqResSomeVarMust, 'must-exclude');
+require.resolve(reqResSomeVar, reqResSomeVar);
+require.resolve(reqResSomeVar, 'can-can');
+require(reqSomeVar);
+require(reqSomeVarMay, 'may-exclude');
+require(reqSomeVarMust, 'must-exclude');
+require(reqSomeVar, reqSomeVar);
+require(reqSomeVar, 'can-can');
 
 require.resolve('./test-y-index.js');
 require('./test-y-index.js');

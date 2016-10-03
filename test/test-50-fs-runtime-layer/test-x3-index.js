@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /* eslint-disable indent */
 /* eslint-disable no-path-concat */
 
@@ -7,114 +6,114 @@
 var fs = require('fs');
 var path = require('path');
 var assert = require('assert');
-var the_require_content_A = './test-z-asset-A.css';
-var the_require_content_B = 'test-z-asset-B.css';
+var theRequireContentA = './test-z-asset-A.css';
+var theRequireContentB = 'test-z-asset-B.css';
 
-function first_lower_case (s) {
+function firstLowerCase (s) {
   return s.slice(0, 1).toLowerCase() + s.slice(1);
 }
 
-function first_upper_case (s) {
+function firstUpperCase (s) {
   return s.slice(0, 1).toUpperCase() + s.slice(1);
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-fs.exists(path.join(__dirname, the_require_content_A), function (e82, v82) {
-fs.exists(__dirname + path.sep + the_require_content_B, function (e83, v83) {
-fs.exists(__dirname + '/' + the_require_content_B, function (e84, v84) {
+fs.exists(path.join(__dirname, theRequireContentA), function (e82, v82) {
+fs.exists(__dirname + path.sep + theRequireContentB, function (e83, v83) {
+fs.exists(__dirname + '/' + theRequireContentB, function (e84, v84) {
 
-fs.exists(first_lower_case(path.join(__dirname, the_require_content_A)), function (e85, v85) {
-fs.exists(first_lower_case(__dirname + path.sep + the_require_content_B), function (e86, v86) {
-fs.exists(first_lower_case(__dirname + '/' + the_require_content_B), function (e87, v87) {
+fs.exists(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e85, v85) {
+fs.exists(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e86, v86) {
+fs.exists(firstLowerCase(__dirname + '/' + theRequireContentB), function (e87, v87) {
 
-fs.exists(first_upper_case(path.join(__dirname, the_require_content_A)), function (e88, v88) {
-fs.exists(first_upper_case(__dirname + path.sep + the_require_content_B), function (e89, v89) {
-fs.exists(first_upper_case(__dirname + '/' + the_require_content_B), function (e90, v90) {
-
-//
-
-fs.exists(path.join(__dirname, the_require_content_A + '-no-such'), function (e91, v91) {
-fs.exists(__dirname + path.sep + the_require_content_B + '-no-such', function (e92, v92) {
-fs.exists(__dirname + '/' + the_require_content_B + '-no-such', function (e93, v93) {
-
-fs.exists(first_lower_case(path.join(__dirname, the_require_content_A + '-no-such')), function (e94, v94) {
-fs.exists(first_lower_case(__dirname + path.sep + the_require_content_B + '-no-such'), function (e95, v95) {
-fs.exists(first_lower_case(__dirname + '/' + the_require_content_B + '-no-such'), function (e96, v96) {
-
-fs.exists(first_upper_case(path.join(__dirname, the_require_content_A + '-no-such')), function (e97, v97) {
-fs.exists(first_upper_case(__dirname + path.sep + the_require_content_B + '-no-such'), function (e98, v98) {
-fs.exists(first_upper_case(__dirname + '/' + the_require_content_B + '-no-such'), function (e99, v99) {
+fs.exists(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e88, v88) {
+fs.exists(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e89, v89) {
+fs.exists(firstUpperCase(__dirname + '/' + theRequireContentB), function (e90, v90) {
 
 //
 
-fs.access(path.join(__dirname, the_require_content_A), function (e100, v100) {
-fs.access(__dirname + path.sep + the_require_content_B, function (e101, v101) {
-fs.access(__dirname + '/' + the_require_content_B, function (e102, v102) {
+fs.exists(path.join(__dirname, theRequireContentA + '-no-such'), function (e91, v91) {
+fs.exists(__dirname + path.sep + theRequireContentB + '-no-such', function (e92, v92) {
+fs.exists(__dirname + '/' + theRequireContentB + '-no-such', function (e93, v93) {
 
-fs.access(first_lower_case(path.join(__dirname, the_require_content_A)), function (e103, v103) {
-fs.access(first_lower_case(__dirname + path.sep + the_require_content_B), function (e104, v104) {
-fs.access(first_lower_case(__dirname + '/' + the_require_content_B), function (e105, v105) {
+fs.exists(firstLowerCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e94, v94) {
+fs.exists(firstLowerCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e95, v95) {
+fs.exists(firstLowerCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e96, v96) {
 
-fs.access(first_upper_case(path.join(__dirname, the_require_content_A)), function (e106, v106) {
-fs.access(first_upper_case(__dirname + path.sep + the_require_content_B), function (e107, v107) {
-fs.access(first_upper_case(__dirname + '/' + the_require_content_B), function (e108, v108) {
-
-//
-
-fs.access(path.join(__dirname, the_require_content_A + '-no-such'), function (e109, v109) {
-fs.access(__dirname + path.sep + the_require_content_B + '-no-such', function (e110, v110) {
-fs.access(__dirname + '/' + the_require_content_B + '-no-such', function (e111, v111) {
-
-fs.access(first_lower_case(path.join(__dirname, the_require_content_A + '-no-such')), function (e112, v112) {
-fs.access(first_lower_case(__dirname + path.sep + the_require_content_B + '-no-such'), function (e113, v113) {
-fs.access(first_lower_case(__dirname + '/' + the_require_content_B + '-no-such'), function (e114, v114) {
-
-fs.access(first_upper_case(path.join(__dirname, the_require_content_A + '-no-such')), function (e115, v115) {
-fs.access(first_upper_case(__dirname + path.sep + the_require_content_B + '-no-such'), function (e116, v116) {
-fs.access(first_upper_case(__dirname + '/' + the_require_content_B + '-no-such'), function (e117, v117) {
+fs.exists(firstUpperCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e97, v97) {
+fs.exists(firstUpperCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e98, v98) {
+fs.exists(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e99, v99) {
 
 //
 
-fs.stat(path.join(__dirname, the_require_content_A), function (e118, v118) {
-fs.stat(__dirname + path.sep + the_require_content_B, function (e119, v119) {
-fs.stat(__dirname + '/' + the_require_content_B, function (e120, v120) {
+fs.access(path.join(__dirname, theRequireContentA), function (e100, v100) {
+fs.access(__dirname + path.sep + theRequireContentB, function (e101, v101) {
+fs.access(__dirname + '/' + theRequireContentB, function (e102, v102) {
 
-fs.stat(first_lower_case(path.join(__dirname, the_require_content_A)), function (e121, v121) {
-fs.stat(first_lower_case(__dirname + path.sep + the_require_content_B), function (e122, v122) {
-fs.stat(first_lower_case(__dirname + '/' + the_require_content_B), function (e123, v123) {
+fs.access(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e103, v103) {
+fs.access(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e104, v104) {
+fs.access(firstLowerCase(__dirname + '/' + theRequireContentB), function (e105, v105) {
 
-fs.stat(first_upper_case(path.join(__dirname, the_require_content_A)), function (e124, v124) {
-fs.stat(first_upper_case(__dirname + path.sep + the_require_content_B), function (e125, v125) {
-fs.stat(first_upper_case(__dirname + '/' + the_require_content_B), function (e126, v126) {
-
-//
-
-fs.lstat(path.join(__dirname, the_require_content_A), function (e127, v127) {
-fs.lstat(__dirname + path.sep + the_require_content_B, function (e128, v128) {
-fs.lstat(__dirname + '/' + the_require_content_B, function (e129, v129) {
-
-fs.lstat(first_lower_case(path.join(__dirname, the_require_content_A)), function (e130, v130) {
-fs.lstat(first_lower_case(__dirname + path.sep + the_require_content_B), function (e131, v131) {
-fs.lstat(first_lower_case(__dirname + '/' + the_require_content_B), function (e132, v132) {
-
-fs.lstat(first_upper_case(path.join(__dirname, the_require_content_A)), function (e133, v133) {
-fs.lstat(first_upper_case(__dirname + path.sep + the_require_content_B), function (e134, v134) {
-fs.lstat(first_upper_case(__dirname + '/' + the_require_content_B), function (e135, v135) {
+fs.access(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e106, v106) {
+fs.access(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e107, v107) {
+fs.access(firstUpperCase(__dirname + '/' + theRequireContentB), function (e108, v108) {
 
 //
 
-fs.realpath(path.join(__dirname, the_require_content_A), function (e145, v145) {
-fs.realpath(__dirname + path.sep + the_require_content_B, function (e146, v146) {
-fs.realpath(__dirname + '/' + the_require_content_B, function (e147, v147) {
+fs.access(path.join(__dirname, theRequireContentA + '-no-such'), function (e109, v109) {
+fs.access(__dirname + path.sep + theRequireContentB + '-no-such', function (e110, v110) {
+fs.access(__dirname + '/' + theRequireContentB + '-no-such', function (e111, v111) {
 
-fs.realpath(first_lower_case(path.join(__dirname, the_require_content_A)), function (e148, v148) {
-fs.realpath(first_lower_case(__dirname + path.sep + the_require_content_B), function (e149, v149) {
-fs.realpath(first_lower_case(__dirname + '/' + the_require_content_B), function (e150, v150) {
+fs.access(firstLowerCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e112, v112) {
+fs.access(firstLowerCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e113, v113) {
+fs.access(firstLowerCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e114, v114) {
 
-fs.realpath(first_upper_case(path.join(__dirname, the_require_content_A)), function (e151, v151) {
-fs.realpath(first_upper_case(__dirname + path.sep + the_require_content_B), function (e152, v152) {
-fs.realpath(first_upper_case(__dirname + '/' + the_require_content_B), function (e153, v153) {
+fs.access(firstUpperCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e115, v115) {
+fs.access(firstUpperCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e116, v116) {
+fs.access(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e117, v117) {
+
+//
+
+fs.stat(path.join(__dirname, theRequireContentA), function (e118, v118) {
+fs.stat(__dirname + path.sep + theRequireContentB, function (e119, v119) {
+fs.stat(__dirname + '/' + theRequireContentB, function (e120, v120) {
+
+fs.stat(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e121, v121) {
+fs.stat(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e122, v122) {
+fs.stat(firstLowerCase(__dirname + '/' + theRequireContentB), function (e123, v123) {
+
+fs.stat(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e124, v124) {
+fs.stat(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e125, v125) {
+fs.stat(firstUpperCase(__dirname + '/' + theRequireContentB), function (e126, v126) {
+
+//
+
+fs.lstat(path.join(__dirname, theRequireContentA), function (e127, v127) {
+fs.lstat(__dirname + path.sep + theRequireContentB, function (e128, v128) {
+fs.lstat(__dirname + '/' + theRequireContentB, function (e129, v129) {
+
+fs.lstat(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e130, v130) {
+fs.lstat(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e131, v131) {
+fs.lstat(firstLowerCase(__dirname + '/' + theRequireContentB), function (e132, v132) {
+
+fs.lstat(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e133, v133) {
+fs.lstat(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e134, v134) {
+fs.lstat(firstUpperCase(__dirname + '/' + theRequireContentB), function (e135, v135) {
+
+//
+
+fs.realpath(path.join(__dirname, theRequireContentA), function (e145, v145) {
+fs.realpath(__dirname + path.sep + theRequireContentB, function (e146, v146) {
+fs.realpath(__dirname + '/' + theRequireContentB, function (e147, v147) {
+
+fs.realpath(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e148, v148) {
+fs.realpath(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e149, v149) {
+fs.realpath(firstLowerCase(__dirname + '/' + theRequireContentB), function (e150, v150) {
+
+fs.realpath(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e151, v151) {
+fs.realpath(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e152, v152) {
+fs.realpath(firstUpperCase(__dirname + '/' + theRequireContentB), function (e153, v153) {
 
   console.log([
 
