@@ -2,8 +2,6 @@
 
 'use strict';
 
-if (process) return; // TODO ENABLE
-
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
@@ -26,17 +24,18 @@ utils.pkg.sync([
   '--output', output, input
 ]);
 
-const spoiler = fs.readFileSync(output);
-spoiler[spoiler.length - 100] += 1;
-spoiler[spoiler.length - 120] -= 1;
-fs.writeFileSync(output, spoiler);
+const damage = fs.readFileSync(output);
+const boundary = 4096;
+damage[damage.length - boundary - 10] += 1;
+damage[damage.length - boundary + 10] -= 1;
+fs.writeFileSync(output, damage);
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],
   { cwd: path.dirname(output),
-    stdio: 'pipe', expect: 2 }
+    stdio: 'pipe', expect: 1 }
 );
 
 assert.equal(right.stdout, '');
-assert.equal(right.stderr, 'Corrupt executable\n');
+assert(right.stderr.indexOf('CHECKSUM_MISMATCH') >= 0);
 utils.vacuum.sync(output);
