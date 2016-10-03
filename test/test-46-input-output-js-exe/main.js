@@ -14,6 +14,6 @@ const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
   '--output', 'test-output.exe', input
-]);
+], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);

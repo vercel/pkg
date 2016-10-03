@@ -20,6 +20,6 @@ const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
   input
-]);
+], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);
