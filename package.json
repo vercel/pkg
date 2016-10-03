@@ -9,7 +9,7 @@
   },
   "files": [
     "lib-es5",
-    "dictionary",
+    "dictionary/*.js",
     "prelude"
   ],
   "babel": {
@@ -28,6 +28,7 @@
     "escodegen": "1.8.1",
     "fs-promise": "0.5.0",
     "globby": "6.0.0",
+    "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
     "pkg-fetch": "1.5.1",
@@ -50,7 +51,7 @@
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "prepublish": "eslint-klopov . && npm run test:nonpm && npm run babel",
+    "prepublish": "(in-install || eslint-klopov .) && (in-install || npm run test:nonpm) && (in-install || npm run babel)",
     "test": "node test/test.js node0 nonpm && node test/test.js node4 nonpm && node test/test.js node7 nonpm && node test/test.js node6",
     "test:nonpm": "node test/test.js node6 nonpm"
   },
