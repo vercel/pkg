@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable indent */
 /* eslint-disable no-path-concat */
-/* eslint-disable no-undefined */
 
 'use strict';
 

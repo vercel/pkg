@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-bitwise */
-
 'use strict';
 
 const fs = require('fs');

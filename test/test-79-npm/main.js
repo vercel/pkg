@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-process-env */
-
 'use strict';
 
 const UPM = false; // USE_PREINSTALLED_MODULES

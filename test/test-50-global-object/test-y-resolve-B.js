@@ -1,6 +1,4 @@
-/* eslint-disable no-undef */
-
 'use strict';
 
 global.y = 84;
-console.log(y);
+console.log(y); // eslint-disable-line no-undef

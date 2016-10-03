@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 /* eslint-disable camelcase */
 /* eslint-disable max-statements-per-line */
 

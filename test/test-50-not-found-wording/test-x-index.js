@@ -1,10 +1,8 @@
-/* eslint-disable no-useless-concat */
-
 'use strict';
 
 var fs = require('fs');
 var path = require('path');
-var name = path.join(__dirname, 'not' + 'exists');
+var name = path.join(__dirname, 'not' + 'exists'); // eslint-disable-line no-useless-concat
 
 try {
   fs.readFileSync(name);
