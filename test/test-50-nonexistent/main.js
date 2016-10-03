@@ -24,21 +24,6 @@ right = utils.pkg.sync([
 ], { stdio: inspect, expect: 2 });
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
-
-/*
-// TODO restore
-
-right = right.split('\n').filter(function (line) {
-  return line.indexOf('  error  ') >= 0;
-}).map(function (line) {
-  return line.split('  error  ')[1];
-}).join('\n') + '\n';
-
-assert.equal(right,
-  'Cannot read file, ENOENT\n'
-);
-
-assert.equal(right,
-  'Cannot read file, ENOENT\n'
-);
-*/
+assert(right.indexOf('Error!') >= 0);
+assert(right.indexOf('12345') >= 0);
+assert(right.indexOf('not exist') >= 0);
