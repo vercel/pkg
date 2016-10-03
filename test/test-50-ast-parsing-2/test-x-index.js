@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-path-concat */
-/* eslint-disable no-process-env */
-
 'use strict';
 
 var path = require('path');
@@ -20,8 +17,8 @@ require(/**/async.slice(1.5).toString('utf8')/**/);
 
 require(/**/async + '.js'/**/);
 require(/**/async + 75.25/**/);
-require(/**/__dirname + '/' + async/**/);
-require(/**/__dirname + '/' + async + 35.5/**/);
+require(/**/__dirname + '/' + async/**/); // eslint-disable-line no-path-concat
+require(/**/__dirname + '/' + async + 35.5/**/); // eslint-disable-line no-path-concat
 
 require(/**/[async, 'js'].join('.')/**/); // eslint-disable-line array-bracket-spacing
 // TODO require({ async: "js" }.join("."));

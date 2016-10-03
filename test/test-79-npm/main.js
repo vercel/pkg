@@ -188,7 +188,8 @@ dickies.some(function (dicky) {
     assert(planets.length > 0);
     planets.some(function (planet) {
       console.log('Installing ' + planet + '...');
-      let successful = false, counter = 10;
+      let successful = false;
+      let counter = 10;
       while ((!successful) && (counter > 0)) {
         successful = true;
         try {

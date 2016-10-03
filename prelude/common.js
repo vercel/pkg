@@ -1,6 +1,3 @@
-/* eslint-enable no-param-reassign */
-/* eslint-disable strict */
-
 'use strict';
 
 var path = require('path');

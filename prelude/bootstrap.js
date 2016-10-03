@@ -1,10 +1,6 @@
-/* eslint-disable no-bitwise */
 /* eslint-disable no-multi-spaces */
-/* eslint-enable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-rest-params */
-/* eslint-disable prefer-spread */
-/* eslint-disable strict */
 
 /* global REQUIRE_COMMON */
 /* global VIRTUAL_FILESYSTEM */
@@ -13,7 +9,7 @@
 'use strict';
 
 var common = {};
-REQUIRE_COMMON(common); // eslint-disable-line new-cap
+REQUIRE_COMMON(common);
 
 var STORE_CODE = common.STORE_CODE;
 var STORE_CONTENT = common.STORE_CONTENT;
@@ -208,7 +204,9 @@ var modifyNativeAddonWin32 = (function () {
 
     function readStringToZero (p_) {
       if (p_ === 0) return '';
-      var s = '', c, p = p_;
+      var s = '';
+      var p = p_;
+      var c;
       while (true) {
         c = f[p];
         if (c === 0) break;
@@ -228,7 +226,8 @@ var modifyNativeAddonWin32 = (function () {
     var sections = [];
 
     (function () {
-      var pos = firstSection, section;
+      var pos = firstSection;
+      var section;
       while (true) {
         if (sections.length === numberOfSections) break;
         section = {};
@@ -273,7 +272,8 @@ var modifyNativeAddonWin32 = (function () {
     var imps = [];
 
     (function () {
-      var pos = firstRaw, imp;
+      var pos = firstRaw;
+      var imp;
       while (true) {
         imp = {};
         imp.pos = pos;
@@ -398,7 +398,7 @@ var modifyNativeAddonWin32 = (function () {
   process.pkg.path.resolve = function () {
     var args = cloneArgs(arguments);
     args.unshift(path.dirname(ENTRYPOINT));
-    return path.resolve.apply(path, args);
+    return path.resolve.apply(path, args); // eslint-disable-line prefer-spread
   };
 
 }());
@@ -1138,7 +1138,7 @@ var modifyNativeAddonWin32 = (function () {
     // console.log("accessFromTheBox", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
-    return undefined; // eslint-disable-line no-undefined
+    return undefined;
 
   }
 
@@ -1244,9 +1244,9 @@ var modifyNativeAddonWin32 = (function () {
     path = normalizePath(path);
     // console.log("internalModuleReadFile", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return undefined; // eslint-disable-line no-undefined
+    if (!entity) return undefined;
     var entityContent = entity[STORE_CONTENT];
-    if (!Buffer.isBuffer(entityContent)) return undefined; // eslint-disable-line no-undefined
+    if (!Buffer.isBuffer(entityContent)) return undefined;
     return entityContent.toString();
 
   };
