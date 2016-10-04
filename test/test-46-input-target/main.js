@@ -10,7 +10,8 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'latest';
 const input = './test-x-index';
-const exe = { win32: '.exe', linux: '-linux', darwin: '-macos' }[process.platform];
+const exe = { win32: '.exe', linux: '-linux',
+  darwin: '-macos', freebsd: '-freebsd' }[process.platform];
 const newcomers = [ 'test-x-index' + exe ];
 const before = utils.filesBefore(newcomers);
 

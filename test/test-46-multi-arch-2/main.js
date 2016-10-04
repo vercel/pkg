@@ -24,7 +24,7 @@ let right;
 utils.pkg.sync([
   '--target', target,
   '--output', output, input
-]);
+], { stdio: 'inherit' });
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],
