@@ -95,7 +95,8 @@ files may be specified as `assets` as well. Their sources will
 not be stripped. It improves performance of execution of those
 files and simplifies debugging.
 
-See also [Virtual filesystem](#virtual-filesystem).
+See also [Virtual filesystem](#virtual-filesystem) and
+[Detecting assets in source code](#detecting-assets-in-source-code).
 
 ### Options
 
@@ -126,10 +127,27 @@ value                          | in node             | packaged                 
 -------------------------------|---------------------|--------------------------|-----------
 __filename                     | /project/app.js     | /thebox/project/app.js   |
 __dirname                      | /project            | /thebox/project          |
-process.cwd()                  | /project            | /deploy                  | suppose the app is called
+process.cwd()                  | /project            | /deploy                  | suppose the app is called ...
 process.execPath               | /usr/bin/nodejs     | /deploy/app-x64          | `app-x64` and run in `/deploy`
 process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64          |
 process.argv[1]                | /project/app.js     | /deploy/app-x64          |
 process.pkg.entrypoint         | undefined           | /thebox/project/app.js   |
 process.pkg.defaultEntrypoint  | undefined           | /thebox/project/app.js   |
 require.main.filename          | /project/app.js     | /thebox/project/app.js   |
+
+Hence in order to make use of the file collected at packaging
+time (serve an asset or list assets directory) you should take
+`__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
+or `require.main.filename`. One way is `require` and
+`require.resolve` - they use current `__dirname` by default.
+Another preferred way is `path.join(__dirname, 'path/to/file')`.
+Learn more about `path.join` in
+[Detecting assets in source code](#detecting-assets-in-source-code).
+
+On the other hand, in order to access real file system (pick
+up a user's plugin or list user's directory) you should take
+`process.cwd()` or `process.argv[1]`. Why `argv[1]`? Because
+you will be able to run the project both with `node` and in
+packaged state.
+
+## Detecting assets in source code
