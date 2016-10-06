@@ -45,16 +45,16 @@ generated for via `--targets` option. A canonical target
 consists of 3 elements, separated by dashes, for example
 `node6-macos-x64` or `node4-linux-armv6`:
 
-* nodeRange. node${n} or latest
-* platform. macos (aka darwin), win (aka win32), linux, freebsd
-* arch. x64, x86, armv6, armv7
+* **nodeRange** node${n} or latest
+* **platform** freebsd, linux, macos, win
+* **arch** x64, x86, armv6, armv7
 
-You may omit any of the elements (for example just `node6`).
+You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
 system-wide `node` installation (it's version and arch).
 There is also an alias `host`, that means that all 3 elements
 are taken from current platform/node. By default targets are
-`linux,macos,win` for current platform and arch.
+`linux,macos,win` for current node version and arch.
 
 ### Config
 
