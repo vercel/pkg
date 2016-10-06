@@ -382,7 +382,8 @@ var modifyNativeAddonWin32 = (function () {
   process.argv[1] = process.execPath;
   process.versions.pkg = '%PKG_VERSION%';
   process.pkg.mount = createMountpoint;
-  process.pkg.DEFAULT_ENTRYPOINT = DEFAULT_ENTRYPOINT;
+  process.pkg.entrypoint = ENTRYPOINT;
+  process.pkg.defaultEntrypoint = DEFAULT_ENTRYPOINT;
 
 }());
 

@@ -92,10 +92,10 @@ you target (see [Targets](#targets)), i.e. be already transpiled.
 or list of globs. Files specified as `assets` will be packaged
 into executable as raw content without modifications. Javascript
 files may be specified as `assets` as well. Their sources will
-not be stripped. It improves performance of execution of these
+not be stripped. It improves performance of execution of those
 files and simplifies debugging.
 
-See also [Virtual filesystem](virtual-filesystem)
+See also [Virtual filesystem](#virtual-filesystem).
 
 ### Options
 
@@ -108,7 +108,7 @@ See also [Virtual filesystem](virtual-filesystem)
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
-to `node app.js a b`
+to `node app.js a b`.
 
 ## Virtual filesystem
 
@@ -118,6 +118,6 @@ internal virtual filesystem where all that files reside.
 
 Packaged VFS files have `/thebox/` prefix in their paths (or
 `C:\thebox\` in Windows). If you used `pkg /path/app.js` command line,
-then `__filename` variable will be likely `/thebox/path/app.js`
+then `__filename` value will be likely `/thebox/path/app.js`
 at run-time. `__dirname` will be `/thebox/path` as well. Here is
 the comparison table of path-related values:
