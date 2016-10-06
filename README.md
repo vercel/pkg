@@ -31,19 +31,17 @@ It may be:
 
 * Path to entry file. Suppose it is `/path/app.js`, then
 packaged app will work the same way as `node /path/app.js`
-
 * Path to `package.json`. `Pkg` will follow `bin` property of
 the specified `package.json` and use it as entry file.
-
 * Path to directory. `Pkg` will look for `package.json` in
 the specified directory. See above.
 
 ### Targets
 
-You can specify the list of targets the binaries will be
-generated for via `--targets` option. A canonical target
-consists of 3 elements, separated by dashes, for example
-`node6-macos-x64` or `node4-linux-armv6`:
+The final executables can generated for several target machines
+at a time. You can specify the list of targets via `--targets`
+option. A canonical target consists of 3 elements, separated by
+dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 * **nodeRange** node${n} or latest
 * **platform** freebsd, linux, macos, win
@@ -86,7 +84,7 @@ recommended to use package.json's `pkg` property.
 or list of globs. Files specified as `scripts` will be compiled
 using `v8::ScriptCompiler` and placed into executable without
 sources. They must conform JS standards of those `node` versions
-you target (see [Targets](#Targets)), i.e. be already transpiled.
+you target (see [Targets](#targets)), i.e. be already transpiled.
 
 ### Assets
 
@@ -97,6 +95,16 @@ files may be specified as `assets` as well. Their sources will
 not be stripped. It improves performance of execution of these
 files and simplifies debugging.
 
+See also [Virtual filesystem](virtual-filesystem)
+
+### Options
+
+### Output
+
+### Debug
+
+### Build
+
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
@@ -104,12 +112,12 @@ to `node app.js a b`
 
 ## Virtual filesystem
 
-During packaging process `pkg` collects project files and place
+During packaging process `pkg` collects project files and places
 them into final executable. At run time the packaged application has
 internal virtual filesystem where all that files reside.
 
-Virtual filesystem files have `/thebox/` (or `C:\thebox\` in
-Windows) prefix in their path names. If you used `pkg /path/app.js`
-command line, then `__filename` variable will be likely
-`/thebox/path/app.js` at run-time. `__dirname` will be `/thebox/path`
-as well. Here is the comparison table of path-related values:
+Packaged VFS files have `/thebox/` prefix in their paths (or
+`C:\thebox\` in Windows). If you used `pkg /path/app.js` command line,
+then `__filename` variable will be likely `/thebox/path/app.js`
+at run-time. `__dirname` will be `/thebox/path` as well. Here is
+the comparison table of path-related values:
