@@ -64,13 +64,52 @@ and includes them into final executable. In most cases you
 don't need to specify anything manually. However your code
 may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
-example views, css, images etc). These cases are hard for
-`pkg` to handle correctly. So, you must specify the files -
-scripts and assets - manually in a config.
+example views, css, images etc).
+```
+  require('./build/' + cmd + '.js')
+  path.join(__dirname, 'views', viewName)
+```
+Such cases are not handled by `pkg`. So you must specify the
+files - scripts and assets - manually in a config. It is
+recommended to use package.json's `pkg` property.
+```
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": "views/**/*"
+  }
+```
 
-It is highly recommended to use package.json's `pkg` property.
+
+### Scripts
+
+`scripts` is a [glob](https://github.com/sindresorhus/globby)
+or list of globs. Files specified as `scripts` will be compiled
+using `v8::ScriptCompiler` and placed into executable without
+sources. They must conform JS standards of those `node` versions
+you target (see [Targets](#Targets)), i.e. be already transpiled.
+
+### Assets
+
+`assets` is a [glob](https://github.com/sindresorhus/globby)
+or list of globs. Files specified as `assets` will be packaged
+into executable as raw content without modifications. Javascript
+files may be specified as `assets` as well. Their sources will
+not be stripped. It improves performance of execution of these
+files and simplifies debugging.
 
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
 to `node app.js a b`
+
+## Virtual filesystem
+
+During packaging process `pkg` collects project files and place
+them into final executable. At run time the packaged application has
+internal virtual filesystem where all that files reside.
+
+Virtual filesystem files have `/thebox/` (or `C:\thebox\` in
+Windows) prefix in their path names. If you used `pkg /path/app.js`
+command line, then `__filename` variable will be likely
+`/thebox/path/app.js` at run-time. `__dirname` will be `/thebox/path`
+as well. Here is the comparison table of path-related values:
