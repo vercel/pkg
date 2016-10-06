@@ -12,7 +12,7 @@ Package your Node.js project into an executable
 * Make some kind of self-extracting archive or installer
 * No need to install Node.js and npm to deploy the packaged application
 * No need to download hundreds of files via `npm install` to deploy
-your application. Deploy it as a single independent file
+your application. Deploy it as a single file
 * Put your assets inside the executable to make it even more portable
 * Test your app against new Node.js version without installing it
 
@@ -65,7 +65,7 @@ argument to `require`) or use non-javascript files (for
 example views, css, images etc).
 ```
   require('./build/' + cmd + '.js')
-  path.join(__dirname, 'views', viewName)
+  path.join(__dirname, 'views/' + viewName)
 ```
 Such cases are not handled by `pkg`. So you must specify the
 files - scripts and assets - manually in a config. It is
@@ -95,21 +95,48 @@ files may be specified as `assets` as well. Their sources will
 not be stripped. It improves performance of execution of those
 files and simplifies debugging.
 
-See also [Virtual filesystem](#virtual-filesystem) and
-[Detecting assets in source code](#detecting-assets-in-source-code).
+See also
+[Detecting assets in source code](#detecting-assets-in-source-code) and
+[Virtual filesystem](#virtual-filesystem).
 
 ### Options
 
+Node.js application can be called with runtime options (it's own
+or belonging to V8). To list them type `node --help` or
+`node --v8-options`. You can "bake" these runtime options into
+packaged application. The app will always run with the options
+turned on. Just remove `--` from option name.
+```
+pkg app.js --options expose-gc
+```
+
 ### Output
+
+You may specify `--output` if you create only one executable
+or `--out-dir` to place executables for multiple targets.
 
 ### Debug
 
+Pass `--debug` to `pkg` to get a log of packaging process.
+If you have issues with some particular file (seems not packaged
+into executable), it may be useful to look through the log.
+
 ### Build
+
+`pkg` has so called `base binaries` - they are actually same
+`node` executables but with some patches applied. They are
+used as a base for every executable `pkg` creates. `pkg`
+downloads precompiled base binaries before packaging your
+application. If you prefer to compile base binaries from
+source instead of downloading them, you may pass `--build`
+option to `pkg`. First ensure your computer meets the
+requirements to compile original `node`:
+[BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
-to `node app.js a b`.
+to `node app.js a b`
 
 ## Virtual filesystem
 
@@ -120,10 +147,10 @@ internal virtual filesystem where all that files reside.
 Packaged VFS files have `/thebox/` prefix in their paths (or
 `C:\thebox\` in Windows). If you used `pkg /path/app.js` command line,
 then `__filename` value will be likely `/thebox/path/app.js`
-at run-time. `__dirname` will be `/thebox/path` as well. Here is
+at run time. `__dirname` will be `/thebox/path` as well. Here is
 the comparison table of path-related values:
 
-value                          | in node             | packaged                 | comments
+value                          | with node           | packaged                 | comments
 -------------------------------|---------------------|--------------------------|-----------
 __filename                     | /project/app.js     | /thebox/project/app.js   |
 __dirname                      | /project            | /thebox/project          |
@@ -136,18 +163,27 @@ process.pkg.defaultEntrypoint  | undefined           | /thebox/project/app.js   
 require.main.filename          | /project/app.js     | /thebox/project/app.js   |
 
 Hence in order to make use of the file collected at packaging
-time (serve an asset or list assets directory) you should take
+time (pick up own JS plugin or serve an asset) you should take
 `__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
-or `require.main.filename`. One way is `require` and
-`require.resolve` - they use current `__dirname` by default.
-Another preferred way is `path.join(__dirname, 'path/to/file')`.
-Learn more about `path.join` in
+or `require.main.filename` as a base for your path calculations.
+One way is just `require` or `require.resolve` because they use
+current `__dirname` by default. But they are applicable to
+javascript files only. For assets use
+`path.join(__dirname, '../path/to/asset')`. Learn more about
+`path.join` in
 [Detecting assets in source code](#detecting-assets-in-source-code).
 
 On the other hand, in order to access real file system (pick
-up a user's plugin or list user's directory) you should take
-`process.cwd()` or `process.argv[1]`. Why `argv[1]`? Because
-you will be able to run the project both with `node` and in
-packaged state.
+up a user's JS plugin or list user's directory) you should take
+`process.cwd()` or `path.dirname(process.argv[1])`. Why `argv[1]`?
+Because you will be able to run the project both with `node`
+and in packaged state.
 
 ## Detecting assets in source code
+
+When `pkg` encounters `path.join(__dirname, '../path/to/asset')`,
+it automatically packages the file specified as an asset. See
+(Assets)[#assets]. Pay attention that `path.join` must have two
+arguments and the last one must be a string literal.
+
+This way you may even avoid creating `pkg` config for your project.
