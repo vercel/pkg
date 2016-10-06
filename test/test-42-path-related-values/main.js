@@ -24,7 +24,7 @@ left = utils.spawn.sync(
 utils.pkg.sync([
   '--target', target,
   '--output', output, input
-]);
+], { stdio: 'inherit' });
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],
@@ -43,11 +43,12 @@ for (let obj of [ left, right ]) {
 }
 
 function pad (s, width) {
-  return s + ' '.repeat(width - s.length);
+  const p = width > s.length ? width - s.length : 1;
+  return s + ' '.repeat(p);
 }
 
 for (let s in left) {
-  console.log(pad(s, 30), '|', pad(left[s], 22), '|', right[s]);
+  console.log(pad(s, 30), '|', pad(left[s], 36), '|', right[s]);
 }
 
 utils.vacuum.sync(path.dirname(output));

@@ -121,3 +121,15 @@ Packaged VFS files have `/thebox/` prefix in their paths (or
 then `__filename` value will be likely `/thebox/path/app.js`
 at run-time. `__dirname` will be `/thebox/path` as well. Here is
 the comparison table of path-related values:
+
+value                          | in node             | packaged
+-------------------------------|---------------------|--------------------------
+__filename                     | /project/app.js     | /thebox/project/app.js
+__dirname                      | /project            | /thebox/project
+process.cwd()                  | /project            | /deploy
+process.execPath               | /usr/bin/nodejs     | /deploy/app-x64
+process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64
+process.argv[1]                | /project/app.js     | /deploy/app-x64
+process.pkg.entrypoint         | undefined           | /thebox/project/app.js
+process.pkg.defaultEntrypoint  | undefined           | /thebox/project/app.js
+require.main.filename          | /project/app.js     | /thebox/project/app.js

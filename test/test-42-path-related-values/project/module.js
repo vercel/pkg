@@ -1,6 +1,8 @@
 'use strict';
 
 console.log(JSON.stringify({
+  '__filename': __filename,
+  '__dirname': __dirname,
   'process.cwd()': process.cwd(),
   'process.execPath': process.execPath,
   'process.argv[0]': process.argv[0],
@@ -9,7 +11,5 @@ console.log(JSON.stringify({
     ? process.pkg.entrypoint : 'undefined',
   'process.pkg.defaultEntrypoint': process.pkg
     ? process.pkg.defaultEntrypoint : 'undefined',
-  'require.main.filename': require.main.filename,
-  '__filename': __filename,
-  '__dirname': __dirname
+  'require.main.filename': require.main.filename
 }));
