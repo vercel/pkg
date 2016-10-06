@@ -49,10 +49,10 @@ dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
-system-wide `node` installation (it's version and arch).
+system-wide Node.js installation (it's version and arch).
 There is also an alias `host`, that means that all 3 elements
-are taken from current platform/node. By default targets are
-`linux,macos,win` for current node version and arch.
+are taken from current platform/Node.js. By default targets are
+`linux,macos,win` for current Node.js version and arch.
 
 ### Config
 
@@ -83,7 +83,7 @@ recommended to use package.json's `pkg` property.
 `scripts` is a [glob](https://github.com/sindresorhus/globby)
 or list of globs. Files specified as `scripts` will be compiled
 using `v8::ScriptCompiler` and placed into executable without
-sources. They must conform JS standards of those `node` versions
+sources. They must conform JS standards of those Node.js versions
 you target (see [Targets](#targets)), i.e. be already transpiled.
 
 ### Assets
@@ -101,8 +101,8 @@ See also
 
 ### Options
 
-Node.js application can be called with runtime options (it's own
-or belonging to V8). To list them type `node --help` or
+Node.js application can be called with runtime options
+(belonging to Node.js or V8). To list them type `node --help` or
 `node --v8-options`. You can "bake" these runtime options into
 packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
@@ -130,7 +130,7 @@ downloads precompiled base binaries before packaging your
 application. If you prefer to compile base binaries from
 source instead of downloading them, you may pass `--build`
 option to `pkg`. First ensure your computer meets the
-requirements to compile original `node`:
+requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
 ## Usage of packaged app
@@ -150,7 +150,7 @@ then `__filename` value will be likely `/thebox/path/app.js`
 at run time. `__dirname` will be `/thebox/path` as well. Here is
 the comparison table of path-related values:
 
-value                          | with node           | packaged                 | comments
+value                          | with `node`         | packaged                 | comments
 -------------------------------|---------------------|--------------------------|-----------
 __filename                     | /project/app.js     | /thebox/project/app.js   |
 __dirname                      | /project            | /thebox/project          |
@@ -183,7 +183,7 @@ and in packaged state.
 
 When `pkg` encounters `path.join(__dirname, '../path/to/asset')`,
 it automatically packages the file specified as an asset. See
-(Assets)[#assets]. Pay attention that `path.join` must have two
+[Assets](#assets). Pay attention that `path.join` must have two
 arguments and the last one must be a string literal.
 
 This way you may even avoid creating `pkg` config for your project.
