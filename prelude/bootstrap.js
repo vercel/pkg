@@ -23,9 +23,7 @@ var stripTheBox = common.stripTheBox;
 var ENTRYPOINT;
 var FLAG_FORK_WAS_CALLED = false;
 var FLAG_DISABLE_DOT_NODE = false;
-var NODE_VERSION = process.version;
-if (NODE_VERSION.slice(0, 1) === 'v') NODE_VERSION = NODE_VERSION.slice(1);
-var NODE_VERSION_MAJOR = NODE_VERSION.split('.')[0] | 0;
+var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
 // /////////////////////////////////////////////////////////////////
 // ENTRYPOINT //////////////////////////////////////////////////////
