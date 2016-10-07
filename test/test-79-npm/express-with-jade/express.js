@@ -6,8 +6,6 @@ var app = express();
 app.set('views', 'views');
 app.set('view engine', 'jade');
 
-require('jade');
-
 app.get('/', function (req, res) {
   res.render('fixture.jade', { title: 'Hey', message: 'Hello there!' });
 });

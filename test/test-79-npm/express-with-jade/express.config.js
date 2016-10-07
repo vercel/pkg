@@ -1,7 +1,3 @@
 'use strict';
 
-module.exports = {
-  assets: [
-    'views/*.jade'
-  ]
-};
+module.exports = require('./package.json');
