@@ -8,7 +8,7 @@
     "pkg": "lib-es5/bin.js"
   },
   "files": [
-    "lib-es5",
+    "lib-es5/*.js",
     "dictionary/*.js",
     "prelude/*.js"
   ],
