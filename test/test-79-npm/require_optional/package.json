@@ -1,1 +1,1 @@
-{ "private": true, "peerOptionalDependencies": { "async": "*" } }
+{ "private": true, "peerOptionalDependencies": { "chalk": "*" } }
