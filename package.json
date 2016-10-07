@@ -64,6 +64,7 @@
     }
   },
   "greenkeeper": {
-    "emails": false
+    "emails": false,
+    "ignore": [ "pkg-fetch" ]
   }
 }
