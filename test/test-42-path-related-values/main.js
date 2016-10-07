@@ -47,8 +47,10 @@ function pad (s, width) {
   return s + ' '.repeat(p);
 }
 
+console.log('-'.repeat(78));
 for (let s in left) {
   console.log(pad(s, 30), '|', pad(left[s], 36), '|', right[s]);
 }
+console.log('-'.repeat(78));
 
 utils.vacuum.sync(path.dirname(output));
