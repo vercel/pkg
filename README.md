@@ -38,8 +38,8 @@ the specified directory. See above.
 
 ### Targets
 
-The final executables can generated for several target machines
-at a time. You can specify the list of targets via `--targets`
+`pkg` can generate executables for several target machines at a
+time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
 dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
@@ -58,7 +58,7 @@ are taken from current platform/Node.js. By default targets are
 
 During packaging process `pkg` parses your sources, detects
 calls to `require`, traverses the dependencies of your project
-and includes them into final executable. In most cases you
+and includes them into executable. In most cases you
 don't need to specify anything manually. However your code
 may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
@@ -123,7 +123,7 @@ into executable), it may be useful to look through the log.
 
 ### Build
 
-`pkg` has so called `base binaries` - they are actually same
+`pkg` has so called "base binaries" - they are actually same
 `node` executables but with some patches applied. They are
 used as a base for every executable `pkg` creates. `pkg`
 downloads precompiled base binaries before packaging your
@@ -141,7 +141,7 @@ to `node app.js a b`
 ## Virtual filesystem
 
 During packaging process `pkg` collects project files and places
-them into final executable. At run time the packaged application has
+them into executable. At run time the packaged application has
 internal virtual filesystem where all that files reside.
 
 Packaged VFS files have `/thebox/` prefix in their paths (or
