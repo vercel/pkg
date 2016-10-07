@@ -10,8 +10,5 @@ before_install:
   - sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-4.8 g++-4.8
   - sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install libavahi-compat-libdnssd-dev # npm install mdns
   - export CXX="g++-4.8" CC="gcc-4.8"
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-after_success:
-  - if [ "$TRAVIS_BRANCH" = "master" ]; then cd ${TRAVIS_BUILD_DIR}; npm run ci:publish; fi
 git:
   depth: 1
