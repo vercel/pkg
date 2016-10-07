@@ -33,6 +33,7 @@
     "multistream": "2.1.0",
     "pkg-fetch": "1.7.2",
     "progress": "1.1.8",
+    "publish": "0.6.0",
     "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4",
     "simple-bufferstream": "1.0.0"
   },
@@ -53,7 +54,8 @@
     "lint": "eslint-klopov . || true",
     "prepublish": "in-install || (eslint-klopov . && npm run test:nonpm && npm run babel)",
     "test": "node test/test.js node0 nonpm && node test/test.js node4 nonpm && node test/test.js node7 nonpm && node test/test.js node6",
-    "test:nonpm": "node test/test.js node6 nonpm"
+    "test:nonpm": "node test/test.js node6 nonpm",
+    "posttest": "publish"
   },
   "eslintConfig": {
     "extends": "klopov",
@@ -65,6 +67,8 @@
   },
   "greenkeeper": {
     "emails": false,
-    "ignore": [ "pkg-fetch" ]
+    "ignore": [
+      "pkg-fetch"
+    ]
   }
 }
