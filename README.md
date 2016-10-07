@@ -187,3 +187,10 @@ it automatically packages the file specified as an asset. See
 arguments and the last one must be a string literal.
 
 This way you may even avoid creating `pkg` config for your project.
+
+## Native addons
+
+Native addons (`.node` files) use is supported, but packaging
+`.node` files inside the executable is not resolved yet. You have
+to deploy native addons used by your project to the same directory
+as the executable.
