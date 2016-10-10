@@ -9,11 +9,18 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-// linux may not have multiarch installed
-if (process.platform === 'linux') return;
+if (function () {
+  // testing armv7-to-armv6 crosscompilation
+  if (process.platform === 'linux' && process.arch === 'arm') return false;
+  // TODO what about armv8? we need to distingish host arch
+  // armv6/armv7/armv8 - not just 'arm' we have now
+  // linux may not have multiarch installed
+  if (process.platform === 'linux') return true;
+  return false;
+}()) return;
 
 const opposite = { x64: 'x86',
-  x86: 'x64', ia32: 'x64' };
+  x86: 'x64', ia32: 'x64', arm: 'armv6' };
 
 const target = opposite[process.arch];
 const input = './test-x-index.js';
