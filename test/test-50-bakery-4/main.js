@@ -2,8 +2,6 @@
 
 'use strict';
 
-if (process.version) return; // TODO reenable
-
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
