@@ -27,7 +27,7 @@
     "chalk": "1.1.3",
     "escodegen": "1.8.1",
     "fs-promise": "1.0.0",
-    "globby": "6.0.0",
+    "globby": "6.1.0",
     "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
