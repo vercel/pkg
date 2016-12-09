@@ -6,6 +6,3 @@
 
 # logs
 npm-debug.log
-
-# yarn deterministic helper
-yarn.lock
