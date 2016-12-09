@@ -32,6 +32,7 @@ right = right.split('\n').filter(function (line) {
          (line.indexOf(' Warning ') >= 0);
 }).filter(function (line) {
   return (line.indexOf('Targets:') < 0) &&
+         (line.indexOf('added to queue') < 0) &&
          (line.indexOf('was included') < 0);
 }).map(function (line) {
   if (line.indexOf('Cannot find module') >= 0) {
