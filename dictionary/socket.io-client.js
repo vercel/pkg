@@ -7,7 +7,7 @@ module.exports = {
     ],
     assets: [
       'socket.io.js',
-      'dist/**/*.js' // for 0.9.17
+      'dist/**/*' // for 0.9.17
     ]
   }
 };
