@@ -11,7 +11,7 @@ setTimeout(function () {
     res.on('data', function (chunk) {
       chunks += chunk.toString();
     }).on('end', function () {
-      if (chunks.indexOf('BINARY_ACK') >= 0) {
+      if (chunks.indexOf('__webpack_require__') >= 0) {
         console.log('ok');
       }
       io.close();
