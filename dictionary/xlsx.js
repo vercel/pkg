@@ -6,6 +6,8 @@ module.exports = {
       'xlsx.js': [
         'require(\'js\'+\'zip\')',
         'require(\'jszip\')',
+        'require(\'./js\'+\'zip\')',
+        'require(\'./jszip\')',
         'require(\'./od\' + \'s\')',
         'require(\'./ods\')'
       ]
