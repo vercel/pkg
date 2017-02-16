@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "3.0.0-beta.25",
+  "version": "3.0.0-beta.26",
   "description": "",
   "readme": "ERROR: No README data found!",
   "main": "lib-es5/index.js",
