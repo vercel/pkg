@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "3.0.0-beta.26",
+  "version": "3.0.0-beta.27",
   "description": "",
   "readme": "",
   "main": "lib-es5/index.js",
