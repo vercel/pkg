@@ -2,7 +2,7 @@
   "name": "pkg",
   "version": "3.0.0-beta.26",
   "description": "",
-  "readme": "ERROR: No README data found!",
+  "readme": "",
   "main": "lib-es5/index.js",
   "bin": {
     "pkg": "lib-es5/bin.js"
