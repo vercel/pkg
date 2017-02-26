@@ -17,7 +17,9 @@ for (const nodeRange of [ 'node0', 'node4', 'node6', 'node7' ]) {
   const nodeVersion = nodeRangeToNodeVersion(nodeRange);
   for (const platform of knownPlatforms) {
     const archs = [ 'x86', 'x64' ];
-    if (platform === 'linux') archs.push('armv6', 'armv7');
+    // preparing pkg-fetch arm binaries is a premature obstacle.
+    // lets do arm building and pkg testing simultaneously
+    // if (platform === 'linux') archs.push('armv6', 'armv7');
     for (const arch of archs) {
       if (dontBuild(nodeVersion, platform, arch)) continue;
       items.push({ nodeRange, platform, arch });
