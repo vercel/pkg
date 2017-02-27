@@ -2,6 +2,6 @@
 
 module.exports = {
   dependencies: {
-    'qs': '*'
+    'delta': '*'
   }
 };
