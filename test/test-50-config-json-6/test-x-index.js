@@ -1,3 +1,3 @@
 'use strict';
 
-require('body-parser');
+require('alpha');

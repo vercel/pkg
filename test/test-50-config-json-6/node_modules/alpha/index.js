@@ -1,5 +1,5 @@
 'use strict';
 
-var dataPath = 'qs';
+var dataPath = 'delta';
 require(dataPath);
 console.log(global.FOO);
