@@ -11,7 +11,7 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
-const output = './test-output.exe';
+const output = './run-time/test-output.exe';
 
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
@@ -32,4 +32,4 @@ right = utils.spawn.sync(
 );
 
 assert.equal(left, right);
-utils.vacuum.sync(output);
+utils.vacuum.sync(path.dirname(output));

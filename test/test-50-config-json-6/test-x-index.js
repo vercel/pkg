@@ -1,5 +1,3 @@
 'use strict';
 
-var dataPath = 'qs';
-require(dataPath);
-console.log(global.FOO);
+require('body-parser');

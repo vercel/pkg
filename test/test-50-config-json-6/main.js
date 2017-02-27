@@ -23,7 +23,6 @@ left = utils.spawn.sync(
 
 utils.pkg.sync([
   '--target', target,
-  '--config', './test-config.js',
   '--output', output, input
 ]);
 
