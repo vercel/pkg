@@ -25,7 +25,7 @@ utils.pkg.sync([
 
 right = utils.spawn.sync(
   './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
+  { expect: null }
 );
 
 assert.equal(right, 'ok\n');

@@ -72,11 +72,13 @@ module.exports.spawn.sync = function (command, args, opts) {
     opts.stdio = [ d, d, d ];
   }
 
-  const expect = opts.expect || 0;
+  let expect = opts.expect === undefined ? 0 : opts.expect;
   delete opts.expect; // to avoid passing to spawnSync
-  const opts2 = Object.assign({}, opts); // 0.12.x spoils
+  const opts2 = Object.assign({}, opts); // 0.12.x mutates
   const child = spawnSync(command, args, opts2);
-  const s = child.status;
+  let s = child.status;
+  // conform old node vers to https://github.com/nodejs/node/pull/11288
+  if (child.signal) s = null;
 
   if (child.error || (s !== expect)) {
     if (opts.stdio[1] === 'pipe' && child.stdout) {
@@ -92,6 +94,8 @@ module.exports.spawn.sync = function (command, args, opts) {
     throw child.error;
   }
   if (s !== expect) {
+    if (s === null) s = 'null';
+    if (expect === null) expect = 'null';
     throw new Error('Status ' + s.toString() +
       ', expected ' + expect.toString());
   }
