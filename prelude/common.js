@@ -99,13 +99,13 @@ exports.stripSnapshot = function (f) {
     return file[0] + ':\\';
   }
   if (/^.:\\snapshot\\/.test(file)) {
-    return file[0] + ':' + file.slice(9);
+    return file[0] + ':' + file.slice(11);
   }
   if (/^\/snapshot$/.test(file)) {
     return '/';
   }
   if (/^\/snapshot\//.test(file)) {
-    return file.slice(7);
+    return file.slice(9);
   }
   return f; // not inside
 };
