@@ -44,12 +44,12 @@ left.some(function (leftValue, index) {
   const rightValue = right[index];
   if (leftValue.slice(1, 3) === ':\\') {
     assert.equal(rightValue.slice(1, 3), ':\\');
-    leftValue = leftValue.slice(0, 3) + 'thebox\\' + leftValue.slice(3);
+    leftValue = leftValue.slice(0, 3) + 'snapshot\\' + leftValue.slice(3);
     assert.equal(leftValue, rightValue);
   } else
   if (leftValue.slice(0, 1) === '/') {
     assert.equal(rightValue.slice(0, 1), '/');
-    leftValue = '/thebox' + leftValue;
+    leftValue = '/snapshot' + leftValue;
     assert.equal(leftValue, rightValue);
   } else {
     assert.equal(leftValue, rightValue);

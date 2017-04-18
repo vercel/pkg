@@ -13,7 +13,7 @@ const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './run-time/test-output.exe';
 
-// see readFromTheBox "NODE_VERSION_MAJOR"
+// see readFromSnapshot "NODE_VERSION_MAJOR"
 
 function bitty (version) {
   return (2 * (/^(node|v)?4/.test(version))) |

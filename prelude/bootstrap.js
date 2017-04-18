@@ -17,8 +17,8 @@ var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
 
 var normalizePath = common.normalizePath;
-var insideTheBox = common.insideTheBox;
-var stripTheBox = common.stripTheBox;
+var insideSnapshot = common.insideSnapshot;
+var stripSnapshot = common.stripSnapshot;
 
 var ENTRYPOINT;
 var FLAG_FORK_WAS_CALLED = false;
@@ -34,7 +34,7 @@ if (ENTRYPOINT === 'DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = DEFAULT_ENTRYPOINT;
 }
 
-if (!insideTheBox(ENTRYPOINT)) {
+if (!insideSnapshot(ENTRYPOINT)) {
   return { undoPatch: true };
 }
 
@@ -45,7 +45,7 @@ if (!insideTheBox(ENTRYPOINT)) {
 var mountpoints = [];
 
 function insideMountpoint (f) {
-  if (!insideTheBox(f)) return null;
+  if (!insideSnapshot(f)) return null;
   var file = normalizePath(f);
   var found = mountpoints.map(function (mountpoint) {
     var interior = mountpoint.interior;
@@ -97,27 +97,27 @@ function createMountpoint (interior, exterior) {
 
 // TODO move to some test
 
-createMountpoint("d:\\thebox\\countly\\plugins-ext", "d:\\deploy\\countly\\v16.02\\plugins-ext");
+createMountpoint("d:\\snapshot\\countly\\plugins-ext", "d:\\deploy\\countly\\v16.02\\plugins-ext");
 
-console.log(insideMountpoint("d:\\thebox"));
-console.log(insideMountpoint("d:\\thebox\\"));
-console.log(insideMountpoint("d:\\thebox\\countly"));
-console.log(insideMountpoint("d:\\thebox\\countly\\"));
-console.log(insideMountpoint("d:\\thebox\\countly\\plugins-ext"));
-console.log(insideMountpoint("d:\\thebox\\countly\\plugins-ext\\"));
-console.log(insideMountpoint("d:\\thebox\\countly\\plugins-ext\\1234"));
+console.log(insideMountpoint("d:\\snapshot"));
+console.log(insideMountpoint("d:\\snapshot\\"));
+console.log(insideMountpoint("d:\\snapshot\\countly"));
+console.log(insideMountpoint("d:\\snapshot\\countly\\"));
+console.log(insideMountpoint("d:\\snapshot\\countly\\plugins-ext"));
+console.log(insideMountpoint("d:\\snapshot\\countly\\plugins-ext\\"));
+console.log(insideMountpoint("d:\\snapshot\\countly\\plugins-ext\\1234"));
 
-console.log(translate("d:\\thebox\\countly\\plugins-ext"));
-console.log(translate("d:\\thebox\\countly\\plugins-ext\\"));
-console.log(translate("d:\\thebox\\countly\\plugins-ext\\1234"));
+console.log(translate("d:\\snapshot\\countly\\plugins-ext"));
+console.log(translate("d:\\snapshot\\countly\\plugins-ext\\"));
+console.log(translate("d:\\snapshot\\countly\\plugins-ext\\1234"));
 
-console.log(translateNth([], 0, "d:\\thebox\\countly\\plugins-ext"));
-console.log(translateNth([], 0, "d:\\thebox\\countly\\plugins-ext\\"));
-console.log(translateNth([], 0, "d:\\thebox\\countly\\plugins-ext\\1234"));
+console.log(translateNth([], 0, "d:\\snapshot\\countly\\plugins-ext"));
+console.log(translateNth([], 0, "d:\\snapshot\\countly\\plugins-ext\\"));
+console.log(translateNth([], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 
-console.log(translateNth(["", "r+"], 0, "d:\\thebox\\countly\\plugins-ext"));
-console.log(translateNth(["", "rw"], 0, "d:\\thebox\\countly\\plugins-ext\\"));
-console.log(translateNth(["", "a+"], 0, "d:\\thebox\\countly\\plugins-ext\\1234"));
+console.log(translateNth(["", "r+"], 0, "d:\\snapshot\\countly\\plugins-ext"));
+console.log(translateNth(["", "rw"], 0, "d:\\snapshot\\countly\\plugins-ext\\"));
+console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 */
 
 // /////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ function projectToNearby (f) {
 }
 
 function findNativeAddon (path) {
-  if (!insideTheBox(path)) throw new Error('UNEXPECTED-10');
+  if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
   var projector = projectToFilesystem(path);
   if (require('fs').existsSync(projector)) return projector;
@@ -463,7 +463,7 @@ var modifyNativeAddonWin32 = (function () {
 
   function error_ENOENT (fileOrDirectory, path) { // eslint-disable-line camelcase
     var error = new Error(
-      fileOrDirectory + ' \'' + stripTheBox(path) + '\' ' +
+      fileOrDirectory + ' \'' + stripSnapshot(path) + '\' ' +
       'was not included into executable at compilation stage. ' +
       'Please recompile adding it as asset or script.'
     );
@@ -500,10 +500,10 @@ var modifyNativeAddonWin32 = (function () {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function openFromTheBox (path_) {
+  function openFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("openFromTheBox", path);
+    // console.log("openFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
     var nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
@@ -519,20 +519,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.openSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.openSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.openSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return openFromTheBox(path);
+    return openFromSnapshot(path);
 
   };
 
   fs.open = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.open.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -541,7 +541,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = openFromTheBox(path);
+      var r = openFromSnapshot(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -557,7 +557,7 @@ var modifyNativeAddonWin32 = (function () {
   // read //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function readFromTheBoxSub (dock, entityContent, buffer, offset, length, position) {
+  function readFromSnapshotSub (dock, entityContent, buffer, offset, length, position) {
 
     var p = position;
     if ((p === null) || (typeof p === 'undefined')) p = dock.position;
@@ -569,7 +569,7 @@ var modifyNativeAddonWin32 = (function () {
 
   }
 
-  function readFromTheBox (fd, buffer, offset, length, position) {
+  function readFromSnapshot (fd, buffer, offset, length, position) {
 
     if (offset < 0) throw new Error('Offset is out of bounds');
     if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return 0;
@@ -579,7 +579,7 @@ var modifyNativeAddonWin32 = (function () {
     var dock = docks[fd];
     var entity = dock.entity;
     var entityContent = entity[STORE_CONTENT];
-    if (entityContent) return readFromTheBoxSub(dock, entityContent, buffer, offset, length, position);
+    if (entityContent) return readFromSnapshotSub(dock, entityContent, buffer, offset, length, position);
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(dock.path);
     throw new Error('UNEXPECTED-15');
@@ -592,7 +592,7 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.readSync.apply(fs, arguments);
     }
 
-    return readFromTheBox(fd, buffer, offset, length, position);
+    return readFromSnapshot(fd, buffer, offset, length, position);
 
   };
 
@@ -604,7 +604,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = readFromTheBox(
+      var r = readFromSnapshot(
         fd, buffer, offset, length, position
       );
       process.nextTick(function () {
@@ -622,7 +622,7 @@ var modifyNativeAddonWin32 = (function () {
   // write /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function writeToTheBox () {
+  function writeToSnapshot () {
 
     throw new Error('Cannot write to packaged file');
 
@@ -634,7 +634,7 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.writeSync.apply(fs, arguments);
     }
 
-    return writeToTheBox();
+    return writeToSnapshot();
 
   };
 
@@ -646,7 +646,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = writeToTheBox();
+      var r = writeToSnapshot();
       process.nextTick(function () {
         callback(null, r, buffer);
       });
@@ -662,7 +662,7 @@ var modifyNativeAddonWin32 = (function () {
   // close /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function closeFromTheBox (fd) {
+  function closeFromSnapshot (fd) {
 
     ancestor.closeSync.call(fs, fd);
     delete docks[fd];
@@ -675,7 +675,7 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.closeSync.apply(fs, arguments);
     }
 
-    return closeFromTheBox(fd);
+    return closeFromSnapshot(fd);
 
   };
 
@@ -687,7 +687,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = closeFromTheBox(fd);
+      var r = closeFromSnapshot(fd);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -713,10 +713,10 @@ var modifyNativeAddonWin32 = (function () {
     }
   }
 
-  function readFileFromTheBox (path_) {
+  function readFileFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("readFileFromTheBox", path);
+    // console.log("readFileFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File', path);
     var entityCode = entity[STORE_CODE];
@@ -725,7 +725,7 @@ var modifyNativeAddonWin32 = (function () {
     // why return empty buffer?
     // otherwise this error will arise:
     // Error: UNEXPECTED-20
-    //     at readFileFromTheBox (e:0)
+    //     at readFileFromSnapshot (e:0)
     //     at Object.fs.readFileSync (e:0)
     //     at Object.Module._extensions..js (module.js:421:20)
     //     at Module.load (module.js:357:32)
@@ -748,7 +748,7 @@ var modifyNativeAddonWin32 = (function () {
       return path;
     }
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.readFileSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -763,7 +763,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var encoding = options.encoding;
     assertEncoding(encoding);
-    var buffer = readFileFromTheBox(path);
+    var buffer = readFileFromSnapshot(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
 
@@ -771,7 +771,7 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.readFile = function (path, options_) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.readFile.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -789,7 +789,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var buffer = readFileFromTheBox(path);
+      var buffer = readFileFromSnapshot(path);
       if (encoding) buffer = buffer.toString(encoding);
       process.nextTick(function () {
         callback(null, buffer);
@@ -813,10 +813,10 @@ var modifyNativeAddonWin32 = (function () {
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function readdirFromTheBox (path_) {
+  function readdirFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("readdirFromTheBox", path);
+    // console.log("readdirFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('Directory', path);
     var entityLinks = entity[STORE_LINKS];
@@ -831,20 +831,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.readdirSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return readdirFromTheBox(path);
+    return readdirFromSnapshot(path);
 
   };
 
   fs.readdir = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.readdir.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -853,7 +853,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = readdirFromTheBox(path);
+      var r = readdirFromSnapshot(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -869,30 +869,30 @@ var modifyNativeAddonWin32 = (function () {
   // realpath //////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function realpathFromTheBox (path_) {
+  function realpathFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("realpathFromTheBox", path);
+    // console.log("realpathFromSnapshot", path);
     return path;
 
   }
 
   fs.realpathSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.realpathSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       // app should not know real file name
     }
 
-    return realpathFromTheBox(path);
+    return realpathFromSnapshot(path);
 
   };
 
   fs.realpath = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.realpath.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -900,7 +900,7 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     var callback = maybeCallback(arguments);
-    var r = realpathFromTheBox(path);
+    var r = realpathFromSnapshot(path);
     process.nextTick(function () {
       callback(null, r);
     });
@@ -947,10 +947,10 @@ var modifyNativeAddonWin32 = (function () {
     return ancestor.statSync.call(fs, path);
   }
 
-  function statFromTheBox (path_) {
+  function statFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("statFromTheBox", path);
+    // console.log("statFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForStat(path);
     var entityStat = entity[STORE_STAT];
@@ -963,20 +963,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.statSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.statSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.statSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return statFromTheBox(path);
+    return statFromSnapshot(path);
 
   };
 
   fs.stat = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.stat.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -985,7 +985,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = statFromTheBox(path);
+      var r = statFromSnapshot(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1003,20 +1003,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.lstatSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.lstatSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.lstatSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return statFromTheBox(path);
+    return statFromSnapshot(path);
 
   };
 
   fs.lstat = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.lstat.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -1025,7 +1025,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = statFromTheBox(path);
+      var r = statFromSnapshot(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1041,7 +1041,7 @@ var modifyNativeAddonWin32 = (function () {
   // fstat /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function fstatFromTheBox (fd) {
+  function fstatFromSnapshot (fd) {
 
     var dock = docks[fd];
     var entity = dock.entity;
@@ -1059,7 +1059,7 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.fstatSync.apply(fs, arguments);
     }
 
-    return fstatFromTheBox(fd);
+    return fstatFromSnapshot(fd);
 
   };
 
@@ -1071,7 +1071,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = fstatFromTheBox(fd);
+      var r = fstatFromSnapshot(fd);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1087,10 +1087,10 @@ var modifyNativeAddonWin32 = (function () {
   // exists ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function existsFromTheBox (path_) {
+  function existsFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("existsFromTheBox", path);
+    // console.log("existsFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return false;
     return true;
@@ -1099,20 +1099,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.existsSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.existsSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.existsSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return existsFromTheBox(path);
+    return existsFromSnapshot(path);
 
   };
 
   fs.exists = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.exists.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -1120,7 +1120,7 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     var callback = maybeCallback(arguments);
-    var r = existsFromTheBox(path);
+    var r = existsFromSnapshot(path);
     process.nextTick(function () {
       callback(r);
     });
@@ -1131,10 +1131,10 @@ var modifyNativeAddonWin32 = (function () {
   // access ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function accessFromTheBox (path_) {
+  function accessFromSnapshot (path_) {
 
     var path = normalizePath(path_);
-    // console.log("accessFromTheBox", path);
+    // console.log("accessFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
     return undefined;
@@ -1143,20 +1143,20 @@ var modifyNativeAddonWin32 = (function () {
 
   fs.accessSync = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.accessSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.accessSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return accessFromTheBox(path);
+    return accessFromSnapshot(path);
 
   };
 
   fs.access = function (path) {
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return ancestor.access.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -1165,7 +1165,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var callback = maybeCallback(arguments);
     try {
-      var r = accessFromTheBox(path);
+      var r = accessFromSnapshot(path);
       process.nextTick(function () {
         callback(null, r);
       });
@@ -1205,7 +1205,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var path = revertMakingLong(long);
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return process.binding('fs').internalModuleStat(long);
     }
     if (insideMountpoint(path)) {
@@ -1233,7 +1233,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var path = revertMakingLong(long);
 
-    if (!insideTheBox(path)) {
+    if (!insideSnapshot(path)) {
       return process.binding('fs').internalModuleReadFile(long);
     }
     if (insideMountpoint(path)) {
@@ -1272,7 +1272,7 @@ var modifyNativeAddonWin32 = (function () {
     } catch (error) {
       if (((error.code === 'ENOENT') ||
            (error.code === 'MODULE_NOT_FOUND')) &&
-          (!insideTheBox(path)) &&
+          (!insideSnapshot(path)) &&
           (!require('path').isAbsolute(path))) {
         if (!error.pkg) {
           error.pkg = true;
@@ -1315,7 +1315,7 @@ var modifyNativeAddonWin32 = (function () {
 
   Module.prototype._compile = function (content, filename_) {
 
-    if (!insideTheBox(filename_)) {
+    if (!insideSnapshot(filename_)) {
       return ancestor._compile.apply(this, arguments);
     }
     if (insideMountpoint(filename_)) {
@@ -1370,7 +1370,7 @@ var modifyNativeAddonWin32 = (function () {
       FLAG_DISABLE_DOT_NODE = false;
     }
 
-    if (!insideTheBox(filename)) {
+    if (!insideSnapshot(filename)) {
       return filename;
     }
     if (insideMountpoint(filename)) {
@@ -1388,7 +1388,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var filename = filename_;
 
-    if (!insideTheBox(filename)) {
+    if (!insideSnapshot(filename)) {
       try {
         return ancestor._node.call(null, module, filename);
       } catch (error) {
@@ -1552,9 +1552,9 @@ var modifyNativeAddonWin32 = (function () {
         }
 
         var entrypoint = extractEntrypoint(args[1]);
-        if (callsNode && insideTheBox(entrypoint)) {
+        if (callsNode && insideSnapshot(entrypoint)) {
           // pm2 calls "node" with __dirname-based
-          // thebox-script. force execPath instead of "node"
+          // snapshot-script. force execPath instead of "node"
           args[0] = process.execPath;
         }
 
@@ -1584,18 +1584,18 @@ var modifyNativeAddonWin32 = (function () {
     ]));
 
     assert(JSON.stringify(rearrange([
-      "/thebox/home/igor/script.js"
+      "/snapshot/home/igor/script.js"
     ])) === JSON.stringify([
       "--entrypoint",
-      "/thebox/home/igor/script.js"
+      "/snapshot/home/igor/script.js"
     ]));
 
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
-      "/thebox/home/igor/script.js"
+      "/snapshot/home/igor/script.js"
     ])) === JSON.stringify([
       "--entrypoint",
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "--runtime",
       "--node-opt-01"
     ]));
@@ -1603,22 +1603,22 @@ var modifyNativeAddonWin32 = (function () {
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
       "--node-opt-02",
-      "/thebox/home/igor/script.js"
+      "/snapshot/home/igor/script.js"
     ])) === JSON.stringify([
       "--entrypoint",
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "--runtime",
       "--node-opt-01",
       "--node-opt-02"
     ]));
 
     assert(JSON.stringify(rearrange([
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "app-opt-01",
       "app-opt-02"
     ])) === JSON.stringify([
       "--entrypoint",
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "app-opt-01",
       "app-opt-02"
     ]));
@@ -1626,12 +1626,12 @@ var modifyNativeAddonWin32 = (function () {
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
       "--node-opt-02",
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "app-opt-01",
       "app-opt-02"
     ])) === JSON.stringify([
       "--entrypoint",
-      "/thebox/home/igor/script.js",
+      "/snapshot/home/igor/script.js",
       "app-opt-01",
       "app-opt-02",
       "--runtime",

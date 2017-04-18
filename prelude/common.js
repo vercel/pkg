@@ -65,46 +65,46 @@ function replaceSlashes (file, slash) {
   return file;
 }
 
-function insertTheBox (file) {
+function injectSnapshot (file) {
   if (/^.:\\/.test(file)) {
     // C:\path\to
-    return file[0] + ':\\thebox' + file.slice(2);
+    return file[0] + ':\\snapshot' + file.slice(2);
   } else
   if (/^\//.test(file)) {
     // /home/user/project
-    return '/thebox' + file;
+    return '/snapshot' + file;
   }
   return file;
 }
 
-exports.theboxify = function (file, slash) {
+exports.snapshotify = function (file, slash) {
   var f = normalizePath(file);
-  return insertTheBox(replaceSlashes(f, slash));
+  return injectSnapshot(replaceSlashes(f, slash));
 };
 
-function insideTheBox (f) {
+function insideSnapshot (f) {
   if (typeof f !== 'string') return false;
   var file = normalizePath(f);
-  return (/^.:\\thebox$/.test(file)) ||
-         (/^.:\\thebox\\/.test(file)) ||
-         (/^\/thebox$/.test(file)) ||
-         (/^\/thebox\//.test(file));
+  return (/^.:\\snapshot$/.test(file)) ||
+         (/^.:\\snapshot\\/.test(file)) ||
+         (/^\/snapshot$/.test(file)) ||
+         (/^\/snapshot\//.test(file));
 }
 
-exports.insideTheBox = insideTheBox;
+exports.insideSnapshot = insideSnapshot;
 
-exports.stripTheBox = function (f) {
+exports.stripSnapshot = function (f) {
   var file = normalizePath(f);
-  if (/^.:\\thebox$/.test(file)) {
+  if (/^.:\\snapshot$/.test(file)) {
     return file[0] + ':\\';
   }
-  if (/^.:\\thebox\\/.test(file)) {
+  if (/^.:\\snapshot\\/.test(file)) {
     return file[0] + ':' + file.slice(9);
   }
-  if (/^\/thebox$/.test(file)) {
+  if (/^\/snapshot$/.test(file)) {
     return '/';
   }
-  if (/^\/thebox\//.test(file)) {
+  if (/^\/snapshot\//.test(file)) {
     return file.slice(7);
   }
   return f; // not inside

@@ -144,23 +144,23 @@ During packaging process `pkg` collects project files and places
 them into executable. At run time the packaged application has
 internal virtual filesystem where all that files reside.
 
-Packaged VFS files have `/thebox/` prefix in their paths (or
-`C:\thebox\` in Windows). If you used `pkg /path/app.js` command line,
-then `__filename` value will be likely `/thebox/path/app.js`
-at run time. `__dirname` will be `/thebox/path` as well. Here is
+Packaged VFS files have `/snapshot/` prefix in their paths (or
+`C:\snapshot\` in Windows). If you used `pkg /path/app.js` command line,
+then `__filename` value will be likely `/snapshot/path/app.js`
+at run time. `__dirname` will be `/snapshot/path` as well. Here is
 the comparison table of path-related values:
 
-value                          | with `node`         | packaged                 | comments
--------------------------------|---------------------|--------------------------|-----------
-__filename                     | /project/app.js     | /thebox/project/app.js   |
-__dirname                      | /project            | /thebox/project          |
-process.cwd()                  | /project            | /deploy                  | suppose the app is called ...
-process.execPath               | /usr/bin/nodejs     | /deploy/app-x64          | `app-x64` and run in `/deploy`
-process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64          |
-process.argv[1]                | /project/app.js     | /deploy/app-x64          |
-process.pkg.entrypoint         | undefined           | /thebox/project/app.js   |
-process.pkg.defaultEntrypoint  | undefined           | /thebox/project/app.js   |
-require.main.filename          | /project/app.js     | /thebox/project/app.js   |
+value                          | with `node`         | packaged                   | comments
+-------------------------------|---------------------|----------------------------|-----------
+__filename                     | /project/app.js     | /snapshot/project/app.js   |
+__dirname                      | /project            | /snapshot/project          |
+process.cwd()                  | /project            | /deploy                    | suppose the app is called ...
+process.execPath               | /usr/bin/nodejs     | /deploy/app-x64            | `app-x64` and run in `/deploy`
+process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64            |
+process.argv[1]                | /project/app.js     | /deploy/app-x64            |
+process.pkg.entrypoint         | undefined           | /snapshot/project/app.js   |
+process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
+require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
 
 Hence in order to make use of the file collected at packaging
 time (pick up own JS plugin or serve an asset) you should take
