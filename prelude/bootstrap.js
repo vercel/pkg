@@ -1541,6 +1541,7 @@ var modifyNativeAddonWin32 = (function () {
 
       var callsNode = (args[0] === 'node');
       var callsExecPath = (args[0] === process.execPath);
+      var callsArgv1 = (args[0] === process.argv[1]);
 
       if (callsNode || callsExecPath) {
 
@@ -1556,6 +1557,11 @@ var modifyNativeAddonWin32 = (function () {
           // snapshot-script. force execPath instead of "node"
           args[0] = process.execPath;
         }
+
+      } else
+      if (callsArgv1) {
+
+        args[0] = process.execPath;
 
       }
 
