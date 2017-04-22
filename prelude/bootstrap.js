@@ -31,7 +31,7 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
 ENTRYPOINT = process.argv[1];
 if (ENTRYPOINT === 'DEFAULT_ENTRYPOINT') {
-  ENTRYPOINT = DEFAULT_ENTRYPOINT;
+  ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
 
 if (!insideSnapshot(ENTRYPOINT)) {
@@ -377,7 +377,6 @@ var modifyNativeAddonWin32 = (function () {
 (function () {
 
   process.pkg = {};
-  process.argv[1] = process.execPath;
   process.versions.pkg = '%PKG_VERSION%';
   process.pkg.mount = createMountpoint;
   process.pkg.entrypoint = ENTRYPOINT;
@@ -1284,7 +1283,7 @@ var modifyNativeAddonWin32 = (function () {
             'into executable and want to \'require\' it from ' +
             'filesystem (likely plugin), specify an absolute ' +
             'path in \'require\' call using process.cwd() or ' +
-            'process.argv[1].';
+            'process.execPath.';
         }
       }
       throw error;
