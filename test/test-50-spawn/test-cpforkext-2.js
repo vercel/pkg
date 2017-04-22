@@ -11,7 +11,7 @@ assert(!process.send);
 
 try {
   child = cp.fork(path.join(
-    path.dirname(process.execPath),
+    process.cwd(),
     'test-cpforkext-child.js'
   ), [ 'argvx', 'argvy' ]);
 } catch (e) {

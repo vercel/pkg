@@ -11,7 +11,7 @@ if (process.send) {
 }
 
 child = spawn(
-  process.execPath, [ process.execPath, 'argvx', 'argvy' ],
+  process.execPath, [ process.argv[1], 'argvx', 'argvy' ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
