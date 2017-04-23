@@ -157,7 +157,7 @@ __dirname                      | /project            | /snapshot/project        
 process.cwd()                  | /project            | /deploy                    | suppose the app is called ...
 process.execPath               | /usr/bin/nodejs     | /deploy/app-x64            | `app-x64` and run in `/deploy`
 process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64            |
-process.argv[1]                | /project/app.js     | /deploy/app-x64            |
+process.argv[1]                | /project/app.js     | /snapshot/project/app.js   |
 process.pkg.entrypoint         | undefined           | /snapshot/project/app.js   |
 process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
 require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
@@ -175,7 +175,7 @@ javascript files only. For assets use
 
 On the other hand, in order to access real file system (pick
 up a user's JS plugin or list user's directory) you should take
-`process.cwd()` or `path.dirname(process.argv[1])`. Why `argv[1]`?
+`process.cwd()` or `path.dirname(process.execPath)`. Why `cwd`?
 Because you will be able to run the project both with `node`
 and in packaged state.
 
