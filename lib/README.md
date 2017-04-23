@@ -77,7 +77,6 @@ recommended to use package.json's `pkg` property.
   }
 ```
 
-
 ### Scripts
 
 `scripts` is a [glob](https://github.com/sindresorhus/globby)
@@ -97,7 +96,7 @@ files and simplifies debugging.
 
 See also
 [Detecting assets in source code](#detecting-assets-in-source-code) and
-[Virtual filesystem](#virtual-filesystem).
+[Snapshot filesystem](#snapshot-filesystem).
 
 ### Options
 
@@ -138,13 +137,14 @@ requirements to compile original Node.js:
 Command line call to packaged app `./app a b` is equivalent
 to `node app.js a b`
 
-## Virtual filesystem
+## Snapshot filesystem
 
 During packaging process `pkg` collects project files and places
-them into executable. At run time the packaged application has
-internal virtual filesystem where all that files reside.
+them into executable. It is called a snapshot. At run time the
+packaged application has access to snapshot filesystem where all
+that files reside.
 
-Packaged VFS files have `/snapshot/` prefix in their paths (or
+Packaged files have `/snapshot/` prefix in their paths (or
 `C:\snapshot\` in Windows). If you used `pkg /path/app.js` command line,
 then `__filename` value will be likely `/snapshot/path/app.js`
 at run time. `__dirname` will be `/snapshot/path` as well. Here is
@@ -162,8 +162,8 @@ process.pkg.entrypoint         | undefined           | /snapshot/project/app.js 
 process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
 require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
 
-Hence in order to make use of the file collected at packaging
-time (pick up own JS plugin or serve an asset) you should take
+Hence, in order to make use of the file collected at packaging
+time (make use of own JS file or serve an asset) you should take
 `__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
 or `require.main.filename` as a base for your path calculations.
 One way is just `require` or `require.resolve` because they use
@@ -175,9 +175,7 @@ javascript files only. For assets use
 
 On the other hand, in order to access real file system (pick
 up a user's JS plugin or list user's directory) you should take
-`process.cwd()` or `path.dirname(process.execPath)`. Why `cwd`?
-Because you will be able to run the project both with `node`
-and in packaged state.
+`process.cwd()` or `path.dirname(process.execPath)`.
 
 ## Detecting assets in source code
 
