@@ -19,10 +19,10 @@ const inspect = (standard === 'stdout')
 
 right = utils.pkg.sync([
   '--target', target,
-  '--output', 'no-output', '12345'
+  '--output', 'no-output', '.'
 ], { stdio: inspect, expect: 2 });
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.indexOf('Error!') >= 0);
 assert(right.indexOf('not exist') >= 0);
-assert(right.indexOf('12345') >= 0);
+assert(right.indexOf('package.json') >= 0);
