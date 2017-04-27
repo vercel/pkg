@@ -24,5 +24,5 @@ right = utils.pkg.sync([
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.indexOf('Error!') >= 0);
-assert(right.indexOf('not exist') >= 0);
+assert(right.indexOf('does not exist') >= 0);
 assert(right.indexOf('12345') >= 0);
