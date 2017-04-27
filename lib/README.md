@@ -10,7 +10,7 @@ Package your Node.js project into an executable
 * Make a demo/evaluation/trial version of your app without sources
 * Instantly make executables for other platforms (cross-compilation)
 * Make some kind of self-extracting archive or installer
-* No need to install Node.js and npm to deploy the packaged application
+* No need to install Node.js and npm to run the packaged application
 * No need to download hundreds of files via `npm install` to deploy
 your application. Deploy it as a single file
 * Put your assets inside the executable to make it even more portable
