@@ -17,7 +17,6 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
-  '--debug',
   '--target', 'node7-x6',
   '--output', 'no-output', 'test-x-index.js'
 ], { stdio: inspect, expect: 2 });
