@@ -1,7 +1,7 @@
 {
   "name": "pkg",
   "version": "3.0.0-beta.33",
-  "description": "",
+  "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "bin": {
     "pkg": "lib-es5/bin.js"
