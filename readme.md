@@ -5,7 +5,7 @@
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
-## Use cases
+## Use Cases
 
 * Make a commercial version of your application without sources
 * Make a demo/evaluation/trial version of your app without sources
@@ -17,18 +17,15 @@ your application. Deploy it as a single file
 * Put your assets inside the executable to make it even more portable
 * Test your app against new Node.js version without installing it
 
-## Install
+## Usage
 
 ```
 npm install -g pkg
 ```
 
-## CLI usage
+After installing it, run `pkg --help` without arguments to see list of options.
 
-Run `pkg --help` without arguments to see list of options.
-
-The entrypoint of your project is a mandatory CLI argument.
-It may be:
+The entrypoint of your project is a mandatory CLI argument. It may be:
 
 * Path to entry file. Suppose it is `/path/app.js`, then
 packaged app will work the same way as `node /path/app.js`
