@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
 
-Package your Node.js project into an executable
+This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
 ## Use cases
 
