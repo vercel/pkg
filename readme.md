@@ -1,6 +1,7 @@
 # pkg
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
+[![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
 
 Package your Node.js project into an executable
 
