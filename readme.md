@@ -1,4 +1,4 @@
-# pkg
+![](https://raw.githubusercontent.com/zeit/art/39a6d9ad77606e2589ddd620b23e093d3b3c6195/pkg/repo-banner.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
