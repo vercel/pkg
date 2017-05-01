@@ -32,7 +32,7 @@
     "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
-    "pkg-fetch": "1.9.2",
+    "pkg-fetch": "1.9.3",
     "progress": "1.1.8",
     "resolve": "igorklopov/node-resolve#b443b80eaee4597a80d3c03cda15e539963001d4",
     "simple-bufferstream": "1.0.0"
