@@ -60,8 +60,7 @@
     "extends": "klopov",
     "parser": "babel-eslint",
     "rules": {
-      "max-depth": "off",
-      "padded-blocks": "off"
+      "max-depth": "off"
     }
   },
   "greenkeeper": {

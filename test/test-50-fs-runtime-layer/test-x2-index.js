@@ -22,141 +22,111 @@ function firstUpperCase (s) {
 fs.readFile(path.join(__dirname, theRequireContentA), function (e01, v01) {
 fs.readFile(__dirname + path.sep + theRequireContentB, function (e02, v02) {
 fs.readFile(__dirname + '/' + theRequireContentB, function (e03, v03) {
-
 fs.readFile(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e04, v04) {
 fs.readFile(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e05, v05) {
 fs.readFile(firstLowerCase(__dirname + '/' + theRequireContentB), function (e06, v06) {
-
 fs.readFile(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e07, v07) {
 fs.readFile(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e08, v08) {
 fs.readFile(firstUpperCase(__dirname + '/' + theRequireContentB), function (e09, v09) {
-
 //
 
 fs.readFile(path.join(__dirname, theRequireContentA + '-no-such'), function (e10, v10) {
 fs.readFile(__dirname + path.sep + theRequireContentB + '-no-such', function (e11, v11) {
 fs.readFile(__dirname + '/' + theRequireContentB + '-no-such', function (e12, v12) {
-
 fs.readFile(firstLowerCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e13, v13) {
 fs.readFile(firstLowerCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e14, v14) {
 fs.readFile(firstLowerCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e15, v15) {
-
 fs.readFile(firstUpperCase(path.join(__dirname, theRequireContentA + '-no-such')), function (e16, v16) {
 fs.readFile(firstUpperCase(__dirname + path.sep + theRequireContentB + '-no-such'), function (e17, v17) {
 fs.readFile(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), function (e18, v18) {
-
 //
 
 fs.readFile(__dirname, function (e19, v19) {
 fs.readFile(path.dirname(__dirname), function (e20, v20) {
 fs.readFile(path.dirname(path.dirname(__dirname)), function (e21, v21) {
-
 fs.readFile(firstLowerCase(__dirname), function (e22, v22) {
 fs.readFile(firstLowerCase(path.dirname(__dirname)), function (e23, v23) {
 fs.readFile(firstLowerCase(path.dirname(path.dirname(__dirname))), function (e24, v24) {
-
 fs.readFile(firstUpperCase(__dirname), function (e25, v25) {
 fs.readFile(firstUpperCase(path.dirname(__dirname)), function (e26, v26) {
 fs.readFile(firstUpperCase(path.dirname(path.dirname(__dirname))), function (e27, v27) {
-
 //
 
 fs.open(path.join(__dirname, theRequireContentA), 'r', function (e28, v28) {
 fs.open(__dirname + path.sep + theRequireContentB, 'r', function (e29, v29) {
 fs.open(__dirname + '/' + theRequireContentB, 'r', function (e30, v30) {
-
 fs.open(firstLowerCase(path.join(__dirname, theRequireContentA)), 'r', function (e31, v31) {
 fs.open(firstLowerCase(__dirname + path.sep + theRequireContentB), 'r', function (e32, v32) {
 fs.open(firstLowerCase(__dirname + '/' + theRequireContentB), 'r', function (e33, v33) {
-
 fs.open(firstUpperCase(path.join(__dirname, theRequireContentA)), 'r', function (e34, v34) {
 fs.open(firstUpperCase(__dirname + path.sep + theRequireContentB), 'r', function (e35, v35) {
 fs.open(firstUpperCase(__dirname + '/' + theRequireContentB), 'r', function (e36, v36) {
-
 //
 
 fs.open(path.join(__dirname, theRequireContentA + '-no-such'), 'r', function (e37, v37) {
 fs.open(__dirname + path.sep + theRequireContentB + '-no-such', 'r', function (e38, v38) {
 fs.open(__dirname + '/' + theRequireContentB + '-no-such', 'r', function (e39, v39) {
-
 fs.open(firstLowerCase(path.join(__dirname, theRequireContentA + '-no-such')), 'r', function (e40, v40) {
 fs.open(firstLowerCase(__dirname + path.sep + theRequireContentB + '-no-such'), 'r', function (e41, v41) {
 fs.open(firstLowerCase(__dirname + '/' + theRequireContentB + '-no-such'), 'r', function (e42, v42) {
-
 fs.open(firstUpperCase(path.join(__dirname, theRequireContentA + '-no-such')), 'r', function (e43, v43) {
 fs.open(firstUpperCase(__dirname + path.sep + theRequireContentB + '-no-such'), 'r', function (e44, v44) {
 fs.open(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), 'r', function (e45, v45) {
-
 //
 
 fs.open(__dirname, 'r', function (e46, v46) {
 fs.open(path.dirname(__dirname), 'r', function (e47, v47) {
 fs.open(path.dirname(path.dirname(__dirname)), 'r', function (e48, v48) {
-
 fs.open(firstLowerCase(__dirname), 'r', function (e49, v49) {
 fs.open(firstLowerCase(path.dirname(__dirname)), 'r', function (e50, v50) {
 fs.open(firstLowerCase(path.dirname(path.dirname(__dirname))), 'r', function (e51, v51) {
-
 fs.open(firstUpperCase(__dirname), 'r', function (e52, v52) {
 fs.open(firstUpperCase(path.dirname(__dirname)), 'r', function (e53, v53) {
 fs.open(firstUpperCase(path.dirname(path.dirname(__dirname))), 'r', function (e54, v54) {
-
 //
 
 fs.readdir(__dirname, function (e55, v55) {
 fs.readdir(path.dirname(__dirname), function (e56, v56) {
 fs.readdir(path.dirname(path.dirname(__dirname)), function (e57, v57) {
-
 fs.readdir(firstLowerCase(__dirname), function (e58, v58) {
 fs.readdir(firstLowerCase(path.dirname(__dirname)), function (e59, v59) {
 fs.readdir(firstLowerCase(path.dirname(path.dirname(__dirname))), function (e60, v60) {
-
 fs.readdir(firstUpperCase(__dirname), function (e61, v61) {
 fs.readdir(firstUpperCase(path.dirname(__dirname)), function (e62, v62) {
 fs.readdir(firstUpperCase(path.dirname(path.dirname(__dirname))), function (e63, v63) {
-
 //
 
 fs.readdir(__dirname + '-no-such', function (e64, v64) {
 fs.readdir(path.dirname(__dirname) + '-no-such', function (e65, v65) {
 fs.readdir(path.dirname(path.dirname(__dirname)) + '-no-such', function (e66, v66) {
-
 fs.readdir(firstLowerCase(__dirname + '-no-such'), function (e67, v67) {
 fs.readdir(firstLowerCase(path.dirname(__dirname) + '-no-such'), function (e68, v68) {
 fs.readdir(firstLowerCase(path.dirname(path.dirname(__dirname)) + '-no-such'), function (e69, v69) {
-
 fs.readdir(firstUpperCase(__dirname + '-no-such'), function (e70, v70) {
 fs.readdir(firstUpperCase(path.dirname(__dirname) + '-no-such'), function (e71, v71) {
 fs.readdir(firstUpperCase(path.dirname(path.dirname(__dirname)) + '-no-such'), function (e72, v72) {
-
 //
 
 fs.readdir(path.join(__dirname, theRequireContentA), function (e73, v73) {
 fs.readdir(__dirname + path.sep + theRequireContentB, function (e74, v74) {
 fs.readdir(__dirname + '/' + theRequireContentB, function (e75, v75) {
-
 fs.readdir(firstLowerCase(path.join(__dirname, theRequireContentA)), function (e76, v76) {
 fs.readdir(firstLowerCase(__dirname + path.sep + theRequireContentB), function (e77, v77) {
 fs.readdir(firstLowerCase(__dirname + '/' + theRequireContentB), function (e78, v78) {
-
 fs.readdir(firstUpperCase(path.join(__dirname, theRequireContentA)), function (e79, v79) {
 fs.readdir(firstUpperCase(__dirname + path.sep + theRequireContentB), function (e80, v80) {
 fs.readdir(firstUpperCase(__dirname + '/' + theRequireContentB), function (e81, v81) {
-
 //
 
 fs.fstat(v28, function (e136, v136) {
 fs.fstat(v29, function (e137, v137) {
 fs.fstat(v30, function (e138, v138) {
-
 fs.fstat(v46, function (e139, v139) {
 fs.fstat(v47, function (e140, v140) {
 fs.fstat(v48, function (e141, v141) {
-
 fs.fstat(v49, function (e142, v142) {
 fs.fstat(v50, function (e143, v143) {
 fs.fstat(v51, function (e144, v144) {
-
   console.log([
 
     '******************************************************',
@@ -314,7 +284,6 @@ fs.fstat(v51, function (e144, v144) {
     '******************************************************'
 
   ].join('\n'));
-
 }); }); }); }); }); }); }); }); });
 }); }); }); }); }); }); }); }); });
 }); }); }); }); }); }); }); }); });

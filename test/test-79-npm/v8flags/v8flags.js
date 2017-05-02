@@ -21,7 +21,6 @@ cp.execFile = function () {
 };
 
 setTimeout(function () {
-
   var v8flags = require('v8flags');
   v8flags(function (error, results) {
     if (error) return;
@@ -30,5 +29,4 @@ setTimeout(function () {
     if (!execFileCalled) return;
     console.log('ok');
   });
-
 }, 500);

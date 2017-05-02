@@ -70,7 +70,6 @@ function update (p, n) {
 }
 
 if (!UPM) {
-
   console.log('Cleaning cache...');
 
   if (windows) {
@@ -87,11 +86,9 @@ if (!UPM) {
   }
 
   utils.mkdirp.sync('z-isolator');
-
 }
 
 (function () {
-
   console.log('Getting stamp...');
 
   const input = path.resolve('stamp.js');
@@ -112,7 +109,6 @@ if (!UPM) {
   console.log('Stamp is ' + JSON.stringify(stamp));
   console.log('Waiting...');
   utils.pause(5);
-
 }());
 
 const dickies = globby.sync([
@@ -124,7 +120,6 @@ const dickies = globby.sync([
 ]);
 
 dickies.some(function (dicky) {
-
   const input = path.resolve(dicky);
 
   const foldy = path.dirname(input);
@@ -168,17 +163,14 @@ dickies.some(function (dicky) {
   }
 
   if (!allow) {
-
     update(wordy, 'nop');
     console.log(wordy + ' not allowed here!');
     return;
-
   }
 
   let version = '';
 
   if (!UPM) {
-
     const build = meta.build;
     const earth = packy.replace('-shy', '');
     const moons = meta.moons || [];
@@ -215,7 +207,6 @@ dickies.some(function (dicky) {
       assert.equal(packyWildcard.split('.').length, 3);
       assert.equal(packyVersion, packyWildcard);
     }
-
   }
 
   let right;
@@ -242,7 +233,6 @@ dickies.some(function (dicky) {
   if (right !== 'ok') {
     update(wordy, 'error' + version);
   } else {
-
     console.log('Compiling ' + wordy + '...');
 
     let config = path.join(foldy, packy + '.config.js');
@@ -289,7 +279,6 @@ dickies.some(function (dicky) {
     } else {
       update(wordy, 'ok' + version);
     }
-
   }
 
   const rubbishes = globby.sync(
@@ -301,12 +290,9 @@ dickies.some(function (dicky) {
   });
 
   if (!UPM) {
-
     console.log('Cleanup...');
     utils.vacuum.sync(path.join(foldy, 'node_modules'));
-
   }
-
 });
 
 console.log(

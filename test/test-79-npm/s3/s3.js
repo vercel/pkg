@@ -16,11 +16,9 @@ var ee = client.listObjects({
 });
 
 ee.on('error', function (error) {
-
   if (error) {
     if (error.message.indexOf('does not exist') >= 0) {
       console.log('ok');
     }
   }
-
 });

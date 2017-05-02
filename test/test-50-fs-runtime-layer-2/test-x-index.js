@@ -31,7 +31,6 @@ function dumpError (error) {
 test01();
 
 function test01 () {
-
   console.log('<<< test01 >>>');
 
   fs.stat(theFile, function (error, stats) {
@@ -56,11 +55,9 @@ function test01 () {
       });
     });
   });
-
 }
 
 function test02 () {
-
   console.log('<<< test02 >>>');
 
   const stats = fs.statSync(theFile);
@@ -75,11 +72,9 @@ function test02 () {
   console.log('data', data);
   fs.closeSync(fd);
   test03();
-
 }
 
 function test03 () {
-
   console.log('<<< test03 >>>');
 
   const stats = fs.statSync(theFile);
@@ -120,11 +115,9 @@ function test03 () {
   console.log('bytesRead_o', bytesRead, 'buffer', buffer[0], buffer[1]);
   fs.closeSync(fd);
   test04();
-
 }
 
 function test04 () {
-
   const stats = fs.statSync(theDirectory);
   console.log(stats.size);
   const fd = fs.openSync(theDirectory, 'r');
@@ -142,11 +135,9 @@ function test04 () {
   console.log(bytesRead, buffer[0], buffer[1]);
   fs.closeSync(fd);
   test05();
-
 }
 
 function test05 () {
-
   const fd = 'incorrect fd as string';
   const buffer = new Buffer([ 12, 34, 56, 78 ]);
   let bytesRead;
@@ -156,11 +147,9 @@ function test05 () {
   console.log(bytesRead, buffer[0], buffer[1]);
   try { fs.closeSync(fd); } catch (error) { dumpError(error); }
   test06();
-
 }
 
 function test06 () {
-
   const fd = 7890;
   const buffer = new Buffer([ 12, 34, 56, 78 ]);
   let bytesRead;
@@ -170,11 +159,9 @@ function test06 () {
   console.log(bytesRead, buffer[0], buffer[1]);
   try { fs.closeSync(fd); console.log('EBADF: bad file descriptor'); } catch (error) { dumpError(error); }
   test07();
-
 }
 
 function test07 () {
-
   const rs = fs.createReadStream(theFile);
 
   rs.on('open', function () {
@@ -196,5 +183,4 @@ function test07 () {
   rs.on('end', function () {
     console.log('end');
   });
-
 }

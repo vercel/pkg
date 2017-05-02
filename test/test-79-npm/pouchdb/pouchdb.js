@@ -5,7 +5,6 @@ var db = new PouchDB('dbname');
 var rimraf = require('../../../node_modules/rimraf');
 
 (function (cb) {
-
   db.put({
     _id: 'dave@gmail.com',
     name: 'David',
@@ -20,12 +19,9 @@ var rimraf = require('../../../node_modules/rimraf');
       }
     });
   });
-
 }(function (error) {
-
   if (error) throw error;
   db.close(function () {
     rimraf.sync('dbname');
   });
-
 }));

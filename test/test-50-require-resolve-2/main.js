@@ -71,38 +71,32 @@ right = [
   'require-content-K',
   'require-content-L'
 ].reduce(function (x, y) {
-
   const r = x.replace(
     new RegExp(y + '-run-time', 'g'),
                y + '-compile-time');
   // assert(r !== x);
   return r;
-
 }, right);
 
 right3 = [
   'require-code-J'
 ].reduce(function (x, y) {
-
   const r = x.replace(
     new RegExp(y + '-run-time', 'g'),
                y + '-compile-time');
   // assert(r !== x);
   return r;
-
 }, right3);
 
 right3 = [
   'require-content-K',
   'require-content-L'
 ].reduce(function (x, y) {
-
   const r = x.replace(
     new RegExp(y + '-run-time-3', 'g'),
                y + '-compile-time');
   // assert(r !== x);
   return r;
-
 }, right3);
 
 if (left.length === 0) {

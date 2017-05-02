@@ -164,11 +164,9 @@ function findNativeAddon (path) {
 // /////////////////////////////////////////////////////////////////
 
 var modifyNativeAddonWin32 = (function () {
-
   var fs = require('fs');
 
   return function (addon) {
-
     var modifiedAddon;
 
     var newExeName = require('path').basename(process.execPath);
@@ -299,7 +297,6 @@ var modifyNativeAddonWin32 = (function () {
     }());
 
     imps.some(function (imp) {
-
       var firstThunkRaw = imp.firstThunkRaw;
 
       var thunks = [];
@@ -335,7 +332,6 @@ var modifyNativeAddonWin32 = (function () {
       }());
 
       imp.thunks = thunks;
-
     });
 
     var impNode = imps.filter(function (imp) {
@@ -365,9 +361,7 @@ var modifyNativeAddonWin32 = (function () {
     impNode.name.writeBack();
     fs.writeFileSync(modifiedAddon, f);
     return modifiedAddon;
-
   };
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -375,13 +369,11 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   process.pkg = {};
   process.versions.pkg = '%PKG_VERSION%';
   process.pkg.mount = createMountpoint;
   process.pkg.entrypoint = ENTRYPOINT;
   process.pkg.defaultEntrypoint = DEFAULT_ENTRYPOINT;
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -389,7 +381,6 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   var path = require('path');
 
   process.pkg.path = {};
@@ -398,7 +389,6 @@ var modifyNativeAddonWin32 = (function () {
     args.unshift(path.dirname(ENTRYPOINT));
     return path.resolve.apply(path, args); // eslint-disable-line prefer-spread
   };
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -406,7 +396,6 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   var fs = require('fs');
   var ancestor = {};
   ancestor.openSync =         fs.openSync;
@@ -500,7 +489,6 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function openFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("openFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
@@ -513,11 +501,9 @@ var modifyNativeAddonWin32 = (function () {
     dock.entity = entity;
     dock.position = 0;
     return fd;
-
   }
 
   fs.openSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.openSync.apply(fs, arguments);
     }
@@ -526,11 +512,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return openFromSnapshot(path);
-
   };
 
   fs.open = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.open.apply(fs, arguments);
     }
@@ -549,7 +533,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -557,7 +540,6 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function readFromSnapshotSub (dock, entityContent, buffer, offset, length, position) {
-
     var p = position;
     if ((p === null) || (typeof p === 'undefined')) p = dock.position;
     if (p >= entityContent.length) return 0;
@@ -565,11 +547,9 @@ var modifyNativeAddonWin32 = (function () {
     var result = entityContent.copy(buffer, offset, p, end);
     dock.position = end;
     return result;
-
   }
 
   function readFromSnapshot (fd, buffer, offset, length, position) {
-
     if (offset < 0) throw new Error('Offset is out of bounds');
     if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return 0;
     if (offset >= buffer.length) throw new Error('Offset is out of bounds');
@@ -582,21 +562,17 @@ var modifyNativeAddonWin32 = (function () {
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(dock.path);
     throw new Error('UNEXPECTED-15');
-
   }
 
   fs.readSync = function (fd, buffer, offset, length, position) {
-
     if (!docks[fd]) {
       return ancestor.readSync.apply(fs, arguments);
     }
 
     return readFromSnapshot(fd, buffer, offset, length, position);
-
   };
 
   fs.read = function (fd, buffer, offset, length, position) {
-
     if (!docks[fd]) {
       return ancestor.read.apply(fs, arguments);
     }
@@ -614,7 +590,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -622,23 +597,18 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function writeToSnapshot () {
-
     throw new Error('Cannot write to packaged file');
-
   }
 
   fs.writeSync = function (fd) {
-
     if (!docks[fd]) {
       return ancestor.writeSync.apply(fs, arguments);
     }
 
     return writeToSnapshot();
-
   };
 
   fs.write = function (fd, buffer) {
-
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
@@ -654,7 +624,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -662,24 +631,19 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function closeFromSnapshot (fd) {
-
     ancestor.closeSync.call(fs, fd);
     delete docks[fd];
-
   }
 
   fs.closeSync = function (fd) {
-
     if (!docks[fd]) {
       return ancestor.closeSync.apply(fs, arguments);
     }
 
     return closeFromSnapshot(fd);
-
   };
 
   fs.close = function (fd) {
-
     if (!docks[fd]) {
       return ancestor.close.apply(fs, arguments);
     }
@@ -695,7 +659,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -713,7 +676,6 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   function readFileFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("readFileFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
@@ -738,11 +700,9 @@ var modifyNativeAddonWin32 = (function () {
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(path);
     throw new Error('UNEXPECTED-20');
-
   }
 
   fs.readFileSync = function (path, options_) {
-
     if (path === 'dirty-hack-for-testing-purposes') {
       return path;
     }
@@ -765,11 +725,9 @@ var modifyNativeAddonWin32 = (function () {
     var buffer = readFileFromSnapshot(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
-
   };
 
   fs.readFile = function (path, options_) {
-
     if (!insideSnapshot(path)) {
       return ancestor.readFile.apply(fs, arguments);
     }
@@ -798,7 +756,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -813,7 +770,6 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function readdirFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("readdirFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
@@ -825,11 +781,9 @@ var modifyNativeAddonWin32 = (function () {
     var entityContent = entity[STORE_CONTENT];
     if (entityContent) throw error_ENOTDIR(path);
     throw new Error('UNEXPECTED-25');
-
   }
 
   fs.readdirSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
@@ -838,11 +792,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return readdirFromSnapshot(path);
-
   };
 
   fs.readdir = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.readdir.apply(fs, arguments);
     }
@@ -861,7 +813,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -869,15 +820,12 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function realpathFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("realpathFromSnapshot", path);
     return path;
-
   }
 
   fs.realpathSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.realpathSync.apply(fs, arguments);
     }
@@ -886,11 +834,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return realpathFromSnapshot(path);
-
   };
 
   fs.realpath = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.realpath.apply(fs, arguments);
     }
@@ -903,7 +849,6 @@ var modifyNativeAddonWin32 = (function () {
     process.nextTick(function () {
       callback(null, r);
     });
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -915,7 +860,6 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   function restoreStat (restore) {
-
     assertNumber(restore.atime);
     restore.atime = new Date(restore.atime);
     assertNumber(restore.mtime);
@@ -937,7 +881,6 @@ var modifyNativeAddonWin32 = (function () {
     restore.isFIFO = function () {
       return false;
     };
-
   }
 
   function findNativeAddonForStat (path_) {
@@ -947,7 +890,6 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   function statFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("statFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
@@ -957,11 +899,9 @@ var modifyNativeAddonWin32 = (function () {
     var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
     restoreStat(restore);
     return restore;
-
   }
 
   fs.statSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.statSync.apply(fs, arguments);
     }
@@ -970,11 +910,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return statFromSnapshot(path);
-
   };
 
   fs.stat = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.stat.apply(fs, arguments);
     }
@@ -993,7 +931,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1001,7 +938,6 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   fs.lstatSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.lstatSync.apply(fs, arguments);
     }
@@ -1010,11 +946,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return statFromSnapshot(path);
-
   };
 
   fs.lstat = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.lstat.apply(fs, arguments);
     }
@@ -1033,7 +967,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1041,7 +974,6 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function fstatFromSnapshot (fd) {
-
     var dock = docks[fd];
     var entity = dock.entity;
     var entityStat = entity[STORE_STAT];
@@ -1049,21 +981,17 @@ var modifyNativeAddonWin32 = (function () {
     var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
     restoreStat(restore);
     return restore;
-
   }
 
   fs.fstatSync = function (fd) {
-
     if (!docks[fd]) {
       return ancestor.fstatSync.apply(fs, arguments);
     }
 
     return fstatFromSnapshot(fd);
-
   };
 
   fs.fstat = function (fd) {
-
     if (!docks[fd]) {
       return ancestor.fstat.apply(fs, arguments);
     }
@@ -1079,7 +1007,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1087,17 +1014,14 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function existsFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("existsFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return false;
     return true;
-
   }
 
   fs.existsSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.existsSync.apply(fs, arguments);
     }
@@ -1106,11 +1030,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return existsFromSnapshot(path);
-
   };
 
   fs.exists = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.exists.apply(fs, arguments);
     }
@@ -1123,7 +1045,6 @@ var modifyNativeAddonWin32 = (function () {
     process.nextTick(function () {
       callback(r);
     });
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1131,17 +1052,14 @@ var modifyNativeAddonWin32 = (function () {
   // ///////////////////////////////////////////////////////////////
 
   function accessFromSnapshot (path_) {
-
     var path = normalizePath(path_);
     // console.log("accessFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File or directory', path);
     return undefined;
-
   }
 
   fs.accessSync = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.accessSync.apply(fs, arguments);
     }
@@ -1150,11 +1068,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     return accessFromSnapshot(path);
-
   };
 
   fs.access = function (path) {
-
     if (!insideSnapshot(path)) {
       return ancestor.access.apply(fs, arguments);
     }
@@ -1173,7 +1089,6 @@ var modifyNativeAddonWin32 = (function () {
         callback(error);
       });
     }
-
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1196,7 +1111,6 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   fs.internalModuleStat = function (long) {
-
     // from node comments:
     // Used to speed up module loading. Returns 0 if the path refers to
     // a file, 1 when it's a directory or < 0 on error (usually -ENOENT).
@@ -1220,11 +1134,9 @@ var modifyNativeAddonWin32 = (function () {
     if (entityStat.isFileValue) return 0;
     if (entityStat.isDirectoryValue) return 1;
     return -ENOENT;
-
   };
 
   fs.internalModuleReadFile = function (long) {
-
     // from node comments:
     // Used to speed up module loading. Returns the contents of the file as
     // a string or undefined when the file cannot be opened. The speedup
@@ -1246,9 +1158,7 @@ var modifyNativeAddonWin32 = (function () {
     var entityContent = entity[STORE_CONTENT];
     if (!Buffer.isBuffer(entityContent)) return undefined;
     return entityContent.toString();
-
   };
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -1256,7 +1166,6 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   var Module = require('module');
   var ancestor = {};
   ancestor.require =          Module.prototype.require;
@@ -1313,7 +1222,6 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   Module.prototype._compile = function (content, filename_) {
-
     if (!insideSnapshot(filename_)) {
       return ancestor._compile.apply(this, arguments);
     }
@@ -1350,11 +1258,9 @@ var modifyNativeAddonWin32 = (function () {
     }
 
     throw new Error('UNEXPECTED-55');
-
   };
 
   Module._resolveFilename = function (request) {
-
     var filename;
 
     var reqDotNode = (request.slice(-5) === '.node'); // bindings.js: opts.bindings += '.node'
@@ -1380,11 +1286,9 @@ var modifyNativeAddonWin32 = (function () {
     if (found) filename = found;
 
     return filename;
-
   };
 
   Module._extensions['.node'] = function (module, filename_) {
-
     var filename = filename_;
 
     if (!insideSnapshot(filename)) {
@@ -1410,14 +1314,12 @@ var modifyNativeAddonWin32 = (function () {
       filename = modifyNativeAddonWin32(filename);
       return ancestor._node.call(null, module, filename);
     }
-
   };
 
   Module.runMain = function () {
     Module._load(ENTRYPOINT, null, true);
     process._tickCallback();
   };
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -1425,7 +1327,6 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   var cluster = require('cluster');
   var ancestor = {};
   ancestor.fork = cluster.fork;
@@ -1440,7 +1341,6 @@ var modifyNativeAddonWin32 = (function () {
       }
     };
   }
-
 }());
 
 // /////////////////////////////////////////////////////////////////
@@ -1448,7 +1348,6 @@ var modifyNativeAddonWin32 = (function () {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-
   var childProcess = require('child_process');
   var ancestor = {};
   ancestor.fork = childProcess.fork;
@@ -1533,18 +1432,15 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   childProcess.spawn = function () {
-
     var args = cloneArgs(arguments);
 
     if ((args[0] && args[1] &&
          args[1].unshift && args[2])) {
-
       var callsNode = (args[0] === 'node');
       var callsExecPath = (args[0] === process.execPath);
       var callsArgv1 = (args[0] === process.argv[1]);
 
       if (callsNode || callsExecPath) {
-
         if (FLAG_FORK_WAS_CALLED) {
           args[1] = rearrangeFork(args[1]);
         } else {
@@ -1557,20 +1453,14 @@ var modifyNativeAddonWin32 = (function () {
           // snapshot-script. force execPath instead of "node"
           args[0] = process.execPath;
         }
-
       } else
       if (callsArgv1) {
-
         args[0] = process.execPath;
-
       }
-
     }
 
     return ancestor.spawn.apply(childProcess, args);
-
   };
-
 }());
 
 // /////////////////////////////////////////////////////////////////

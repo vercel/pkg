@@ -5,7 +5,6 @@ var db = new Levelup('dbname');
 var rimraf = require('../../../node_modules/rimraf');
 
 (function (cb) {
-
   db.open(function (error1) {
     if (error1) return cb(error1);
 
@@ -24,14 +23,10 @@ var rimraf = require('../../../node_modules/rimraf');
         }
       });
     });
-
   });
-
 }(function (error) {
-
   if (error) throw error;
   db.close(function () {
     rimraf.sync('dbname');
   });
-
 }));

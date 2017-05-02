@@ -9,7 +9,6 @@ var theFile = path.join(__dirname, 'test-z-asset.css');
 test01();
 
 function test01 () {
-
   fs.open(theFile, 'w+', function (error, fd) {
     console.log(error === null);
     var buffer = new Buffer('FOO');
@@ -27,11 +26,9 @@ function test01 () {
       });
     });
   });
-
 }
 
 function test02 () {
-
   var fd = fs.openSync(theFile, 'w+');
   var buffer = new Buffer('QUX BARABAZ');
   var bytesWritten;
@@ -40,5 +37,4 @@ function test02 () {
   fs.closeSync(fd);
   try { bytesWritten = fs.writeFileSync(theFile, 'GARAQUX'); } catch (error) { console.log(error.message); }
   console.log(bytesWritten);
-
 }

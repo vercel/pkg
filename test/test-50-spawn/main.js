@@ -64,7 +64,6 @@ function stripTraceOpt (lines) {
 }
 
 pairs.some(function (pair) {
-
   const input = pair.input;
   const output = pair.output;
 
@@ -91,5 +90,4 @@ pairs.some(function (pair) {
   assert.equal(left, right);
   utils.vacuum.sync('run-time');
   utils.vacuum.sync(output);
-
 });

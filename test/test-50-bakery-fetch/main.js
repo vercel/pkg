@@ -19,7 +19,6 @@ fetch.need({ nodeRange: target,
   platform: fetch.system.hostPlatform,
   arch: fetch.system.hostArch
 }).then(function (needed) {
-
   right = utils.spawn.sync(
     './' + path.basename(needed),
     [ '-e', 'if (global.gc) console.log("ok");',
@@ -28,7 +27,6 @@ fetch.need({ nodeRange: target,
   );
 
   assert.equal(right, 'ok\n');
-
 }).catch(function (error) {
   console.error(`> ${error.message}`);
   process.exit(2);

@@ -49,10 +49,8 @@ module.exports.exec = function () {
 };
 
 module.exports.exec.sync = function (command, opts) {
-
   const child = execSync(command, opts);
   return (child || '').toString();
-
 };
 
 module.exports.spawn = function () {
@@ -60,7 +58,6 @@ module.exports.spawn = function () {
 };
 
 module.exports.spawn.sync = function (command, args, opts) {
-
   if (!opts) opts = {};
   opts = Object.assign({}, opts); // change own copy
 
@@ -115,7 +112,6 @@ module.exports.spawn.sync = function (command, args, opts) {
   } else {
     return '';
   }
-
 };
 
 module.exports.pkg = function () {

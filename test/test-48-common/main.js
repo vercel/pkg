@@ -8,7 +8,6 @@ const assert = require('assert');
 const common = require('../../prelude/common.js');
 
 if (process.platform === 'win32') {
-
   assert.equal('c:',                     common.normalizePath('c:'));
   assert.equal('C:\\',                   common.normalizePath('c:\\'));
   assert.equal('C:\\',                   common.normalizePath('c:\\\\'));
@@ -46,9 +45,7 @@ if (process.platform === 'win32') {
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo\\\\'));
   assert.equal('C:\\snapshot\\foo\\bar', common.snapshotify('c:\\foo\\\\bar'));
   assert.equal('C:\\snapshot\\foo\\bar', common.snapshotify('c:\\foo\\\\bar\\\\\\'));
-
 } else {
-
   assert.equal('/',                 common.normalizePath('/'));
   assert.equal('/',                 common.normalizePath('//'));
   assert.equal('/snapshot',         common.normalizePath('/snapshot'));
@@ -85,5 +82,4 @@ if (process.platform === 'win32') {
   assert.equal('/snapshot/foo',     common.snapshotify('/foo//'));
   assert.equal('/snapshot/foo/bar', common.snapshotify('/foo//bar'));
   assert.equal('/snapshot/foo/bar', common.snapshotify('/foo//bar///'));
-
 }
