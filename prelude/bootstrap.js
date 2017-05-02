@@ -353,8 +353,7 @@ var modifyNativeAddonWin32 = (function () {
 
     var placeSection = impNode.name.section;
     var place = placeSection.rawAddress + placeSection.virtualSize;
-    var written = writeString(place, newExeName);
-    placeSection.virtualSize += written;
+    placeSection.virtualSize += writeString(place, newExeName);
     placeSection.writeBack();
     impNode.name.posRaw = place;
     impNode.name.raw2rva();
