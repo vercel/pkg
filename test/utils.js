@@ -145,8 +145,7 @@ module.exports.filesBefore = function (n) {
   for (const ni of n) {
     module.exports.vacuum.sync(ni);
   }
-  const b = globby.sync('**/*', { nodir: true }).sort();
-  return b;
+  return globby.sync('**/*', { nodir: true }).sort();
 };
 
 module.exports.filesAfter = function (b, n) {
