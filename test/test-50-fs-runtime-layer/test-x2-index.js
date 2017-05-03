@@ -30,6 +30,17 @@ fs.readFile(firstUpperCase(__dirname + path.sep + theRequireContentB), function 
 fs.readFile(firstUpperCase(__dirname + '/' + theRequireContentB), function (e09, v09) {
 //
 
+fs.readFile(path.join(__dirname, theRequireContentA), { encoding: 'utf8' }, function (e01a, v01a) {
+fs.readFile(__dirname + path.sep + theRequireContentB, { encoding: 'utf8' }, function (e02a, v02a) {
+fs.readFile(__dirname + '/' + theRequireContentB, { encoding: 'utf8' }, function (e03a, v03a) {
+fs.readFile(firstLowerCase(path.join(__dirname, theRequireContentA)), { encoding: 'utf8' }, function (e04a, v04a) {
+fs.readFile(firstLowerCase(__dirname + path.sep + theRequireContentB), { encoding: 'utf8' }, function (e05a, v05a) {
+fs.readFile(firstLowerCase(__dirname + '/' + theRequireContentB), { encoding: 'utf8' }, function (e06a, v06a) {
+fs.readFile(firstUpperCase(path.join(__dirname, theRequireContentA)), { encoding: 'utf8' }, function (e07a, v07a) {
+fs.readFile(firstUpperCase(__dirname + path.sep + theRequireContentB), { encoding: 'utf8' }, function (e08a, v08a) {
+fs.readFile(firstUpperCase(__dirname + '/' + theRequireContentB), { encoding: 'utf8' }, function (e09a, v09a) {
+//
+
 fs.readFile(path.join(__dirname, theRequireContentA + '-no-such'), function (e10, v10) {
 fs.readFile(__dirname + path.sep + theRequireContentB + '-no-such', function (e11, v11) {
 fs.readFile(__dirname + '/' + theRequireContentB + '-no-such', function (e12, v12) {
@@ -143,6 +154,21 @@ fs.fstat(v51, function (e144, v144) {
     e07 === null, v07.length,
     e08 === null, v08.length,
     e09 === null, v09.length,
+
+    '******************************************************',
+    '******************************************************',
+    '******************************************************',
+
+    'readFile', assert(e01a === null),
+    e01a === null, v01a.length,
+    e02a === null, v02a.length,
+    e03a === null, v03a.length,
+    e04a === null, v04a.length,
+    e05a === null, v05a.length,
+    e06a === null, v06a.length,
+    e07a === null, v07a.length,
+    e08a === null, v08a.length,
+    e09a === null, v09a.length,
 
     '******************************************************',
     '******************************************************',
@@ -284,6 +310,7 @@ fs.fstat(v51, function (e144, v144) {
     '******************************************************'
 
   ].join('\n'));
+}); }); }); }); }); }); }); }); });
 }); }); }); }); }); }); }); }); });
 }); }); }); }); }); }); }); }); });
 }); }); }); }); }); }); }); }); });

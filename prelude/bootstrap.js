@@ -669,7 +669,9 @@ var modifyNativeAddonWin32 = (function () {
       return { encoding: null, flag: 'r' };
     } else if (typeof options === 'string') {
       return { encoding: options, flag: 'r' };
-    } else if (typeof options !== 'object') {
+    } else if (typeof options === 'object') {
+      return options;
+    } else {
       return null;
     }
   }
