@@ -1,17 +1,9 @@
 'use strict';
 
-// only pkg-ed run
-if (!process.pkg) {
-  console.log('ok');
-  return;
-}
-
 var require2 = require('require-uncached');
-
-try {
-  require2('async');
-} catch (error) {
-  if (error.message.indexOf('Pkg') >= 0) {
-    console.log('ok');
-  }
+var depsOfPkg = require('../../../package.json').dependencies;
+var anyDep = Object.keys(depsOfPkg)[0];
+var result = require2(anyDep);
+if (typeof result !== 'undefined') {
+  console.log('ok');
 }
