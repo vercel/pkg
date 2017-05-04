@@ -5,6 +5,9 @@ module.exports = {
     files: [
       // suppress because hundreds of
       // C++ files go inside executable
+    ],
+    assets: [
+      'etc/*.pem'
     ]
   }
 };
