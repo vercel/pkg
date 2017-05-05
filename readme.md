@@ -74,6 +74,8 @@ recommended to use package.json's `pkg` property.
     "assets": "views/**/*"
   }
 ```
+Just be sure to call `pkg package.json` or `pkg .` to make use
+of `scripts` and `assets` entries.
 
 ### Scripts
 
@@ -190,3 +192,10 @@ Native addons (`.node` files) use is supported, but packaging
 `.node` files inside the executable is not resolved yet. You have
 to deploy native addons used by your project to the same directory
 as the executable.
+
+When a package, that contains a native module, is being installed,
+the native module is compiled against current system-wide node.js
+version. Then, when you compile your project with `pkg`, pay attention
+to `--target` option. You should specify the same node.js version
+as your system-wide node.js to make compiled executable compatible
+with `.node` files.
