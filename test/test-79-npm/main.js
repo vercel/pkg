@@ -85,7 +85,7 @@ if (!UPM) {
     );
   }
 
-  utils.mkdirp.sync('z-isolator');
+  utils.mkdirp.sync('$isolator');
 }
 
 (function () {
@@ -93,7 +93,7 @@ if (!UPM) {
 
   const input = path.resolve('stamp.js');
   const lucky = path.basename(input).slice(0, -3);
-  const output = path.join('z-isolator', lucky + '.exe');
+  const output = path.join('$isolator', lucky + '.exe');
 
   utils.pkg.sync([
     '--target', target,
@@ -134,7 +134,7 @@ dickies.some(function (dicky) {
     wordy = foldyName + '/' + wordy;
   }
 
-  const output = path.join('z-isolator', packy + '.exe');
+  const output = path.join('$isolator', packy + '.exe');
 
   console.log();
   console.log('*********************************************************');
