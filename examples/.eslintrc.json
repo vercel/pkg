@@ -1,0 +1,9 @@
+{
+  "parserOptions": {
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-path-concat": "off",
+    "no-var": "off"
+  }
+}
