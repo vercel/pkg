@@ -681,6 +681,8 @@ var modifyNativeAddonWin32 = (function () {
     // console.log("readFileFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) throw error_ENOENT('File', path);
+    var entityContent = entity[STORE_CONTENT];
+    if (entityContent) return new Buffer(entityContent); // clone to prevent mutating store
     var entityCode = entity[STORE_CODE];
     if (entityCode) return new Buffer('source-code-not-available');
 
@@ -696,8 +698,6 @@ var modifyNativeAddonWin32 = (function () {
     //     at startup (node.js:140:18)
     //     at node.js:1001:3
 
-    var entityContent = entity[STORE_CONTENT];
-    if (entityContent) return new Buffer(entityContent); // clone to prevent mutating store
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) throw error_EISDIR(path);
     throw new Error('UNEXPECTED-20');
