@@ -543,6 +543,7 @@ var modifyNativeAddonWin32 = (function () {
     if ((p === null) || (typeof p === 'undefined')) p = dock.position;
     if (p >= entityContent.length) return 0;
     var end = p + length;
+    if (end >= entityContent.length) end = entityContent.length;
     var result = entityContent.copy(buffer, offset, p, end);
     dock.position = end;
     return result;
