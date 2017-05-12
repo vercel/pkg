@@ -16,7 +16,7 @@ dicts = dicts.filter(function (dict) {
 
 let tests = fs.readdirSync('../test-79-npm');
 tests = tests.filter(function (test) {
-  if (test === 'z-isolator') return false;
+  if (test === '_isolator') return false;
   const full = path.join('../test-79-npm', test);
   return fs.statSync(full).isDirectory();
 });
