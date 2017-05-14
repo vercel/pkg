@@ -84,11 +84,13 @@ exports.snapshotify = function (file, slash) {
 
 function insideSnapshot (f) {
   if (typeof f !== 'string') return false;
-  var file = normalizePath(f);
-  return (/^.:\\snapshot$/.test(file)) ||
-         (/^.:\\snapshot\\/.test(file)) ||
-         (/^\/snapshot$/.test(file)) ||
-         (/^\/snapshot\//.test(file));
+  const slice010 = f.slice(0, 10);
+  if (slice010 === '/snapshot/' ||
+      slice010 === '/snapshot') return true;
+  const slice111 = f.slice(1, 11);
+  if (slice111 === '\\snapshot\\' ||
+      slice111 === '\\snapshot') return true;
+  return false;
 }
 
 exports.insideSnapshot = insideSnapshot;
