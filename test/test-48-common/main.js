@@ -51,7 +51,7 @@ if (process.platform === 'win32') {
   assert.equal('C:\\foo',          common.stripSnapshot('c:\\snapshot\\\\foo'));
   assert.equal('C:\\foo\\bar',     common.stripSnapshot('c:\\snapshot\\\\foo\\\\bar\\\\\\'));
 
-  assert.equal('C:\\snapshot\\',         common.snapshotify('c:\\'));
+  assert.equal('C:\\snapshot',           common.snapshotify('c:\\'));
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo'));
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo\\'));
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo\\\\'));
@@ -76,7 +76,7 @@ if (process.platform === 'win32') {
   assert.equal('/foo',         common.stripSnapshot('/snapshot//foo'));
   assert.equal('/foo/bar',     common.stripSnapshot('/snapshot//foo//bar///'));
 
-  assert.equal('/snapshot/',        common.snapshotify('/'));
+  assert.equal('/snapshot',         common.snapshotify('/'));
   assert.equal('/snapshot/foo',     common.snapshotify('/foo'));
   assert.equal('/snapshot/foo',     common.snapshotify('/foo/'));
   assert.equal('/snapshot/foo',     common.snapshotify('/foo//'));

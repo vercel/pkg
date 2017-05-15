@@ -68,10 +68,12 @@ function replaceSlashes (file, slash) {
 function injectSnapshot (file) {
   if (/^.:\\/.test(file)) {
     // C:\path\to
+    if (file.length === 3) file = file.slice(0, 2); // C:\
     return file[0] + ':\\snapshot' + file.slice(2);
   } else
   if (/^\//.test(file)) {
     // /home/user/project
+    if (file.length === 1) file = ''; // /
     return '/snapshot' + file;
   }
   return file;
