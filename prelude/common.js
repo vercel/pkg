@@ -87,9 +87,9 @@ function insideSnapshot (f) {
   var slice010 = f.slice(0, 10);
   if (slice010 === '/snapshot/' ||
       slice010 === '/snapshot') return true;
-  var slice111 = f.slice(1, 11);
-  if (slice111 === '\\snapshot\\' ||
-      slice111 === '\\snapshot') return true;
+  var slice112 = f.slice(1, 12);
+  if (slice112 === ':\\snapshot\\' ||
+      slice112 === ':\\snapshot') return true;
   return false;
 }
 
