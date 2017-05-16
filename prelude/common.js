@@ -68,12 +68,12 @@ function replaceSlashes (file, slash) {
 function injectSnapshot (file) {
   if (/^.:\\/.test(file)) {
     // C:\path\to
-    if (file.length === 3) file = file.slice(0, 2); // C:\
+    if (file.length === 3) file = file.slice(0, -1); // C:\
     return file[0] + ':\\snapshot' + file.slice(2);
   } else
   if (/^\//.test(file)) {
     // /home/user/project
-    if (file.length === 1) file = ''; // /
+    if (file.length === 1) file = file.slice(0, -1); // /
     return '/snapshot' + file;
   }
   return file;
@@ -84,14 +84,19 @@ exports.snapshotify = function (file, slash) {
   return injectSnapshot(replaceSlashes(f, slash));
 };
 
+var win32 = process.platform === 'win32';
+
 function insideSnapshot (f) {
   if (typeof f !== 'string') return false;
-  var slice010 = f.slice(0, 10);
-  if (slice010 === '/snapshot/' ||
-      slice010 === '/snapshot') return true;
-  var slice112 = f.slice(1, 12);
-  if (slice112 === ':\\snapshot\\' ||
-      slice112 === ':\\snapshot') return true;
+  if (win32) {
+    var slice112 = f.slice(1, 12);
+    if (slice112 === ':\\snapshot\\' ||
+        slice112 === ':\\snapshot') return true;
+  } else {
+    var slice010 = f.slice(0, 10);
+    if (slice010 === '/snapshot/' ||
+        slice010 === '/snapshot') return true;
+  }
   return false;
 }
 

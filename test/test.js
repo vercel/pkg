@@ -29,7 +29,7 @@ files.sort().some(function (file) {
   } catch (error) {
     console.log();
     console.log(`> ${chalk.red('Error!')} ${error.message}`);
-    console.log(`> ${chalk.red('Error!')} ${file} FAILED`);
+    console.log(`> ${chalk.red('Error!')} ${file} FAILED (in ${target})`);
     process.exit(2);
   }
   console.log(file, 'ok');
