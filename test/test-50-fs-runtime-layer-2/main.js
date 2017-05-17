@@ -46,5 +46,12 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(left, right);
+left = left.split('\n');
+right = right.split('\n');
+// right may have less lines, premature exit,
+// less trused, so using left.length here
+for (let i = 0; i < left.length; i += 1) {
+  assert.equal(left[i], right[i]);
+}
+
 utils.vacuum.sync(path.dirname(output));
