@@ -230,14 +230,18 @@ function test06 () {
 }
 
 function test07 () {
+  console.log('before createReadStream');
   const rs = fs.createReadStream(theFile);
+  console.log('after createReadStream');
 
   rs.on('open', function () {
     console.log('open');
   });
 
   rs.on('readable', function () {
+    console.log('before read');
     let r = rs.read();
+    console.log('after read');
     if (!r) {
       r = 'null';
     } else
