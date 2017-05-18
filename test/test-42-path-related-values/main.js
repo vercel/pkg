@@ -36,7 +36,9 @@ right = JSON.parse(right);
 
 for (let obj of [ left, right ]) {
   for (let s in obj) {
-    obj[s] = obj[s].replace('\\pkg\\test\\test-42-path-related-values', '')
+    obj[s] = obj[s].replace('/home/travis/build', '')
+                   .replace('/home/travis/.nvm/versions', '')
+                   .replace('\\pkg\\test\\test-42-path-related-values', '')
                    .replace('/pkg/test/test-42-path-related-values', '')
                    .replace('app-x64.exe', 'app-x64');
   }
