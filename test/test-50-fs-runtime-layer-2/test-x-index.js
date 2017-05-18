@@ -55,7 +55,17 @@ function test01 () {
               assert.equal(error6, null);
               const data3 = buffer3.toString('utf8', 0, buffer3.length);
               console.log('data3', data3);
-              test01e(fd);
+              const buffer4 = buffer3;
+              fs.writeFile(theFile, buffer4, function (error7, wtf2) {
+                if (process.pkg) {
+                  assert.equal(typeof error7, 'object'); // TODO maybe code=EACCESS?
+                } else {
+                  assert.equal(error7, null);
+                }
+                assert.equal(wtf2, undefined);
+                test01e(fd);
+              });
+              console.log('after fs.writeFile');
             });
             console.log('after fs.readFile');
           });
@@ -90,7 +100,17 @@ function test01e (badFd) {
             fs.readFile(theFile + '.notExists', function (error6, buffer3) {
               console.log('fs.readFile.error6.code', error6.code);
               console.log('typeof buffer3', typeof buffer3);
-              test02();
+              const buffer4 = new Buffer(1024);
+              fs.writeFile(theFile + '/canNotWrite', buffer4, function (error7, wtf2) {
+                if (process.pkg) {
+                  assert.equal(error7.code, 'ENOENT');
+                } else {
+                  assert.equal(error7.code, 'ENOTDIR');
+                }
+                assert.equal(wtf2, undefined);
+                test02();
+              });
+              console.log('after fs.writeFile');
             });
             console.log('after fs.readFile');
           });
