@@ -34,23 +34,25 @@ function test01 () {
   console.log('<<< test01 >>>');
 
   fs.stat(theFile, function (error, stats) {
-    console.log('fs.stat.error === null', error === null);
+    assert.equal(error, null);
     console.log('stats.size', stats.size);
     fs.open(theFile, 'r', function (error2, fd) {
-      console.log('fs.open.error2 === null', error2 === null);
+      assert.equal(error2, null);
+      console.log('typeof fd', typeof fd);
       fs.fstat(fd, function (error3, fstats) {
-        console.log('fs.fstat.error3 === null', error3 === null);
+        assert.equal(error3, null);
         console.log('fstats.size', fstats.size);
         const buffer = new Buffer(stats.size / 2 | 0);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
-          console.log('fs.read.error4 === null', error4 === null);
+          assert.equal(error4, null);
           assert(buffer === buffer2); // should be same instances
           const data2 = buffer2.toString('utf8', 0, buffer2.length);
           console.log('data2', data2);
-          fs.close(fd, function (error5) {
-            console.log('fs.close.error5 === null', error5 === null);
+          fs.close(fd, function (error5, wtf) {
+            assert.equal(error5, null);
+            console.log('typeof wtf', typeof wtf);
             fs.readFile(theFile, function (error6, buffer3) {
-              console.log('fs.readFile.error6 === null', error6 === null);
+              assert.equal(error6, null);
               const data3 = buffer3.toString('utf8', 0, buffer3.length);
               console.log('data3', data3);
               test01e(fd);
@@ -72,21 +74,21 @@ function test01e (badFd) {
   console.log('<<< test01e >>>');
 
   fs.stat(theFile + '.notExists', function (error, stats) {
-    console.log('fs.stat.error === null', error === null);
+    console.log('fs.stat.error.code', error.code);
     fs.open(theFile + '.notExists', 'r', function (error2, fd) {
-      console.log('fs.open.error2 === null', error2 === null);
+      console.log('fs.open.error2.code', error2.code);
       fd = badFd;
       fs.fstat(fd, function (error3, fstats) {
-        console.log('fs.fstat.error3 === null', error3 === null);
+        console.log('fs.fstat.error3.code', error3.code);
         const buffer = new Buffer(1024);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
-          console.log('fs.read.error4 === null', error4 === null);
+          console.log('fs.read.error4.code', error4.code);
           console.log('typeof bytesRead', typeof bytesRead);
           console.log('typeof buffer2', typeof buffer2);
           fs.close(fd, function (error5) {
-            console.log('fs.close.error5 === null', error5 === null);
+            console.log('fs.close.error5.code', error5.code);
             fs.readFile(theFile + '.notExists', function (error6, buffer3) {
-              console.log('fs.readFile.error6 === null', error6 === null);
+              console.log('fs.readFile.error6.code', error6.code);
               console.log('typeof buffer3', typeof buffer3);
               test02();
             });
