@@ -49,12 +49,47 @@ function test01 () {
           console.log('data', data);
           fs.close(fd, function (error5) {
             console.log('fs.close.error5 === null', error5 === null);
+            test01e(fd);
+          });
+          console.log('after fs.close');
+        });
+        console.log('after fs.read');
+      });
+      console.log('after fs.fstat');
+    });
+    console.log('after fs.open');
+  });
+  console.log('after fs.stat');
+}
+
+function test01e (badFd) {
+  console.log('<<< test01e >>>');
+
+  fs.stat(theFile + '.notExists', function (error, stats) {
+    console.log('fs.stat.error === null', error === null);
+    fs.open(theFile + '.notExists', 'r', function (error2, fd) {
+      console.log('fs.open.error2 === null', error2 === null);
+      fd = badFd;
+      fs.fstat(fd, function (error3, fstats) {
+        console.log('fs.fstat.error3 === null', error3 === null);
+        const buffer = new Buffer(1024);
+        fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
+          console.log('fs.read.error4 === null', error4 === null);
+          console.log('typeof bytesRead', typeof bytesRead);
+          console.log('typeof buffer2', typeof buffer2);
+          fs.close(fd, function (error5) {
+            console.log('fs.close.error5 === null', error5 === null);
             test02();
           });
+          console.log('after fs.close');
         });
+        console.log('after fs.read');
       });
+      console.log('after fs.fstat');
     });
+    console.log('after fs.open');
   });
+  console.log('after fs.stat');
 }
 
 function test02 () {
