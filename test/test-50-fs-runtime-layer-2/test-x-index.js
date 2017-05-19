@@ -63,7 +63,13 @@ function test01 () {
                   assert.equal(error7, null);
                 }
                 assert.equal(wtf2, undefined);
-                test01e(fd);
+                fs.readdir(theDirectory, function (error8, list) {
+                  assert.equal(error8, null);
+                  assert(Array.isArray(list));
+                  console.log('typeof list', typeof list);
+                  test01e(fd);
+                });
+                console.log('after fs.readdir');
               });
               console.log('after fs.writeFile');
             });
@@ -108,7 +114,12 @@ function test01e (badFd) {
                   assert.equal(error7.code, 'ENOTDIR');
                 }
                 assert.equal(wtf2, undefined);
-                test02();
+                fs.readdir(theDirectory + '.notExists', function (error8, list) {
+                  console.log('fs.readdir.error8.code', error8.code);
+                  console.log('typeof list', typeof list);
+                  test02();
+                });
+                console.log('after fs.readdir');
               });
               console.log('after fs.writeFile');
             });
