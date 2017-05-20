@@ -86,21 +86,23 @@ exports.snapshotify = function (file, slash) {
 
 var win32 = process.platform === 'win32';
 
-function insideSnapshot (f) {
-  if (typeof f !== 'string') return false;
-  if (win32) {
+if (win32) {
+  exports.insideSnapshot = function insideSnapshot (f) {
+    if (typeof f !== 'string') return false;
     var slice112 = f.slice(1, 12);
     if (slice112 === ':\\snapshot\\' ||
         slice112 === ':\\snapshot') return true;
-  } else {
+    return false;
+  };
+} else {
+  exports.insideSnapshot = function insideSnapshot (f) {
+    if (typeof f !== 'string') return false;
     var slice010 = f.slice(0, 10);
     if (slice010 === '/snapshot/' ||
         slice010 === '/snapshot') return true;
-  }
-  return false;
+    return false;
+  };
 }
-
-exports.insideSnapshot = insideSnapshot;
 
 exports.stripSnapshot = function (f) {
   var file = normalizePath(f);
