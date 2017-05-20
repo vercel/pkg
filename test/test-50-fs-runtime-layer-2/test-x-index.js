@@ -34,25 +34,25 @@ function test01 () {
   console.log('<<< test01 >>>');
 
   fs.stat(theFile, function (error, stats) {
-    assert.equal(error, null);
+    console.log('fs.stat.error === null', error === null);
     console.log('stats.size', stats.size);
     fs.open(theFile, 'r', function (error2, fd) {
-      assert.equal(error2, null);
+      console.log('fs.open.error2 === null', error2 === null);
       console.log('typeof fd', typeof fd);
       fs.fstat(fd, function (error3, fstats) {
-        assert.equal(error3, null);
+        console.log('fs.fstat.error3 === null', error3 === null);
         console.log('fstats.size', fstats.size);
         const buffer = new Buffer(stats.size / 2 | 0);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
-          assert.equal(error4, null);
-          assert(buffer === buffer2); // should be same instances
+          console.log('fs.read.error4 === null', error4 === null);
+          console.log('buffer === buffer2', buffer === buffer2); // should be same instances
           const data2 = buffer2.toString('utf8', 0, buffer2.length);
           console.log('data2', data2);
           fs.close(fd, function (error5, wtf) {
-            assert.equal(error5, null);
+            console.log('fs.close.error5 === null', error5 === null);
             console.log('typeof wtf', typeof wtf);
             fs.readFile(theFile, function (error6, buffer3) {
-              assert.equal(error6, null);
+              console.log('fs.readFile.error6 === null', error6 === null);
               const data3 = buffer3.toString('utf8', 0, buffer3.length);
               console.log('data3', data3);
               const buffer4 = buffer3;
@@ -62,17 +62,14 @@ function test01 () {
                 } else {
                   assert.equal(error7, null);
                 }
-                assert.equal(wtf2, undefined);
+                console.log('typeof wtf2', typeof wtf2);
                 fs.readdir(theDirectory, function (error8, list) {
-                  assert.equal(error8, null);
-                  assert(Array.isArray(list));
-                  console.log('typeof list', typeof list);
+                  console.log('fs.readdir.error8 === null', error8 === null);
+                  console.log('Array.isArray(list)', Array.isArray(list));
                   fs.exists(theFile, function (value) {
-                    assert.equal(value, true);
-                    console.log('typeof value', typeof value);
+                    console.log('value', value);
                     fs.exists(theDirectory, function (value2) {
-                      assert.equal(value2, true);
-                      console.log('typeof value2', typeof value2);
+                      console.log('value2', value2);
                       test01e(fd);
                     });
                     console.log('after fs.exists(theDirectory)');
@@ -111,8 +108,9 @@ function test01e (badFd) {
           console.log('fs.read.error4.code', error4.code);
           console.log('typeof bytesRead', typeof bytesRead);
           console.log('typeof buffer2', typeof buffer2);
-          fs.close(fd, function (error5) {
+          fs.close(fd, function (error5, wtf) {
             console.log('fs.close.error5.code', error5.code);
+            console.log('typeof wtf', typeof wtf);
             fs.readFile(theDirectory, function (error6, buffer3) {
               console.log('fs.readFile.error6.code', error6.code);
               console.log('typeof buffer3', typeof buffer3);
@@ -126,7 +124,7 @@ function test01e (badFd) {
                   } else {
                     assert.equal(error8.code, 'ENOTDIR');
                   }
-                  assert.equal(wtf2, undefined);
+                  console.log('typeof wtf2', typeof wtf2);
                   fs.readdir(theFile, function (error9, list) {
                     console.log('fs.readdir.error9.code', error9.code);
                     console.log('typeof list', typeof list);
