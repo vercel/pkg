@@ -89,9 +89,9 @@ function test01 () {
 function test01e (badFd) {
   console.log('<<< test01e >>>');
 
-  fs.stat(theFile + '.notExists', function (error, stats) {
+  fs.stat('notExists', function (error, stats) {
     console.log('fs.stat.error.code', error.code);
-    fs.open(theFile + '.notExists', 'r', function (error2, fd) {
+    fs.open('notExists', 'r', function (error2, fd) {
       console.log('fs.open.error2.code', error2.code);
       fd = badFd;
       fs.fstat(fd, function (error3, fstats) {
@@ -106,7 +106,7 @@ function test01e (badFd) {
             fs.readFile(theDirectory, function (error6, buffer3) {
               console.log('fs.readFile.error6.code', error6.code);
               console.log('typeof buffer3', typeof buffer3);
-              fs.readFile(theFile + '.notExists', function (error7, buffer4) {
+              fs.readFile('notExists', function (error7, buffer4) {
                 console.log('fs.readFile.error7.code', error7.code);
                 console.log('typeof buffer4', typeof buffer4);
                 const buffer5 = new Buffer(1024);
@@ -120,18 +120,18 @@ function test01e (badFd) {
                   fs.readdir(theFile, function (error9, list) {
                     console.log('fs.readdir.error9.code', error9.code);
                     console.log('typeof list', typeof list);
-                    fs.readdir(theDirectory + '.notExists', function (error10, list2) {
+                    fs.readdir('notExists', function (error10, list2) {
                       console.log('fs.readdir.error10.code', error10.code);
                       console.log('typeof list2', typeof list2);
                       test02();
                     });
-                    console.log('after fs.readdir(theDirectory)');
+                    console.log('after fs.readdir(notExists)');
                   });
                   console.log('after fs.readdir(theFile)');
                 });
                 console.log('after fs.writeFile');
               });
-              console.log('after fs.readFile(theFile)');
+              console.log('after fs.readFile(notExists)');
             });
             console.log('after fs.readFile(theDirectory)');
           });
