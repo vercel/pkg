@@ -66,10 +66,12 @@ function test01 () {
                 fs.readdir(theDirectory, function (error8, list) {
                   console.log('fs.readdir.error8 === null', error8 === null);
                   console.log('Array.isArray(list)', Array.isArray(list));
-                  fs.exists(theFile, function (value) {
+                  fs.exists(theFile, function (value, wtf3) {
                     console.log('value', value);
-                    fs.exists(theDirectory, function (value2) {
+                    console.log('typeof wtf3', typeof wtf3);
+                    fs.exists(theDirectory, function (value2, wtf4) {
                       console.log('value2', value2);
+                      console.log('typeof wtf4', typeof wtf4);
                       test01e(fd);
                     });
                     console.log('after fs.exists(theDirectory)');
@@ -131,8 +133,9 @@ function test01e (badFd) {
                     fs.readdir('notExists', function (error10, list2) {
                       console.log('fs.readdir.error10.code', error10.code);
                       console.log('typeof list2', typeof list2);
-                      fs.exists('notExists', function (value) {
+                      fs.exists('notExists', function (value, wtf3) {
                         console.log('value', value);
+                        console.log('typeof wtf3', typeof wtf3);
                         test02();
                       });
                       console.log('after fs.exists');
