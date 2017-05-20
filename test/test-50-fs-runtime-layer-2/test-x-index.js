@@ -114,10 +114,15 @@ function test01e (badFd) {
                   assert.equal(error7.code, 'ENOTDIR');
                 }
                 assert.equal(wtf2, undefined);
-                fs.readdir(theDirectory + '.notExists', function (error8, list) {
+                fs.readdir(theFile, function (error8, list) {
                   console.log('fs.readdir.error8.code', error8.code);
                   console.log('typeof list', typeof list);
-                  test02();
+                  fs.readdir(theDirectory + '.notExists', function (error9, list2) {
+                    console.log('fs.readdir.error9.code', error9.code);
+                    console.log('typeof list2', typeof list2);
+                    test02();
+                  });
+                  console.log('after fs.readdir');
                 });
                 console.log('after fs.readdir');
               });
