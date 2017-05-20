@@ -67,7 +67,17 @@ function test01 () {
                   assert.equal(error8, null);
                   assert(Array.isArray(list));
                   console.log('typeof list', typeof list);
-                  test01e(fd);
+                  fs.exists(theFile, function (value) {
+                    assert.equal(value, true);
+                    console.log('typeof value', typeof value);
+                    fs.exists(theDirectory, function (value2) {
+                      assert.equal(value2, true);
+                      console.log('typeof value2', typeof value2);
+                      test01e(fd);
+                    });
+                    console.log('after fs.exists(theDirectory)');
+                  });
+                  console.log('after fs.exists(theFile)');
                 });
                 console.log('after fs.readdir');
               });
@@ -123,7 +133,11 @@ function test01e (badFd) {
                     fs.readdir('notExists', function (error10, list2) {
                       console.log('fs.readdir.error10.code', error10.code);
                       console.log('typeof list2', typeof list2);
-                      test02();
+                      fs.exists('notExists', function (value) {
+                        console.log('value', value);
+                        test02();
+                      });
+                      console.log('after fs.exists');
                     });
                     console.log('after fs.readdir(notExists)');
                   });
