@@ -103,32 +103,37 @@ function test01e (badFd) {
           console.log('typeof buffer2', typeof buffer2);
           fs.close(fd, function (error5) {
             console.log('fs.close.error5.code', error5.code);
-            fs.readFile(theFile + '.notExists', function (error6, buffer3) {
+            fs.readFile(theDirectory, function (error6, buffer3) {
               console.log('fs.readFile.error6.code', error6.code);
               console.log('typeof buffer3', typeof buffer3);
-              const buffer4 = new Buffer(1024);
-              fs.writeFile(theFile + '/canNotWrite', buffer4, function (error7, wtf2) {
-                if (process.pkg) {
-                  assert.equal(error7.code, 'ENOENT');
-                } else {
-                  assert.equal(error7.code, 'ENOTDIR');
-                }
-                assert.equal(wtf2, undefined);
-                fs.readdir(theFile, function (error8, list) {
-                  console.log('fs.readdir.error8.code', error8.code);
-                  console.log('typeof list', typeof list);
-                  fs.readdir(theDirectory + '.notExists', function (error9, list2) {
+              fs.readFile(theFile + '.notExists', function (error7, buffer4) {
+                console.log('fs.readFile.error7.code', error7.code);
+                console.log('typeof buffer4', typeof buffer4);
+                const buffer5 = new Buffer(1024);
+                fs.writeFile(theFile + '/canNotWrite', buffer5, function (error8, wtf2) {
+                  if (process.pkg) {
+                    assert.equal(error8.code, 'ENOENT');
+                  } else {
+                    assert.equal(error8.code, 'ENOTDIR');
+                  }
+                  assert.equal(wtf2, undefined);
+                  fs.readdir(theFile, function (error9, list) {
                     console.log('fs.readdir.error9.code', error9.code);
-                    console.log('typeof list2', typeof list2);
-                    test02();
+                    console.log('typeof list', typeof list);
+                    fs.readdir(theDirectory + '.notExists', function (error10, list2) {
+                      console.log('fs.readdir.error10.code', error10.code);
+                      console.log('typeof list2', typeof list2);
+                      test02();
+                    });
+                    console.log('after fs.readdir(theDirectory)');
                   });
-                  console.log('after fs.readdir');
+                  console.log('after fs.readdir(theFile)');
                 });
-                console.log('after fs.readdir');
+                console.log('after fs.writeFile');
               });
-              console.log('after fs.writeFile');
+              console.log('after fs.readFile(theFile)');
             });
-            console.log('after fs.readFile');
+            console.log('after fs.readFile(theDirectory)');
           });
           console.log('after fs.close');
         });
