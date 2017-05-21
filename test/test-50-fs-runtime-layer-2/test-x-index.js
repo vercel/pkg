@@ -72,7 +72,12 @@ function test01 () {
                     fs.exists(theDirectory, function (value2, wtf4) {
                       console.log('value2', value2);
                       console.log('typeof wtf4', typeof wtf4);
-                      test01e(fd);
+                      fs.realpath(theFile, function (error9, real) {
+                        console.log('fs.realpath.error9 === null', error9 === null);
+                        console.log('typeof real', typeof real);
+                        test01e(fd);
+                      });
+                      console.log('after fs.realpath');
                     });
                     console.log('after fs.exists(theDirectory)');
                   });
@@ -136,7 +141,12 @@ function test01e (badFd) {
                       fs.exists('notExists', function (value, wtf3) {
                         console.log('value', value);
                         console.log('typeof wtf3', typeof wtf3);
-                        test02();
+                        fs.realpath('notExists', function (error11, real) {
+                          console.log('fs.realpath.error11.code', error11.code);
+                          console.log('typeof real', typeof real);
+                          test02();
+                        });
+                        console.log('after fs.realpath');
                       });
                       console.log('after fs.exists');
                     });
