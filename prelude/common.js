@@ -10,7 +10,7 @@ exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
 function uppercaseDriveLetter (f) {
-  if (!(/^.:\\/.test(f))) return f;
+  if (f.slice(1, 3) !== ':\\') return f;
   return f[0].toUpperCase() + f.slice(1);
 }
 
@@ -18,11 +18,24 @@ function removeTrailingSlashes (f) {
   if (f === '/') {
     return f; // dont remove from "/"
   }
-  if (/^.:\\$/.test(f)) {
+  if (f.slice(1) === ':\\') {
     return f; // dont remove from "D:\"
   }
-  return f.replace(/\/+$/, '')
-    .replace(/\\+$/, '');
+  var last = f.length - 1;
+  while (true) {
+    var char = f.charAt(last);
+    if (char === '\\') {
+      f = f.slice(0, -1);
+      last -= 1;
+    } else
+    if (char === '/') {
+      f = f.slice(0, -1);
+      last -= 1;
+    } else {
+      break;
+    }
+  }
+  return f;
 }
 
 function normalizePath (f) {
