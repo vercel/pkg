@@ -148,7 +148,7 @@ function projectToNearby (f) {
   );
 }
 
-function findNativeAddon (path) {
+function findNativeAddonSync (path) {
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
   var projector = projectToFilesystem(path);
@@ -886,7 +886,7 @@ var modifyNativeAddonWin32 = (function () {
   }
 
   function findNativeAddonForStat (path_) {
-    var path = findNativeAddon(path_);
+    var path = findNativeAddonSync(path_);
     if (!path) throw error_ENOENT('File or directory', path_);
     return ancestor.statSync.call(fs, path);
   }
@@ -1106,8 +1106,8 @@ var modifyNativeAddonWin32 = (function () {
     return f;
   }
 
-  function findNativeAddonForInternalModuleStat (path_) {
-    var path = findNativeAddon(path_);
+  function findNativeAddonSyncForInternalModuleStat (path_) {
+    var path = findNativeAddonSync(path_);
     if (!path) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(path));
   }
@@ -1130,7 +1130,7 @@ var modifyNativeAddonWin32 = (function () {
     path = normalizePath(path);
     // console.log("internalModuleStat", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return findNativeAddonForInternalModuleStat(path);
+    if (!entity) return findNativeAddonSyncForInternalModuleStat(path);
     var entityStat = entity[STORE_STAT];
     if (!entityStat) return -ENOENT;
     if (entityStat.isFileValue) return 0;
@@ -1284,7 +1284,7 @@ var modifyNativeAddonWin32 = (function () {
       return filename;
     }
 
-    var found = findNativeAddon(filename);
+    var found = findNativeAddonSync(filename);
     if (found) filename = found;
 
     return filename;
