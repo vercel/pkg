@@ -1272,7 +1272,7 @@ var modifyNativeAddonWin32 = (function () {
 
     FLAG_DISABLE_DOT_NODE = !enable;
     try {
-      filename = ancestor._resolveFilename.apply(null, arguments);
+      filename = ancestor._resolveFilename.apply(this, arguments);
     } finally {
       FLAG_DISABLE_DOT_NODE = false;
     }
