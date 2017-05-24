@@ -1265,16 +1265,17 @@ var modifyNativeAddonWin32 = (function () {
   Module._resolveFilename = function (request) {
     var filename;
 
-    var reqDotNode = (request.slice(-5) === '.node'); // bindings.js: opts.bindings += '.node'
-    var reqLeftSlash = (request.indexOf('\\') >= 0);  // heapdump: require('../build/Release/addon')
-    var reqRightSlash = (request.indexOf('/') >= 0);  // slash means that non-package is required ...
-    var enable = reqDotNode || reqLeftSlash || reqRightSlash; // ... (had a problem in levelup/pouchdb)
-
-    FLAG_DISABLE_DOT_NODE = !enable;
     try {
       filename = ancestor._resolveFilename.apply(this, arguments);
-    } finally {
-      FLAG_DISABLE_DOT_NODE = false;
+    } catch (error) {
+      if (error.code !== 'MODULE_NOT_FOUND') throw error;
+
+      FLAG_DISABLE_DOT_NODE = true;
+      try {
+        filename = ancestor._resolveFilename.apply(this, arguments);
+      } finally {
+        FLAG_DISABLE_DOT_NODE = false;
+      }
     }
 
     if (!insideSnapshot(filename)) {
