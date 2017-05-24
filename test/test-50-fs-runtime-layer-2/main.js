@@ -9,9 +9,8 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2] || 'host'; // can not pass 'host' to bitty
-if (target === 'host') target = 'node' + process.version[1];
-
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './run-time/test-output.exe';
 

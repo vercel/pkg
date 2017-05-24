@@ -10,12 +10,13 @@ const fetch = require('pkg-fetch');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-let target = process.argv[2] || 'host'; // can not pass 'host' to 'fetch'
-if (target === 'host') target = 'node' + process.version[1];
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 
 let right;
 
-fetch.need({ nodeRange: target,
+fetch.need({
+  nodeRange: target,
   platform: fetch.system.hostPlatform,
   arch: fetch.system.hostArch
 }).then(function (needed) {
