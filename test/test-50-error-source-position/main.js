@@ -11,7 +11,7 @@ assert(__dirname === process.cwd());
 
 const host = 'node' + process.version[1];
 const target = process.argv[2] || host;
-const input = './test-x-index';
+const input = './test-x-index.js';
 const output = './test-output.exe';
 
 const version = target;
