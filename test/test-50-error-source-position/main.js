@@ -14,9 +14,6 @@ const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-const version = target;
-if (/^(node|v)?0/.test(version)) return;
-
 let right;
 
 utils.pkg.sync([
@@ -31,6 +28,9 @@ right = utils.spawn.sync(
     stdio: 'pipe', expect: 1 }
 );
 
+if (!(/^(node|v)?0/.test(target))) {
+  assert(right.stderr.indexOf('x.parse is not a function') >= 0);
+}
+
 assert(right.stderr.indexOf('x.parse();\n  ^') >= 0);
-assert(right.stderr.indexOf('x.parse is not a function') >= 0);
 utils.vacuum.sync(output);

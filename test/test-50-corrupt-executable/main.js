@@ -15,8 +15,7 @@ const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-const version = target;
-if (/^(node|v)?0/.test(version)) return;
+if (/^(node|v)?0/.test(target)) return;
 
 let right;
 
