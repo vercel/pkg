@@ -31,5 +31,6 @@ right = utils.spawn.sync(
     stdio: 'pipe', expect: 1 }
 );
 
+assert(right.stderr.indexOf('x.parse();\n  ^') >= 0);
 assert(right.stderr.indexOf('x.parse is not a function') >= 0);
 utils.vacuum.sync(output);
