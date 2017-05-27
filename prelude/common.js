@@ -2,7 +2,7 @@
 
 var path = require('path');
 
-exports.STORE_CODE = 0;
+exports.STORE_BLOB = 0;
 exports.STORE_CONTENT = 1;
 exports.STORE_LINKS = 2;
 exports.STORE_STAT = 3;

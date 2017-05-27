@@ -11,7 +11,7 @@
 var common = {};
 REQUIRE_COMMON(common);
 
-var STORE_CODE = common.STORE_CODE;
+var STORE_BLOB = common.STORE_BLOB;
 var STORE_CONTENT = common.STORE_CONTENT;
 var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
@@ -684,8 +684,8 @@ var modifyNativeAddonWin32 = (function () {
     if (!entity) throw error_ENOENT('File', path);
     var entityContent = entity[STORE_CONTENT];
     if (entityContent) return new Buffer(entityContent); // clone to prevent mutating store
-    var entityCode = entity[STORE_CODE];
-    if (entityCode) return new Buffer('source-code-not-available');
+    var entityBlob = entity[STORE_BLOB];
+    if (entityBlob) return new Buffer('source-code-not-available');
 
     // why return empty buffer?
     // otherwise this error will arise:
@@ -778,8 +778,8 @@ var modifyNativeAddonWin32 = (function () {
     if (!entity) throw error_ENOENT('Directory', path);
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) return entityLinks.concat(readdirMountpoints(path)); // immutable concat to prevent mutating store
-    var entityCode = entity[STORE_CODE];
-    if (entityCode) throw error_ENOTDIR(path);
+    var entityBlob = entity[STORE_BLOB];
+    if (entityBlob) throw error_ENOTDIR(path);
     var entityContent = entity[STORE_CONTENT];
     if (entityContent) throw error_ENOTDIR(path);
     throw new Error('UNEXPECTED-25');
@@ -1241,19 +1241,19 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor._compile.apply(this, arguments);
     }
 
-    var entityCode = entity[STORE_CODE];
+    var entityBlob = entity[STORE_BLOB];
     var entityContent = entity[STORE_CONTENT];
 
-    if (entityCode) {
+    if (entityBlob) {
       if (entityContent) throw new Error('UNEXPECTED-45');
       var dirname = require('path').dirname(filename);
       var rqfn = makeRequireFunction.call(this);
       var args = [ this.exports, rqfn, this, filename, dirname ];
-      return entityCode.apply(this.exports, args);
+      return entityBlob.apply(this.exports, args);
     }
 
     if (entityContent) {
-      if (entityCode) throw new Error('UNEXPECTED-50');
+      if (entityBlob) throw new Error('UNEXPECTED-50');
       // content is already in utf8 and without BOM (that is expected
       // by stock _compile), but entityContent is still a Buffer
       return ancestor._compile.apply(this, arguments);
