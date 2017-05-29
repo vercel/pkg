@@ -126,11 +126,8 @@ function test01e (badFd) {
                 console.log('typeof buffer4', typeof buffer4);
                 const buffer5 = new Buffer(1024);
                 fs.writeFile(theFile + '/canNotWrite', buffer5, function (error8, wtf2) {
-                  if (process.pkg) {
-                    assert.equal(error8.code, 'ENOENT');
-                  } else {
-                    assert.equal(error8.code, 'ENOTDIR');
-                  }
+                  assert(error8.code === 'ENOENT' ||
+                         error8.code === 'ENOTDIR');
                   console.log('typeof wtf2', typeof wtf2);
                   fs.readdir(theFile, function (error9, list) {
                     console.log('fs.readdir.error9.code', error9.code);

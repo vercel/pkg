@@ -32,5 +32,6 @@ if (!(/^(node|v)?0/.test(target))) {
   assert(right.stderr.indexOf('x.parse is not a function') >= 0);
 }
 
-assert(right.stderr.indexOf('x.parse();\n  ^') >= 0);
+const errorPointer = 'x.parse();' + require('os').EOL + '  ^';
+assert(right.stderr.indexOf(errorPointer) >= 0);
 utils.vacuum.sync(output);
