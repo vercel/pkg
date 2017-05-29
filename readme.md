@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/zeit/art/39a6d9ad77606e2589ddd620b23e093d3b3c6195/pkg/repo-banner.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
-[![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg) 
+[![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg)
 [![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
 [![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
 
@@ -27,8 +27,10 @@ npm install -g pkg
 
 After installing it, run `pkg --help` without arguments to see list of options.
 
-The entrypoint of your project is a mandatory CLI argument. It may be:
+The entrypoint of your project is an optional CLI argument. It may be:
 
+* Running `pkg` without arguments is the same as `pkg .`
+(see 'Path to directory' below).
 * Path to entry file. Suppose it is `/path/app.js`, then
 packaged app will work the same way as `node /path/app.js`
 * Path to `package.json`. `Pkg` will follow `bin` property of
