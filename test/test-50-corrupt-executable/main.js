@@ -26,8 +26,12 @@ utils.pkg.sync([
 
 const damage = fs.readFileSync(output);
 const boundary = 4096;
-damage[damage.length - boundary - 10] += 1;
-damage[damage.length - boundary + 10] -= 1;
+damage[damage.length - 2 * boundary - 10] = 0x2;
+damage[damage.length - 3 * boundary - 10] = 0x2;
+damage[damage.length - 4 * boundary - 10] = 0x2;
+damage[damage.length - 2 * boundary + 10] = 0x2;
+damage[damage.length - 3 * boundary + 10] = 0x2;
+damage[damage.length - 4 * boundary + 10] = 0x2;
 fs.writeFileSync(output, damage);
 
 right = utils.spawn.sync(
@@ -37,5 +41,7 @@ right = utils.spawn.sync(
 );
 
 assert.equal(right.stdout, '');
-assert(right.stderr.indexOf('CHECKSUM_MISMATCH') >= 0);
+assert((right.stderr.indexOf('Invalid') >= 0) ||
+       (right.stderr.indexOf('ILLEGAL') >= 0) ||
+       (right.stderr.indexOf('SyntaxError') >= 0));
 utils.vacuum.sync(output);
