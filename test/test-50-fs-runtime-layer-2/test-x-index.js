@@ -42,7 +42,7 @@ function test01 () {
       fs.fstat(fd, function (error3, fstats) {
         console.log('fs.fstat.error3 === null', error3 === null);
         console.log('fstats.size', fstats.size);
-        const buffer = new Buffer(stats.size / 2 | 0);
+        const buffer = Buffer.alloc(stats.size / 2 | 0);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
           console.log('fs.read.error4 === null', error4 === null);
           console.log('buffer === buffer2', buffer === buffer2); // should be same instances
@@ -110,7 +110,7 @@ function test01e (badFd) {
       fd = badFd;
       fs.fstat(fd, function (error3, fstats) {
         console.log('fs.fstat.error3.code', error3.code);
-        const buffer = new Buffer(1024);
+        const buffer = Buffer.alloc(1024);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {
           console.log('fs.read.error4.code', error4.code);
           console.log('typeof bytesRead', typeof bytesRead);
@@ -124,7 +124,7 @@ function test01e (badFd) {
               fs.readFile('notExists', function (error7, buffer4) {
                 console.log('fs.readFile.error7.code', error7.code);
                 console.log('typeof buffer4', typeof buffer4);
-                const buffer5 = new Buffer(1024);
+                const buffer5 = Buffer.alloc(1024);
                 fs.writeFile(theFile + '/canNotWrite', buffer5, function (error8, wtf2) {
                   assert(error8.code === 'ENOENT' ||
                          error8.code === 'ENOTDIR');
@@ -176,7 +176,7 @@ function test02 () {
   const fd = fs.openSync(theFile, 'r');
   const fstats = fs.fstatSync(fd);
   console.log('fstats.size', fstats.size);
-  const buffer = new Buffer(stats.size);
+  const buffer = Buffer.alloc(stats.size);
   const bytesRead = fs.readSync(fd, buffer, 0, buffer.length);
   console.log('bytesRead', bytesRead);
   const data = buffer.toString('utf8', 0, buffer.length);
@@ -193,7 +193,7 @@ function test03 () {
   const fd = fs.openSync(theFile, 'r');
   const fstats = fs.fstatSync(fd);
   console.log('fstats.size', fstats.size);
-  const buffer = new Buffer(6);
+  const buffer = Buffer.alloc(6);
   let bytesRead = fs.readSync(fd, buffer, 0, 6);
   console.log('bytesRead_a', bytesRead, 'buffer', buffer[0], buffer[1]);
   bytesRead = fs.readSync(fd, buffer, 0, 6);
@@ -234,7 +234,7 @@ function test04 () {
   const fd = fs.openSync(theDirectory, 'r');
   const fstats = fs.fstatSync(fd);
   console.log(fstats.size);
-  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const buffer = Buffer.from([ 12, 34, 56, 78 ]);
   let bytesRead;
   try { bytesRead = fs.readSync(fd, buffer, 0, 6); } catch (error) { dumpError(error); }
   console.log(bytesRead, buffer[0], buffer[1]);
@@ -250,7 +250,7 @@ function test04 () {
 
 function test05 () {
   const fd = 'incorrect fd as string';
-  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const buffer = Buffer.from([ 12, 34, 56, 78 ]);
   let bytesRead;
   try { bytesRead = fs.readSync(fd, buffer, 0, 6); } catch (error) { dumpError(error); }
   console.log(bytesRead, buffer[0], buffer[1]);
@@ -262,7 +262,7 @@ function test05 () {
 
 function test06 () {
   const fd = 7890;
-  const buffer = new Buffer([ 12, 34, 56, 78 ]);
+  const buffer = Buffer.from([ 12, 34, 56, 78 ]);
   let bytesRead;
   try { bytesRead = fs.readSync(fd, buffer, 0, 6); } catch (error) { dumpError(error); }
   console.log(bytesRead, buffer[0], buffer[1]);
