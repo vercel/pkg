@@ -1,5 +1,10 @@
 'use strict';
 
+var fs = require('fs');
+if (!fs.existsSync('package.json')) {
+  fs.writeFileSync('package.json', '{}');
+}
+
 var Run = require('node-pre-gyp').Run;
 var r = new Run();
 

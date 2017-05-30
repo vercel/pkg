@@ -1,7 +1,8 @@
 'use strict';
 
-module.exports = function () {
+module.exports = function (stamp) {
   return {
-    allow: false // TODO mac only. but maybe test?
+    allow: stamp.p === 'darwin',
+    note: 'requires macOS'
   };
 };
