@@ -23,6 +23,7 @@ var STORE_STAT = common.STORE_STAT;
 var normalizePath = common.normalizePath;
 var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
+var removeUplevels = common.removeUplevels;
 
 var ENTRYPOINT;
 var FLAG_FORK_WAS_CALLED = false;
@@ -134,10 +135,12 @@ function projectToFilesystem (f) {
     require('path').dirname(
       process.execPath
     ),
-    require('path').relative(
-      require('path').dirname(
-        DEFAULT_ENTRYPOINT
-      ), f
+    removeUplevels(
+      require('path').relative(
+        require('path').dirname(
+          DEFAULT_ENTRYPOINT
+        ), f
+      )
     )
   );
 }

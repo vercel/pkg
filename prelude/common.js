@@ -133,3 +133,33 @@ exports.stripSnapshot = function (f) {
   }
   return f; // not inside
 };
+
+if (win32) {
+  exports.removeUplevels = function removeUplevels (f) {
+    while (true) {
+      if (f === '..') {
+        f = '.';
+      } else
+      if (/^\.\.\\/.test(f)) {
+        f = f.slice(3);
+      } else {
+        break;
+      }
+    }
+    return f;
+  };
+} else {
+  exports.removeUplevels = function removeUplevels (f) {
+    while (true) {
+      if (f === '..') {
+        f = '.';
+      } else
+      if (/^\.\.\//.test(f)) {
+        f = f.slice(3);
+      } else {
+        break;
+      }
+    }
+    return f;
+  };
+}

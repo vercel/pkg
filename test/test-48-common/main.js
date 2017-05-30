@@ -45,6 +45,13 @@ if (process.platform === 'win32') {
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo\\\\'));
   assert.equal('C:\\snapshot\\foo\\bar', common.snapshotify('c:\\foo\\\\bar'));
   assert.equal('C:\\snapshot\\foo\\bar', common.snapshotify('c:\\foo\\\\bar\\/\\\\'));
+
+  assert.equal('foo',     common.removeUplevels('..\\foo'));
+  assert.equal('foo',     common.removeUplevels('..\\..\\foo'));
+  assert.equal('.\\foo',  common.removeUplevels('.\\foo'));
+  assert.equal('.',       common.removeUplevels('.'));
+  assert.equal('.',       common.removeUplevels('..'));
+  assert.equal('.',       common.removeUplevels('..\\..'));
 } else {
   assert.equal('/',                 common.normalizePath('/'));
   assert.equal('/',                 common.normalizePath('//'));
@@ -82,4 +89,11 @@ if (process.platform === 'win32') {
   assert.equal('/snapshot/foo',     common.snapshotify('/foo//'));
   assert.equal('/snapshot/foo/bar', common.snapshotify('/foo//bar'));
   assert.equal('/snapshot/foo/bar', common.snapshotify('/foo//bar/\\//'));
+
+  assert.equal('foo',     common.removeUplevels('../foo'));
+  assert.equal('foo',     common.removeUplevels('../../foo'));
+  assert.equal('./foo',   common.removeUplevels('./foo'));
+  assert.equal('.',       common.removeUplevels('.'));
+  assert.equal('.',       common.removeUplevels('..'));
+  assert.equal('.',       common.removeUplevels('../..'));
 }
