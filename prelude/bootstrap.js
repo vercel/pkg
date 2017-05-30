@@ -28,6 +28,7 @@ var ENTRYPOINT;
 var FLAG_FORK_WAS_CALLED = false;
 var FLAG_DISABLE_DOT_NODE = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
+var windows = process.platform === 'win32';
 
 // /////////////////////////////////////////////////////////////////
 // ENTRYPOINT //////////////////////////////////////////////////////
@@ -332,8 +333,6 @@ function payloadFileSync (pointer) {
   ancestor.exists =           fs.exists;
   ancestor.accessSync =       fs.accessSync;
   ancestor.access =           fs.access;
-
-  var windows = process.platform === 'win32';
 
   var docks = {};
   var ENOTDIR = windows ? 4052 : 20;
