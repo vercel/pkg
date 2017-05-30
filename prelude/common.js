@@ -137,11 +137,11 @@ exports.stripSnapshot = function (f) {
 if (win32) {
   exports.removeUplevels = function removeUplevels (f) {
     while (true) {
+      if (f.slice(0, 3) === '..\\') {
+        f = f.slice(3);
+      } else
       if (f === '..') {
         f = '.';
-      } else
-      if (/^\.\.\\/.test(f)) {
-        f = f.slice(3);
       } else {
         break;
       }
@@ -151,11 +151,11 @@ if (win32) {
 } else {
   exports.removeUplevels = function removeUplevels (f) {
     while (true) {
+      if (f.slice(0, 3) === '../') {
+        f = f.slice(3);
+      } else
       if (f === '..') {
         f = '.';
-      } else
-      if (/^\.\.\//.test(f)) {
-        f = f.slice(3);
       } else {
         break;
       }
