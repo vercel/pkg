@@ -52,19 +52,20 @@ function stamp2string (s) {
   return s.p + '/' + s.a + '/m' + s.m.toString();
 }
 
-function update (p, n) {
+function update (p, r, v, note) {
   if (!table[p]) table[p] = {};
   const row = table[p];
   const ss = stamp2string(stamp);
   const o = row[ss];
-  row[ss] = n;
-  const nr = n.split(',')[0];
-  const or = o ? o.split(',')[0] : '';
-  if ((!o) && (nr !== 'ok')) {
-    changes.push(p + ',' + ss + ': new ' + n);
+  const rv = r + (v ? (',' + v) : '');
+  const rn = r + (note ? (',' + note) : '');
+  row[ss] = rv + (note ? (',' + note) : '');
+  const o2 = o ? o.split(',')[0] : '';
+  if ((!o) && (r !== 'ok')) {
+    changes.push(p + ',' + ss + ': new ' + rn);
   } else
-  if ((or !== nr) && (nr !== 'ok')) {
-    changes.push(p + ',' + ss + ': ' + o + ' -> ' + n);
+  if ((o2 !== r) && (r !== 'ok')) {
+    changes.push(p + ',' + ss + ': ' + o + ' -> ' + rn);
   }
   save();
 }
@@ -162,8 +163,10 @@ dickies.some(function (dicky) {
     allow = true;
   }
 
+  const note = meta.note;
+
   if (!allow) {
-    update(wordy, 'nop');
+    update(wordy, 'nop', '', note);
     console.log(wordy + ' not allowed here!');
     return;
   }
@@ -201,7 +204,7 @@ dickies.some(function (dicky) {
     )).version;
 
     console.log('Version of ' + packy + ' is ' + packyVersion);
-    version = ',' + packyVersion;
+    version = packyVersion;
 
     if (packyWildcard) {
       assert.equal(packyWildcard.split('.').length, 3);
@@ -231,7 +234,7 @@ dickies.some(function (dicky) {
   console.log('Result is \'' + right + '\'');
 
   if (right !== 'ok') {
-    update(wordy, 'error' + version);
+    update(wordy, 'bad-test', version, note);
   } else {
     console.log('Compiling ' + wordy + '...');
 
@@ -275,9 +278,9 @@ dickies.some(function (dicky) {
     console.log('Result is \'' + right + '\'');
 
     if (right !== 'ok') {
-      update(wordy, 'error' + version);
+      update(wordy, 'error', version, note);
     } else {
-      update(wordy, 'ok' + version);
+      update(wordy, 'ok', version);
     }
   }
 
