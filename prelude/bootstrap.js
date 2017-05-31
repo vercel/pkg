@@ -1085,7 +1085,7 @@ function payloadFileSync (pointer) {
     var im = require('internal/module');
     if (NODE_VERSION_MAJOR <= 7) {
       makeRequireFunction = function (m) {
-        im.makeRequireFunction.call(m);
+        return im.makeRequireFunction.call(m);
       };
     } else {
       makeRequireFunction = im.makeRequireFunction;

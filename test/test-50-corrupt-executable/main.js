@@ -15,8 +15,6 @@ const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-if (/^(node|v)?0/.test(target)) return;
-
 let right;
 
 utils.pkg.sync([
