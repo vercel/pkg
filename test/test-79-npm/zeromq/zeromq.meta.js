@@ -4,7 +4,6 @@ const home = require('../home.js');
 
 module.exports = function (stamp) {
   return {
-    allow: home(stamp) && (stamp.p === 'darwin'),
-    note: 'requires macOS'
+    allow: home(stamp)
   };
 };
