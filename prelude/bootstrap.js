@@ -1083,9 +1083,14 @@ function payloadFileSync (pointer) {
       return rqfn;
     };
   } else {
-    makeRequireFunction = (
-      require('internal/module').makeRequireFunction
-    );
+    var im = require('internal/module');
+    if (NODE_VERSION_MAJOR <= 7) {
+      makeRequireFunction = function (m) {
+        im.makeRequireFunction.call(m);
+      };
+    } else {
+      makeRequireFunction = im.makeRequireFunction;
+    }
   }
 
   Module.prototype._compile = function (content, filename_) {
@@ -1127,7 +1132,7 @@ function payloadFileSync (pointer) {
       var wrapper = script.runInThisContext(options);
       if (!wrapper) process.exit(4); // for example VERSION_MISMATCH
       var dirname = require('path').dirname(filename);
-      var rqfn = makeRequireFunction.call(this);
+      var rqfn = makeRequireFunction(this);
       var args = [ this.exports, rqfn, this, filename, dirname ];
       return wrapper.apply(this.exports, args);
     }
