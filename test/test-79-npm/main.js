@@ -17,7 +17,7 @@ const host = 'node' + process.version[1];
 const target = process.argv[2] || host;
 const windows = process.platform === 'win32';
 const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5 }[
-  process.version.match(/^(node|v)?(\d+)/)[2] | 0 ];
+  process.version.match(/^(node|v)?(\d+)/)[2] | 0];
 assert(npm !== undefined);
 
 function applyMetaToRight (right, meta) {
@@ -64,11 +64,11 @@ function update (p, r, v, note) {
   const rv = r + (v ? (',' + v) : '');
   const rn = r + (note ? (',' + note) : '');
   row[ss] = rv + (note ? (',' + note) : '');
-  const o2 = o ? o.split(',')[0] : '';
+  const o2 = o ? o.split(',')[0] : undefined;
   if ((!o) && (r !== 'ok')) {
     changes.push(p + ',' + ss + ': new ' + rn);
   } else
-  if ((o2 !== r) && (r !== 'ok')) {
+  if ((o2 !== undefined) && (o2 !== r)) {
     changes.push(p + ',' + ss + ': ' + o + ' -> ' + rn);
   }
   save();
@@ -187,28 +187,27 @@ dickies.some(function (dicky) {
     const build = meta.build;
     const earth = packy.replace('-shy', '');
     const moons = meta.moons || [];
-    const planets = moons.concat([ earth ]);
+    let planets = moons.concat([ earth ]);
     assert(planets.length > 0);
-    planets.some(function (planet) {
-      console.log('Installing ' + planet + '...');
-      let successful = false;
-      let counter = 10;
-      while ((!successful) && (counter > 0)) {
-        successful = true;
-        let command = 'npm install ' + planet;
-        if (npm >= 5) command += ' --no-save';
-        if (build) command += ' --build-from-source=' + build;
-        command += ' --unsafe-perm';
-        try {
-          utils.exec.sync(command, { cwd: foldy });
-        } catch (__) {
-          assert(__);
-          utils.vacuum.sync(path.join(foldy, 'node_modules'));
-          successful = false;
-          counter -= 1;
-        }
+    planets = planets.join(' ');
+    console.log('Installing ' + planets + '...');
+    let successful = false;
+    let counter = 10;
+    while ((!successful) && (counter > 0)) {
+      successful = true;
+      let command = 'npm install ' + planets;
+      if (npm >= 5) command += ' --no-save';
+      if (build) command += ' --build-from-source=' + build;
+      command += ' --unsafe-perm';
+      try {
+        utils.exec.sync(command, { cwd: foldy });
+      } catch (__) {
+        assert(__);
+        utils.vacuum.sync(path.join(foldy, 'node_modules'));
+        successful = false;
+        counter -= 1;
       }
-    });
+    }
 
     const packyVersion = JSON.parse(fs.readFileSync(
       path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
