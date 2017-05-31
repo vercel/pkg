@@ -1069,8 +1069,7 @@ function payloadFileSync (pointer) {
   var makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
-    makeRequireFunction = function () {
-      var self = this; // eslint-disable-line consistent-this,no-invalid-this
+    makeRequireFunction = function (self) {
       function rqfn (path) {
         return self.require(path);
       }
