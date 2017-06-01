@@ -22,8 +22,8 @@ fetch.need({
 }).then(function (needed) {
   right = utils.spawn.sync(
     './' + path.basename(needed),
-    [ '-e', 'if (global.gc) console.log("ok");',
-      '--runtime', '--expose-gc' ],
+    [ '--pkg-fallback', '--expose-gc',
+      '-e', 'if (global.gc) console.log("ok");' ],
     { cwd: path.dirname(needed) }
   );
 

@@ -34,7 +34,7 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 // /////////////////////////////////////////////////////////////////
 
 ENTRYPOINT = process.argv[1];
-if (ENTRYPOINT === 'DEFAULT_ENTRYPOINT') {
+if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
 
@@ -1202,62 +1202,6 @@ function payloadFileSync (pointer) {
   var ancestor = {};
   ancestor.spawn = childProcess.spawn;
 
-  function filterBadOptions (args) {
-    return args.filter(function (arg) {
-      var name = arg.split('=')[0];
-      return name !== '--debug-port';
-    });
-  }
-
-  function makeRuntimeArgs (args) {
-    var noBad = filterBadOptions(args);
-    if (!noBad.length) return [];
-    return [ '--runtime' ].concat(noBad);
-  }
-
-  function rearrange (args) {
-    var i;
-    var scriptPos = -1;
-    if (scriptPos === -1) {
-      for (i = 1; i < args.length; i += 1) {
-        if (args[i - 1] === '--entrypoint') {
-          args.splice(i - 1, 1);
-          scriptPos = i;
-          break;
-        }
-      }
-    }
-    if (scriptPos === -1) {
-      for (i = 0; i < args.length; i += 1) {
-        if (args[i].slice(0, 2) !== '--') {
-          scriptPos = i;
-          break;
-        }
-      }
-    }
-    if (scriptPos === -1) {
-      // i have never seen this case,
-      // but all arguments start with "--"
-      // hence they are runtime args
-      return makeRuntimeArgs(args);
-    } else {
-      var leftArgs = [];
-      if (args[scriptPos] !== ENTRYPOINT) {
-        leftArgs.push(
-          '--entrypoint',
-          args[scriptPos]
-        );
-      }
-      return leftArgs.concat(
-        args.slice(scriptPos + 1)
-      ).concat(
-        makeRuntimeArgs(
-          args.slice(0, scriptPos)
-        )
-      );
-    }
-  }
-
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
 
@@ -1271,161 +1215,10 @@ function payloadFileSync (pointer) {
 
       if (callsNode || callsExecPath || callsArgv1) {
         args[0] = process.execPath;
-        args[1] = rearrange(args[1]);
+        args[1].unshift('--pkg-fallback');
       }
     }
 
     return ancestor.spawn.apply(childProcess, args);
   };
 }());
-
-// /////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-
-/*
-
-    // TODO move to some test
-
-    assert(JSON.stringify(rearrange([
-      "/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/home/igor/script.js"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "--runtime",
-      "--node-opt-01"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      ENTRYPOINT
-    ])) === JSON.stringify([
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      ENTRYPOINT
-    ])) === JSON.stringify([
-      "--runtime",
-      "--node-opt-01"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      ENTRYPOINT
-    ])) === JSON.stringify([
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      ENTRYPOINT,
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "app-opt-01",
-      "app-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      ENTRYPOINT,
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "--entrypoint",
-      ENTRYPOINT,
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-*/
