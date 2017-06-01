@@ -26,9 +26,17 @@ const pairs = [
     output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpforkext-2.js',
     output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawnexp-1.js',
+  { input: './test-spawn-1.js',
     output: './run-time/test-output-' + rnd() + '.exe' },
-  { input: './test-spawnexp-2.js',
+  { input: './test-spawn-2.js',
+    output: './run-time/test-output-' + rnd() + '.exe' },
+  { input: './test-spawn-3.js',
+    output: './run-time/test-output-' + rnd() + '.exe' },
+  { input: './test-spawn-4.js',
+    output: './run-time/test-output-' + rnd() + '.exe' },
+  { input: './test-spawn-5.js',
+    output: './run-time/test-output-' + rnd() + '.exe' },
+  { input: './test-spawn-6.js',
     output: './run-time/test-output-' + rnd() + '.exe' }
 ];
 

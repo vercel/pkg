@@ -5,13 +5,8 @@
 var spawn = require('child_process').spawn;
 var child;
 
-if (process.send) {
-  require('./test-spawnexp-child.js');
-  return;
-}
-
 child = spawn(
-  process.execPath, [ process.argv[1] ],
+  process.execPath, [ require.resolve('./test-spawn-child.js') ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 

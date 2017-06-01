@@ -1236,27 +1236,19 @@ function payloadFileSync (pointer) {
       }
     }
     if (scriptPos === -1) {
-      // i dont know this case,
-      // but all options start with "--"
-      // hence they are runtime opts
+      // i have never seen this case,
+      // but all arguments start with "--"
+      // hence they are runtime args
       return makeRuntimeArgs(args);
-    } else
-    if (args[scriptPos] === process.argv[1]) {
-      // cluster calls "execPath" with process.argv[1]
-      // see "cluster.settings.exec = argv[1]"
-      // i must skip entrypoint to use default one
-      return [].concat(
-        args.slice(scriptPos + 1)
-      ).concat(
-        makeRuntimeArgs(
-          args.slice(0, scriptPos)
-        )
-      );
     } else {
-      return [].concat([
-        '--entrypoint',
-        args[scriptPos]
-      ]).concat(
+      var leftArgs = [];
+      if (args[scriptPos] !== ENTRYPOINT) {
+        leftArgs.push(
+          '--entrypoint',
+          args[scriptPos]
+        );
+      }
+      return leftArgs.concat(
         args.slice(scriptPos + 1)
       ).concat(
         makeRuntimeArgs(
@@ -1273,7 +1265,9 @@ function payloadFileSync (pointer) {
          args[1].unshift && args[2])) {
       var callsNode = (args[0] === 'node');
       var callsExecPath = (args[0] === process.execPath);
-      var callsArgv1 = (args[0] === process.argv[1]);
+      // ENTRYPOINT here because argv[1] may
+      // be altered before calling 'spawn'
+      var callsArgv1 = (args[0] === ENTRYPOINT);
 
       if (callsNode || callsExecPath || callsArgv1) {
         args[0] = process.execPath;
@@ -1357,13 +1351,30 @@ function payloadFileSync (pointer) {
     ]));
 
     assert(JSON.stringify(rearrange([
-      process["argv"][1]
+      "--node-opt-01",
+      "--node-opt-02",
+      "--entrypoint",
+      "/snapshot/home/igor/script.js",
+      "app-opt-01",
+      "app-opt-02"
+    ])) === JSON.stringify([
+      "--entrypoint",
+      "/snapshot/home/igor/script.js",
+      "app-opt-01",
+      "app-opt-02",
+      "--runtime",
+      "--node-opt-01",
+      "--node-opt-02"
+    ]));
+
+    assert(JSON.stringify(rearrange([
+      ENTRYPOINT
     ])) === JSON.stringify([
     ]));
 
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
-      process["argv"][1]
+      ENTRYPOINT
     ])) === JSON.stringify([
       "--runtime",
       "--node-opt-01"
@@ -1372,7 +1383,7 @@ function payloadFileSync (pointer) {
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
       "--node-opt-02",
-      process["argv"][1]
+      ENTRYPOINT
     ])) === JSON.stringify([
       "--runtime",
       "--node-opt-01",
@@ -1380,7 +1391,7 @@ function payloadFileSync (pointer) {
     ]));
 
     assert(JSON.stringify(rearrange([
-      process["argv"][1],
+      ENTRYPOINT,
       "app-opt-01",
       "app-opt-02"
     ])) === JSON.stringify([
@@ -1391,7 +1402,22 @@ function payloadFileSync (pointer) {
     assert(JSON.stringify(rearrange([
       "--node-opt-01",
       "--node-opt-02",
-      process["argv"][1],
+      ENTRYPOINT,
+      "app-opt-01",
+      "app-opt-02"
+    ])) === JSON.stringify([
+      "app-opt-01",
+      "app-opt-02",
+      "--runtime",
+      "--node-opt-01",
+      "--node-opt-02"
+    ]));
+
+    assert(JSON.stringify(rearrange([
+      "--node-opt-01",
+      "--node-opt-02",
+      "--entrypoint",
+      ENTRYPOINT,
       "app-opt-01",
       "app-opt-02"
     ])) === JSON.stringify([

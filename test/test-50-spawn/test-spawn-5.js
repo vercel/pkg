@@ -6,12 +6,12 @@ var spawn = require('child_process').spawn;
 var child;
 
 if (process.send) {
-  require('./test-spawnexp-child.js');
+  require('./test-spawn-child.js');
   return;
 }
 
 child = spawn(
-  process.execPath, [ process.argv[1], 'argvx', 'argvy' ],
+  process.execPath, [ process.argv[1] ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
