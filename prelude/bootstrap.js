@@ -26,7 +26,6 @@ var stripSnapshot = common.stripSnapshot;
 var removeUplevels = common.removeUplevels;
 
 var ENTRYPOINT;
-var FLAG_FORK_WAS_CALLED = false;
 var FLAG_DISABLE_DOT_NODE = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
@@ -1195,44 +1194,13 @@ function payloadFileSync (pointer) {
 }());
 
 // /////////////////////////////////////////////////////////////////
-// PATCH CLUSTER ///////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-
-(function () {
-  var cluster = require('cluster');
-  var ancestor = {};
-  ancestor.fork = cluster.fork;
-
-  if (ancestor.fork) {
-    cluster.fork = function () {
-      FLAG_FORK_WAS_CALLED = true;
-      try {
-        return ancestor.fork.apply(cluster, arguments);
-      } finally {
-        FLAG_FORK_WAS_CALLED = false;
-      }
-    };
-  }
-}());
-
-// /////////////////////////////////////////////////////////////////
 // PATCH CHILD_PROCESS /////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
 (function () {
   var childProcess = require('child_process');
   var ancestor = {};
-  ancestor.fork = childProcess.fork;
   ancestor.spawn = childProcess.spawn;
-
-  childProcess.fork = function () {
-    FLAG_FORK_WAS_CALLED = true;
-    try {
-      return ancestor.fork.apply(childProcess, arguments);
-    } finally {
-      FLAG_FORK_WAS_CALLED = false;
-    }
-  };
 
   function filterBadOptions (args) {
     return args.filter(function (arg) {
@@ -1247,12 +1215,24 @@ function payloadFileSync (pointer) {
     return [ '--runtime' ].concat(noBad);
   }
 
-  function rearrangeFork (args) {
+  function rearrange (args) {
+    var i;
     var scriptPos = -1;
-    for (var i = 0; i < args.length; i += 1) {
-      if (args[i].slice(0, 2) !== '--') {
-        scriptPos = i;
-        break;
+    if (scriptPos === -1) {
+      for (i = 1; i < args.length; i += 1) {
+        if (args[i - 1] === '--entrypoint') {
+          args.splice(i - 1, 1);
+          scriptPos = i;
+          break;
+        }
+      }
+    }
+    if (scriptPos === -1) {
+      for (i = 0; i < args.length; i += 1) {
+        if (args[i].slice(0, 2) !== '--') {
+          scriptPos = i;
+          break;
+        }
       }
     }
     if (scriptPos === -1) {
@@ -1286,23 +1266,6 @@ function payloadFileSync (pointer) {
     }
   }
 
-  function rearrangeSpawn (args) {
-    var scriptPos = 0;
-    if (args[scriptPos] === process.argv[1]) {
-      return [].concat(
-        args.slice(scriptPos + 1)
-      );
-    } else {
-      return [].concat(args);
-    }
-  }
-
-  function extractEntrypoint (args) {
-    var i = args.indexOf('--entrypoint');
-    if (i < 0) return null;
-    return args[i + 1];
-  }
-
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
 
@@ -1312,22 +1275,9 @@ function payloadFileSync (pointer) {
       var callsExecPath = (args[0] === process.execPath);
       var callsArgv1 = (args[0] === process.argv[1]);
 
-      if (callsNode || callsExecPath) {
-        if (FLAG_FORK_WAS_CALLED) {
-          args[1] = rearrangeFork(args[1]);
-        } else {
-          args[1] = rearrangeSpawn(args[1]);
-        }
-
-        var entrypoint = extractEntrypoint(args[1]);
-        if (callsNode && insideSnapshot(entrypoint)) {
-          // pm2 calls "node" with __dirname-based
-          // snapshot-script. force execPath instead of "node"
-          args[0] = process.execPath;
-        }
-      } else
-      if (callsArgv1) {
+      if (callsNode || callsExecPath || callsArgv1) {
         args[0] = process.execPath;
+        args[1] = rearrange(args[1]);
       }
     }
 

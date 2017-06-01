@@ -2,7 +2,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
@@ -11,7 +10,6 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'host';
-const windows = process.platform === 'win32';
 
 function rnd () {
   return Math.random().toString().slice(-6);
@@ -33,24 +31,6 @@ const pairs = [
   { input: './test-spawnexp-2.js',
     output: './run-time/test-output-' + rnd() + '.exe' }
 ];
-
-if (!windows) {
-  pairs.push(
-    { input: './test-spawn-1.js',
-      output: './run-time/test-output-' + rnd() + '.exe' },
-    { input: './test-spawn-2.js',
-      output: './run-time/test-output-' + rnd() + '.exe' }
-  );
-}
-
-function chmodPlusX (file) {
-  const stat = fs.statSync(file);
-  const plusx = (stat.mode | 64 | 8).toString(8).slice(-3);
-  fs.chmodSync(file, plusx);
-}
-
-chmodPlusX('./test-spawn-1.js');
-chmodPlusX('./test-spawn-2.js');
 
 function stripTraceOpt (lines) {
   return lines.split('\n').filter(function (line) {
@@ -87,7 +67,12 @@ pairs.some(function (pair) {
 
   right = stripTraceOpt(right);
   left = stripTraceOpt(left);
-  assert.equal(left, right);
+  if (left !== right) {
+    console.log(JSON.stringify(pair));
+    console.log(left);
+    console.log(right);
+    throw new Error('Assertion');
+  }
   utils.vacuum.sync('run-time');
   utils.vacuum.sync(output);
 });
