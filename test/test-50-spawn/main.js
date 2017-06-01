@@ -17,27 +17,31 @@ function rnd () {
 
 const pairs = [
   { input: './test-cluster.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-1.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-2.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpforkext-1.js',
     output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpforkext-2.js',
     output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-1.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-2.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-3.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-4.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-5.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
+    output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-6.js',
-    output: './run-time/test-output-' + rnd() + '.exe' }
+    output: './test-output-' + rnd() + '.exe' },
+  { input: './test-spawnext-1.js',
+    output: './test-output-' + rnd() + '.exe' },
+  { input: './test-spawnext-2.js',
+    output: './test-output-' + rnd() + '.exe' }
 ];
 
 function stripTraceOpt (lines) {
@@ -81,6 +85,6 @@ pairs.some(function (pair) {
     console.log(right);
     throw new Error('Assertion');
   }
-  utils.vacuum.sync('run-time');
+
   utils.vacuum.sync(output);
 });
