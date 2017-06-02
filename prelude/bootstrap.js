@@ -25,7 +25,7 @@ var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
 var removeUplevels = common.removeUplevels;
 
-var ARGV0, ENTRYPOINT;
+var ARGV0, ENTRYPOINT, EXECPATH;
 var FLAG_DISABLE_DOT_NODE = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
@@ -38,6 +38,8 @@ ENTRYPOINT = process.argv[1];
 if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
+
+EXECPATH = process.execPath;
 
 // /////////////////////////////////////////////////////////////////
 // MOUNTPOINTS /////////////////////////////////////////////////////
@@ -128,7 +130,7 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 function projectToFilesystem (f) {
   return require('path').join(
     require('path').dirname(
-      process.execPath
+      EXECPATH
     ),
     removeUplevels(
       require('path').relative(
@@ -143,7 +145,7 @@ function projectToFilesystem (f) {
 function projectToNearby (f) {
   return require('path').join(
     require('path').dirname(
-      process.execPath
+      EXECPATH
     ),
     require('path').basename(
       f
@@ -1201,6 +1203,8 @@ function payloadFileSync (pointer) {
   ancestor.spawnSync = childProcess.spawnSync;
   ancestor.execFile = childProcess.execFile;
   ancestor.execFileSync = childProcess.execFileSync;
+  ancestor.exec = childProcess.exec;
+  ancestor.execSync = childProcess.execSync;
 
   function modifyCmdArgs (args) {
     if (!args[0]) return;
@@ -1208,18 +1212,46 @@ function payloadFileSync (pointer) {
       args.splice(1, 0, []);
     }
     if (args[0] === 'node' ||
-        args[0] === process.execPath ||
         // ENTRYPOINT and ARGV0 here because argv[1]
         // may be altered before calling 'spawn'
         args[0] === ARGV0 ||
-        args[0] === ENTRYPOINT) {
-      args[0] = process.execPath;
+        args[0] === ENTRYPOINT ||
+        args[0] === EXECPATH) {
+      args[0] = EXECPATH;
       args[1].unshift('--pkg-fallback');
       if (NODE_VERSION_MAJOR === 0) {
         args[1] = args[1].filter(function (a) {
           return (a.slice(0, 13) !== '--debug-port=');
         });
       }
+    }
+  }
+
+  function startsWith (args, sub) {
+    var space = sub + ' ';
+    if (args[0].slice(0, space.length) === space) {
+      args[0] = args[0].slice(sub.length); // not space!
+      return true;
+    }
+    if (args[0] === sub) {
+      args[0] = '';
+      return true;
+    }
+    return false;
+  }
+
+  function modifyCmd (args) {
+    if (!args[0]) return;
+    if (startsWith(args, 'node') ||
+        // ENTRYPOINT and ARGV0 here because argv[1]
+        // may be altered before calling 'spawn'
+        startsWith(args, ARGV0) ||
+        startsWith(args, JSON.stringify(ARGV0)) ||
+        startsWith(args, ENTRYPOINT) ||
+        startsWith(args, JSON.stringify(ENTRYPOINT)) ||
+        startsWith(args, EXECPATH) ||
+        startsWith(args, JSON.stringify(EXECPATH))) {
+      args[0] = JSON.stringify(EXECPATH) + ' --pkg-fallback' + args[0];
     }
   }
 
@@ -1245,5 +1277,17 @@ function payloadFileSync (pointer) {
     var args = cloneArgs(arguments);
     modifyCmdArgs(args);
     return ancestor.execFileSync.apply(childProcess, args);
+  };
+
+  childProcess.exec = function () {
+    var args = cloneArgs(arguments);
+    modifyCmd(args);
+    return ancestor.exec.apply(childProcess, args);
+  };
+
+  childProcess.execSync = function () {
+    var args = cloneArgs(arguments);
+    modifyCmd(args);
+    return ancestor.execSync.apply(childProcess, args);
   };
 }());
