@@ -165,6 +165,13 @@ dickies.some(function (dicky) {
     meta = {};
   }
 
+  const ci = meta.ci;
+
+  if (ci === 'skip') {
+    console.log(wordy + ' is skipped in CI!');
+    return;
+  }
+
   let allow;
 
   if (typeof meta.allow !== 'undefined') {

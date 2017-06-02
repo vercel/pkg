@@ -6,12 +6,12 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-let dicts = fs.readdirSync('../../dictionary');
-dicts = dicts.filter(function (dict) {
-  return dict !== '.eslintrc.json';
-}).map(function (dict) {
-  assert.equal(dict.slice(-3), '.js');
-  return dict.slice(0, -3);
+let configs = fs.readdirSync('../../dictionary');
+configs = configs.filter(function (config) {
+  return config !== '.eslintrc.json';
+}).map(function (config) {
+  assert.equal(config.slice(-3), '.js');
+  return config.slice(0, -3);
 });
 
 let tests = fs.readdirSync('../test-79-npm');
@@ -24,22 +24,22 @@ tests = tests.filter(function (test) {
 tests.push('etc'); // TODO who creates it?
 tests.push('steam-resources'); // absent in npm. installed via github
 
-dicts.push('etc'); // TODO who creates it?
-dicts.push('express-with-jade');
-dicts.push('redis-with-hiredis');
+configs.push('etc'); // TODO who creates it?
+configs.push('express-with-jade');
+configs.push('redis-with-hiredis');
 
 let absent = false;
 
-dicts.some(function (dict) {
-  if (tests.indexOf(dict) < 0) {
-    console.log(dict + ' is absent in tests');
+configs.some(function (config) {
+  if (tests.indexOf(config) < 0) {
+    console.log(config + ' is absent in tests');
     absent = true;
   }
 });
 
 tests.some(function (test) {
-  if (dicts.indexOf(test) < 0) {
-    console.log(test + ' is absent in dicts');
+  if (configs.indexOf(test) < 0) {
+    console.log(test + ' is absent in dictionary');
     absent = true;
   }
 });
