@@ -53,9 +53,9 @@
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "prepublish": "in-install || (eslint-klopov . && npm run test:nonpm && npm run babel)",
-    "test": "eslint-klopov . && npm run babel && node test/test.js node0 nonpm && node test/test.js node4 nonpm && node test/test.js node7 nonpm && node test/test.js node8 nonpm && node test/test.js node6",
-    "test:nonpm": "node test/test.js node6 nonpm"
+    "prepublish": "in-install || (eslint-klopov . && npm run test:no-npm && npm run babel)",
+    "test": "eslint-klopov . && npm run babel && node test/test.js node0 no-npm && node test/test.js node4 no-npm && node test/test.js node6 no-npm && node test/test.js node7 no-npm && node test/test.js node8 no-npm && node test/test.js host only-npm",
+    "test:no-npm": "node test/test.js node6 no-npm"
   },
   "eslintConfig": {
     "extends": "klopov",

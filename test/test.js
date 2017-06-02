@@ -6,18 +6,25 @@ const chalk = require('chalk');
 const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
-const host = 'node' + process.version[1];
-const target = process.argv[2] || host;
+const target = process.argv[2] || 'host';
 const modify = process.argv[3];
 
-const list = [ path.join(__dirname, '*/main.js') ];
+console.log('');
+console.log('*************************************');
+console.log(process.argv.slice(2).join(' '));
+console.log('*************************************');
+console.log('');
 
-// TODO restore fetch-all test
-list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
+const list = [];
 
-if (modify === 'nonpm') {
-  list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
-  list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+if (modify === 'only-npm') {
+  list.push(path.join(__dirname, 'test-79-npm/main.js'));
+} else {
+  list.push(path.join(__dirname, '*/main.js'));
+  if (modify === 'no-npm') {
+    list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
+    list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+  }
 }
 
 const files = globby.sync(list);
