@@ -45,6 +45,10 @@ const pairs = [
   { input: './test-spawn-b-1.js',
     output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-b-2.js',
+    output: './test-output-' + rnd() + '.exe' },
+  { input: './test-spawnSync-a-1.js',
+    output: './test-output-' + rnd() + '.exe' },
+  { input: './test-spawnSync-a-2.js',
     output: './test-output-' + rnd() + '.exe' }
 ];
 

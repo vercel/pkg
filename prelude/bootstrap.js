@@ -25,7 +25,7 @@ var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
 var removeUplevels = common.removeUplevels;
 
-var ENTRYPOINT;
+var ARGV0, ENTRYPOINT;
 var FLAG_DISABLE_DOT_NODE = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
@@ -33,6 +33,7 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 // ENTRYPOINT //////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
+ARGV0 = process.argv[0];
 ENTRYPOINT = process.argv[1];
 if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
@@ -1197,19 +1198,17 @@ function payloadFileSync (pointer) {
   var childProcess = require('child_process');
   var ancestor = {};
   ancestor.spawn = childProcess.spawn;
+  ancestor.spawnSync = childProcess.spawnSync;
 
-  childProcess.spawn = function () {
-    var args = cloneArgs(arguments);
-
+  function modifySpawnArgs (args) {
     if ((args[0] && args[1] &&
          args[1].unshift && args[2])) {
-      var callsNode = (args[0] === 'node');
-      var callsExecPath = (args[0] === process.execPath);
-      // ENTRYPOINT here because argv[1] may
-      // be altered before calling 'spawn'
-      var callsArgv1 = (args[0] === ENTRYPOINT);
-
-      if (callsNode || callsExecPath || callsArgv1) {
+      if (args[0] === 'node' ||
+          args[0] === process.execPath ||
+          // ENTRYPOINT and ARGV0 here because argv[1]
+          // may be altered before calling 'spawn'
+          args[0] === ARGV0 ||
+          args[0] === ENTRYPOINT) {
         args[0] = process.execPath;
         args[1].unshift('--pkg-fallback');
         if (NODE_VERSION_MAJOR === 0) {
@@ -1219,7 +1218,17 @@ function payloadFileSync (pointer) {
         }
       }
     }
+  }
 
+  childProcess.spawn = function () {
+    var args = cloneArgs(arguments);
+    modifySpawnArgs(args);
     return ancestor.spawn.apply(childProcess, args);
+  };
+
+  childProcess.spawnSync = function () {
+    var args = cloneArgs(arguments);
+    modifySpawnArgs(args);
+    return ancestor.spawnSync.apply(childProcess, args);
   };
 }());
