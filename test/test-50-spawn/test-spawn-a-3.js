@@ -3,9 +3,8 @@
 'use strict';
 
 var spawn = require('child_process').spawn;
-var child;
 
-child = spawn(
+var child = spawn(
   process.execPath, [
     require.resolve('./test-spawn-a-child.js')
   ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
@@ -19,5 +18,5 @@ child.on('message', function (value) {
 child.send(2);
 
 child.on('exit', function () {
-  console.log('Spawn child exited');
+  console.log('Child exited');
 });

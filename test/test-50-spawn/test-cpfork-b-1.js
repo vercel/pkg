@@ -26,5 +26,5 @@ child.on('message', function (value) {
 child.send(2);
 
 child.on('exit', function () {
-  console.log('Forked child exited');
+  console.log('Child exited');
 });

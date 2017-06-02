@@ -4,9 +4,8 @@
 
 var path = require('path');
 var spawn = require('child_process').spawn;
-var child;
 
-child = spawn(
+var child = spawn(
   process.execPath, [ path.join(
     process.cwd(),
     'test-spawn-b-child.js'
@@ -22,5 +21,5 @@ child.on('message', function (value) {
 child.send(2);
 
 child.on('exit', function () {
-  console.log('Spawn child exited');
+  console.log('Child exited');
 });

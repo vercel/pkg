@@ -4,14 +4,13 @@
 
 var path = require('path');
 var spawn = require('child_process').spawn;
-var child;
 
 if (process.send) {
   require('./test-spawn-a-child.js');
   return;
 }
 
-child = spawn(
+var child = spawn(
   process.argv[0], [
     path.join(process.cwd(), path.basename(__filename))
   ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
@@ -25,5 +24,5 @@ child.on('message', function (value) {
 child.send(2);
 
 child.on('exit', function () {
-  console.log('Spawn child exited');
+  console.log('Child exited');
 });

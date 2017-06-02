@@ -4,8 +4,10 @@
 
 var spawnSync = require('child_process').spawnSync;
 
-spawnSync(
+var child = spawnSync(
   process.execPath, [
     require.resolve('./test-spawnSync-a-child.js'), 'argvx', 'argvy'
-  ], { stdio: [ 'inherit', 'inherit', 'inherit' ] }
+  ], { stdio: 'inherit' }
 );
+
+console.log(child.status);
