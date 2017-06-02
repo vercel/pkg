@@ -3,16 +3,17 @@
 'use strict';
 
 var assert = require('assert');
+var path = require('path');
 var cp = require('child_process');
 var child;
 
 assert(!process.send);
 
 try {
-  child = cp.fork(
-    require.resolve('./test-cpfork-child.js'),
-    [ 'argx', 'argvy' ]
-  );
+  child = cp.fork(path.join(
+    process.cwd(),
+    'test-cpfork-b-child.js'
+  ));
 } catch (e) {
   console.log(e.message);
 }

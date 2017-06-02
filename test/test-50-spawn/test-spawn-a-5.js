@@ -6,7 +6,7 @@ var spawn = require('child_process').spawn;
 var child;
 
 if (process.send) {
-  require('./test-spawn-child.js');
+  require('./test-spawn-a-child.js');
   return;
 }
 

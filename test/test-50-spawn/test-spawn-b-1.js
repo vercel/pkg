@@ -2,11 +2,15 @@
 
 'use strict';
 
+var path = require('path');
 var spawn = require('child_process').spawn;
 var child;
 
 child = spawn(
-  process.execPath, [ require.resolve('./test-spawn-child.js') ],
+  process.execPath, [ path.join(
+    process.cwd(),
+    'test-spawn-b-child.js'
+  ) ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 

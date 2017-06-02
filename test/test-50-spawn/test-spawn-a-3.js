@@ -6,8 +6,9 @@ var spawn = require('child_process').spawn;
 var child;
 
 child = spawn(
-  process.execPath, [ require.resolve('./test-spawn-child.js'), 'argvx', 'argvy' ],
-  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
+  process.execPath, [
+    require.resolve('./test-spawn-a-child.js')
+  ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
 child.on('message', function (value) {
