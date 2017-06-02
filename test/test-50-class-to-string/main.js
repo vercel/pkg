@@ -15,8 +15,6 @@ const input = './test-x-index.js';
 const output = './test-output.exe';
 
 if (/^(node|v)?0/.test(target)) return;
-// did not make a patch for node4 :p
-if (/^(node|v)?4/.test(target)) return;
 
 let right;
 
