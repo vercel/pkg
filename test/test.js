@@ -12,6 +12,9 @@ const modify = process.argv[3];
 
 const list = [ path.join(__dirname, '*/main.js') ];
 
+// TODO restore fetch-all test
+list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
+
 if (modify === 'nonpm') {
   list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
   list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
