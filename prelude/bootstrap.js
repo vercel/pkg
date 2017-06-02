@@ -1202,21 +1202,22 @@ function payloadFileSync (pointer) {
   ancestor.execFile = childProcess.execFile;
 
   function modifyArgs (args) {
-    if ((args[0] && args[1] &&
-         args[1].unshift)) {
-      if (args[0] === 'node' ||
-          args[0] === process.execPath ||
-          // ENTRYPOINT and ARGV0 here because argv[1]
-          // may be altered before calling 'spawn'
-          args[0] === ARGV0 ||
-          args[0] === ENTRYPOINT) {
-        args[0] = process.execPath;
-        args[1].unshift('--pkg-fallback');
-        if (NODE_VERSION_MAJOR === 0) {
-          args[1] = args[1].filter(function (a) {
-            return (a.slice(0, 13) !== '--debug-port=');
-          });
-        }
+    if (!args[0]) return;
+    if (!Array.isArray(args[1])) {
+      args.splice(1, 0, []);
+    }
+    if (args[0] === 'node' ||
+        args[0] === process.execPath ||
+        // ENTRYPOINT and ARGV0 here because argv[1]
+        // may be altered before calling 'spawn'
+        args[0] === ARGV0 ||
+        args[0] === ENTRYPOINT) {
+      args[0] = process.execPath;
+      args[1].unshift('--pkg-fallback');
+      if (NODE_VERSION_MAJOR === 0) {
+        args[1] = args[1].filter(function (a) {
+          return (a.slice(0, 13) !== '--debug-port=');
+        });
       }
     }
   }

@@ -8,5 +8,5 @@ var cluster = require('cluster');
 assert(!process.send);
 assert(!cluster.worker);
 
-console.log('Hello from spawnSync-a-child!');
+console.log('Hello from spawnSync-child!');
 console.log('Args', JSON.stringify(process.argv.slice(2)));

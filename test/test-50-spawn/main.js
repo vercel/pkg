@@ -21,20 +21,13 @@ const pairs = [
   { input: './test-cpfork-a-2.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-b-1.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-cpfork-b-2.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-execFile-a-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-execFile-a-2.js', output: './test-output-' + rnd() + '.exe' },
+  { input: './test-execFile.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-a-1.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-a-2.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-a-3.js', output: './test-output-' + rnd() + '.exe' },
   { input: './test-spawn-a-4.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-5.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-6.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-7.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-8.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-b-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-b-2.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawnSync-a-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawnSync-a-2.js', output: './test-output-' + rnd() + '.exe' }
+  { input: './test-spawn-b.js', output: './test-output-' + rnd() + '.exe' },
+  { input: './test-spawnSync.js', output: './test-output-' + rnd() + '.exe' }
 ];
 
 function stripTraceOpt (lines) {

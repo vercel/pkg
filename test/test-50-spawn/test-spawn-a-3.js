@@ -4,10 +4,14 @@
 
 var spawn = require('child_process').spawn;
 
+if (process.send) {
+  require('./test-spawn-a-child.js');
+  return;
+}
+
 var child = spawn(
-  process.execPath, [
-    require.resolve('./test-spawn-a-child.js')
-  ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
+  process.execPath, [ process.argv[1], 'argvx', 'argvy' ],
+  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
 child.on('message', function (value) {
