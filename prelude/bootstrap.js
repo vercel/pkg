@@ -1212,6 +1212,11 @@ function payloadFileSync (pointer) {
       if (callsNode || callsExecPath || callsArgv1) {
         args[0] = process.execPath;
         args[1].unshift('--pkg-fallback');
+        if (NODE_VERSION_MAJOR === 0) {
+          args[1] = args[1].filter(function (a) {
+            return (a.slice(0, 13) !== '--debug-port=');
+          });
+        }
       }
     }
 
