@@ -290,9 +290,9 @@ const table = {
     "darwin/x64/m57": "ok,4.15.3"
   },
   "express-load": {
-    "darwin/x64/m48": "ok,1.1.15",
-    "darwin/x64/m51": "ok,1.1.15",
-    "darwin/x64/m57": "bad-test,1.1.15"
+    "darwin/x64/m48": "ok,1.1.16",
+    "darwin/x64/m51": "ok,1.1.16",
+    "darwin/x64/m57": "ok,1.1.16"
   },
   "express-session": {
     "darwin/x64/m48": "ok,1.15.3",

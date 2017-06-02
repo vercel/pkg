@@ -14,6 +14,6 @@ var parser = new Parser({
   }
 });
 
-if (typeof parser.name === 'string') {
+if (Array.isArray(parser.bufferCache)) {
   console.log('ok');
 }
