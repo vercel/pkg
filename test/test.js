@@ -6,7 +6,9 @@ const chalk = require('chalk');
 const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
-const target = process.argv[2] || 'host';
+const host = 'node' + process.version[1];
+let target = process.argv[2] || 'host';
+if (target === 'host') target = host;
 const modify = process.argv[3];
 
 console.log('');

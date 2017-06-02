@@ -1206,6 +1206,42 @@ function payloadFileSync (pointer) {
   ancestor.exec = childProcess.exec;
   ancestor.execSync = childProcess.execSync;
 
+  var impostor = JSON.stringify(EXECPATH) + ' --pkg-fallback';
+
+  function startsWith2 (args, index, name) {
+    var quote = '"' + name + ' ';
+    if (args[index].slice(0, quote.length) === quote) {
+      args[index] = '"' + impostor + ' ' + args[index].slice(quote.length);
+      return true;
+    }
+    var space = name + ' ';
+    if (args[index].slice(0, space.length) === space) {
+      args[index] = impostor + ' ' + args[index].slice(space.length);
+      return true;
+    }
+    if (args[index] === name) {
+      args[index] = impostor;
+      return true;
+    }
+    return false;
+  }
+
+  function startsWith (args, index, name) {
+    return startsWith2(args, index, name) ||
+           startsWith2(args, index, '"' + name + '"') ||
+           startsWith2(args, index, JSON.stringify(name));
+  }
+
+  function modifyCmd (args) {
+    if (!args[0]) return;
+    return (startsWith(args, 0, 'node') ||
+            // ENTRYPOINT and ARGV0 here because argv[1]
+            // may be altered before calling 'spawn'
+            startsWith(args, 0, ARGV0) ||
+            startsWith(args, 0, ENTRYPOINT) ||
+            startsWith(args, 0, EXECPATH));
+  }
+
   function modifyCmdArgs (args) {
     if (!args[0]) return;
     if (!Array.isArray(args[1])) {
@@ -1224,38 +1260,6 @@ function payloadFileSync (pointer) {
           return (a.slice(0, 13) !== '--debug-port=');
         });
       }
-    }
-  }
-
-  function startsWith2 (args, name) {
-    var space = name + ' ';
-    if (args[0].slice(0, space.length) === space) {
-      args[0] = args[0].slice(name.length); // not space!
-      return true;
-    }
-    if (args[0] === name) {
-      args[0] = '';
-      return true;
-    }
-    return false;
-  }
-
-  function startsWith (args, name) {
-    return startsWith2(args, name) ||
-           startsWith2(args, '"' + name + '"') ||
-           startsWith2(args, JSON.stringify(name));
-  }
-
-  function modifyCmd (args) {
-    if (!args[0]) return;
-    if (startsWith(args, 'node') ||
-        // ENTRYPOINT and ARGV0 here because argv[1]
-        // may be altered before calling 'spawn'
-        startsWith(args, ARGV0) ||
-        startsWith(args, ENTRYPOINT) ||
-        startsWith(args, EXECPATH)) {
-      args[0] = JSON.stringify(EXECPATH) +
-        ' --pkg-fallback' + args[0];
     }
   }
 
