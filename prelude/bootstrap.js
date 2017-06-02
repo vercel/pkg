@@ -1232,17 +1232,17 @@ function payloadFileSync (pointer) {
            startsWith2(args, index, JSON.stringify(name));
   }
 
-  function modifyCmd (args) {
-    if (!args[0]) return;
-    return (startsWith(args, 0, 'node') ||
+  function modifyLong (args, index) {
+    if (!args[index]) return;
+    return (startsWith(args, index, 'node') ||
             // ENTRYPOINT and ARGV0 here because argv[1]
             // may be altered before calling 'spawn'
-            startsWith(args, 0, ARGV0) ||
-            startsWith(args, 0, ENTRYPOINT) ||
-            startsWith(args, 0, EXECPATH));
+            startsWith(args, index, ARGV0) ||
+            startsWith(args, index, ENTRYPOINT) ||
+            startsWith(args, index, EXECPATH));
   }
 
-  function modifyCmdArgs (args) {
+  function modifyShort (args) {
     if (!args[0]) return;
     if (!Array.isArray(args[1])) {
       args.splice(1, 0, []);
@@ -1260,42 +1260,57 @@ function payloadFileSync (pointer) {
           return (a.slice(0, 13) !== '--debug-port=');
         });
       }
+    } else
+    if (require('path').basename(args[0]) === 'cmd.exe') {
+      for (var i = 0; i < args[1].length; i += 1) {
+        modifyLong(args[1], i);
+      }
     }
   }
 
+/*
+  var ms = [
+    '/Windows/system32/cmd.exe', [
+      '/s', '/c', '"node "D:\\snapshot\\fixture.js""'
+    ]
+  ];
+  modifyShort(ms);
+  console.log(ms);
+*/
+
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
-    modifyCmdArgs(args);
+    modifyShort(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
   childProcess.spawnSync = function () {
     var args = cloneArgs(arguments);
-    modifyCmdArgs(args);
+    modifyShort(args);
     return ancestor.spawnSync.apply(childProcess, args);
   };
 
   childProcess.execFile = function () {
     var args = cloneArgs(arguments);
-    modifyCmdArgs(args);
+    modifyShort(args);
     return ancestor.execFile.apply(childProcess, args);
   };
 
   childProcess.execFileSync = function () {
     var args = cloneArgs(arguments);
-    modifyCmdArgs(args);
+    modifyShort(args);
     return ancestor.execFileSync.apply(childProcess, args);
   };
 
   childProcess.exec = function () {
     var args = cloneArgs(arguments);
-    modifyCmd(args);
+    modifyLong(args, 0);
     return ancestor.exec.apply(childProcess, args);
   };
 
   childProcess.execSync = function () {
     var args = cloneArgs(arguments);
-    modifyCmd(args);
+    modifyLong(args, 0);
     return ancestor.execSync.apply(childProcess, args);
   };
 }());
