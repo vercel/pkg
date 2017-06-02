@@ -11,27 +11,21 @@ var updateNotifier = require('update-notifier');
 var pjson = { name: 'pkg', version: '3.0.0' };
 var notifier;
 
-function runNotifier (cb) {
+function runNotifier () {
   notifier = updateNotifier({
     pkg: pjson,
     updateCheckInterval: 0
   });
   setTimeout(function () {
-    cb(notifier.update);
-  }, 950);
+    if (spawnWasCalled &&
+        notifier.update &&
+        notifier.update.current === '3.0.0') {
+      console.log('ok');
+      process.exit(0);
+    } else {
+      runNotifier();
+    }
+  }, 1984);
 }
 
-// never works first time.
-// it seems to create some
-// persistent structures
-
-runNotifier(function () {
-  runNotifier(function (update) {
-    if (spawnWasCalled &&
-        update &&
-        update.current === '3.0.0') {
-      console.log('ok');
-    }
-    process.exit(0);
-  });
-});
+runNotifier();
