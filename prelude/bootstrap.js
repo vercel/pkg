@@ -1227,17 +1227,23 @@ function payloadFileSync (pointer) {
     }
   }
 
-  function startsWith (args, sub) {
-    var space = sub + ' ';
+  function startsWith2 (args, name) {
+    var space = name + ' ';
     if (args[0].slice(0, space.length) === space) {
-      args[0] = args[0].slice(sub.length); // not space!
+      args[0] = args[0].slice(name.length); // not space!
       return true;
     }
-    if (args[0] === sub) {
+    if (args[0] === name) {
       args[0] = '';
       return true;
     }
     return false;
+  }
+
+  function startsWith (args, name) {
+    return startsWith2(args, name) ||
+           startsWith2(args, '"' + name + '"') ||
+           startsWith2(args, JSON.stringify(name));
   }
 
   function modifyCmd (args) {
@@ -1246,12 +1252,10 @@ function payloadFileSync (pointer) {
         // ENTRYPOINT and ARGV0 here because argv[1]
         // may be altered before calling 'spawn'
         startsWith(args, ARGV0) ||
-        startsWith(args, JSON.stringify(ARGV0)) ||
         startsWith(args, ENTRYPOINT) ||
-        startsWith(args, JSON.stringify(ENTRYPOINT)) ||
-        startsWith(args, EXECPATH) ||
-        startsWith(args, JSON.stringify(EXECPATH))) {
-      args[0] = JSON.stringify(EXECPATH) + ' --pkg-fallback' + args[0];
+        startsWith(args, EXECPATH)) {
+      args[0] = JSON.stringify(EXECPATH) +
+        ' --pkg-fallback' + args[0];
     }
   }
 
