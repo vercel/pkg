@@ -49,7 +49,7 @@ right = utils.spawn.sync(
 left = left.split('\n');
 right = right.split('\n');
 // right may have less lines, premature exit,
-// less trused, so using left.length here
+// less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
   assert.equal(left[i], right[i]);
 }
