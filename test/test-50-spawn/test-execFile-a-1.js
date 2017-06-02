@@ -11,6 +11,6 @@ var child = execFile(
 );
 
 child.on('exit', function (code) {
-  // TODO console.log(code);
+  console.log(code);
   console.log('Child exited');
 });

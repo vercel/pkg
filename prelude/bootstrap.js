@@ -1199,10 +1199,11 @@ function payloadFileSync (pointer) {
   var ancestor = {};
   ancestor.spawn = childProcess.spawn;
   ancestor.spawnSync = childProcess.spawnSync;
+  ancestor.execFile = childProcess.execFile;
 
-  function modifySpawnArgs (args) {
+  function modifyArgs (args) {
     if ((args[0] && args[1] &&
-         args[1].unshift && args[2])) {
+         args[1].unshift)) {
       if (args[0] === 'node' ||
           args[0] === process.execPath ||
           // ENTRYPOINT and ARGV0 here because argv[1]
@@ -1222,13 +1223,19 @@ function payloadFileSync (pointer) {
 
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
-    modifySpawnArgs(args);
+    modifyArgs(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
   childProcess.spawnSync = function () {
     var args = cloneArgs(arguments);
-    modifySpawnArgs(args);
+    modifyArgs(args);
     return ancestor.spawnSync.apply(childProcess, args);
+  };
+
+  childProcess.execFile = function () {
+    var args = cloneArgs(arguments);
+    modifyArgs(args);
+    return ancestor.execFile.apply(childProcess, args);
   };
 }());
