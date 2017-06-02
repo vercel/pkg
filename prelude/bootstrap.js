@@ -1200,8 +1200,9 @@ function payloadFileSync (pointer) {
   ancestor.spawn = childProcess.spawn;
   ancestor.spawnSync = childProcess.spawnSync;
   ancestor.execFile = childProcess.execFile;
+  ancestor.execFileSync = childProcess.execFileSync;
 
-  function modifyArgs (args) {
+  function modifyCmdArgs (args) {
     if (!args[0]) return;
     if (!Array.isArray(args[1])) {
       args.splice(1, 0, []);
@@ -1224,19 +1225,25 @@ function payloadFileSync (pointer) {
 
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
-    modifyArgs(args);
+    modifyCmdArgs(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
   childProcess.spawnSync = function () {
     var args = cloneArgs(arguments);
-    modifyArgs(args);
+    modifyCmdArgs(args);
     return ancestor.spawnSync.apply(childProcess, args);
   };
 
   childProcess.execFile = function () {
     var args = cloneArgs(arguments);
-    modifyArgs(args);
+    modifyCmdArgs(args);
     return ancestor.execFile.apply(childProcess, args);
+  };
+
+  childProcess.execFileSync = function () {
+    var args = cloneArgs(arguments);
+    modifyCmdArgs(args);
+    return ancestor.execFileSync.apply(childProcess, args);
   };
 }());

@@ -2,6 +2,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
@@ -15,20 +16,13 @@ function rnd () {
   return Math.random().toString().slice(-6);
 }
 
-const pairs = [
-  { input: './test-cluster.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-a-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-a-2.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-b-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-b-2.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-execFile.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-1.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-2.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-3.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-a-4.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawn-b.js', output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawnSync.js', output: './test-output-' + rnd() + '.exe' }
-];
+const pairs = fs.readdirSync('.').filter(function (f) {
+  return (f !== 'main.js') && (!(/-child\.js$/.test(f)));
+}).map(function (f) {
+  return ({
+    input: f, output: './test-output-' + rnd() + '.exe'
+  });
+});
 
 function stripTraceOpt (lines) {
   return lines.split('\n').filter(function (line) {
