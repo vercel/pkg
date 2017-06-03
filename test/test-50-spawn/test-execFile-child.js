@@ -9,4 +9,4 @@ assert(!process.send);
 assert(!cluster.worker);
 
 console.log('Hello from execFile-child!');
-process.exit(4 + process.argv.length);
+console.log('Args', JSON.stringify(process.argv.slice(2)));

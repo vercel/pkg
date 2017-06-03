@@ -12,6 +12,5 @@ var child = spawn(
 );
 
 child.on('exit', function (code) {
-  console.log(code);
-  console.log('Child exited');
+  console.log('Child exited with code', code);
 });

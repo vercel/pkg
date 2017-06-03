@@ -7,10 +7,12 @@ var execFile = require('child_process').execFile;
 var child = execFile(
   process.execPath, [
     require.resolve('./test-execFile-child.js'), 'argvx', 'argvy'
-  ], { stdio: 'inherit' }
+  ]
 );
 
+child.stdout.pipe(process.stdout);
+child.stderr.pipe(process.stderr);
+
 child.on('exit', function (code) {
-  console.log(code);
-  console.log('Child exited');
+  console.log('Child exited with code', code);
 });

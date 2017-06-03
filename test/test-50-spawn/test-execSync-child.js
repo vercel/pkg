@@ -9,3 +9,4 @@ assert(!process.send);
 assert(!cluster.worker);
 
 console.log('Hello from execSync-child!');
+console.log('Args', JSON.stringify(process.argv.slice(2)));

@@ -10,4 +10,4 @@ var child = spawnSync(
   ], { stdio: 'inherit' }
 );
 
-console.log(child.status);
+console.log('Child exited with code', child.status);

@@ -17,6 +17,6 @@ child.on('message', function (value) {
 
 child.send(2);
 
-child.on('exit', function () {
-  console.log('Child exited');
+child.on('exit', function (code) {
+  console.log('Child exited with code', code);
 });

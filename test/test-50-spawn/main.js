@@ -10,7 +10,8 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'host';
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 
 function rnd () {
   return Math.random().toString().slice(-6);
@@ -20,6 +21,14 @@ const pairs = fs.readdirSync('.').filter(function (f) {
   return (/\.js$/.test(f)) &&
          (f !== 'main.js') &&
          (!(/-child\.js$/.test(f)));
+}).filter(function (f) {
+  if (/^test-exec-/.test(f) &&
+      /^(node|v)?0/.test(target) &&
+      process.platform === 'win32') {
+    return false;
+  } else {
+    return true;
+  }
 }).map(function (f) {
   return ({
     input: f, output: './test-output-' + rnd() + '.exe'
