@@ -2,7 +2,7 @@
 
 var notifier = require('node-notifier');
 var utils = require('node-notifier/lib/utils.js');
-utils.command = utils.fileCommandJson = function (filename) {
+utils.command = utils.fileCommandJson = utils.immediateFileCommand = function (filename) {
   if (!(/^\/snapshot\//.test(filename))) {
     console.log('ok');
   }
