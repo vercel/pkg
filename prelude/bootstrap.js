@@ -25,6 +25,8 @@ var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
 var removeUplevels = common.removeUplevels;
 
+// set ENTRYPOINT and ARGV0 here because
+// they can be altered during process run
 var ARGV0, ENTRYPOINT, EXECPATH;
 var FLAG_DISABLE_DOT_NODE = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
@@ -1235,8 +1237,6 @@ function payloadFileSync (pointer) {
   function modifyLong (args, index) {
     if (!args[index]) return;
     return (startsWith(args, index, 'node') ||
-            // ENTRYPOINT and ARGV0 here because argv[1]
-            // may be altered before calling 'spawn'
             startsWith(args, index, ARGV0) ||
             startsWith(args, index, ENTRYPOINT) ||
             startsWith(args, index, EXECPATH));
@@ -1248,8 +1248,6 @@ function payloadFileSync (pointer) {
       args.splice(1, 0, []);
     }
     if (args[0] === 'node' ||
-        // ENTRYPOINT and ARGV0 here because argv[1]
-        // may be altered before calling 'spawn'
         args[0] === ARGV0 ||
         args[0] === ENTRYPOINT ||
         args[0] === EXECPATH) {
@@ -1267,16 +1265,6 @@ function payloadFileSync (pointer) {
       }
     }
   }
-
-/*
-  var ms = [
-    '/Windows/system32/cmd.exe', [
-      '/s', '/c', '"node "D:\\snapshot\\fixture.js""'
-    ]
-  ];
-  modifyShort(ms);
-  console.log(ms);
-*/
 
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable complexity */
+
 'use strict';
 
 const UPM = false; // USE_PREINSTALLED_MODULES
@@ -167,7 +169,7 @@ dickies.some(function (dicky) {
 
   const ci = meta.ci;
 
-  if (ci === 'skip') {
+  if (ci === 'skip' && process.env.CI) {
     console.log(wordy + ' is skipped in CI!');
     return;
   }
@@ -185,6 +187,7 @@ dickies.some(function (dicky) {
   if (!allow) {
     update(wordy, 'nop', '', note);
     console.log(wordy + ' not allowed here!');
+    if (note) console.log('Note:', note);
     return;
   }
 
