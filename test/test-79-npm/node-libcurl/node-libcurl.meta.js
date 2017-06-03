@@ -7,6 +7,7 @@
 
 module.exports = function () {
   return {
-    allow: false
+    allow: false,
+    note: 'hard to meet various requirements'
   };
 };

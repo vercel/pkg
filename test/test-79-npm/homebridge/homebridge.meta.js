@@ -4,7 +4,7 @@ const home = require('../home.js');
 
 module.exports = function (stamp) {
   return {
-    allow: home(stamp) && (stamp.p !== 'win32'),
+    allow: home(stamp),
     note: 'requires OpenSSL-dev and mdns installed'
   };
 };

@@ -17,12 +17,16 @@ function rnd () {
 }
 
 const pairs = fs.readdirSync('.').filter(function (f) {
-  return (f !== 'main.js') && (!(/-child\.js$/.test(f)));
+  return (/\.js$/.test(f)) &&
+         (f !== 'main.js') &&
+         (!(/-child\.js$/.test(f)));
 }).map(function (f) {
   return ({
     input: f, output: './test-output-' + rnd() + '.exe'
   });
 });
+
+assert(pairs.length > 6);
 
 function stripTraceOpt (lines) {
   return lines.split('\n').filter(function (line) {
@@ -61,8 +65,8 @@ pairs.some(function (pair) {
   left = stripTraceOpt(left);
   if (left !== right) {
     console.log(JSON.stringify(pair));
-    console.log('<<left<<', left);
-    console.log('>>right>>', right);
+    console.log('<<left<<\n' + left);
+    console.log('>>right>>\n' + right);
     throw new Error('Assertion');
   }
 
