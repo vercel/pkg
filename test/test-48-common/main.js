@@ -32,12 +32,12 @@ if (process.platform === 'win32') {
 
   assert.equal('c:\\',             common.stripSnapshot('c:\\'));
   assert.equal('c:\\\\',           common.stripSnapshot('c:\\\\'));
-  assert.equal('C:\\',             common.stripSnapshot('c:\\snapshot'));
+  assert.equal('C:\\**\\',         common.stripSnapshot('c:\\snapshot'));
   assert.equal('c:\\snapshoter',   common.stripSnapshot('c:\\snapshoter'));
-  assert.equal('C:\\',             common.stripSnapshot('c:\\snapshot\\'));
+  assert.equal('C:\\**\\',         common.stripSnapshot('c:\\snapshot\\'));
   assert.equal('c:\\snapshoter\\', common.stripSnapshot('c:\\snapshoter\\'));
-  assert.equal('C:\\foo',          common.stripSnapshot('c:\\snapshot\\\\foo'));
-  assert.equal('C:\\foo\\bar',     common.stripSnapshot('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
+  assert.equal('C:\\**\\foo',      common.stripSnapshot('c:\\snapshot\\\\foo'));
+  assert.equal('C:\\**\\foo\\bar', common.stripSnapshot('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
 
   assert.equal('C:\\snapshot',           common.snapshotify('c:\\'));
   assert.equal('C:\\snapshot\\foo',      common.snapshotify('c:\\foo'));
@@ -76,12 +76,12 @@ if (process.platform === 'win32') {
 
   assert.equal('/',            common.stripSnapshot('/'));
   assert.equal('//',           common.stripSnapshot('//'));
-  assert.equal('/',            common.stripSnapshot('/snapshot'));
+  assert.equal('/**/',         common.stripSnapshot('/snapshot'));
   assert.equal('/snapshoter',  common.stripSnapshot('/snapshoter'));
-  assert.equal('/',            common.stripSnapshot('/snapshot/'));
+  assert.equal('/**/',         common.stripSnapshot('/snapshot/'));
   assert.equal('/snapshoter/', common.stripSnapshot('/snapshoter/'));
-  assert.equal('/foo',         common.stripSnapshot('/snapshot//foo'));
-  assert.equal('/foo/bar',     common.stripSnapshot('/snapshot//foo//bar/\\//'));
+  assert.equal('/**/foo',      common.stripSnapshot('/snapshot//foo'));
+  assert.equal('/**/foo/bar',  common.stripSnapshot('/snapshot//foo//bar/\\//'));
 
   assert.equal('/snapshot',         common.snapshotify('/'));
   assert.equal('/snapshot/foo',     common.snapshotify('/foo'));

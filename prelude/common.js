@@ -120,16 +120,16 @@ if (win32) {
 exports.stripSnapshot = function (f) {
   var file = normalizePath(f);
   if (/^.:\\snapshot$/.test(file)) {
-    return file[0] + ':\\';
+    return file[0] + ':\\**\\';
   }
   if (/^.:\\snapshot\\/.test(file)) {
-    return file[0] + ':' + file.slice(11);
+    return file[0] + ':\\**' + file.slice(11);
   }
   if (/^\/snapshot$/.test(file)) {
-    return '/';
+    return '/**/';
   }
   if (/^\/snapshot\//.test(file)) {
-    return file.slice(9);
+    return '/**' + file.slice(9);
   }
   return f; // not inside
 };
