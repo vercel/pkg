@@ -219,9 +219,18 @@ dickies.some(function (dicky) {
       }
     }
 
-    const packyVersion = JSON.parse(fs.readFileSync(
-      path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
-    )).version;
+    let packyVersion;
+
+    try {
+      packyVersion = JSON.parse(fs.readFileSync(
+        path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
+      )).version;
+    } catch (___) {
+      update(wordy, 'bad-npm-i', '', note);
+      console.log(wordy + ' failed to install here!');
+      if (note) console.log('Note:', note);
+      return;
+    }
 
     console.log('Version of ' + packy + ' is ' + packyVersion);
     version = packyVersion;
