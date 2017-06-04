@@ -21,14 +21,6 @@ const pairs = fs.readdirSync('.').filter(function (f) {
   return (/\.js$/.test(f)) &&
          (f !== 'main.js') &&
          (!(/-child\.js$/.test(f)));
-}).filter(function (f) {
-  if (/^test-exec-/.test(f) &&
-      /^(node|v)?0/.test(target) &&
-      process.platform === 'win32') {
-    return false;
-  } else {
-    return true;
-  }
 }).map(function (f) {
   return ({
     input: f, output: './test-output-' + rnd() + '.exe'

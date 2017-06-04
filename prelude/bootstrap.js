@@ -1208,17 +1208,15 @@ function payloadFileSync (pointer) {
   ancestor.exec = childProcess.exec;
   ancestor.execSync = childProcess.execSync;
 
-  var impostor = JSON.stringify(EXECPATH) + ' --pkg-fallback';
-
-  function startsWith2 (args, index, name) {
-    var quote = '"' + name + ' ';
-    if (args[index].slice(0, quote.length) === quote) {
-      args[index] = '"' + impostor + ' ' + args[index].slice(quote.length);
+  function startsWith2 (args, index, name, impostor) {
+    var qsName = '"' + name + ' ';
+    if (args[index].slice(0, qsName.length) === qsName) {
+      args[index] = '"' + impostor + ' ' + args[index].slice(qsName.length);
       return true;
     }
-    var space = name + ' ';
-    if (args[index].slice(0, space.length) === space) {
-      args[index] = impostor + ' ' + args[index].slice(space.length);
+    var sName = name + ' ';
+    if (args[index].slice(0, sName.length) === sName) {
+      args[index] = impostor + ' ' + args[index].slice(sName.length);
       return true;
     }
     if (args[index] === name) {
@@ -1229,9 +1227,22 @@ function payloadFileSync (pointer) {
   }
 
   function startsWith (args, index, name) {
-    return startsWith2(args, index, name) ||
-           startsWith2(args, index, '"' + name + '"') ||
-           startsWith2(args, index, JSON.stringify(name));
+    var qName = '"' + name + '"';
+    var qEXECPATH = '"' + EXECPATH + '"';
+    var jsName = JSON.stringify(name);
+    var jsEXECPATH = JSON.stringify(EXECPATH);
+    return startsWith2(args, index, name + ' --pkg-fallback',
+                                    EXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, qName + ' --pkg-fallback',
+                                    qEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, jsName + ' --pkg-fallback',
+                                    jsEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, name,
+                                    EXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, qName,
+                                    qEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, jsName,
+                                    jsEXECPATH + ' --pkg-fallback');
   }
 
   function modifyLong (args, index) {
@@ -1258,10 +1269,12 @@ function payloadFileSync (pointer) {
           return (a.slice(0, 13) !== '--debug-port=');
         });
       }
-    } else
-    if (require('path').basename(args[0]) === 'cmd.exe') {
-      for (var i = 0; i < args[1].length; i += 1) {
-        modifyLong(args[1], i);
+    } else {
+      var shell = require('path').basename(args[0]);
+      if (shell === 'sh' || shell === 'cmd.exe') {
+        for (var i = 0; i < args[1].length; i += 1) {
+          modifyLong(args[1], i);
+        }
       }
     }
   }
