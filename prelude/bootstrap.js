@@ -1270,9 +1270,9 @@ function payloadFileSync (pointer) {
         });
       }
     } else {
-      var shell = require('path').basename(args[0]);
-      if (shell === 'sh' || shell === 'cmd.exe') {
-        for (var i = 0; i < args[1].length; i += 1) {
+      for (var i = 1; i < args[1].length; i += 1) {
+        var mbc = args[1][i - 1];
+        if (mbc === '-c' || mbc === '/c') {
           modifyLong(args[1], i);
         }
       }
