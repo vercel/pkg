@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert');
 var path = require('path');
 
 exports.STORE_BLOB = 0;
@@ -92,12 +93,51 @@ function injectSnapshot (file) {
   return file;
 }
 
+function nonRootFromFile (f) {
+  var p = path.parse(f);
+  return f.slice(p.root.length).split(path.sep);
+}
+
+function denominatorLength (nr1, nr2) {
+  var e = Math.min(nr1.length, nr2.length);
+  if (e === 0) return 0;
+  for (var i = 0; i < e; i += 1) {
+    if (nr1[i] !== nr2[i]) return i;
+  }
+  return e;
+}
+
+function denominatorOfNonRoots (nr1, nr2) {
+  var length = denominatorLength(nr1, nr2);
+  if (length === nr1.length) return nr1;
+  return nr1.slice(0, length);
+}
+
 exports.retrieveDenominator = function (files) {
-  return undefined;
+  assert(files.length > 0);
+  files = files.map(function (file) {
+    return normalizePath(file);
+  });
+
+  var nr1 = nonRootFromFile(files[0]);
+  for (var i = 1; i < files.length; i += 1) {
+    var nr2 = nonRootFromFile(files[i]);
+    nr1 = denominatorOfNonRoots(nr1, nr2);
+  }
+
+  return nr1.reduce(function (p, c) {
+    return p + c.length + 1;
+  }, 0);
 };
+
+function substituteDenominator (f, denominator) {
+  var p = path.parse(f);
+  return p.root + f.slice(p.root.length + denominator);
+}
 
 exports.snapshotify = function (file, denominator, slash) {
   var f = normalizePath(file);
+  if (denominator) f = substituteDenominator(f, denominator);
   return injectSnapshot(replaceSlashes(f, slash));
 };
 
