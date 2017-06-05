@@ -92,7 +92,11 @@ function injectSnapshot (file) {
   return file;
 }
 
-exports.snapshotify = function (file, slash) {
+exports.retrieveDenominator = function (files) {
+  return undefined;
+};
+
+exports.snapshotify = function (file, denominator, slash) {
   var f = normalizePath(file);
   return injectSnapshot(replaceSlashes(f, slash));
 };
