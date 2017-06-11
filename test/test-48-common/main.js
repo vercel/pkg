@@ -7,6 +7,11 @@
 const assert = require('assert');
 const common = require('../../prelude/common.js');
 
+function snapshotifyMany (files) {
+  const d = common.retrieveDenominator(files);
+  return files.map((f) => common.snapshotify(f, d));
+}
+
 if (process.platform === 'win32') {
   assert.equal('c:',                     common.normalizePath('c:'));
   assert.equal('C:\\',                   common.normalizePath('c:\\'));
@@ -52,6 +57,14 @@ if (process.platform === 'win32') {
   assert.equal('.',       common.removeUplevels('.'));
   assert.equal('.',       common.removeUplevels('..'));
   assert.equal('.',       common.removeUplevels('..\\..'));
+
+  assert.deepEqual(snapshotifyMany(
+    [ 'C:\\long\\haired\\freaky\\people', 'C:\\long\\haired\\aliens' ]),
+    [ 'C:\\snapshot\\freaky\\people',     'C:\\snapshot\\aliens' ]);
+
+  assert.deepEqual(snapshotifyMany(
+    [ 'C:\\long\\haired\\freaky\\people',     'C:\\long\\hyphen\\sign' ]),
+    [ 'C:\\snapshot\\haired\\freaky\\people', 'C:\\snapshot\\hyphen\\sign' ]);
 } else {
   assert.equal('/',                 common.normalizePath('/'));
   assert.equal('/',                 common.normalizePath('//'));
@@ -96,4 +109,12 @@ if (process.platform === 'win32') {
   assert.equal('.',       common.removeUplevels('.'));
   assert.equal('.',       common.removeUplevels('..'));
   assert.equal('.',       common.removeUplevels('../..'));
+
+  assert.deepEqual(snapshotifyMany(
+    [ '/long/haired/freaky/people', '/long/haired/aliens' ]),
+    [ '/snapshot/freaky/people',    '/snapshot/aliens' ]);
+
+  assert.deepEqual(snapshotifyMany(
+    [ '/long/haired/freaky/people',     '/long/hyphen/sign' ]),
+    [ '/snapshot/haired/freaky/people', '/snapshot/hyphen/sign' ]);
 }
