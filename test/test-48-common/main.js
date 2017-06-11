@@ -65,6 +65,10 @@ if (process.platform === 'win32') {
   assert.deepEqual(snapshotifyMany(
     [ 'C:\\long\\haired\\freaky\\people',     'C:\\long\\hyphen\\sign' ]),
     [ 'C:\\snapshot\\haired\\freaky\\people', 'C:\\snapshot\\hyphen\\sign' ]);
+
+  assert.deepEqual(snapshotifyMany(
+    [ 'C:\\long\\haired\\freaky\\people',           'D:\\long\\hyphen\\sign' ]),
+    [ 'C:\\snapshot\\long\\haired\\freaky\\people', 'D:\\snapshot\\long\\hyphen\\sign' ]);
 } else {
   assert.equal('/',                 common.normalizePath('/'));
   assert.equal('/',                 common.normalizePath('//'));

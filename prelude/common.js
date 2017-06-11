@@ -117,12 +117,13 @@ exports.retrieveDenominator = function (files) {
     s1 = s1.slice(0, longestCommonLength(s1, s2));
   }
 
+  if (s1 === '') return 0;
   return s1.lastIndexOf(path.sep);
 };
 
 function substituteDenominator (f, denominator) {
   var rootLength = win32 ? 2 : 0;
-  return f.slice(0, rootLength) + f.slice(rootLength + denominator);
+  return f.slice(0, rootLength) + f.slice(denominator);
 }
 
 exports.snapshotify = function (file, denominator, slash) {
