@@ -121,14 +121,13 @@ exports.retrieveDenominator = function (files) {
   return s1.lastIndexOf(path.sep);
 };
 
-function substituteDenominator (f, denominator) {
+exports.substituteDenominator = function (f, denominator) {
   var rootLength = win32 ? 2 : 0;
   return f.slice(0, rootLength) + f.slice(denominator);
-}
+};
 
-exports.snapshotify = function (file, denominator, slash) {
-  var f = normalizePath(file);
-  if (denominator) f = substituteDenominator(f, denominator);
+exports.snapshotify = function (file, slash) {
+  var f = normalizePath(file); // TODO shouldn't it be normalized already?
   return injectSnapshot(replaceSlashes(f, slash));
 };
 
