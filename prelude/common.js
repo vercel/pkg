@@ -107,13 +107,10 @@ function longestCommonLength (s1, s2) {
 
 exports.retrieveDenominator = function (files) {
   assert(files.length > 0);
-  files = files.map(function (file) {
-    return normalizePath(file);
-  });
 
-  var s1 = files[0];
+  var s1 = files[0] + path.sep;
   for (var i = 1; i < files.length; i += 1) {
-    var s2 = files[i];
+    var s2 = files[i] + path.sep;
     s1 = s1.slice(0, longestCommonLength(s1, s2));
   }
 
@@ -127,8 +124,8 @@ exports.substituteDenominator = function (f, denominator) {
 };
 
 exports.snapshotify = function (file, slash) {
-  var f = normalizePath(file); // TODO shouldn't it be normalized already?
-  return injectSnapshot(replaceSlashes(f, slash));
+  assert.equal(file, normalizePath(file));
+  return injectSnapshot(replaceSlashes(file, slash));
 };
 
 if (win32) {
