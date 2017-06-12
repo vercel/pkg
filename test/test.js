@@ -9,11 +9,11 @@ const utils = require('./utils.js');
 const host = 'node' + process.version[1];
 let target = process.argv[2] || 'host';
 if (target === 'host') target = host;
-const modify = process.argv[3];
+const modify = process.argv[3] || 'all';
 
 console.log('');
 console.log('*************************************');
-console.log(process.argv.slice(2).join(' '));
+console.log(host + ' ' + modify);
 console.log('*************************************');
 console.log('');
 
