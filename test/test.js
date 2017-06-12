@@ -13,7 +13,7 @@ const modify = process.argv[3] || 'all';
 
 console.log('');
 console.log('*************************************');
-console.log(host + ' ' + modify);
+console.log(target + ' ' + modify);
 console.log('*************************************');
 console.log('');
 
