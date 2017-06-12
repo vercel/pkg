@@ -31,29 +31,12 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-// case-insensitive for windows
-left = left.toLowerCase();
-right = right.toLowerCase();
-
 left = left.split('\n');
 right = right.split('\n');
-
-assert.equal(left.length, right.length);
-
-left.some(function (leftValue, index) {
-  const rightValue = right[index];
-  if (leftValue.slice(1, 3) === ':\\') {
-    assert.equal(rightValue.slice(1, 3), ':\\');
-    leftValue = leftValue.slice(0, 3) + 'snapshot\\' + leftValue.slice(3);
-    assert.equal(leftValue, rightValue);
-  } else
-  if (leftValue.slice(0, 1) === '/') {
-    assert.equal(rightValue.slice(0, 1), '/');
-    leftValue = '/snapshot' + leftValue;
-    assert.equal(leftValue, rightValue);
-  } else {
-    assert.equal(leftValue, rightValue);
-  }
-});
+// right may have less lines, premature exit,
+// less trusted, so using left.length here
+for (let i = 0; i < left.length; i += 1) {
+  assert.equal(left[i], right[i]);
+}
 
 utils.vacuum.sync(path.dirname(output));

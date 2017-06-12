@@ -42,17 +42,20 @@ right = right.split('\n');
 assert.equal(left.length, right.length);
 assert(left.length > 100);
 
+var nonSnapshot;
 left.some(function (leftValue, index) {
   const rightValue = right[index];
   if (leftValue.slice(1, 3) === ':\\') {
-    assert.equal(rightValue.slice(1, 3), ':\\');
-    leftValue = leftValue.slice(0, 3) + 'snapshot\\' + leftValue.slice(3);
-    assert.equal(leftValue, rightValue);
+    assert.equal(rightValue.slice(1, 12), ':\\snapshot\\');
+    nonSnapshot = rightValue.length - 12;
+    assert.equal(leftValue.slice(-nonSnapshot),
+      rightValue.slice(-nonSnapshot));
   } else
   if (leftValue.slice(0, 1) === '/') {
-    assert.equal(rightValue.slice(0, 1), '/');
-    leftValue = '/snapshot' + leftValue;
-    assert.equal(leftValue, rightValue);
+    assert.equal(rightValue.slice(0, 10), '/snapshot/');
+    nonSnapshot = rightValue.length - 10;
+    assert.equal(leftValue.slice(-nonSnapshot),
+      rightValue.slice(-nonSnapshot));
   } else
   if (leftValue === '') {
     assert.equal(leftValue, rightValue);

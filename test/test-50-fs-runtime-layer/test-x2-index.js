@@ -88,13 +88,13 @@ fs.open(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), 'r', 
 
 fs.open(__dirname, 'r', function (e46, v46) {
 fs.open(path.dirname(__dirname), 'r', function (e47, v47) {
-fs.open(path.dirname(path.dirname(__dirname)), 'r', function (e48, v48) {
+fs.open(path.dirname(__dirname), 'r', function (e48, v48) { // not "path.dirname(path.dirname" due to denominator
 fs.open(firstLowerCase(__dirname), 'r', function (e49, v49) {
 fs.open(firstLowerCase(path.dirname(__dirname)), 'r', function (e50, v50) {
-fs.open(firstLowerCase(path.dirname(path.dirname(__dirname))), 'r', function (e51, v51) {
+fs.open(firstLowerCase(path.dirname(__dirname)), 'r', function (e51, v51) { // not "path.dirname(path.dirname" due to denominator
 fs.open(firstUpperCase(__dirname), 'r', function (e52, v52) {
 fs.open(firstUpperCase(path.dirname(__dirname)), 'r', function (e53, v53) {
-fs.open(firstUpperCase(path.dirname(path.dirname(__dirname))), 'r', function (e54, v54) {
+fs.open(firstUpperCase(path.dirname(__dirname)), 'r', function (e54, v54) { // not "path.dirname(path.dirname" due to denominator
 //
 
 fs.readdir(__dirname, function (e55, v55) {
