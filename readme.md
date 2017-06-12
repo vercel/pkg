@@ -115,7 +115,7 @@ pkg app.js --options expose-gc
 ### Output
 
 You may specify `--output` if you create only one executable
-or `--out-dir` to place executables for multiple targets.
+or `--out-path` to place executables for multiple targets.
 
 ### Debug
 
@@ -197,8 +197,8 @@ to deploy native addons used by your project to the same directory
 as the executable.
 
 When a package, that contains a native module, is being installed,
-the native module is compiled against current system-wide node.js
+the native module is compiled against current system-wide Node.js
 version. Then, when you compile your project with `pkg`, pay attention
-to `--target` option. You should specify the same node.js version
-as your system-wide node.js to make compiled executable compatible
+to `--target` option. You should specify the same Node.js version
+as your system-wide Node.js to make compiled executable compatible
 with `.node` files.
