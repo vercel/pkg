@@ -20,7 +20,7 @@ const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
   '--target', 'linux,macos,win',
-  '--out-dir', 'out', input
+  '--out-path', 'out', input
 ]);
 
 utils.filesAfter(before, newcomers);

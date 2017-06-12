@@ -8,18 +8,16 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
+const target = process.argv[2] || 'latest';
 const input = './test-x-index';
-
-const newcomers = [
-  'out/test-x-index-linux',
-  'out/test-x-index-macos',
-  'out/test-x-index-win.exe'
-];
-
+const exe = { win32: '.exe', linux: '',
+  darwin: '', freebsd: '' }[process.platform];
+const newcomers = [ 'out/test-x-index' + exe ];
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
-  '--out-dir', 'out', input
+  '--target', target,
+  '--out-path', 'out', input
 ]);
 
 utils.filesAfter(before, newcomers);
