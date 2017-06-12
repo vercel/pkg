@@ -72,4 +72,5 @@ pairs.some(function (pair) {
   }
 
   utils.vacuum.sync(output);
+  console.log(__dirname, input, 'ok');
 });
