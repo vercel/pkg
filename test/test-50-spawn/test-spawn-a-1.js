@@ -16,11 +16,7 @@ var child = spawn(
 
 child.on('message', function (value) {
   console.log(value.toString());
-  child.send(value, function (error) {
-    if (error) {
-      console.log('child.send.error', error);
-    }
-  });
+  child.send(value);
 });
 
 child.send(2);
