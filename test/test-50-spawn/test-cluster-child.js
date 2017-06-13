@@ -12,6 +12,6 @@ console.log('Hello from cluster-child!');
 console.log('Args', JSON.stringify(process.argv.slice(2)));
 
 process.on('message', function (value) {
-  process.send(value * 2);
   if (value === 128) process.exit();
+  process.send(value * 2);
 });
