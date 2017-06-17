@@ -39,7 +39,12 @@ right = right.split('\n');
 // right may have less lines, premature exit,
 // less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
-  assert.equal(left[i], right[i]);
+  if (left[i] !== right[i]) {
+    console.log('line', i);
+    console.log('<<left<<\n' + left);
+    console.log('>>right>>\n' + right);
+    throw new Error('Assertion');
+  }
 }
 
 utils.vacuum.sync(path.dirname(output));
