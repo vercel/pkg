@@ -165,20 +165,20 @@ process.pkg.entrypoint         | undefined           | /snapshot/project/app.js 
 process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
 require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
 
-Hence, in order to make use of the file collected at packaging
-time (make use of own JS file or serve an asset) you should take
-`__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
+Hence, in order to make use of a file collected at packaging
+time (`require` a javascript file or serve an asset) you should
+take `__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
 or `require.main.filename` as a base for your path calculations.
-One way is just `require` or `require.resolve` because they use
-current `__dirname` by default. But they are applicable to
-javascript files only. For assets use
+For javascript files you can just `require` or `require.resolve`
+because they use current `__dirname` by default. For assets use
 `path.join(__dirname, '../path/to/asset')`. Learn more about
 `path.join` in
 [Detecting assets in source code](#detecting-assets-in-source-code).
 
-On the other hand, in order to access real file system (pick
-up a user's JS plugin or list user's directory) you should take
-`process.cwd()` or `path.dirname(process.execPath)`.
+On the other hand, in order to access real file system at run time
+(pick up a user's external javascript plugin, json configuration or
+even get a list of user's directory) you should take `process.cwd()`
+or `path.dirname(process.execPath)`.
 
 ## Detecting assets in source code
 
