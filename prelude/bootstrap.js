@@ -167,15 +167,16 @@ function projectToNearby (f) {
 }
 
 function findNativeAddonSync (path) {
+  if (!FLAG_DISABLE_DOT_NODE) return null;
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
+  // check mearby first to prevent .node tampering
+  var projector = projectToNearby(path);
+  if (require('fs').existsSync(projector)) return projector;
   var projectors = projectToFilesystem(path);
   for (var i = 0; i < projectors.length; i += 1) {
     if (require('fs').existsSync(projectors[i])) return projectors[i];
   }
-  if (FLAG_DISABLE_DOT_NODE) return null; // FLAG influences only nearby
-  var projector = projectToNearby(path);
-  if (require('fs').existsSync(projector)) return projector;
   return null;
 }
 
@@ -1161,6 +1162,7 @@ function payloadFileSync (pointer) {
 
   Module._resolveFilename = function (request) {
     var filename;
+    var flagWas = false;
 
     try {
       filename = ancestor._resolveFilename.apply(this, arguments);
@@ -1170,6 +1172,7 @@ function payloadFileSync (pointer) {
       FLAG_DISABLE_DOT_NODE = true;
       try {
         filename = ancestor._resolveFilename.apply(this, arguments);
+        flagWas = true;
       } finally {
         FLAG_DISABLE_DOT_NODE = false;
       }
@@ -1182,8 +1185,13 @@ function payloadFileSync (pointer) {
       return filename;
     }
 
-    var found = findNativeAddonSync(filename);
-    if (found) filename = found;
+    FLAG_DISABLE_DOT_NODE = flagWas;
+    try {
+      var found = findNativeAddonSync(filename);
+      if (found) filename = found;
+    } finally {
+      FLAG_DISABLE_DOT_NODE = false;
+    }
 
     return filename;
   };
