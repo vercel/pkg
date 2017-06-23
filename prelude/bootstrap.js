@@ -130,18 +130,29 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 
 function projectToFilesystem (f) {
-  return require('path').join(
-    require('path').dirname(
-      EXECPATH
-    ),
-    removeUplevels(
-      require('path').relative(
-        require('path').dirname(
-          DEFAULT_ENTRYPOINT
-        ), f
-      )
+  var xpdn = require('path').dirname(
+    EXECPATH
+  );
+  var relative = removeUplevels(
+    require('path').relative(
+      require('path').dirname(
+        DEFAULT_ENTRYPOINT
+      ), f
     )
   );
+  var uplevels = [];
+  var maxUplevels = xpdn.split(require('path').sep).length;
+  for (var i = 0, u = ''; i < maxUplevels; i += 1) {
+    uplevels.push(u);
+    u += '/..';
+  }
+  return uplevels.map(function (uplevel) {
+    return require('path').join(
+      xpdn,
+      uplevel,
+      relative
+    );
+  });
 }
 
 function projectToNearby (f) {
@@ -158,10 +169,12 @@ function projectToNearby (f) {
 function findNativeAddonSync (path) {
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
-  var projector = projectToFilesystem(path);
-  if (require('fs').existsSync(projector)) return projector;
+  var projectors = projectToFilesystem(path);
+  for (var i = 0; i < projectors.length; i += 1) {
+    if (require('fs').existsSync(projectors[i])) return projectors[i];
+  }
   if (FLAG_DISABLE_DOT_NODE) return null; // FLAG influences only nearby
-  projector = projectToNearby(path);
+  var projector = projectToNearby(path);
   if (require('fs').existsSync(projector)) return projector;
   return null;
 }
