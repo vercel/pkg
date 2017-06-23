@@ -2,7 +2,8 @@
 
 var express = require('express');
 var app = express();
-var server = require('http').Server(app);
+var Server = require('http').Server;
+var server = new Server(app);
 
 server.listen(8080);
 

@@ -3,7 +3,7 @@
 'use strict';
 
 const fs = require('fs');
-const detector = require('../../lib/detector.js');
+const detector = require('../../lib-es5/detector.js');
 const body = fs.readFileSync('./test-y-data.txt', 'utf8');
 
 detector.detect(

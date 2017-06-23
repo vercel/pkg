@@ -103,12 +103,12 @@ function test01 () {
 function test01e (badFd) {
   console.log('<<< test01e >>>');
 
-  fs.stat('notExists', function (error, stats) {
+  fs.stat('notExists', function (error) {
     console.log('fs.stat.error.code', error.code);
     fs.open('notExists', 'r', function (error2, fd) {
       console.log('fs.open.error2.code', error2.code);
       fd = badFd;
-      fs.fstat(fd, function (error3, fstats) {
+      fs.fstat(fd, function (error3) {
         console.log('fs.fstat.error3.code', error3.code);
         const buffer = Buffer.alloc(1024);
         fs.read(fd, buffer, 0, buffer.length, null, function (error4, bytesRead, buffer2) {

@@ -1,5 +1,5 @@
+/* eslint-disable brace-style */
 /* eslint-disable complexity */
-/* eslint-disable indent */
 /* eslint-disable no-path-concat */
 
 'use strict';

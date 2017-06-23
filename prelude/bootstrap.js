@@ -1,3 +1,5 @@
+/* eslint-disable new-cap */
+/* eslint-disable no-buffer-constructor */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-rest-params */
@@ -525,7 +527,7 @@ function payloadFileSync (pointer) {
     return writeToSnapshot();
   };
 
-  fs.write = function (fd, buffer) {
+  fs.write = function (fd) {
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
@@ -1159,7 +1161,7 @@ function payloadFileSync (pointer) {
     throw new Error('UNEXPECTED-55');
   };
 
-  Module._resolveFilename = function (request) {
+  Module._resolveFilename = function () {
     var filename;
     var flagWas = false;
 
