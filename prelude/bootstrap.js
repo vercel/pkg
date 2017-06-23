@@ -27,8 +27,8 @@ var removeUplevels = common.removeUplevels;
 
 // set ENTRYPOINT and ARGV0 here because
 // they can be altered during process run
-var ARGV0, ENTRYPOINT, EXECPATH;
-var FLAG_DISABLE_DOT_NODE = false;
+var ARGV0, EXECPATH, ENTRYPOINT;
+var FLAG_ENABLE_PROJECT = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
 // /////////////////////////////////////////////////////////////////
@@ -36,12 +36,11 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 // /////////////////////////////////////////////////////////////////
 
 ARGV0 = process.argv[0];
+EXECPATH = process.execPath;
 ENTRYPOINT = process.argv[1];
 if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
-
-EXECPATH = process.execPath;
 
 // /////////////////////////////////////////////////////////////////
 // MOUNTPOINTS /////////////////////////////////////////////////////
@@ -167,7 +166,7 @@ function projectToNearby (f) {
 }
 
 function findNativeAddonSync (path) {
-  if (!FLAG_DISABLE_DOT_NODE) return null;
+  if (!FLAG_ENABLE_PROJECT) return null;
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
   // check mearby first to prevent .node tampering
@@ -1169,12 +1168,12 @@ function payloadFileSync (pointer) {
     } catch (error) {
       if (error.code !== 'MODULE_NOT_FOUND') throw error;
 
-      FLAG_DISABLE_DOT_NODE = true;
+      FLAG_ENABLE_PROJECT = true;
       try {
         filename = ancestor._resolveFilename.apply(this, arguments);
         flagWas = true;
       } finally {
-        FLAG_DISABLE_DOT_NODE = false;
+        FLAG_ENABLE_PROJECT = false;
       }
     }
 
@@ -1185,12 +1184,12 @@ function payloadFileSync (pointer) {
       return filename;
     }
 
-    FLAG_DISABLE_DOT_NODE = flagWas;
+    FLAG_ENABLE_PROJECT = flagWas;
     try {
       var found = findNativeAddonSync(filename);
       if (found) filename = found;
     } finally {
-      FLAG_DISABLE_DOT_NODE = false;
+      FLAG_ENABLE_PROJECT = false;
     }
 
     return filename;
