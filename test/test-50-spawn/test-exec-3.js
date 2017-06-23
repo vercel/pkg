@@ -14,5 +14,7 @@ child.stdout.pipe(process.stdout);
 child.stderr.pipe(process.stderr);
 
 child.on('exit', function (code) {
-  console.log('Child exited with code', code);
+  setTimeout(function () {
+    console.log('Child exited with code', code);
+  }, 100);
 });
