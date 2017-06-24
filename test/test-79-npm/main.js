@@ -278,7 +278,9 @@ dickies.some(function (dicky) {
     );
 
     if (meta.deployFiles) {
-      deployFiles.push(...meta.deployFiles.map((f) => path.join(foldy, f)));
+      Array.prototype.push.apply(deployFiles,
+        meta.deployFiles.map((f) => path.join(foldy, f))
+      );
     }
 
     deployFiles.some(function (deployFile) {
