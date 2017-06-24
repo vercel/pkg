@@ -277,14 +277,18 @@ dickies.some(function (dicky) {
 
     console.log('Copying addons...');
 
-    const addons = globby.sync(
+    const deployFiles = globby.sync(
       path.join(foldy, 'node_modules', '**', '*.node')
     );
 
-    addons.some(function (addon) {
+    if (meta.deployFiles) {
+      deployFiles.push(...meta.deployFiles.map((f) => path.join(foldy, f)));
+    }
+
+    deployFiles.some(function (deployFile) {
       fs.writeFileSync(
-        path.join(path.dirname(output), path.basename(addon)),
-        fs.readFileSync(addon)
+        path.join(path.dirname(output), path.basename(deployFile)),
+        fs.readFileSync(deployFile)
       );
     });
 
