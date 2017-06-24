@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    moons: [ 'coffee-script', 'interpret' ]
+    packages: [ 'coffee-script', 'interpret' ]
   };
 };

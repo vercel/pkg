@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    moons: [ 'pg' ]
+    packages: [ 'pg' ]
   };
 };

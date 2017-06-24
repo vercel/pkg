@@ -5,6 +5,6 @@ const home = require('../home.js');
 module.exports = function (stamp) {
   return {
     allow: home(stamp),
-    moons: [ 'mysql', 'pg', 'pg-hstore', 'sqlite3', 'tedious' ]
+    packages: [ 'mysql', 'pg', 'pg-hstore', 'sqlite3', 'tedious' ]
   };
 };

@@ -195,17 +195,13 @@ dickies.some(function (dicky) {
 
   if (!UPM) {
     const build = meta.build;
-    const earth = packy.replace('-shy', '');
-    const moons = meta.moons || [];
-    let planets = moons.concat([ earth ]);
-    assert(planets.length > 0);
-    planets = planets.join(' ');
-    console.log('Installing ' + planets + '...');
+    const packages = [ packy ].concat(meta.packages || []);
+    console.log('Installing ' + packages + '...');
     let successful = false;
     let counter = 10;
     while ((!successful) && (counter > 0)) {
       successful = true;
-      let command = 'npm install ' + planets;
+      let command = 'npm install ' + packages.join(' ');
       if (npm >= 5) command += ' --no-save';
       if (build) command += ' --build-from-source=' + build;
       command += ' --unsafe-perm';
@@ -223,7 +219,7 @@ dickies.some(function (dicky) {
 
     try {
       packyVersion = JSON.parse(fs.readFileSync(
-        path.join(foldy, 'node_modules', earth.split('@')[0], 'package.json'), 'utf8'
+        path.join(foldy, 'node_modules', packy.split('@')[0], 'package.json'), 'utf8'
       )).version;
     } catch (___) {
       update(wordy, 'bad-npm-i', '', note);
