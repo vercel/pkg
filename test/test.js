@@ -17,6 +17,16 @@ console.log(target + ' ' + modify);
 console.log('*************************************');
 console.log('');
 
+if (process.env.CI) {
+  if (target === 'node0' ||
+      target === 'node4' ||
+      target === 'node7') {
+    console.log(target + ' is skipped in CI!');
+    console.log('');
+    process.exit();
+  }
+}
+
 const list = [];
 
 if (modify === 'only-npm') {

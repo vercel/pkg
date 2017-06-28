@@ -169,7 +169,7 @@ dickies.some(function (dicky) {
 
   const ci = meta.ci;
 
-  if (ci === 'skip' && process.env.CI) {
+  if (process.env.CI && ci === 'skip') {
     console.log(wordy + ' is skipped in CI!');
     return;
   }
