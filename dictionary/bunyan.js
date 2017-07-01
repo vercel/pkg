@@ -5,7 +5,7 @@ module.exports = {
     patches: {
       'lib/bunyan.js': [
         'mv = require(\'mv\' + \'\');',
-        'mv = require(\'mv\');'
+        'mv = require(\'mv\', \'may-exclude\');'
       ]
     }
   }
