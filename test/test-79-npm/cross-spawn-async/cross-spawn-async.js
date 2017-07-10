@@ -7,7 +7,7 @@ var bin = path.join(__dirname, 'fixture.js');
 var args = [];
 
 if (process.pkg) {
-  args.unshift('--entrypoint', bin);
+  args.unshift(bin);
   bin = process.execPath;
 } else {
   fs.chmodSync(bin, 511);

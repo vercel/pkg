@@ -46,7 +46,6 @@ right.split('\n').some(function (line) {
   s = line.split('Path.resolve(')[1];
   if (s) {
     rightLines.push(s.slice(0, -(') is ambiguous').length));
-    return;
   }
 });
 

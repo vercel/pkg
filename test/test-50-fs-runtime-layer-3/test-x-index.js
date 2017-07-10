@@ -1,3 +1,4 @@
+/* eslint-disable no-buffer-constructor */
 /* eslint-disable max-statements-per-line */
 
 'use strict';

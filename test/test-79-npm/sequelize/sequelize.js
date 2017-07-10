@@ -3,11 +3,6 @@
 var sequelize = require('sequelize');
 if (typeof sequelize.and !== 'function') return;
 
-var Dialect1 = require('sequelize/lib/dialects/mariadb');
-var db1 = new Dialect1({ config: {}, options: { dialect: 'mariadb' } });
-var cm1 = db1.connectionManager;
-if (typeof cm1.lib.createConnection !== 'function') return;
-
 var Dialect2 = require('sequelize/lib/dialects/mssql');
 var db2 = new Dialect2({ config: {}, options: { dialect: 'mssql' } });
 var cm2 = db2.connectionManager;

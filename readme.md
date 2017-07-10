@@ -1,6 +1,9 @@
 ![](https://raw.githubusercontent.com/zeit/art/39a6d9ad77606e2589ddd620b23e093d3b3c6195/pkg/repo-banner.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
+[![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
+[![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg)
+[![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
 [![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
@@ -74,6 +77,8 @@ recommended to use package.json's `pkg` property.
     "assets": "views/**/*"
   }
 ```
+Just be sure to call `pkg package.json` or `pkg .` to make use
+of `scripts` and `assets` entries.
 
 ### Scripts
 
@@ -110,7 +115,7 @@ pkg app.js --options expose-gc
 ### Output
 
 You may specify `--output` if you create only one executable
-or `--out-dir` to place executables for multiple targets.
+or `--out-path` to place executables for multiple targets.
 
 ### Debug
 
@@ -160,20 +165,20 @@ process.pkg.entrypoint         | undefined           | /snapshot/project/app.js 
 process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
 require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
 
-Hence, in order to make use of the file collected at packaging
-time (make use of own JS file or serve an asset) you should take
-`__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
+Hence, in order to make use of a file collected at packaging
+time (`require` a javascript file or serve an asset) you should
+take `__filename`, `__dirname`, `process.pkg.defaultEntrypoint`
 or `require.main.filename` as a base for your path calculations.
-One way is just `require` or `require.resolve` because they use
-current `__dirname` by default. But they are applicable to
-javascript files only. For assets use
+For javascript files you can just `require` or `require.resolve`
+because they use current `__dirname` by default. For assets use
 `path.join(__dirname, '../path/to/asset')`. Learn more about
 `path.join` in
 [Detecting assets in source code](#detecting-assets-in-source-code).
 
-On the other hand, in order to access real file system (pick
-up a user's JS plugin or list user's directory) you should take
-`process.cwd()` or `path.dirname(process.execPath)`.
+On the other hand, in order to access real file system at run time
+(pick up a user's external javascript plugin, json configuration or
+even get a list of user's directory) you should take `process.cwd()`
+or `path.dirname(process.execPath)`.
 
 ## Detecting assets in source code
 
@@ -190,3 +195,10 @@ Native addons (`.node` files) use is supported, but packaging
 `.node` files inside the executable is not resolved yet. You have
 to deploy native addons used by your project to the same directory
 as the executable.
+
+When a package, that contains a native module, is being installed,
+the native module is compiled against current system-wide Node.js
+version. Then, when you compile your project with `pkg`, pay attention
+to `--target` option. You should specify the same Node.js version
+as your system-wide Node.js to make compiled executable compatible
+with `.node` files.

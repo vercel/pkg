@@ -26,6 +26,6 @@ child.on('message', function (value) {
 
 child.send(2);
 
-cluster.on('exit', function () {
-  console.log('Cluster worker exited');
+cluster.on('exit', function (_, code) {
+  console.log('Child exited with code', code);
 });

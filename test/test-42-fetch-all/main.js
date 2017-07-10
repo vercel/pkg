@@ -13,11 +13,11 @@ function nodeRangeToNodeVersion (nodeRange) {
   return 'v' + nodeRange.slice(4);
 }
 
-for (const nodeRange of [ 'node0', 'node4', 'node6', 'node7' ]) {
+for (const nodeRange of [ 'node0', 'node4', 'node6', 'node7', 'node8' ]) {
   const nodeVersion = nodeRangeToNodeVersion(nodeRange);
   for (const platform of knownPlatforms) {
     const archs = [ 'x86', 'x64' ];
-    // preparing pkg-fetch arm binaries is a premature obstacle.
+    // preparing pkg-fetch arm binaries is an obstacle.
     // lets do arm building and pkg testing simultaneously
     // if (platform === 'linux') archs.push('armv6', 'armv7');
     for (const arch of archs) {

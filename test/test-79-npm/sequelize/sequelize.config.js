@@ -2,7 +2,7 @@
 
 module.exports = {
   dependencies: {
-    'mysql': '*',
+    'mysql2': '*',
     'pg': '*',
     'pg-hstore': '*',
     'sqlite3': '*',

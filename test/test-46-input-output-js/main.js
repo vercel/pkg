@@ -9,7 +9,8 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const input = './test-x-index.js';
-const newcomers = [ 'test-output' ];
+const exe = (process.platform === 'win32' ? '.exe' : '');
+const newcomers = [ 'test-output' + exe ];
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([

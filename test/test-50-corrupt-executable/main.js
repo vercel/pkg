@@ -10,12 +10,10 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'host';
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
-
-const version = target;
-if (/^(node|v)?0/.test(version)) return;
 
 let right;
 
@@ -26,8 +24,12 @@ utils.pkg.sync([
 
 const damage = fs.readFileSync(output);
 const boundary = 4096;
-damage[damage.length - boundary - 10] += 1;
-damage[damage.length - boundary + 10] -= 1;
+damage[damage.length - 2 * boundary - 10] = 0x2;
+damage[damage.length - 3 * boundary - 10] = 0x2;
+damage[damage.length - 4 * boundary - 10] = 0x2;
+damage[damage.length - 2 * boundary + 10] = 0x2;
+damage[damage.length - 3 * boundary + 10] = 0x2;
+damage[damage.length - 4 * boundary + 10] = 0x2;
 fs.writeFileSync(output, damage);
 
 right = utils.spawn.sync(
@@ -37,5 +39,7 @@ right = utils.spawn.sync(
 );
 
 assert.equal(right.stdout, '');
-assert(right.stderr.indexOf('CHECKSUM_MISMATCH') >= 0);
+assert((right.stderr.indexOf('Invalid') >= 0) ||
+       (right.stderr.indexOf('ILLEGAL') >= 0) ||
+       (right.stderr.indexOf('SyntaxError') >= 0));
 utils.vacuum.sync(output);

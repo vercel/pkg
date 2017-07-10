@@ -1,3 +1,5 @@
+/* eslint-disable require-await */
+
 'use strict';
 
 async function multiply (a, b = 1) {

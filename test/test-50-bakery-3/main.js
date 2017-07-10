@@ -28,7 +28,7 @@ utils.pkg.sync([
 
 right = utils.spawn.sync(
   './' + path.basename(output),
-  [ '--runtime', '--v8-options' ],
+  [ '--pkg-fallback', '--v8-options' ],
   { cwd: path.dirname(output) }
 );
 

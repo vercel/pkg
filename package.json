@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "3.0.3",
+  "version": "4.1.1",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -27,15 +27,16 @@
     "babel-runtime": "6.23.0",
     "chalk": "1.1.3",
     "escodegen": "1.8.1",
-    "fs-promise": "2.0.2",
+    "fs-extra": "3.0.1",
     "globby": "6.1.0",
     "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
-    "pkg-fetch": "1.9.3",
+    "pkg-fetch": "2.3.5",
     "progress": "2.0.0",
     "resolve": "1.3.3",
-    "simple-bufferstream": "1.0.0"
+    "simple-bufferstream": "1.0.0",
+    "stream-meter": "1.0.4"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
@@ -44,7 +45,7 @@
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-es2015": "6.24.1",
     "babel-register": "6.24.1",
-    "eslint-config-klopov": "0.11.0",
+    "eslint-config-klopov": "0.13.0",
     "json-stable-stringify": "1.0.1",
     "mkdirp": "0.5.1",
     "rimraf": "2.6.1"
@@ -52,15 +53,15 @@
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "prepublish": "in-install || (eslint-klopov . && npm run test:nonpm && npm run babel)",
-    "test": "eslint-klopov . && node test/test.js node0 nonpm && node test/test.js node4 nonpm && node test/test.js node7 nonpm && node test/test.js node6",
-    "test:nonpm": "node test/test.js node6 nonpm"
+    "prepublish": "in-install || (eslint-klopov . && npm run babel && npm run test:no-npm)",
+    "test": "eslint-klopov . && npm run babel && node test/test.js node0 no-npm && node test/test.js node4 no-npm && node test/test.js node6 no-npm && node test/test.js node7 no-npm && node test/test.js node8 no-npm && node test/test.js host only-npm",
+    "test:no-npm": "node test/test.js host no-npm"
   },
   "eslintConfig": {
     "extends": "klopov",
     "parser": "babel-eslint",
     "rules": {
-      "max-depth": "off"
+      "wrap-iife": "off"
     }
   },
   "greenkeeper": {

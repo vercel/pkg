@@ -49,14 +49,14 @@ const lines = Object.keys(mappy).sort().map(function (key) {
 
 assert.equal(lines,
   'connect.js = DISCLOSED code (with sources)\n' +
-  'has-no-license.js = compiled code (no sources)\n' +
+  'has-no-license.js = bytecode (no sources)\n' +
   'has-no-license.js (w) = Cannot resolve \'hasNoLicenseNonLiteral\'\n' +
   'has-permissive-license.js = DISCLOSED code (with sources)\n' +
   'has-permissive-license.js (w) = Cannot resolve \'hasPermissiveLicenseNonLiteral\'\n' +
-  'has-strict-license.js = compiled code (no sources)\n' +
+  'has-strict-license.js = bytecode (no sources)\n' +
   'has-strict-license.js (w) = Cannot resolve \'hasStrictLicenseNonLiteral\'\n' +
   'package.json = DISCLOSED code (with sources)\n' +
-  'test-x-index.js = compiled code (no sources)\n'
+  'test-x-index.js = bytecode (no sources)\n'
 );
 
 utils.vacuum.sync(output);

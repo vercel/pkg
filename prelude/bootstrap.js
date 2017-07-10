@@ -1,7 +1,13 @@
+/* eslint-disable new-cap */
+/* eslint-disable no-buffer-constructor */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-rest-params */
+/* eslint-disable prefer-spread */
 
+/* global EXECPATH_FD */
+/* global PAYLOAD_POSITION */
+/* global PAYLOAD_SIZE */
 /* global REQUIRE_COMMON */
 /* global VIRTUAL_FILESYSTEM */
 /* global DEFAULT_ENTRYPOINT */
@@ -11,7 +17,7 @@
 var common = {};
 REQUIRE_COMMON(common);
 
-var STORE_CODE = common.STORE_CODE;
+var STORE_BLOB = common.STORE_BLOB;
 var STORE_CONTENT = common.STORE_CONTENT;
 var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
@@ -19,23 +25,23 @@ var STORE_STAT = common.STORE_STAT;
 var normalizePath = common.normalizePath;
 var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
+var removeUplevels = common.removeUplevels;
 
-var ENTRYPOINT;
-var FLAG_FORK_WAS_CALLED = false;
-var FLAG_DISABLE_DOT_NODE = false;
+// set ENTRYPOINT and ARGV0 here because
+// they can be altered during process run
+var ARGV0, EXECPATH, ENTRYPOINT;
+var FLAG_ENABLE_PROJECT = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
 // /////////////////////////////////////////////////////////////////
 // ENTRYPOINT //////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
+ARGV0 = process.argv[0];
+EXECPATH = process.execPath;
 ENTRYPOINT = process.argv[1];
-if (ENTRYPOINT === 'DEFAULT_ENTRYPOINT') {
+if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
-}
-
-if (!insideSnapshot(ENTRYPOINT)) {
-  return { undoPatch: true };
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -125,22 +131,35 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 
 function projectToFilesystem (f) {
-  return require('path').join(
-    require('path').dirname(
-      process.execPath
-    ),
+  var xpdn = require('path').dirname(
+    EXECPATH
+  );
+  var relative = removeUplevels(
     require('path').relative(
       require('path').dirname(
         DEFAULT_ENTRYPOINT
       ), f
     )
   );
+  var uplevels = [];
+  var maxUplevels = xpdn.split(require('path').sep).length;
+  for (var i = 0, u = ''; i < maxUplevels; i += 1) {
+    uplevels.push(u);
+    u += '/..';
+  }
+  return uplevels.map(function (uplevel) {
+    return require('path').join(
+      xpdn,
+      uplevel,
+      relative
+    );
+  });
 }
 
 function projectToNearby (f) {
   return require('path').join(
     require('path').dirname(
-      process.execPath
+      EXECPATH
     ),
     require('path').basename(
       f
@@ -148,220 +167,128 @@ function projectToNearby (f) {
   );
 }
 
-function findNativeAddon (path) {
+function findNativeAddonSync (path) {
+  if (!FLAG_ENABLE_PROJECT) return null;
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
-  var projector = projectToFilesystem(path);
+  // check mearby first to prevent .node tampering
+  var projector = projectToNearby(path);
   if (require('fs').existsSync(projector)) return projector;
-  if (FLAG_DISABLE_DOT_NODE) return null; // FLAG influences only nearby
-  projector = projectToNearby(path);
-  if (require('fs').existsSync(projector)) return projector;
+  var projectors = projectToFilesystem(path);
+  for (var i = 0; i < projectors.length; i += 1) {
+    if (require('fs').existsSync(projectors[i])) return projectors[i];
+  }
   return null;
 }
 
 // /////////////////////////////////////////////////////////////////
-// NATIVE ADDON IAT ////////////////////////////////////////////////
+// FLOW UTILS //////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-var modifyNativeAddonWin32 = (function () {
-  var fs = require('fs');
+function asap (cb) {
+  process.nextTick(cb);
+}
 
-  return function (addon) {
-    var modifiedAddon;
+function dezalgo (cb) {
+  if (!cb) return cb;
 
-    var newExeName = require('path').basename(process.execPath);
-    // sometimes there is "index.EXE"
-    if (newExeName.slice(-4).toLowerCase() === '.exe') {
-      newExeName = newExeName.slice(0, -4) + '.exe';
-    }
+  var sync = true;
+  asap(function () {
+    sync = false;
+  });
 
-    if (addon.slice(-5) === '.node') {
-      modifiedAddon = addon.slice(0, -5) + '.' + newExeName + '.node';
+  return function zalgoSafe () {
+    var args = arguments;
+    if (sync) {
+      asap(function () {
+        cb.apply(undefined, args);
+      });
     } else {
-      modifiedAddon = addon + '.' + newExeName;
+      cb.apply(undefined, args);
     }
-
-    if (fs.existsSync(modifiedAddon)) {
-      return modifyNativeAddonWin32(modifiedAddon, newExeName);
-    }
-
-    // http://www.sunshine2k.de/reversing/tuts/tut_pe.htm
-    // http://www.sunshine2k.de/reversing/tuts/tut_rvait.htm
-    // http://marcoramilli.blogspot.ru/2010/12/windows-pe-header.html
-    // http://www.pelib.com/resources/luevel.txt
-    // http://www.zotteljedi.de/pub/pe.txt
-
-    var f = fs.readFileSync(addon);
-    var peHeader = f.readInt32LE(0x3C);
-    var numberOfSections = f.readInt16LE(peHeader + 0x06);
-    var ia32 = (f.readInt16LE(peHeader + 0x18) !== 0x020B); // ia32 or x64
-    var optHeaderSize = f.readInt16LE(peHeader + 0x14);
-    var firstSection = peHeader + 0x18 + optHeaderSize;
-
-    function readStringToZero (p_) {
-      if (p_ === 0) return '';
-      var s = '';
-      var p = p_;
-      var c;
-      while (true) {
-        c = f[p];
-        if (c === 0) break;
-        if (s.length > 255) break;
-        s += String.fromCharCode(c);
-        p += 1;
-      }
-      return s;
-    }
-
-    function writeString (p, s) {
-      var b = (new Buffer(s + '\x00'));
-      b.copy(f, p);
-      return b.length;
-    }
-
-    var sections = [];
-
-    (function () {
-      var pos = firstSection;
-      var section;
-      while (true) {
-        if (sections.length === numberOfSections) break;
-        section = {};
-        section.pos = pos;
-        section.name = readStringToZero(pos);
-        section.virtualAddress = f.readInt32LE(pos + 0x0C);
-        section.rawAddress = f.readInt32LE(pos + 0x14);
-        section.virtualSize = f.readInt32LE(pos + 0x08);
-        section.rawSize = f.readInt32LE(pos + 0x10);
-        section.writeBack = function () {
-          f.writeInt32LE(this.virtualSize, this.pos + 0x08);
-        };
-        sections.push(section);
-        pos += 0x28;
-      }
-    }());
-
-    function rva2section (rva) {
-      var result = null;
-      sections.some(function (section) {
-        if ((rva >= section.virtualAddress) &&
-            (rva < section.virtualAddress + section.virtualSize)) {
-          result = section;
-          return true;
-        }
-      });
-      return result;
-    }
-
-    function rva2raw (rva) {
-      var section = rva2section(rva);
-      return rva - section.virtualAddress + section.rawAddress;
-    }
-
-    function raw2rva (raw, section) {
-      return raw + section.virtualAddress - section.rawAddress;
-    }
-
-    var firstRva = f.readInt32LE(peHeader + (ia32 ? 0x80 : 0x90));
-    var firstRaw = rva2raw(firstRva);
-
-    var imps = [];
-
-    (function () {
-      var pos = firstRaw;
-      var imp;
-      while (true) {
-        imp = {};
-        imp.pos = pos;
-        imp.firstThunkRva = f.readInt32LE(pos + 0x00);
-        if (imp.firstThunkRva === 0) break;
-        imp.firstThunkRaw = rva2raw(imp.firstThunkRva);
-        imp.name = {};
-        imp.name.pos = pos + 0x0C;
-        imp.name.posRva = f.readInt32LE(imp.name.pos);
-        imp.name.posRaw = rva2raw(imp.name.posRva);
-        imp.name.section = rva2section(imp.name.posRva);
-        imp.name.getValue = function () {
-          return readStringToZero(this.posRaw);
-        };
-        imp.name.value = imp.name.getValue();
-        imp.name.raw2rva = function () {
-          this.posRva = raw2rva(this.posRaw, this.section);
-        };
-        imp.name.writeBack = function () {
-          f.writeInt32LE(this.posRva, this.pos);
-        };
-        imps.push(imp);
-        pos += 0x14;
-      }
-    }());
-
-    imps.some(function (imp) {
-      var firstThunkRaw = imp.firstThunkRaw;
-
-      var thunks = [];
-      (function () {
-        var posLink = firstThunkRaw;
-        var pos, posHi, posRva, posRaw, thunk;
-        while (true) {
-          pos = f.readUInt32LE(posLink);
-          if (!ia32) {
-            posHi = f.readUInt32LE(posLink + 0x04);
-            pos += posHi; // result is 80000006
-          }
-          if (pos === 0) {
-            break;
-          } else
-          if (pos & 0x80000000) {
-            posRva = pos;
-            thunk = {};
-            thunk.pos = 0;
-            thunk.name = posRva.toString(16);
-            thunks.push(thunk);
-            posLink += (ia32 ? 0x04 : 0x08);
-          } else {
-            posRva = f.readInt32LE(posLink);
-            posRaw = rva2raw(posRva);
-            thunk = {};
-            thunk.pos = posRaw;
-            thunk.name = readStringToZero(thunk.pos + 0x02);
-            thunks.push(thunk);
-            posLink += (ia32 ? 0x04 : 0x08);
-          }
-        }
-      }());
-
-      imp.thunks = thunks;
-    });
-
-    var impNode = imps.filter(function (imp) {
-      return imp.thunks.some(function (thunk) {
-        return (thunk.name === 'node_module_register');
-      });
-    })[0];
-
-    if (!impNode) {
-      // odd
-      return addon;
-    }
-
-    if (impNode.name.getValue().toLowerCase() ===
-                     newExeName.toLowerCase()) {
-      // already ok
-      return addon;
-    }
-
-    var placeSection = impNode.name.section;
-    var place = placeSection.rawAddress + placeSection.virtualSize;
-    placeSection.virtualSize += writeString(place, newExeName);
-    placeSection.writeBack();
-    impNode.name.posRaw = place;
-    impNode.name.raw2rva();
-    impNode.name.writeBack();
-    fs.writeFileSync(modifiedAddon, f);
-    return modifiedAddon;
   };
-}());
+}
+
+function rethrow (error, arg) {
+  if (error) throw error;
+  return arg;
+}
+
+// /////////////////////////////////////////////////////////////////
+// PAYLOAD /////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+
+if (typeof PAYLOAD_POSITION !== 'number' ||
+    typeof PAYLOAD_SIZE !== 'number') {
+  throw new Error('MUST HAVE PAYLOAD');
+}
+
+var readPayload = function (buffer, offset, length, position, callback) {
+  require('fs').read(EXECPATH_FD,
+    buffer, offset, length, PAYLOAD_POSITION + position, callback);
+};
+
+var readPayloadSync = function (buffer, offset, length, position) {
+  return require('fs').readSync(EXECPATH_FD,
+    buffer, offset, length, PAYLOAD_POSITION + position);
+};
+
+function payloadCopyUni (source, target, targetStart, sourceStart, sourceEnd, cb) {
+  var cb2 = cb || rethrow;
+  if (sourceStart >= source[1]) return cb2(null, 0);
+  if (sourceEnd >= source[1]) sourceEnd = source[1];
+  var payloadPos = source[0] + sourceStart;
+  var targetPos = targetStart;
+  var targetEnd = targetStart + sourceEnd - sourceStart;
+  if (cb) {
+    readPayload(target, targetPos, targetEnd - targetPos, payloadPos, cb);
+  } else {
+    return readPayloadSync(target, targetPos, targetEnd - targetPos, payloadPos);
+  }
+}
+
+function payloadCopyMany (source, target, targetStart, sourceStart, cb) {
+  var payloadPos = source[0] + sourceStart;
+  var targetPos = targetStart;
+  var targetEnd = targetStart + source[1] - sourceStart;
+  readPayload(target, targetPos, targetEnd - targetPos, payloadPos, function (error, chunkSize) {
+    if (error) return cb(error);
+    sourceStart += chunkSize;
+    targetPos += chunkSize;
+    if (chunkSize !== 0 && targetPos < targetEnd) {
+      payloadCopyMany(source, target, targetPos, sourceStart, cb);
+    } else {
+      return cb();
+    }
+  });
+}
+
+function payloadCopyManySync (source, target, targetStart, sourceStart) {
+  var payloadPos = source[0] + sourceStart;
+  var targetPos = targetStart;
+  var targetEnd = targetStart + source[1] - sourceStart;
+  var chunkSize;
+  while (true) {
+    chunkSize = readPayloadSync(target, targetPos, targetEnd - targetPos, payloadPos);
+    payloadPos += chunkSize;
+    targetPos += chunkSize;
+    if (!(chunkSize !== 0 && targetPos < targetEnd)) break;
+  }
+}
+
+function payloadFile (pointer, cb) {
+  var target = new Buffer(pointer[1]);
+  payloadCopyMany(pointer, target, 0, 0, function (error) {
+    if (error) return cb(error);
+    cb(null, target);
+  });
+}
+
+function payloadFileSync (pointer) {
+  var target = new Buffer(pointer[1]);
+  payloadCopyManySync(pointer, target, 0, 0);
+  return target;
+}
 
 // /////////////////////////////////////////////////////////////////
 // SETUP PROCESS ///////////////////////////////////////////////////
@@ -369,7 +296,7 @@ var modifyNativeAddonWin32 = (function () {
 
 (function () {
   process.pkg = {};
-  process.versions.pkg = '%PKG_VERSION%';
+  process.versions.pkg = '%VERSION%';
   process.pkg.mount = createMountpoint;
   process.pkg.entrypoint = ENTRYPOINT;
   process.pkg.defaultEntrypoint = DEFAULT_ENTRYPOINT;
@@ -437,15 +364,9 @@ var modifyNativeAddonWin32 = (function () {
     }
   }
 
-  function rethrow () {
-    return function (error) {
-      if (error) throw error;
-    };
-  }
-
   function maybeCallback (args) {
     var cb = args[args.length - 1];
-    return typeof cb === 'function' ? cb : rethrow();
+    return typeof cb === 'function' ? cb : rethrow;
   }
 
   function error_ENOENT (fileOrDirectory, path) { // eslint-disable-line camelcase
@@ -487,19 +408,26 @@ var modifyNativeAddonWin32 = (function () {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function openFromSnapshot (path_) {
+  function openFromSnapshot (path_, cb) {
+    var cb2 = cb || rethrow;
     var path = normalizePath(path_);
     // console.log("openFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) throw error_ENOENT('File or directory', path);
+    if (!entity) return cb2(error_ENOENT('File or directory', path));
+    var dock = { path: path, entity: entity, position: 0 };
     var nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
-    var fd = ancestor.openSync.call(fs, nullDevice, 'r');
-    var dock = docks[fd] = {};
-    dock.fd = fd;
-    dock.path = path;
-    dock.entity = entity;
-    dock.position = 0;
-    return fd;
+
+    if (cb) {
+      ancestor.open.call(fs, nullDevice, 'r', function (error, fd) {
+        if (error) return cb(error);
+        docks[fd] = dock;
+        cb(null, fd);
+      });
+    } else {
+      var fd = ancestor.openSync.call(fs, nullDevice, 'r');
+      docks[fd] = dock;
+      return fd;
+    }
   }
 
   fs.openSync = function (path) {
@@ -521,46 +449,48 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.open.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = openFromSnapshot(path);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    openFromSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // read //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function readFromSnapshotSub (dock, entityContent, buffer, offset, length, position) {
-    var p = position;
-    if ((p === null) || (typeof p === 'undefined')) p = dock.position;
-    if (p >= entityContent.length) return 0;
-    var end = p + length;
-    var result = entityContent.copy(buffer, offset, p, end);
-    dock.position = end;
-    return result;
+  function readFromSnapshotSub (entityContent, dock, buffer, offset, length, position, cb) {
+    var p;
+    if ((position !== null) && (position !== undefined)) {
+      p = position;
+    } else {
+      p = dock.position;
+    }
+    if (cb) {
+      payloadCopyUni(entityContent, buffer, offset, p, p + length, function (error, bytesRead, buffer2) {
+        if (error) return cb(error);
+        dock.position = p + bytesRead;
+        cb(null, bytesRead, buffer2);
+      });
+    } else {
+      var bytesRead = payloadCopyUni(entityContent, buffer, offset, p, p + length);
+      dock.position = p + bytesRead;
+      return bytesRead;
+    }
   }
 
-  function readFromSnapshot (fd, buffer, offset, length, position) {
-    if (offset < 0) throw new Error('Offset is out of bounds');
-    if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return 0;
-    if (offset >= buffer.length) throw new Error('Offset is out of bounds');
-    if (offset + length > buffer.length) throw new Error('Length extends beyond buffer');
+  function readFromSnapshot (fd, buffer, offset, length, position, cb) {
+    var cb2 = cb || rethrow;
+    if (offset < 0) return cb2(new Error('Offset is out of bounds'));
+    if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return cb2(null, 0);
+    if (offset >= buffer.length) return cb2(new Error('Offset is out of bounds'));
+    if (offset + length > buffer.length) return cb2(new Error('Length extends beyond buffer'));
 
     var dock = docks[fd];
     var entity = dock.entity;
-    var entityContent = entity[STORE_CONTENT];
-    if (entityContent) return readFromSnapshotSub(dock, entityContent, buffer, offset, length, position);
     var entityLinks = entity[STORE_LINKS];
-    if (entityLinks) throw error_EISDIR(dock.path);
-    throw new Error('UNEXPECTED-15');
+    if (entityLinks) return cb2(error_EISDIR(dock.path));
+    var entityContent = entity[STORE_CONTENT];
+    if (entityContent) return readFromSnapshotSub(entityContent, dock, buffer, offset, length, position, cb);
+    return cb2(new Error('UNEXPECTED-15'));
   }
 
   fs.readSync = function (fd, buffer, offset, length, position) {
@@ -576,27 +506,17 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.read.apply(fs, arguments);
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = readFromSnapshot(
-        fd, buffer, offset, length, position
-      );
-      process.nextTick(function () {
-        callback(null, r, buffer);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    readFromSnapshot(fd, buffer, offset, length, position, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // write /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function writeToSnapshot () {
-    throw new Error('Cannot write to packaged file');
+  function writeToSnapshot (cb) {
+    var cb2 = cb || rethrow;
+    return cb2(new Error('Cannot write to packaged file'));
   }
 
   fs.writeSync = function (fd) {
@@ -607,31 +527,23 @@ var modifyNativeAddonWin32 = (function () {
     return writeToSnapshot();
   };
 
-  fs.write = function (fd, buffer) {
+  fs.write = function (fd) {
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = writeToSnapshot();
-      process.nextTick(function () {
-        callback(null, r, buffer);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    writeToSnapshot(callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // close /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function closeFromSnapshot (fd) {
-    ancestor.closeSync.call(fs, fd);
+  function closeFromSnapshot (fd, cb) {
     delete docks[fd];
+    if (!cb) return ancestor.closeSync.call(fs, fd);
+    ancestor.close.call(fs, fd, cb);
   }
 
   fs.closeSync = function (fd) {
@@ -647,17 +559,8 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.close.apply(fs, arguments);
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = closeFromSnapshot(fd);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    closeFromSnapshot(fd, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -676,13 +579,23 @@ var modifyNativeAddonWin32 = (function () {
     }
   }
 
-  function readFileFromSnapshot (path_) {
+  function readFileFromSnapshotSub (entityContent, cb) {
+    if (!cb) return payloadFileSync(entityContent);
+    payloadFile(entityContent, cb);
+  }
+
+  function readFileFromSnapshot (path_, cb) {
+    var cb2 = cb || rethrow;
     var path = normalizePath(path_);
     // console.log("readFileFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) throw error_ENOENT('File', path);
-    var entityCode = entity[STORE_CODE];
-    if (entityCode) return new Buffer('source-code-not-available');
+    if (!entity) return cb2(error_ENOENT('File', path));
+    var entityLinks = entity[STORE_LINKS];
+    if (entityLinks) return cb2(error_EISDIR(path));
+    var entityContent = entity[STORE_CONTENT];
+    if (entityContent) return readFileFromSnapshotSub(entityContent, cb);
+    var entityBlob = entity[STORE_BLOB];
+    if (entityBlob) return cb2(null, new Buffer('source-code-not-available'));
 
     // why return empty buffer?
     // otherwise this error will arise:
@@ -696,11 +609,7 @@ var modifyNativeAddonWin32 = (function () {
     //     at startup (node.js:140:18)
     //     at node.js:1001:3
 
-    var entityContent = entity[STORE_CONTENT];
-    if (entityContent) return new Buffer(entityContent); // clone to prevent mutating store
-    var entityLinks = entity[STORE_LINKS];
-    if (entityLinks) throw error_EISDIR(path);
-    throw new Error('UNEXPECTED-20');
+    return cb2(new Error('UNEXPECTED-20'));
   }
 
   fs.readFileSync = function (path, options_) {
@@ -745,18 +654,12 @@ var modifyNativeAddonWin32 = (function () {
     var encoding = options.encoding;
     assertEncoding(encoding);
 
-    var callback = maybeCallback(arguments);
-    try {
-      var buffer = readFileFromSnapshot(path);
+    var callback = dezalgo(maybeCallback(arguments));
+    readFileFromSnapshot(path, function (error, buffer) {
+      if (error) return callback(error);
       if (encoding) buffer = buffer.toString(encoding);
-      process.nextTick(function () {
-        callback(null, buffer);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+      callback(null, buffer);
+    });
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -770,18 +673,31 @@ var modifyNativeAddonWin32 = (function () {
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function readdirFromSnapshot (path_) {
+  function readdirFromSnapshotSub (entityLinks, path, cb) {
+    if (cb) {
+      payloadFile(entityLinks, function (error, buffer) {
+        if (error) return cb(error);
+        cb(null, JSON.parse(buffer).concat(readdirMountpoints(path)));
+      });
+    } else {
+      var buffer = payloadFileSync(entityLinks);
+      return JSON.parse(buffer).concat(readdirMountpoints(path));
+    }
+  }
+
+  function readdirFromSnapshot (path_, cb) {
+    var cb2 = cb || rethrow;
     var path = normalizePath(path_);
     // console.log("readdirFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) throw error_ENOENT('Directory', path);
-    var entityLinks = entity[STORE_LINKS];
-    if (entityLinks) return entityLinks.concat(readdirMountpoints(path)); // immutable concat to prevent mutating store
-    var entityCode = entity[STORE_CODE];
-    if (entityCode) throw error_ENOTDIR(path);
+    if (!entity) return cb2(error_ENOENT('Directory', path));
+    var entityBlob = entity[STORE_BLOB];
+    if (entityBlob) return cb2(error_ENOTDIR(path));
     var entityContent = entity[STORE_CONTENT];
-    if (entityContent) throw error_ENOTDIR(path);
-    throw new Error('UNEXPECTED-25');
+    if (entityContent) return cb2(error_ENOTDIR(path));
+    var entityLinks = entity[STORE_LINKS];
+    if (entityLinks) return readdirFromSnapshotSub(entityLinks, path, cb);
+    return cb2(new Error('UNEXPECTED-25'));
   }
 
   fs.readdirSync = function (path) {
@@ -803,17 +719,8 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.readdir.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = readdirFromSnapshot(path);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    readdirFromSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -845,11 +752,8 @@ var modifyNativeAddonWin32 = (function () {
       // app should not know real file name
     }
 
-    var callback = maybeCallback(arguments);
-    var r = realpathFromSnapshot(path);
-    process.nextTick(function () {
-      callback(null, r);
-    });
+    var callback = dezalgo(maybeCallback(arguments));
+    callback(null, realpathFromSnapshot(path));
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -860,46 +764,61 @@ var modifyNativeAddonWin32 = (function () {
     if (typeof number !== 'number') throw new Error('UNEXPECTED-30');
   }
 
-  function restoreStat (restore) {
-    assertNumber(restore.atime);
-    restore.atime = new Date(restore.atime);
-    assertNumber(restore.mtime);
-    restore.mtime = new Date(restore.mtime);
-    assertNumber(restore.ctime);
-    restore.ctime = new Date(restore.ctime);
-    assertNumber(restore.birthtime);
-    restore.birthtime = new Date(restore.birthtime);
+  function restore (s) {
+    assertNumber(s.atime);
+    s.atime = new Date(s.atime);
+    assertNumber(s.mtime);
+    s.mtime = new Date(s.mtime);
+    assertNumber(s.ctime);
+    s.ctime = new Date(s.ctime);
+    assertNumber(s.birthtime);
+    s.birthtime = new Date(s.birthtime);
 
-    restore.isFile = function () {
+    s.isFile = function () {
       return this.isFileValue;
     };
-    restore.isDirectory = function () {
+    s.isDirectory = function () {
       return this.isDirectoryValue;
     };
-    restore.isSymbolicLink = function () {
+    s.isSymbolicLink = function () {
       return false;
     };
-    restore.isFIFO = function () {
+    s.isFIFO = function () {
       return false;
     };
+
+    return s;
   }
 
-  function findNativeAddonForStat (path_) {
-    var path = findNativeAddon(path_);
-    if (!path) throw error_ENOENT('File or directory', path_);
-    return ancestor.statSync.call(fs, path);
+  function findNativeAddonForStat (path, cb) {
+    var cb2 = cb || rethrow;
+    var foundPath = findNativeAddonSync(path);
+    if (!foundPath) return cb2(error_ENOENT('File or directory', path));
+    if (!cb) return ancestor.statSync.call(fs, foundPath);
+    ancestor.stat.call(fs, foundPath, cb);
   }
 
-  function statFromSnapshot (path_) {
+  function statFromSnapshotSub (entityStat, cb) {
+    if (cb) {
+      payloadFile(entityStat, function (error, buffer) {
+        if (error) return cb(error);
+        cb(null, restore(JSON.parse(buffer)));
+      });
+    } else {
+      var buffer = payloadFileSync(entityStat);
+      return restore(JSON.parse(buffer));
+    }
+  }
+
+  function statFromSnapshot (path_, cb) {
+    var cb2 = cb || rethrow;
     var path = normalizePath(path_);
     // console.log("statFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return findNativeAddonForStat(path);
+    if (!entity) return findNativeAddonForStat(path, cb);
     var entityStat = entity[STORE_STAT];
-    if (!entityStat) throw new Error('UNEXPECTED-35');
-    var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
-    restoreStat(restore);
-    return restore;
+    if (entityStat) return statFromSnapshotSub(entityStat, cb);
+    return cb2(new Error('UNEXPECTED-35'));
   }
 
   fs.statSync = function (path) {
@@ -921,17 +840,8 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.stat.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = statFromSnapshot(path);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    statFromSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -957,31 +867,20 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.lstat.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = statFromSnapshot(path);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    statFromSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // fstat /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function fstatFromSnapshot (fd) {
-    var dock = docks[fd];
-    var entity = dock.entity;
+  function fstatFromSnapshot (fd, cb) {
+    var cb2 = cb || rethrow;
+    var entity = docks[fd].entity;
     var entityStat = entity[STORE_STAT];
-    if (!entityStat) throw new Error('UNEXPECTED-40');
-    var restore = JSON.parse(JSON.stringify(entityStat)); // clone to prevent mutating store
-    restoreStat(restore);
-    return restore;
+    if (entityStat) return statFromSnapshotSub(entityStat, cb);
+    return cb2(new Error('UNEXPECTED-40'));
   }
 
   fs.fstatSync = function (fd) {
@@ -997,17 +896,8 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.fstat.apply(fs, arguments);
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = fstatFromSnapshot(fd);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    fstatFromSnapshot(fd, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1041,23 +931,21 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.exists.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    var r = existsFromSnapshot(path);
-    process.nextTick(function () {
-      callback(r);
-    });
+    var callback = dezalgo(maybeCallback(arguments));
+    callback(existsFromSnapshot(path));
   };
 
   // ///////////////////////////////////////////////////////////////
   // access ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function accessFromSnapshot (path_) {
+  function accessFromSnapshot (path_, cb) {
+    var cb2 = cb || rethrow;
     var path = normalizePath(path_);
     // console.log("accessFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) throw error_ENOENT('File or directory', path);
-    return undefined;
+    if (!entity) return cb2(error_ENOENT('File or directory', path));
+    return cb2(null, undefined);
   }
 
   fs.accessSync = function (path) {
@@ -1079,17 +967,8 @@ var modifyNativeAddonWin32 = (function () {
       return ancestor.access.apply(fs, translateNth(arguments, 0, path));
     }
 
-    var callback = maybeCallback(arguments);
-    try {
-      var r = accessFromSnapshot(path);
-      process.nextTick(function () {
-        callback(null, r);
-      });
-    } catch (error) {
-      process.nextTick(function () {
-        callback(error);
-      });
-    }
+    var callback = dezalgo(maybeCallback(arguments));
+    accessFromSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1105,8 +984,8 @@ var modifyNativeAddonWin32 = (function () {
     return f;
   }
 
-  function findNativeAddonForInternalModuleStat (path_) {
-    var path = findNativeAddon(path_);
+  function findNativeAddonSyncForInternalModuleStat (path_) {
+    var path = findNativeAddonSync(path_);
     if (!path) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(path));
   }
@@ -1129,11 +1008,13 @@ var modifyNativeAddonWin32 = (function () {
     path = normalizePath(path);
     // console.log("internalModuleStat", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return findNativeAddonForInternalModuleStat(path);
-    var entityStat = entity[STORE_STAT];
-    if (!entityStat) return -ENOENT;
-    if (entityStat.isFileValue) return 0;
-    if (entityStat.isDirectoryValue) return 1;
+    if (!entity) return findNativeAddonSyncForInternalModuleStat(path);
+    var entityBlob = entity[STORE_BLOB];
+    if (entityBlob) return 0;
+    var entityContent = entity[STORE_CONTENT];
+    if (entityContent) return 0;
+    var entityLinks = entity[STORE_LINKS];
+    if (entityLinks) return 1;
     return -ENOENT;
   };
 
@@ -1157,8 +1038,8 @@ var modifyNativeAddonWin32 = (function () {
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return undefined;
     var entityContent = entity[STORE_CONTENT];
-    if (!Buffer.isBuffer(entityContent)) return undefined;
-    return entityContent.toString();
+    if (!entityContent) return undefined;
+    return payloadFileSync(entityContent).toString();
   };
 }());
 
@@ -1203,8 +1084,7 @@ var modifyNativeAddonWin32 = (function () {
   var makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
-    makeRequireFunction = function () {
-      var self = this; // eslint-disable-line consistent-this,no-invalid-this
+    makeRequireFunction = function (self) {
       function rqfn (path) {
         return self.require(path);
       }
@@ -1217,9 +1097,14 @@ var modifyNativeAddonWin32 = (function () {
       return rqfn;
     };
   } else {
-    makeRequireFunction = (
-      require('internal/module').makeRequireFunction
-    );
+    var im = require('internal/module');
+    if (NODE_VERSION_MAJOR <= 7) {
+      makeRequireFunction = function (m) {
+        return im.makeRequireFunction.call(m);
+      };
+    } else {
+      makeRequireFunction = im.makeRequireFunction;
+    }
   }
 
   Module.prototype._compile = function (content, filename_) {
@@ -1236,23 +1121,38 @@ var modifyNativeAddonWin32 = (function () {
     var entity = VIRTUAL_FILESYSTEM[filename];
 
     if (!entity) {
-      // var user try to "_compile" a packaged file
+      // let user try to "_compile" a packaged file
       return ancestor._compile.apply(this, arguments);
     }
 
-    var entityCode = entity[STORE_CODE];
+    var entityBlob = entity[STORE_BLOB];
     var entityContent = entity[STORE_CONTENT];
 
-    if (entityCode) {
-      if (entityContent) throw new Error('UNEXPECTED-45');
+    if (entityBlob) {
+      var options = {
+        filename: filename,
+        lineOffset: 0,
+        displayErrors: true,
+        cachedData: payloadFileSync(entityBlob),
+        sourceless: !entityContent
+      };
+
+      var Script = require('vm').Script;
+      var code = entityContent
+        ? require('module').wrap(payloadFileSync(entityContent))
+        : undefined;
+
+      var script = new Script(code, options);
+      var wrapper = script.runInThisContext(options);
+      if (!wrapper) process.exit(4); // for example VERSION_MISMATCH
       var dirname = require('path').dirname(filename);
-      var rqfn = makeRequireFunction.call(this);
+      var rqfn = makeRequireFunction(this);
       var args = [ this.exports, rqfn, this, filename, dirname ];
-      return entityCode.apply(this.exports, args);
+      return wrapper.apply(this.exports, args);
     }
 
     if (entityContent) {
-      if (entityCode) throw new Error('UNEXPECTED-50');
+      if (entityBlob) throw new Error('UNEXPECTED-50');
       // content is already in utf8 and without BOM (that is expected
       // by stock _compile), but entityContent is still a Buffer
       return ancestor._compile.apply(this, arguments);
@@ -1261,19 +1161,22 @@ var modifyNativeAddonWin32 = (function () {
     throw new Error('UNEXPECTED-55');
   };
 
-  Module._resolveFilename = function (request) {
+  Module._resolveFilename = function () {
     var filename;
+    var flagWas = false;
 
-    var reqDotNode = (request.slice(-5) === '.node'); // bindings.js: opts.bindings += '.node'
-    var reqLeftSlash = (request.indexOf('\\') >= 0);  // heapdump: require('../build/Release/addon')
-    var reqRightSlash = (request.indexOf('/') >= 0);  // slash means that non-package is required ...
-    var enable = reqDotNode || reqLeftSlash || reqRightSlash; // ... (had a problem in levelup/pouchdb)
-
-    FLAG_DISABLE_DOT_NODE = !enable;
     try {
-      filename = ancestor._resolveFilename.apply(null, arguments);
-    } finally {
-      FLAG_DISABLE_DOT_NODE = false;
+      filename = ancestor._resolveFilename.apply(this, arguments);
+    } catch (error) {
+      if (error.code !== 'MODULE_NOT_FOUND') throw error;
+
+      FLAG_ENABLE_PROJECT = true;
+      try {
+        filename = ancestor._resolveFilename.apply(this, arguments);
+        flagWas = true;
+      } finally {
+        FLAG_ENABLE_PROJECT = false;
+      }
     }
 
     if (!insideSnapshot(filename)) {
@@ -1283,8 +1186,13 @@ var modifyNativeAddonWin32 = (function () {
       return filename;
     }
 
-    var found = findNativeAddon(filename);
-    if (found) filename = found;
+    FLAG_ENABLE_PROJECT = flagWas;
+    try {
+      var found = findNativeAddonSync(filename);
+      if (found) filename = found;
+    } finally {
+      FLAG_ENABLE_PROJECT = false;
+    }
 
     return filename;
   };
@@ -1293,28 +1201,13 @@ var modifyNativeAddonWin32 = (function () {
     var filename = filename_;
 
     if (!insideSnapshot(filename)) {
-      try {
-        return ancestor._node.call(null, module, filename);
-      } catch (error) {
-        filename = modifyNativeAddonWin32(filename);
-        return ancestor._node.call(null, module, filename);
-      }
+      return ancestor._node.call(null, module, filename);
     }
     if (insideMountpoint(filename)) {
-      try {
-        return ancestor._node.call(null, module, translate(filename));
-      } catch (error) {
-        filename = modifyNativeAddonWin32(filename);
-        return ancestor._node.call(null, module, translate(filename));
-      }
+      return ancestor._node.call(null, module, translate(filename));
     }
 
-    try {
-      return ancestor._node.call(null, module, filename);
-    } catch (error) {
-      filename = modifyNativeAddonWin32(filename);
-      return ancestor._node.call(null, module, filename);
-    }
+    return ancestor._node.call(null, module, filename);
   };
 
   Module.runMain = function () {
@@ -1324,261 +1217,123 @@ var modifyNativeAddonWin32 = (function () {
 }());
 
 // /////////////////////////////////////////////////////////////////
-// PATCH CLUSTER ///////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-
-(function () {
-  var cluster = require('cluster');
-  var ancestor = {};
-  ancestor.fork = cluster.fork;
-
-  if (ancestor.fork) {
-    cluster.fork = function () {
-      FLAG_FORK_WAS_CALLED = true;
-      try {
-        return ancestor.fork.apply(cluster, arguments);
-      } finally {
-        FLAG_FORK_WAS_CALLED = false;
-      }
-    };
-  }
-}());
-
-// /////////////////////////////////////////////////////////////////
 // PATCH CHILD_PROCESS /////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
 (function () {
   var childProcess = require('child_process');
   var ancestor = {};
-  ancestor.fork = childProcess.fork;
   ancestor.spawn = childProcess.spawn;
+  ancestor.spawnSync = childProcess.spawnSync;
+  ancestor.execFile = childProcess.execFile;
+  ancestor.execFileSync = childProcess.execFileSync;
+  ancestor.exec = childProcess.exec;
+  ancestor.execSync = childProcess.execSync;
 
-  childProcess.fork = function () {
-    FLAG_FORK_WAS_CALLED = true;
-    try {
-      return ancestor.fork.apply(childProcess, arguments);
-    } finally {
-      FLAG_FORK_WAS_CALLED = false;
+  function startsWith2 (args, index, name, impostor) {
+    var qsName = '"' + name + ' ';
+    if (args[index].slice(0, qsName.length) === qsName) {
+      args[index] = '"' + impostor + ' ' + args[index].slice(qsName.length);
+      return true;
     }
-  };
-
-  function filterBadOptions (args) {
-    return args.filter(function (arg) {
-      var name = arg.split('=')[0];
-      return name !== '--debug-port';
-    });
+    var sName = name + ' ';
+    if (args[index].slice(0, sName.length) === sName) {
+      args[index] = impostor + ' ' + args[index].slice(sName.length);
+      return true;
+    }
+    if (args[index] === name) {
+      args[index] = impostor;
+      return true;
+    }
+    return false;
   }
 
-  function makeRuntimeArgs (args) {
-    var noBad = filterBadOptions(args);
-    if (!noBad.length) return [];
-    return [ '--runtime' ].concat(noBad);
+  function startsWith (args, index, name) {
+    var qName = '"' + name + '"';
+    var qEXECPATH = '"' + EXECPATH + '"';
+    var jsName = JSON.stringify(name);
+    var jsEXECPATH = JSON.stringify(EXECPATH);
+    return startsWith2(args, index, name + ' --pkg-fallback',
+                                    EXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, qName + ' --pkg-fallback',
+                                    qEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, jsName + ' --pkg-fallback',
+                                    jsEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, name,
+                                    EXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, qName,
+                                    qEXECPATH + ' --pkg-fallback') ||
+           startsWith2(args, index, jsName,
+                                    jsEXECPATH + ' --pkg-fallback');
   }
 
-  function rearrangeFork (args) {
-    var scriptPos = -1;
-    for (var i = 0; i < args.length; i += 1) {
-      if (args[i].slice(0, 2) !== '--') {
-        scriptPos = i;
-        break;
+  function modifyLong (args, index) {
+    if (!args[index]) return;
+    return (startsWith(args, index, 'node') ||
+            startsWith(args, index, ARGV0) ||
+            startsWith(args, index, ENTRYPOINT) ||
+            startsWith(args, index, EXECPATH));
+  }
+
+  function modifyShort (args) {
+    if (!args[0]) return;
+    if (!Array.isArray(args[1])) {
+      args.splice(1, 0, []);
+    }
+    if (args[0] === 'node' ||
+        args[0] === ARGV0 ||
+        args[0] === ENTRYPOINT ||
+        args[0] === EXECPATH) {
+      args[0] = EXECPATH;
+      args[1].unshift('--pkg-fallback');
+      if (NODE_VERSION_MAJOR === 0) {
+        args[1] = args[1].filter(function (a) {
+          return (a.slice(0, 13) !== '--debug-port=');
+        });
+      }
+    } else {
+      for (var i = 1; i < args[1].length; i += 1) {
+        var mbc = args[1][i - 1];
+        if (mbc === '-c' || mbc === '/c') {
+          modifyLong(args[1], i);
+        }
       }
     }
-    if (scriptPos === -1) {
-      // i dont know this case,
-      // but all options start with "--"
-      // hence they are runtime opts
-      return makeRuntimeArgs(args);
-    } else
-    if (args[scriptPos] === process.argv[1]) {
-      // cluster calls "execPath" with process.argv[1]
-      // see "cluster.settings.exec = argv[1]"
-      // i must skip entrypoint to use default one
-      return [].concat(
-        args.slice(scriptPos + 1)
-      ).concat(
-        makeRuntimeArgs(
-          args.slice(0, scriptPos)
-        )
-      );
-    } else {
-      return [].concat([
-        '--entrypoint',
-        args[scriptPos]
-      ]).concat(
-        args.slice(scriptPos + 1)
-      ).concat(
-        makeRuntimeArgs(
-          args.slice(0, scriptPos)
-        )
-      );
-    }
-  }
-
-  function rearrangeSpawn (args) {
-    var scriptPos = 0;
-    if (args[scriptPos] === process.argv[1]) {
-      return [].concat(
-        args.slice(scriptPos + 1)
-      );
-    } else {
-      return [].concat(args);
-    }
-  }
-
-  function extractEntrypoint (args) {
-    var i = args.indexOf('--entrypoint');
-    if (i < 0) return null;
-    return args[i + 1];
   }
 
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
-
-    if ((args[0] && args[1] &&
-         args[1].unshift && args[2])) {
-      var callsNode = (args[0] === 'node');
-      var callsExecPath = (args[0] === process.execPath);
-      var callsArgv1 = (args[0] === process.argv[1]);
-
-      if (callsNode || callsExecPath) {
-        if (FLAG_FORK_WAS_CALLED) {
-          args[1] = rearrangeFork(args[1]);
-        } else {
-          args[1] = rearrangeSpawn(args[1]);
-        }
-
-        var entrypoint = extractEntrypoint(args[1]);
-        if (callsNode && insideSnapshot(entrypoint)) {
-          // pm2 calls "node" with __dirname-based
-          // snapshot-script. force execPath instead of "node"
-          args[0] = process.execPath;
-        }
-      } else
-      if (callsArgv1) {
-        args[0] = process.execPath;
-      }
-    }
-
+    modifyShort(args);
     return ancestor.spawn.apply(childProcess, args);
   };
+
+  childProcess.spawnSync = function () {
+    var args = cloneArgs(arguments);
+    modifyShort(args);
+    return ancestor.spawnSync.apply(childProcess, args);
+  };
+
+  childProcess.execFile = function () {
+    var args = cloneArgs(arguments);
+    modifyShort(args);
+    return ancestor.execFile.apply(childProcess, args);
+  };
+
+  childProcess.execFileSync = function () {
+    var args = cloneArgs(arguments);
+    modifyShort(args);
+    return ancestor.execFileSync.apply(childProcess, args);
+  };
+
+  childProcess.exec = function () {
+    var args = cloneArgs(arguments);
+    modifyLong(args, 0);
+    return ancestor.exec.apply(childProcess, args);
+  };
+
+  childProcess.execSync = function () {
+    var args = cloneArgs(arguments);
+    modifyLong(args, 0);
+    return ancestor.execSync.apply(childProcess, args);
+  };
 }());
-
-// /////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////
-
-/*
-
-    // TODO move to some test
-
-    assert(JSON.stringify(rearrange([
-      "/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/home/igor/script.js"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "--runtime",
-      "--node-opt-01"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "/snapshot/home/igor/script.js"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "--entrypoint",
-      "/snapshot/home/igor/script.js",
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      process["argv"][1]
-    ])) === JSON.stringify([
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      process["argv"][1]
-    ])) === JSON.stringify([
-      "--runtime",
-      "--node-opt-01"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      process["argv"][1]
-    ])) === JSON.stringify([
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      process["argv"][1],
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "app-opt-01",
-      "app-opt-02"
-    ]));
-
-    assert(JSON.stringify(rearrange([
-      "--node-opt-01",
-      "--node-opt-02",
-      process["argv"][1],
-      "app-opt-01",
-      "app-opt-02"
-    ])) === JSON.stringify([
-      "app-opt-01",
-      "app-opt-02",
-      "--runtime",
-      "--node-opt-01",
-      "--node-opt-02"
-    ]));
-
-*/

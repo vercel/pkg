@@ -20,7 +20,7 @@ utils.pkg.sync([
 
 utils.spawn.sync(
   './' + path.basename(output),
-  [ '--runtime', '--debug' ],
+  [ '--pkg-fallback', '--debug' ],
   { cwd: path.dirname(output),
     stdio: 'pipe', expect: 9 }
 );

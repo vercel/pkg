@@ -10,47 +10,24 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'host';
-const windows = process.platform === 'win32';
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 
 function rnd () {
   return Math.random().toString().slice(-6);
 }
 
-const pairs = [
-  { input: './test-cluster.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-1.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
-  { input: './test-cpfork-2.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
-  { input: './test-cpforkext-1.js',
-    output: './test-output-' + rnd() + '.exe' },
-  { input: './test-cpforkext-2.js',
-    output: './test-output-' + rnd() + '.exe' },
-  { input: './test-spawnexp-1.js',
-    output: './run-time/test-output-' + rnd() + '.exe' },
-  { input: './test-spawnexp-2.js',
-    output: './run-time/test-output-' + rnd() + '.exe' }
-];
+const pairs = fs.readdirSync('.').filter(function (f) {
+  return (/\.js$/.test(f)) &&
+         (f !== 'main.js') &&
+         (!(/-child\.js$/.test(f)));
+}).map(function (f) {
+  return ({
+    input: f, output: './test-output-' + rnd() + '.exe'
+  });
+});
 
-if (!windows) {
-  pairs.push(
-    { input: './test-spawn-1.js',
-      output: './run-time/test-output-' + rnd() + '.exe' },
-    { input: './test-spawn-2.js',
-      output: './run-time/test-output-' + rnd() + '.exe' }
-  );
-}
-
-function chmodPlusX (file) {
-  const stat = fs.statSync(file);
-  const plusx = (stat.mode | 64 | 8).toString(8).slice(-3);
-  fs.chmodSync(file, plusx);
-}
-
-chmodPlusX('./test-spawn-1.js');
-chmodPlusX('./test-spawn-2.js');
+assert(pairs.length > 6);
 
 function stripTraceOpt (lines) {
   return lines.split('\n').filter(function (line) {
@@ -87,7 +64,13 @@ pairs.some(function (pair) {
 
   right = stripTraceOpt(right);
   left = stripTraceOpt(left);
-  assert.equal(left, right);
-  utils.vacuum.sync('run-time');
+  if (left !== right) {
+    console.log(JSON.stringify(pair));
+    console.log('<<left<<\n' + left);
+    console.log('>>right>>\n' + right);
+    throw new Error('Assertion');
+  }
+
   utils.vacuum.sync(output);
+  console.log(__dirname, input, 'ok');
 });

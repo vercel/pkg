@@ -9,13 +9,13 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'host';
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-const version = target;
-if (/^(node|v)?0/.test(version)) return;
-if (/^(node|v)?4/.test(version)) return;
+if (/^(node|v)?0/.test(target)) return;
+if (/^(node|v)?4/.test(target)) return;
 
 let right;
 

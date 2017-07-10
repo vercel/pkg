@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    moons: [ 'user-home' ]
+    packages: [ 'user-home' ]
   };
 };

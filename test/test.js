@@ -6,15 +6,37 @@ const chalk = require('chalk');
 const globby = require('globby');
 const path = require('path');
 const utils = require('./utils.js');
-let target = process.argv[2] || 'host'; // can not pass 'host' to 'fetch'
-if (target === 'host') target = 'node' + process.version[1];
-const modify = process.argv[3];
+const host = 'node' + process.version[1];
+let target = process.argv[2] || 'host';
+if (target === 'host') target = host;
+const modify = process.argv[3] || 'all';
 
-const list = [ path.join(__dirname, '*/main.js') ];
+console.log('');
+console.log('*************************************');
+console.log(target + ' ' + modify);
+console.log('*************************************');
+console.log('');
 
-if (modify === 'nonpm') {
-  list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
-  list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+if (process.env.CI) {
+  if (target === 'node0' ||
+      target === 'node4' ||
+      target === 'node7') {
+    console.log(target + ' is skipped in CI!');
+    console.log('');
+    process.exit();
+  }
+}
+
+const list = [];
+
+if (modify === 'only-npm') {
+  list.push(path.join(__dirname, 'test-79-npm/main.js'));
+} else {
+  list.push(path.join(__dirname, '*/main.js'));
+  if (modify === 'no-npm') {
+    list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
+    list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+  }
 }
 
 const files = globby.sync(list);
@@ -29,7 +51,7 @@ files.sort().some(function (file) {
   } catch (error) {
     console.log();
     console.log(`> ${chalk.red('Error!')} ${error.message}`);
-    console.log(`> ${chalk.red('Error!')} ${file} FAILED`);
+    console.log(`> ${chalk.red('Error!')} ${file} FAILED (in ${target})`);
     process.exit(2);
   }
   console.log(file, 'ok');

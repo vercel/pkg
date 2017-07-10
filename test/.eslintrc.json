@@ -4,6 +4,7 @@
   },
   "rules": {
     "no-var": "off",
+    "prefer-const": "off",
     "vars-on-top": "off"
   }
 }

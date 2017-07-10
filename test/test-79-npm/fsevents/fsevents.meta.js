@@ -1,7 +1,10 @@
 'use strict';
 
-module.exports = function () {
+const home = require('../home.js');
+
+module.exports = function (stamp) {
   return {
-    allow: false // TODO mac only. but maybe test?
+    allow: home(stamp) && (stamp.p === 'darwin'),
+    note: 'only macos is supported'
   };
 };

@@ -1,4 +1,5 @@
-/* eslint-disable indent */
+/* eslint-disable brace-style */
+/* eslint-disable complexity */
 /* eslint-disable no-path-concat */
 
 'use strict';
@@ -87,13 +88,13 @@ fs.open(firstUpperCase(__dirname + '/' + theRequireContentB + '-no-such'), 'r', 
 
 fs.open(__dirname, 'r', function (e46, v46) {
 fs.open(path.dirname(__dirname), 'r', function (e47, v47) {
-fs.open(path.dirname(path.dirname(__dirname)), 'r', function (e48, v48) {
+fs.open(path.dirname(__dirname), 'r', function (e48, v48) { // not "path.dirname(path.dirname" due to denominator
 fs.open(firstLowerCase(__dirname), 'r', function (e49, v49) {
 fs.open(firstLowerCase(path.dirname(__dirname)), 'r', function (e50, v50) {
-fs.open(firstLowerCase(path.dirname(path.dirname(__dirname))), 'r', function (e51, v51) {
+fs.open(firstLowerCase(path.dirname(__dirname)), 'r', function (e51, v51) { // not "path.dirname(path.dirname" due to denominator
 fs.open(firstUpperCase(__dirname), 'r', function (e52, v52) {
 fs.open(firstUpperCase(path.dirname(__dirname)), 'r', function (e53, v53) {
-fs.open(firstUpperCase(path.dirname(path.dirname(__dirname))), 'r', function (e54, v54) {
+fs.open(firstUpperCase(path.dirname(__dirname)), 'r', function (e54, v54) { // not "path.dirname(path.dirname" due to denominator
 //
 
 fs.readdir(__dirname, function (e55, v55) {
@@ -189,16 +190,16 @@ fs.fstat(v51, function (e144, v144) {
     '******************************************************',
     '******************************************************',
 
-    'readFile-directory', assert(e19.errno === -4068 || e19.errno === -21),
-    e19.errno, e19.code, v19 === undefined,
-    e20.errno, e20.code, v20 === undefined,
-    e21.errno, e21.code, v21 === undefined,
-    e22.errno, e22.code, v22 === undefined,
-    e23.errno, e23.code, v23 === undefined,
-    e24.errno, e24.code, v24 === undefined,
-    e25.errno, e25.code, v25 === undefined,
-    e26.errno, e26.code, v26 === undefined,
-    e27.errno, e27.code, v27 === undefined,
+    'readFile-directory', assert(!e19 || e19.errno === -4068 || e19.errno === -21),
+    !e19 || e19.errno, !e19 || e19.code, v19 === undefined,
+    !e20 || e20.errno, !e20 || e20.code, v20 === undefined,
+    !e21 || e21.errno, !e21 || e21.code, v21 === undefined,
+    !e22 || e22.errno, !e22 || e22.code, v22 === undefined,
+    !e23 || e23.errno, !e23 || e23.code, v23 === undefined,
+    !e24 || e24.errno, !e24 || e24.code, v24 === undefined,
+    !e25 || e25.errno, !e25 || e25.code, v25 === undefined,
+    !e26 || e26.errno, !e26 || e26.code, v26 === undefined,
+    !e27 || e27.errno, !e27 || e27.code, v27 === undefined,
 
     '******************************************************',
     '******************************************************',
