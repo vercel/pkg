@@ -130,6 +130,10 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // PROJECT /////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
+function isRootPath (p) {
+  return require('path').dirname(p) === p;
+}
+
 function projectToFilesystem (f) {
   var xpdn = require('path').dirname(
     EXECPATH
@@ -673,6 +677,20 @@ function payloadFileSync (pointer) {
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  function readdirRoot (path, cb) {
+    if (cb) {
+      ancestor.readdir(path, function (error, entries) {
+        if (error) return cb(error);
+        entries.push('snapshot');
+        cb(null, entries);
+      });
+    } else {
+      var entries = ancestor.readdirSync(path);
+      entries.push('snapshot');
+      return entries;
+    }
+  }
+
   function readdirFromSnapshotSub (entityLinks, path, cb) {
     if (cb) {
       payloadFile(entityLinks, function (error, buffer) {
@@ -685,8 +703,9 @@ function payloadFileSync (pointer) {
     }
   }
 
-  function readdirFromSnapshot (path_, cb) {
+  function readdirFromSnapshot (path_, isRoot, cb) {
     var cb2 = cb || rethrow;
+    if (isRoot) return readdirRoot(path_, cb);
     var path = normalizePath(path_);
     // console.log("readdirFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
@@ -701,18 +720,22 @@ function payloadFileSync (pointer) {
   }
 
   fs.readdirSync = function (path) {
-    if (!insideSnapshot(path)) {
+    var isRoot = isRootPath(path);
+
+    if (!insideSnapshot(path) && !isRoot) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return readdirFromSnapshot(path);
+    return readdirFromSnapshot(path, isRoot);
   };
 
   fs.readdir = function (path) {
-    if (!insideSnapshot(path)) {
+    var isRoot = isRootPath(path);
+
+    if (!insideSnapshot(path) && !isRoot) {
       return ancestor.readdir.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -720,7 +743,7 @@ function payloadFileSync (pointer) {
     }
 
     var callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path, callback);
+    readdirFromSnapshot(path, isRoot, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
