@@ -3,11 +3,11 @@
 var bunyan = require('bunyan');
 var logger = bunyan.createLogger({
   name: 'pkg',
-  streams: [{
+  streams: [ {
     type: 'rotating-file',
     path: 'pkg.log',
     level: 'info'
-  }]
+  } ]
 });
 
 if (logger) {
