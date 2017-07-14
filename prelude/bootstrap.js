@@ -1186,7 +1186,7 @@ function payloadFileSync (pointer) {
 
   Module._resolveFilename = function () {
     var filename;
-    var flagWas = false;
+    var flagWasOn = false;
 
     try {
       filename = ancestor._resolveFilename.apply(this, arguments);
@@ -1194,10 +1194,13 @@ function payloadFileSync (pointer) {
       if (error.code !== 'MODULE_NOT_FOUND') throw error;
 
       FLAG_ENABLE_PROJECT = true;
+      var savePathCache = Module._pathCache;
+      Module._pathCache = Object.create(null);
       try {
         filename = ancestor._resolveFilename.apply(this, arguments);
-        flagWas = true;
+        flagWasOn = true;
       } finally {
+        Module._pathCache = savePathCache;
         FLAG_ENABLE_PROJECT = false;
       }
     }
@@ -1209,7 +1212,7 @@ function payloadFileSync (pointer) {
       return filename;
     }
 
-    FLAG_ENABLE_PROJECT = flagWas;
+    FLAG_ENABLE_PROJECT = flagWasOn;
     try {
       var found = findNativeAddonSync(filename);
       if (found) filename = found;
