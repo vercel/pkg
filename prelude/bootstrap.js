@@ -1076,7 +1076,6 @@ function payloadFileSync (pointer) {
   ancestor.require =          Module.prototype.require;
   ancestor._compile =         Module.prototype._compile;
   ancestor._resolveFilename = Module._resolveFilename;
-  ancestor._node =            Module._extensions['.node'];
   ancestor.runMain =          Module.runMain;
 
   Module.prototype.require = function (path) {
@@ -1221,19 +1220,6 @@ function payloadFileSync (pointer) {
     }
 
     return filename;
-  };
-
-  Module._extensions['.node'] = function (module, filename_) {
-    var filename = filename_;
-
-    if (!insideSnapshot(filename)) {
-      return ancestor._node.call(null, module, filename);
-    }
-    if (insideMountpoint(filename)) {
-      return ancestor._node.call(null, module, translate(filename));
-    }
-
-    return ancestor._node.call(null, module, filename);
   };
 
   Module.runMain = function () {
