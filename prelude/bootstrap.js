@@ -1211,12 +1211,14 @@ function payloadFileSync (pointer) {
       return filename;
     }
 
-    FLAG_ENABLE_PROJECT = flagWasOn;
-    try {
-      var found = findNativeAddonSync(filename);
-      if (found) filename = found;
-    } finally {
-      FLAG_ENABLE_PROJECT = false;
+    if (flagWasOn) {
+      FLAG_ENABLE_PROJECT = true;
+      try {
+        var found = findNativeAddonSync(filename);
+        if (found) filename = found;
+      } finally {
+        FLAG_ENABLE_PROJECT = false;
+      }
     }
 
     return filename;
