@@ -202,3 +202,10 @@ version. Then, when you compile your project with `pkg`, pay attention
 to `--target` option. You should specify the same Node.js version
 as your system-wide Node.js to make compiled executable compatible
 with `.node` files.
+
+## API
+
+`const { exec } = require('pkg')`
+
+`exec(args)` takes an array of command line arguments and returns
+a promise. For example `exec([ 'app.js', '--options', 'expose-gc' ])`.
