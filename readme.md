@@ -208,4 +208,9 @@ with `.node` files.
 `const { exec } = require('pkg')`
 
 `exec(args)` takes an array of command line arguments and returns
-a promise. For example `exec([ 'app.js', '--options', 'expose-gc' ])`.
+a promise. For example:
+
+```
+await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
+// do something with app.exe, run, test, upload, deploy, etc
+```
