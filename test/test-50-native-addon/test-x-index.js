@@ -4,4 +4,4 @@
 
 var Module = require('module');
 Module._extensions['.node'] = Module._extensions['.js'];
-console.log(require('dependency/time.node'));
+console.log(require('./lib/time.node'));
