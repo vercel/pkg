@@ -20,7 +20,7 @@ utils.mkdirp.sync(path.dirname(output));
 
 fs.writeFileSync(
   path.join(path.dirname(output), 'time.node'),
-  fs.readFileSync('./time.node')
+  fs.readFileSync('lib/time.node')
 );
 
 left = utils.spawn.sync(
