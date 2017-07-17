@@ -1,3 +1,6 @@
+// TODO import "barbos0" once it works
+/***/ import x from "barbos0";
+
 function hellee(a, b, c) {
 
         require.resolve();

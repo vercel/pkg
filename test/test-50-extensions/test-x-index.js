@@ -13,4 +13,3 @@ Module._extensions['.js'] = function (module, filename) {
 };
 
 require('./test-y-esnext.js');
-require.resolve('./test-z-sub.js');
