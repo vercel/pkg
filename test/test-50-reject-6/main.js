@@ -20,9 +20,12 @@ utils.pkg.sync([
   '--output', output, inputs.warmup // fetch this particular node version
 ], { stdio: [ 'inherit', 'inherit', 'pipe' ] });
 
-utils.pkg.sync([
+let right = utils.pkg.sync([
   '--target', target,
   '--output', output, inputs.index
-], { stdio: 'pipe', expect: 2 });
+], { stdio: 'pipe' });
 
+assert(right.stdout.indexOf('\x1B\x5B') < 0, 'colors detected');
+assert(right.stdout.indexOf('Warning') >= 0);
+assert(right.stdout.indexOf(target) >= 0);
 utils.vacuum.sync(path.dirname(output));
