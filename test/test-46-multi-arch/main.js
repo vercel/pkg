@@ -23,7 +23,7 @@ let right;
 right = utils.pkg.sync([
   '--target', target,
   '--output', output, input
-], { stdio: 'pipe', expect: 2 });
+], { stdio: 'pipe' });
 
 assert(right.stdout.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.stdout.indexOf('Error!') >= 0);
