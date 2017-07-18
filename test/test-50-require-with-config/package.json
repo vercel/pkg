@@ -1,0 +1,7 @@
+{
+  "bin": "test-x-index.js",
+  "pkg": {
+    "scripts": "test-z-*.js",
+    "assets": "test-*.txt"
+  }
+}

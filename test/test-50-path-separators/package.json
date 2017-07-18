@@ -1,0 +1,6 @@
+{
+  "bin": "test-x-index.js",
+  "pkg": {
+    "assets": "sub/*"
+  }
+}

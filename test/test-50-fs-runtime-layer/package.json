@@ -1,0 +1,9 @@
+{
+  "bin": "test-x-index.js",
+  "pkg": {
+    "assets": [
+      "test-z-asset-A.css",
+      "test-z-asset-B.css"
+    ]
+  }
+}
