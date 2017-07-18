@@ -1,5 +1,7 @@
 // TODO import "barbos0" once it works
-/***/ import x from "barbos0";
+/***/ import foo1 from "barbos0";
+/***/ import { foo2, foo3 } from "barbos0";
+/***/ import foo4, { foo5 as foo5a } from "barbos0";
 
 function hellee(a, b, c) {
 
