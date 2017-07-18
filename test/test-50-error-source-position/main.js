@@ -17,8 +17,8 @@ const output = './test-output.exe';
 let right;
 
 utils.pkg.sync([
+  '--public',
   '--target', target,
-  '--config', './test-config.js',
   '--output', output, input
 ]);
 
