@@ -69,8 +69,8 @@ example views, css, images etc).
   path.join(__dirname, 'views/' + viewName)
 ```
 Such cases are not handled by `pkg`. So you must specify the
-files - scripts and assets - manually in a config. It is
-recommended to use package.json's `pkg` property.
+files - scripts and assets - manually in `pkg` property of
+your `package.json` file.
 ```
   "pkg": {
     "scripts": "build/**/*.js",
