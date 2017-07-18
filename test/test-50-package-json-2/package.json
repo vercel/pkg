@@ -1,0 +1,6 @@
+{
+  "bin": "sub/test-x-index.js",
+  "pkg": {
+    "scripts": "./test-y-data.json"
+  }
+}

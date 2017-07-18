@@ -1,0 +1,7 @@
+{
+  "bin": "test-x-index.js",
+  "license": "MIT",
+  "dependencies": {
+    "delta": "*"
+  }
+}
