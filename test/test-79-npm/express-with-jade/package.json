@@ -1,11 +1,1 @@
-{
-  "private": true,
-  "dependencies": {
-    "jade": "*"
-  },
-  "pkg": {
-    "assets": [
-      "views/*.jade"
-    ]
-  }
-}
+{ "private": true }

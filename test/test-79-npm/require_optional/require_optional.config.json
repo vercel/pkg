@@ -1,0 +1,8 @@
+{
+  "bin": "require_optional.js",
+  "pkg": {
+    "assets": [
+      "package.json"
+    ]
+  }
+}

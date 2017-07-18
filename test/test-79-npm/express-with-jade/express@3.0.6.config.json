@@ -1,0 +1,11 @@
+{
+  "bin": "express@3.0.6.js",
+  "dependencies": {
+    "jade": "*"
+  },
+  "pkg": {
+    "assets": [
+      "views/*.jade"
+    ]
+  }
+}

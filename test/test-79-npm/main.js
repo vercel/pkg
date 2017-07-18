@@ -133,7 +133,7 @@ const dickies = globby.sync([
 ]);
 
 dickies.some(function (dicky) {
-  const input = path.resolve(dicky);
+  let input = path.resolve(dicky);
 
   const foldy = path.dirname(input);
   const foldyName = path.basename(foldy);
@@ -262,14 +262,18 @@ dickies.some(function (dicky) {
     update(wordy, 'bad-test', version, note);
   } else {
     console.log('Compiling ' + wordy + '...');
+    const config = path.join(foldy, packy + '.config.json');
 
-    let config = path.join(foldy, packy + '.config.js');
-    config = fs.existsSync(config) ? [ '--config', config ] : [];
+    if (fs.existsSync(config)) {
+      const { bin } = JSON.parse(fs.readFileSync(config));
+      assert.equal(path.join(foldy, bin), input);
+      input = config;
+    }
 
     utils.pkg.sync([
       '--target', target,
       '--output', output, input
-    ].concat(config));
+    ]);
 
     console.log('Copying addons...');
 

@@ -1,0 +1,10 @@
+{
+  "bin": "sequelize.js",
+  "dependencies": {
+    "mysql2": "*",
+    "pg": "*",
+    "pg-hstore": "*",
+    "sqlite3": "*",
+    "tedious": "*"
+  }
+}
