@@ -1,3 +1,6 @@
 'use strict';
 
-require('./pg.js');
+var pg = require('pg');
+if (pg.connect) {
+  console.log('ok');
+}
