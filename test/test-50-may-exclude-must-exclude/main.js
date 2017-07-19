@@ -43,13 +43,13 @@ right = right.split('\n').filter(function (line) {
 assert.equal(right,
   '> Warning Cannot resolve \'reqResSomeVar\'\n' +
   '> [debug] Cannot resolve \'reqResSomeVarMay\'\n' +
-  '> Warning Malformed requirement \'reqResSomeVar\'\n' +
-  '> Warning Malformed requirement \'reqResSomeVar\'\n' +
+  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
+  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
 
   '> Warning Cannot resolve \'reqSomeVar\'\n' +
   '> [debug] Cannot resolve \'reqSomeVarMay\'\n' +
-  '> Warning Malformed requirement \'reqSomeVar\'\n' +
-  '> Warning Malformed requirement \'reqSomeVar\'\n' +
+  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
+  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
 
   '> [debug] Cannot resolve \'tryReqResSomeVar\'\n' +
   '> [debug] Cannot resolve \'tryReqResSomeVarMay\'\n' +
