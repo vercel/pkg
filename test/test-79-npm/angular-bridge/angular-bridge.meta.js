@@ -1,7 +1,8 @@
 'use strict';
 
-module.exports = function () {
+module.exports = function (stamp, flags) {
   return {
-    ci: 'skip'
+    allow: !flags.ci,
+    note: 'speed up CI by removing this test'
   };
 };

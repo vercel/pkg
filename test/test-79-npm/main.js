@@ -156,22 +156,16 @@ dickies.some(function (dicky) {
 
   console.log('Testing ' + wordy + '...');
 
+  const flags = { ci: process.env.CI };
   let metajs = path.join(foldy, packy + '.meta.js');
   metajs = fs.existsSync(metajs) ? require(metajs) : undefined;
 
   let meta;
 
   if (metajs) {
-    meta = metajs(stamp);
+    meta = metajs(stamp, flags) || {};
   } else {
     meta = {};
-  }
-
-  const ci = meta.ci;
-
-  if (process.env.CI && ci === 'skip') {
-    console.log(wordy + ' is skipped in CI!');
-    return;
   }
 
   let allow;
