@@ -2,13 +2,13 @@
 
 var fs = require('fs');
 var path = require('path');
-var configPath = require('v8flags/config-path.js')(process.platform);
+var home = require('user-home');
 var cp = require('child_process');
 
-var files = fs.readdirSync(configPath);
+var files = fs.readdirSync(home);
 files.some(function (file) {
   if (/^\.v8flags/.test(file)) {
-    fs.unlinkSync(path.join(configPath, file));
+    fs.unlinkSync(path.join(home, file));
   }
 });
 
