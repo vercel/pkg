@@ -1,16 +1,12 @@
+/* eslint-disable no-underscore-dangle */
+
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var home = require('user-home');
 var cp = require('child_process');
 
-var files = fs.readdirSync(home);
-files.some(function (file) {
-  if (/^\.v8flags/.test(file)) {
-    fs.unlinkSync(path.join(home, file));
-  }
-});
+require('module')._extensions['.json'] = function () {
+  throw new Error('prevent loading json cache');
+};
 
 var execFileCalled = false;
 var execFileSave = cp.execFile;

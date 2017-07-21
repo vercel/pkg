@@ -259,7 +259,7 @@ dickies.some(function (dicky) {
     const config = path.join(foldy, packy + '.config.json');
 
     if (fs.existsSync(config)) {
-      const { bin } = JSON.parse(fs.readFileSync(config));
+      const bin = JSON.parse(fs.readFileSync(config)).bin;
       assert.equal(path.join(foldy, bin), input);
       input = config;
     }

@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/* eslint-disable strict */
+
+'use strict';
+
 const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
