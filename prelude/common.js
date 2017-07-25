@@ -133,7 +133,11 @@ if (win32) {
     if (typeof f !== 'string') return false;
     var slice112 = f.slice(1, 12);
     if (slice112 === ':\\snapshot\\' ||
-        slice112 === ':\\snapshot') return true;
+        slice112 === ':/snapshot\\' ||
+        slice112 === ':\\snapshot/' ||
+        slice112 === ':/snapshot/' ||
+        slice112 === ':\\snapshot' ||
+        slice112 === ':/snapshot') return true;
     return false;
   };
 } else {
