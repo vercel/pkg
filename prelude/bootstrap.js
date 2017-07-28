@@ -171,7 +171,8 @@ function projectToNearby (f) {
   );
 }
 
-function findNativeAddonSync (path) {
+function findNativeAddonSyncUnderRequire (path) {
+  // under require means under Module._resolveFilename, etc
   if (!FLAG_ENABLE_PROJECT) return null;
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
@@ -815,7 +816,7 @@ function payloadFileSync (pointer) {
 
   function findNativeAddonForStat (path, cb) {
     var cb2 = cb || rethrow;
-    var foundPath = findNativeAddonSync(path);
+    var foundPath = findNativeAddonSyncUnderRequire(path);
     if (!foundPath) return cb2(error_ENOENT('File or directory', path));
     if (!cb) return ancestor.statSync.call(fs, foundPath);
     ancestor.stat.call(fs, foundPath, cb);
@@ -1007,8 +1008,8 @@ function payloadFileSync (pointer) {
     return f;
   }
 
-  function findNativeAddonSyncForInternalModuleStat (path_) {
-    var path = findNativeAddonSync(path_);
+  function findNativeAddonSyncUnderRequireForInternalModuleStat (path_) {
+    var path = findNativeAddonSyncUnderRequire(path_);
     if (!path) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(path));
   }
@@ -1031,7 +1032,7 @@ function payloadFileSync (pointer) {
     path = normalizePath(path);
     // console.log("internalModuleStat", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return findNativeAddonSyncForInternalModuleStat(path);
+    if (!entity) return findNativeAddonSyncUnderRequireForInternalModuleStat(path);
     var entityBlob = entity[STORE_BLOB];
     if (entityBlob) return 0;
     var entityContent = entity[STORE_CONTENT];
@@ -1214,7 +1215,7 @@ function payloadFileSync (pointer) {
     if (flagWasOn) {
       FLAG_ENABLE_PROJECT = true;
       try {
-        var found = findNativeAddonSync(filename);
+        var found = findNativeAddonSyncUnderRequire(filename);
         if (found) filename = found;
       } finally {
         FLAG_ENABLE_PROJECT = false;
