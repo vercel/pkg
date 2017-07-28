@@ -171,9 +171,7 @@ function projectToNearby (f) {
   );
 }
 
-function findNativeAddonSyncUnderRequire (path) {
-  // under require means under Module._resolveFilename, etc
-  if (!FLAG_ENABLE_PROJECT) return null;
+function findNativeAddonSyncFreeFromRequire (path) {
   if (!insideSnapshot(path)) throw new Error('UNEXPECTED-10');
   if (path.slice(-5) !== '.node') return null; // leveldown.node.js
   // check mearby first to prevent .node tampering
@@ -184,6 +182,11 @@ function findNativeAddonSyncUnderRequire (path) {
     if (require('fs').existsSync(projectors[i])) return projectors[i];
   }
   return null;
+}
+
+function findNativeAddonSyncUnderRequire (path) {
+  if (!FLAG_ENABLE_PROJECT) return null;
+  return findNativeAddonSyncFreeFromRequire(path);
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -936,11 +939,17 @@ function payloadFileSync (pointer) {
   // exists ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  function findNativeAddonForExists (path) {
+    var foundPath = findNativeAddonSyncFreeFromRequire(path);
+    if (!foundPath) return false;
+    return ancestor.existsSync.call(fs, foundPath);
+  }
+
   function existsFromSnapshot (path_) {
     var path = normalizePath(path_);
     // console.log("existsFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return false;
+    if (!entity) return findNativeAddonForExists(path);
     return true;
   }
 
