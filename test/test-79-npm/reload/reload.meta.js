@@ -1,7 +1,3 @@
 'use strict';
 
-module.exports = function () {
-  return {
-    take: 'last-line'
-  };
-};
+module.exports = require('./reload@2.1.0.meta.js');
