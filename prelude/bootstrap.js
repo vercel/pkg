@@ -421,7 +421,6 @@ function payloadFileSync (pointer) {
     if (!entity) return cb2(error_ENOENT('File or directory', path));
     var dock = { path: path, entity: entity, position: 0 };
     var nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
-
     if (cb) {
       ancestor.open.call(fs, nullDevice, 'r', function (error, fd) {
         if (error) return cb(error);
@@ -547,8 +546,11 @@ function payloadFileSync (pointer) {
 
   function closeFromSnapshot (fd, cb) {
     delete docks[fd];
-    if (!cb) return ancestor.closeSync.call(fs, fd);
-    ancestor.close.call(fs, fd, cb);
+    if (cb) {
+      ancestor.close.call(fs, fd, cb);
+    } else {
+      return ancestor.closeSync.call(fs, fd);
+    }
   }
 
   fs.closeSync = function (fd) {
@@ -585,8 +587,11 @@ function payloadFileSync (pointer) {
   }
 
   function readFileFromSnapshotSub (entityContent, cb) {
-    if (!cb) return payloadFileSync(entityContent);
-    payloadFile(entityContent, cb);
+    if (cb) {
+      payloadFile(entityContent, cb);
+    } else {
+      return payloadFileSync(entityContent);
+    }
   }
 
   function readFileFromSnapshot (path_, cb) {
@@ -818,8 +823,11 @@ function payloadFileSync (pointer) {
     var cb2 = cb || rethrow;
     var foundPath = findNativeAddonSyncUnderRequire(path);
     if (!foundPath) return cb2(error_ENOENT('File or directory', path));
-    if (!cb) return ancestor.statSync.call(fs, foundPath);
-    ancestor.stat.call(fs, foundPath, cb);
+    if (cb) {
+      ancestor.stat.call(fs, foundPath, cb);
+    } else {
+      return ancestor.statSync.call(fs, foundPath);
+    }
   }
 
   function statFromSnapshotSub (entityStat, cb) {
@@ -1008,7 +1016,7 @@ function payloadFileSync (pointer) {
     return f;
   }
 
-  function findNativeAddonSyncUnderRequireForInternalModuleStat (path_) {
+  function findNativeAddonForInternalModuleStat (path_) {
     var path = findNativeAddonSyncUnderRequire(path_);
     if (!path) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(path));
@@ -1032,7 +1040,7 @@ function payloadFileSync (pointer) {
     path = normalizePath(path);
     // console.log("internalModuleStat", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return findNativeAddonSyncUnderRequireForInternalModuleStat(path);
+    if (!entity) return findNativeAddonForInternalModuleStat(path);
     var entityBlob = entity[STORE_BLOB];
     if (entityBlob) return 0;
     var entityContent = entity[STORE_CONTENT];
