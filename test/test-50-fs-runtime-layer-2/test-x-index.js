@@ -230,10 +230,10 @@ function test03 () {
 
 function test04 () {
   const stats = fs.statSync(theDirectory);
-  console.log(stats.size);
+  console.log(stats.mode);
   const fd = fs.openSync(theDirectory, 'r');
   const fstats = fs.fstatSync(fd);
-  console.log(fstats.size);
+  console.log(fstats.mode);
   const buffer = Buffer.from([ 12, 34, 56, 78 ]);
   let bytesRead;
   try { bytesRead = fs.readSync(fd, buffer, 0, 6); } catch (error) { dumpError(error); }

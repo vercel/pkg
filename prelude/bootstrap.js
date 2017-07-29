@@ -802,6 +802,15 @@ function payloadFileSync (pointer) {
   // ///////////////////////////////////////////////////////////////
 
   function restore (s) {
+    s.blksize = 4096;
+    s.blocks = 0;
+    s.dev = 0;
+    s.gid = 20;
+    s.ino = 0;
+    s.nlink = 0;
+    s.rdev = 0;
+    s.uid = 500;
+
     s.atime = new Date(EXECSTAT.atime);
     s.mtime = new Date(EXECSTAT.mtime);
     s.ctime = new Date(EXECSTAT.ctime);
