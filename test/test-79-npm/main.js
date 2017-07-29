@@ -106,7 +106,7 @@ if (!UPM) {
 
   const input = path.resolve('stamp.js');
   const lucky = path.basename(input).slice(0, -3);
-  const output = path.join('_isolator', lucky + '.exe');
+  const output = path.resolve('_isolator', lucky + '.exe');
 
   utils.pkg.sync([
     '--target', target,
@@ -147,7 +147,7 @@ dickies.some(function (dicky) {
     wordy = foldyName + '/' + wordy;
   }
 
-  const output = path.join('_isolator', packy + '.exe');
+  const output = path.resolve('_isolator', packy + '.exe');
 
   console.log();
   console.log('*********************************************************');
@@ -273,18 +273,40 @@ dickies.some(function (dicky) {
 
     const deployFiles = globby.sync(
       path.join(foldy, 'node_modules', '**', '*.node')
-    );
+    ).map(function (file) {
+      return {
+        deployFrom: file,
+        deployTo: path.join(path.dirname(output), path.basename(file))
+      };
+    });
 
     if (meta.deployFiles) {
-      Array.prototype.push.apply(deployFiles,
-        meta.deployFiles.map((f) => path.join(foldy, f))
-      );
+      meta.deployFiles.forEach(function (deployFile) {
+        var deployFrom;
+        var deployTo;
+        if (Array.isArray(deployFile)) {
+          deployFrom = deployFile[0];
+          deployTo = deployFile[1];
+        } else {
+          deployFrom = deployFile;
+          deployTo = deployFile;
+        }
+        assert(deployFrom.indexOf('*') < 0);
+        assert(deployTo.indexOf('*') < 0);
+        deployFiles.push({
+          deployFrom: path.join(foldy, deployFrom),
+          deployTo: path.join(path.dirname(output), deployTo)
+        });
+      });
     }
 
     deployFiles.some(function (deployFile) {
+      utils.mkdirp.sync(
+        path.dirname(deployFile.deployTo)
+      );
       fs.writeFileSync(
-        path.join(path.dirname(output), path.basename(deployFile)),
-        fs.readFileSync(deployFile)
+        deployFile.deployTo,
+        fs.readFileSync(deployFile.deployFrom)
       );
     });
 
