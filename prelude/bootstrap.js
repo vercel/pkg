@@ -27,9 +27,6 @@ var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
 var removeUplevels = common.removeUplevels;
 
-// set ENTRYPOINT and ARGV0 here because
-// they can be altered during process run
-var ARGV0, EXECPATH, ENTRYPOINT;
 var FLAG_ENABLE_PROJECT = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 
@@ -37,12 +34,24 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 // ENTRYPOINT //////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-ARGV0 = process.argv[0];
-EXECPATH = process.execPath;
-ENTRYPOINT = process.argv[1];
+// set ENTRYPOINT and ARGV0 here because
+// they can be altered during process run
+var ARGV0 = process.argv[0];
+var EXECPATH = process.execPath;
+var ENTRYPOINT = process.argv[1];
 if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
+
+// /////////////////////////////////////////////////////////////////
+// EXECSTAT ////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+
+var EXECSTAT = require('fs').statSync(EXECPATH);
+EXECSTAT.atimeMs = EXECSTAT.atime.getTime();
+EXECSTAT.mtimeMs = EXECSTAT.mtime.getTime();
+EXECSTAT.ctimeMs = EXECSTAT.ctime.getTime();
+EXECSTAT.birthtimeMs = EXECSTAT.birthtime.getTime();
 
 // /////////////////////////////////////////////////////////////////
 // MOUNTPOINTS /////////////////////////////////////////////////////
@@ -792,25 +801,27 @@ function payloadFileSync (pointer) {
   // stat //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function assertNumber (number) {
-    if (typeof number !== 'number') throw new Error('UNEXPECTED-30');
-  }
-
   function restore (s) {
-    assertNumber(s.atime);
-    s.atime = new Date(s.atime);
-    assertNumber(s.mtime);
-    s.mtime = new Date(s.mtime);
-    assertNumber(s.ctime);
-    s.ctime = new Date(s.ctime);
-    assertNumber(s.birthtime);
-    s.birthtime = new Date(s.birthtime);
+    s.atime = new Date(EXECSTAT.atime);
+    s.mtime = new Date(EXECSTAT.mtime);
+    s.ctime = new Date(EXECSTAT.ctime);
+    s.birthtime = new Date(EXECSTAT.birthtime);
+
+    s.atimeMs = EXECSTAT.atimeMs;
+    s.mtimeMs = EXECSTAT.mtimeMs;
+    s.ctimeMs = EXECSTAT.ctimeMs;
+    s.birthtimeMs = EXECSTAT.birthtimeMs;
+
+    var isFileValue = s.isFileValue;
+    var isDirectoryValue = s.isDirectoryValue;
+    delete s.isFileValue;
+    delete s.isDirectoryValue;
 
     s.isFile = function () {
-      return this.isFileValue;
+      return isFileValue;
     };
     s.isDirectory = function () {
-      return this.isDirectoryValue;
+      return isDirectoryValue;
     };
     s.isSymbolicLink = function () {
       return false;

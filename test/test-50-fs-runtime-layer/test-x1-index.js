@@ -148,26 +148,26 @@ console.log([
 
   //
 
-  fs.statSync(path.join(__dirname, theRequireContentA)).birthtime.getTime(),
-  fs.statSync(__dirname + path.sep + theRequireContentB).birthtime.getTime(),
-  fs.statSync(__dirname + '/' + theRequireContentB).birthtime.getTime(),
-  windows ? fs.statSync(__dirname + '/\\' + theRequireContentB).birthtime.getTime() : '',
-  windows ? fs.statSync(__dirname + '\\' + theRequireContentB).birthtime.getTime() : '',
-  windows ? fs.statSync(__dirname + '\\/' + theRequireContentB).birthtime.getTime() : '',
+  fs.statSync(path.join(__dirname, theRequireContentA)).birthtime.getYear(),
+  fs.statSync(__dirname + path.sep + theRequireContentB).birthtime.getYear(),
+  fs.statSync(__dirname + '/' + theRequireContentB).birthtime.getYear(),
+  windows ? fs.statSync(__dirname + '/\\' + theRequireContentB).birthtime.getYear() : '',
+  windows ? fs.statSync(__dirname + '\\' + theRequireContentB).birthtime.getYear() : '',
+  windows ? fs.statSync(__dirname + '\\/' + theRequireContentB).birthtime.getYear() : '',
 
-  fs.statSync(firstLowerCase(path.join(__dirname, theRequireContentA))).birthtime.getTime(),
-  fs.statSync(firstLowerCase(__dirname + path.sep + theRequireContentB)).birthtime.getTime(),
-  fs.statSync(firstLowerCase(__dirname + '/' + theRequireContentB)).birthtime.getTime(),
-  windows ? fs.statSync(firstLowerCase(__dirname + '/\\' + theRequireContentB)).birthtime.getTime() : '',
-  windows ? fs.statSync(firstLowerCase(__dirname + '\\' + theRequireContentB)).birthtime.getTime() : '',
-  windows ? fs.statSync(firstLowerCase(__dirname + '\\/' + theRequireContentB)).birthtime.getTime() : '',
+  fs.statSync(firstLowerCase(path.join(__dirname, theRequireContentA))).birthtime.getYear(),
+  fs.statSync(firstLowerCase(__dirname + path.sep + theRequireContentB)).birthtime.getYear(),
+  fs.statSync(firstLowerCase(__dirname + '/' + theRequireContentB)).birthtime.getYear(),
+  windows ? fs.statSync(firstLowerCase(__dirname + '/\\' + theRequireContentB)).birthtime.getYear() : '',
+  windows ? fs.statSync(firstLowerCase(__dirname + '\\' + theRequireContentB)).birthtime.getYear() : '',
+  windows ? fs.statSync(firstLowerCase(__dirname + '\\/' + theRequireContentB)).birthtime.getYear() : '',
 
-  fs.statSync(firstUpperCase(path.join(__dirname, theRequireContentA))).birthtime.getTime(),
-  fs.statSync(firstUpperCase(__dirname + path.sep + theRequireContentB)).birthtime.getTime(),
-  fs.statSync(firstUpperCase(__dirname + '/' + theRequireContentB)).birthtime.getTime(),
-  windows ? fs.statSync(firstUpperCase(__dirname + '/\\' + theRequireContentB)).birthtime.getTime() : '',
-  windows ? fs.statSync(firstUpperCase(__dirname + '\\' + theRequireContentB)).birthtime.getTime() : '',
-  windows ? fs.statSync(firstUpperCase(__dirname + '\\/' + theRequireContentB)).birthtime.getTime() : '',
+  fs.statSync(firstUpperCase(path.join(__dirname, theRequireContentA))).birthtime.getYear(),
+  fs.statSync(firstUpperCase(__dirname + path.sep + theRequireContentB)).birthtime.getYear(),
+  fs.statSync(firstUpperCase(__dirname + '/' + theRequireContentB)).birthtime.getYear(),
+  windows ? fs.statSync(firstUpperCase(__dirname + '/\\' + theRequireContentB)).birthtime.getYear() : '',
+  windows ? fs.statSync(firstUpperCase(__dirname + '\\' + theRequireContentB)).birthtime.getYear() : '',
+  windows ? fs.statSync(firstUpperCase(__dirname + '\\/' + theRequireContentB)).birthtime.getYear() : '',
 
   //
 
