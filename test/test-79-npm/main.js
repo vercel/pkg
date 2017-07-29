@@ -308,6 +308,9 @@ dickies.some(function (dicky) {
         deployFile.deployTo,
         fs.readFileSync(deployFile.deployFrom)
       );
+      if (path.extname(deployFile.deployTo) === '.sh') {
+        fs.chmodSync(deployFile.deployTo, 511); // 777
+      }
     });
 
     console.log('Running compiled ' + wordy + '...');

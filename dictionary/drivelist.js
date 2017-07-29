@@ -2,9 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'scripts/*'
-    ],
     patches: {
       'build/scripts.js': [
         'path.join(__dirname, \'..\', \'scripts\')',
