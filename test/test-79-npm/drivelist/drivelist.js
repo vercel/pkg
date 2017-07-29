@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
+// TODO move to meta.js.packages
 var mkdirp = require('../../../node_modules/mkdirp');
 var rimraf = require('../../../node_modules/rimraf');
 
