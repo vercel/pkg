@@ -32,7 +32,7 @@
     "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
-    "pkg-fetch": "2.3.7",
+    "pkg-fetch": "2.3.8",
     "progress": "2.0.0",
     "resolve": "1.4.0",
     "simple-bufferstream": "1.0.0",
