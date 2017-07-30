@@ -7,11 +7,10 @@ var utils = require('node-notifier/lib/utils.js');
 var whichArgument;
 
 utils.command = utils.fileCommandJson = utils.immediateFileCommand = function (filename) {
-  if ((fs.existsSync(filename) ||
-       // notifier is built-in on linux
-       filename === whichArgument) &&
-      path.isAbsolute(filename) &&
-      filename.indexOf('snapshot') < 0) {
+  var forLinux = filename === whichArgument; // 'notify-send' is built-in on linux
+  var forNonLinux = (fs.existsSync(filename) && path.isAbsolute(filename));
+  if ((forLinux || forNonLinux) &&
+       filename.indexOf('snapshot') < 0) {
     console.log('ok');
   }
   process.exit();

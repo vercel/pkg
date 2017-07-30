@@ -7,3 +7,6 @@ module.exports = function (stamp) {
     allow: home(stamp)
   };
 };
+
+// TODO windows has an error
+// 'Invalid access to memory location'
