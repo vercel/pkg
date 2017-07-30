@@ -2,8 +2,7 @@
 
 module.exports = function () {
   return {
-    deployFiles: [
-      [ 'node_modules/google-closure-compiler/compiler.jar', 'compiler.jar' ]
-    ]
+    deployFiles:
+      require('../../../dictionary/google-closure-compiler.js').pkg.deployFiles
   };
 };

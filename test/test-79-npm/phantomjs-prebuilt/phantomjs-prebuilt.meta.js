@@ -3,9 +3,7 @@
 module.exports = function (stamp) {
   return {
     allow: (!(/^arm/).test(stamp.a)),
-    deployFiles: [
-      [ 'node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs', 'phantomjs' ],
-      [ 'node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs.exe', 'phantomjs.exe' ]
-    ]
+    deployFiles:
+      require('../../../dictionary/phantomjs-prebuilt.js').pkg.deployFiles
   };
 };

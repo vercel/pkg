@@ -16,11 +16,7 @@ module.exports = function (stamp, flags) {
   }
 
   return {
-    deployFiles: [
-      [ 'node_modules/node-notifier/vendor/notifu/notifu.exe', 'notifu/notifu.exe' ],
-      [ 'node_modules/node-notifier/vendor/notifu/notifu64.exe', 'notifu/notifu64.exe' ],
-      [ 'node_modules/node-notifier/vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier', 'terminal-notifier/terminal-notifier' ],
-      [ 'node_modules/node-notifier/vendor/snoreToast/SnoreToast.exe', 'snoreToast/SnoreToast.exe' ]
-    ]
+    deployFiles:
+      require('../../../dictionary/node-notifier.js').pkg.deployFiles
   };
 };
