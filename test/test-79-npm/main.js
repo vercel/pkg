@@ -309,9 +309,10 @@ dickies.some(function (dicky) {
           deployFile.deployTo,
           fs.readFileSync(deployFile.deployFrom)
         );
-        if (path.extname(deployFile.deployTo) === '.sh') {
-          fs.chmodSync(deployFile.deployTo, 511); // 777
-        }
+        fs.chmodSync(
+          deployFile.deployTo,
+          fs.statSync(deployFile.deployFrom).mode.toString(8).slice(-3)
+        );
       }
     });
 
