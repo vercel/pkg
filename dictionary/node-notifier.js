@@ -8,16 +8,16 @@ module.exports = {
   pkg: {
     patches: {
       'notifiers/balloon.js': [
-        '__dirname,',
-        'process.execPath + \'/\','
+        '__dirname, \'../vendor/notifu/notifu\'',
+        'path.dirname(process.execPath), \'notifu/notifu\''
       ],
       'notifiers/notificationcenter.js': [
-        '__dirname,',
-        'process.execPath + \'/\','
+        '__dirname,\n  \'../vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier\'',
+        'path.dirname(process.execPath), \'terminal-notifier/terminal-notifier\''
       ],
       'notifiers/toaster.js': [
-        '__dirname,',
-        'process.execPath + \'/\','
+        '__dirname, \'../vendor/snoreToast/SnoreToast.exe\'',
+        'path.dirname(process.execPath), \'snoreToast/SnoreToast.exe\''
       ]
     }
   }
