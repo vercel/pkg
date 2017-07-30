@@ -301,15 +301,17 @@ dickies.some(function (dicky) {
     }
 
     deployFiles.some(function (deployFile) {
-      utils.mkdirp.sync(
-        path.dirname(deployFile.deployTo)
-      );
-      fs.writeFileSync(
-        deployFile.deployTo,
-        fs.readFileSync(deployFile.deployFrom)
-      );
-      if (path.extname(deployFile.deployTo) === '.sh') {
-        fs.chmodSync(deployFile.deployTo, 511); // 777
+      if (fs.existsSync(deployFile.deployFrom)) {
+        utils.mkdirp.sync(
+          path.dirname(deployFile.deployTo)
+        );
+        fs.writeFileSync(
+          deployFile.deployTo,
+          fs.readFileSync(deployFile.deployFrom)
+        );
+        if (path.extname(deployFile.deployTo) === '.sh') {
+          fs.chmodSync(deployFile.deployTo, 511); // 777
+        }
       }
     });
 

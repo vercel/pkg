@@ -8,6 +8,13 @@ module.exports = function (stamp, flags) {
     };
   }
 
+  if (stamp.p === 'win32' && stamp.m < 48) {
+    return {
+      allow: false,
+      note: 'flat npm is needed to require(\'which\')'
+    };
+  }
+
   return {
     deployFiles: [
       [ 'node_modules/node-notifier/vendor/notifu/notifu.exe', 'notifu/notifu.exe' ],

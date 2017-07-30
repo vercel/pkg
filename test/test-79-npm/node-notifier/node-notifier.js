@@ -12,8 +12,10 @@ utils.command = utils.fileCommandJson = utils.immediateFileCommand = function (f
   }
   process.exit();
 };
+
 var which = require('which');
 which.sync = function () {
   return true;
 };
+
 notifier.notify('hi!');
