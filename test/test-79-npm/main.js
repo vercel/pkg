@@ -280,25 +280,42 @@ dickies.some(function (dicky) {
       };
     });
 
+    let deployFilesExt = [];
+
     if (meta.deployFiles) {
-      meta.deployFiles.forEach(function (deployFile) {
-        var deployFrom;
-        var deployTo;
-        if (Array.isArray(deployFile)) {
-          deployFrom = deployFile[0];
-          deployTo = deployFile[1];
-        } else {
-          deployFrom = deployFile;
-          deployTo = deployFile;
-        }
-        assert(deployFrom.indexOf('*') < 0);
-        assert(deployTo.indexOf('*') < 0);
-        deployFiles.push({
-          deployFrom: path.join(foldy, deployFrom),
-          deployTo: path.join(path.dirname(output), deployTo)
-        });
+      deployFilesExt = deployFilesExt.concat(meta.deployFiles);
+    }
+
+    if (meta.deployFilesFrom) {
+      meta.deployFilesFrom.some(function (dictName) {
+        const dict = require('../../dictionary/' + dictName);
+        deployFilesExt = deployFilesExt.concat(
+          dict.pkg.deployFiles.map(function (deployFile) {
+            const deployFrom = 'node_modules/' + dictName + '/' + deployFile[0];
+            const deployTo = deployFile[1];
+            return [ deployFrom, deployTo ];
+          })
+        );
       });
     }
+
+    deployFilesExt.some(function (deployFile) {
+      let deployFrom;
+      let deployTo;
+      if (Array.isArray(deployFile)) {
+        deployFrom = deployFile[0];
+        deployTo = deployFile[1];
+      } else {
+        deployFrom = deployFile;
+        deployTo = deployFile;
+      }
+      assert(deployFrom.indexOf('*') < 0);
+      assert(deployTo.indexOf('*') < 0);
+      deployFiles.push({
+        deployFrom: path.join(foldy, deployFrom),
+        deployTo: path.join(path.dirname(output), deployTo)
+      });
+    });
 
     deployFiles.some(function (deployFile) {
       if (fs.existsSync(deployFile.deployFrom)) {

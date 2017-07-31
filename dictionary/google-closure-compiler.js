@@ -9,7 +9,7 @@ module.exports = {
       ]
     },
     deployFiles: [
-      [ 'node_modules/google-closure-compiler/compiler.jar', 'compiler.jar' ]
+      [ 'compiler.jar', 'compiler.jar' ]
     ]
   }
 };

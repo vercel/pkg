@@ -9,8 +9,8 @@ module.exports = {
       ]
     },
     deployFiles: [
-      [ 'node_modules/phantom/lib/shim/index.js', 'shim/index.js' ],
-      [ 'node_modules/phantom/lib/shim/function_bind_polyfill.js', 'shim/function_bind_polyfill.js' ]
+      [ 'lib/shim/index.js', 'shim/index.js' ],
+      [ 'lib/shim/function_bind_polyfill.js', 'shim/function_bind_polyfill.js' ]
     ]
   }
 };

@@ -1,8 +1,3 @@
 'use strict';
 
-module.exports = function () {
-  return {
-    deployFiles:
-      require('../../../dictionary/drivelist.js').pkg.deployFiles
-  };
-};
+module.exports = require('./drivelist@3.0.0.meta.js');

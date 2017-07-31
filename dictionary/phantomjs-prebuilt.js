@@ -9,8 +9,8 @@ module.exports = {
       ]
     },
     deployFiles: [
-      [ 'node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs', 'phantomjs' ],
-      [ 'node_modules/phantomjs-prebuilt/lib/phantom/bin/phantomjs.exe', 'phantomjs.exe' ]
+      [ 'lib/phantom/bin/phantomjs', 'phantomjs' ],
+      [ 'lib/phantom/bin/phantomjs.exe', 'phantomjs.exe' ]
     ]
   }
 };

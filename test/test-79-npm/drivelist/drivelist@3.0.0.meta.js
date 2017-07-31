@@ -2,7 +2,6 @@
 
 module.exports = function () {
   return {
-    deployFiles:
-      require('../../../dictionary/drivelist.js').pkg.deployFiles
+    deployFilesFrom: [ 'drivelist' ]
   };
 };

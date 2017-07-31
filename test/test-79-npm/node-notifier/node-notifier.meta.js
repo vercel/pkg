@@ -16,7 +16,6 @@ module.exports = function (stamp, flags) {
   }
 
   return {
-    deployFiles:
-      require('../../../dictionary/node-notifier.js').pkg.deployFiles
+    deployFilesFrom: [ 'node-notifier' ]
   };
 };
