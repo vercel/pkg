@@ -5,17 +5,17 @@ module.exports = {
     patches: {
       'build/scripts.js': [
         'path.join(__dirname, \'..\', \'scripts\')',
-        'path.join(path.dirname(process.execPath), \'scripts\')'
+        'path.join(path.dirname(process.execPath), \'drivelist\')'
       ],
       'lib/scripts.js': [
         'path.join(__dirname, \'..\', \'scripts\')',
-        'path.join(path.dirname(process.execPath), \'scripts\')' // for 4.0.0
+        'path.join(path.dirname(process.execPath), \'drivelist\')' // for 4.0.0
       ]
     },
     deployFiles: [
-      [ 'scripts/darwin.sh', 'scripts/darwin.sh' ],
-      [ 'scripts/linux.sh', 'scripts/linux.sh' ],
-      [ 'scripts/win32.bat', 'scripts/win32.bat' ]
+      [ 'scripts/darwin.sh', 'drivelist/darwin.sh' ],
+      [ 'scripts/linux.sh', 'drivelist/linux.sh' ],
+      [ 'scripts/win32.bat', 'drivelist/win32.bat' ]
     ]
   }
 };

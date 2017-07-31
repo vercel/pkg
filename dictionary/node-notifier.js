@@ -9,22 +9,22 @@ module.exports = {
     patches: {
       'notifiers/balloon.js': [
         '__dirname, \'../vendor/notifu/notifu\'',
-        'path.dirname(process.execPath), \'notifu/notifu\''
+        'path.dirname(process.execPath), \'notifier/notifu\''
       ],
       'notifiers/notificationcenter.js': [
         '__dirname,\n  \'../vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier\'',
-        'path.dirname(process.execPath), \'terminal-notifier/terminal-notifier\''
+        'path.dirname(process.execPath), \'notifier/terminal-notifier\''
       ],
       'notifiers/toaster.js': [
         '__dirname, \'../vendor/snoreToast/SnoreToast.exe\'',
-        'path.dirname(process.execPath), \'snoreToast/SnoreToast.exe\''
+        'path.dirname(process.execPath), \'notifier/SnoreToast.exe\''
       ]
     },
     deployFiles: [
-      [ 'vendor/notifu/notifu.exe', 'notifu/notifu.exe' ],
-      [ 'vendor/notifu/notifu64.exe', 'notifu/notifu64.exe' ],
-      [ 'vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier', 'terminal-notifier/terminal-notifier' ],
-      [ 'vendor/snoreToast/SnoreToast.exe', 'snoreToast/SnoreToast.exe' ]
+      [ 'vendor/notifu/notifu.exe', 'notifier/notifu.exe' ],
+      [ 'vendor/notifu/notifu64.exe', 'notifier/notifu64.exe' ],
+      [ 'vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier', 'notifier/terminal-notifier' ],
+      [ 'vendor/snoreToast/SnoreToast.exe', 'notifier/SnoreToast.exe' ]
     ]
   }
 };
