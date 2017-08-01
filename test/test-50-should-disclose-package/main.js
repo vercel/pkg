@@ -17,7 +17,8 @@ const standard = 'stdout';
 function rightReducer (mappy, line, index, right) {
   if ((line.indexOf('Cannot resolve') >= 0) ||
       (line.indexOf('The file was included') >= 0)) {
-    const name = path.basename(right[index + 1]);
+    let name = path.basename(right[index + 1]);
+    if (right[index].indexOf(' Warning ') >= 0) name += ' (w)';
     let value = right[index].split(' as ')[1] || '';
     value = value || right[index].split(' Warning ')[1];
     if (mappy[name]) assert.equal(mappy[name], value);
@@ -52,8 +53,11 @@ for (const pub of [ false, true ]) {
   assert.equal(lines,
     'connect.js = DISCLOSED code (with sources)\n' +
     'has-no-license.js = bytecode (no sources)\n' +
+    'has-no-license.js (w) = Cannot resolve \'hasNoLicenseNonLiteral\'\n' +
     'has-permissive-license.js = DISCLOSED code (with sources)\n' +
+    'has-permissive-license.js (w) = Cannot resolve \'hasPermissiveLicenseNonLiteral\'\n' +
     'has-strict-license.js = bytecode (no sources)\n' +
+    'has-strict-license.js (w) = Cannot resolve \'hasStrictLicenseNonLiteral\'\n' +
     'package.json = DISCLOSED code (with sources)\n' +
     (pub ? 'test-x-index.js = DISCLOSED code (with sources)\n' :
            'test-x-index.js = bytecode (no sources)\n')
