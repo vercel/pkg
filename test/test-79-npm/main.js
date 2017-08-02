@@ -155,8 +155,27 @@ dickies.some(function (dicky) {
   console.log('*********************************************************');
 
   console.log('Testing ' + wordy + '...');
+  const ci = process.env.CI;
 
-  const flags = { ci: process.env.CI };
+  if (ci) {
+    const latest = utils.exec.sync(
+      'npm view ' + packyName + ' version'
+    ).trim();
+    const published = new Date(
+      JSON.parse(utils.exec.sync(
+        'npm view ' + packyName + ' time --json'
+      ))[latest]
+    );
+    const diff = Date.now() - published.getTime();
+    const days = diff / 1000 / 60 / 60 / 24 | 0;
+    if (days >= 360) {
+      update(wordy, 'nop', '', 'abandoned');
+      console.log('Last published ' + days + ' days ago!');
+      return;
+    }
+  }
+
+  const flags = { ci };
   let metajs = path.join(foldy, packy + '.meta.js');
   metajs = fs.existsSync(metajs) ? require(metajs) : undefined;
 
@@ -179,8 +198,9 @@ dickies.some(function (dicky) {
   const note = meta.note;
 
   if (!allow) {
-    update(wordy, 'nop', '', note);
-    console.log(wordy + ' not allowed here!');
+    // no need to pollute changes with this
+    // update(wordy, 'nop', '', note);
+    console.log('Not allowed here!');
     if (note) console.log('Note:', note);
     return;
   }

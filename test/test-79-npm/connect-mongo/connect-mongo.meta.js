@@ -1,13 +1,6 @@
 'use strict';
 
-module.exports = function (stamp, flags) {
-  if (flags.ci) {
-    return {
-      allow: false,
-      note: 'CI'
-    };
-  }
-
+module.exports = function (stamp) {
   return {
     allow: stamp.m >= 46
   };
