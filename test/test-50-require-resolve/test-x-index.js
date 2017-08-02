@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-useless-concat */
 

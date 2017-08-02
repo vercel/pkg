@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 'use strict';
 
 let s = 'function EventEmitter () {\n' +
@@ -23,9 +21,7 @@ for (let i = 0; i < 140; i += 1) {
 
 s += 'ee.emit(\'message\', \'hooray\');\n';
 
-s = '#!/usr/bin/env node\n' +
-    '\n' +
-    '\'use strict\';\n' +
+s = '\'use strict\';\n' +
     '\n' + s;
 
 require('fs').writeFileSync(

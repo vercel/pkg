@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /* eslint-disable max-statements-per-line */
 /* eslint-disable no-empty */
 
