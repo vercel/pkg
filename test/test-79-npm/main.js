@@ -169,7 +169,8 @@ dickies.some(function (dicky) {
     const diff = Date.now() - published.getTime();
     const days = diff / 1000 / 60 / 60 / 24 | 0;
     if (days >= 360) {
-      update(wordy, 'nop', '', 'abandoned');
+      // no need to pollute changes with this
+      // update(wordy, 'nop', '', 'abandoned');
       console.log('Last published ' + days + ' days ago!');
       return;
     }
@@ -198,8 +199,7 @@ dickies.some(function (dicky) {
   const note = meta.note;
 
   if (!allow) {
-    // no need to pollute changes with this
-    // update(wordy, 'nop', '', note);
+    update(wordy, 'nop', '', note);
     console.log('Not allowed here!');
     if (note) console.log('Note:', note);
     return;
