@@ -273,11 +273,11 @@ dickies.some(function (dicky) {
 
     const deployFiles = globby.sync(
       path.join(foldy, 'node_modules', '**', '*.node')
-    ).map(function (file) {
-      return {
-        deployFrom: file,
-        deployTo: path.join(path.dirname(output), path.basename(file))
-      };
+    ).map(function (deployFrom) {
+      return [
+        deployFrom,
+        path.join(path.dirname(output), path.basename(deployFrom))
+      ];
     });
 
     let deployFilesExt = [];
@@ -314,28 +314,39 @@ dickies.some(function (dicky) {
       assert(deployFrom.indexOf('*') < 0);
       assert(deployTo.indexOf('*') < 0);
 
-      deployFiles.push([
-        path.join(foldy, deployFrom),
-        path.join(path.dirname(output), deployTo)
-      ]);
+      deployFrom = path.join(foldy, deployFrom);
+      deployTo = path.join(path.dirname(output), deployTo);
+
+      if (fs.existsSync(deployFrom)) {
+        const statFrom = fs.statSync(deployFrom);
+        if (statFrom.isFile()) {
+          deployFiles.push([ deployFrom, deployTo ]);
+        } else {
+          globby.sync(
+            path.join(deployFrom, '**', '*')
+          ).some(function (deployFrom2) {
+            const r = path.relative(deployFrom, deployFrom2);
+            const deployTo2 = path.join(deployTo, r);
+            if (fs.existsSync(deployFrom2)) {
+              const statFrom2 = fs.statSync(deployFrom2);
+              if (statFrom2.isFile()) {
+                deployFiles.push([ deployFrom2, deployTo2 ]);
+              }
+            }
+          });
+        }
+      }
     });
 
     deployFiles.some(function (deployFile) {
       const deployFrom = deployFile[0];
       const deployTo = deployFile[1];
-      if (fs.existsSync(deployFrom)) {
-        utils.mkdirp.sync(
-          path.dirname(deployTo)
-        );
-        fs.writeFileSync(
-          deployTo,
-          fs.readFileSync(deployFrom)
-        );
-        fs.chmodSync(
-          deployTo,
-          fs.statSync(deployFrom).mode.toString(8).slice(-3)
-        );
-      }
+      const statFrom = fs.statSync(deployFrom);
+      utils.mkdirp.sync(path.dirname(deployTo));
+      fs.writeFileSync(deployTo,
+        fs.readFileSync(deployFrom));
+      fs.chmodSync(deployTo,
+        statFrom.mode.toString(8).slice(-3));
     });
 
     console.log('Running compiled ' + wordy + '...');

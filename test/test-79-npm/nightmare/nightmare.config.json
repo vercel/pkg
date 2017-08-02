@@ -1,0 +1,8 @@
+{
+  "bin": "nightmare.js",
+  "pkg": {
+    "assets": [
+      "nightmare.js"
+    ]
+  }
+}
