@@ -25,6 +25,7 @@ right = utils.pkg.sync([
 ], inspect);
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
+right = right.replace(/\\/g, '/');
 assert(right.indexOf('node_modules/some-package/fromFile') >= 0);
 assert(right.indexOf('path-to-executable/toFile') >= 0);
 utils.vacuum.sync(output);
