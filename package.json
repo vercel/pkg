@@ -27,7 +27,7 @@
     "babel-runtime": "6.25.0",
     "chalk": "2.0.1",
     "escodegen": "1.8.1",
-    "fs-extra": "4.0.0",
+    "fs-extra": "4.0.1",
     "globby": "6.1.0",
     "in-publish": "2.0.0",
     "minimist": "1.2.0",
