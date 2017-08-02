@@ -302,6 +302,7 @@ dickies.some(function (dicky) {
     deployFilesExt.some(function (deployFile) {
       let deployFrom;
       let deployTo;
+
       if (Array.isArray(deployFile)) {
         deployFrom = deployFile[0];
         deployTo = deployFile[1];
@@ -309,26 +310,30 @@ dickies.some(function (dicky) {
         deployFrom = deployFile;
         deployTo = deployFile;
       }
+
       assert(deployFrom.indexOf('*') < 0);
       assert(deployTo.indexOf('*') < 0);
-      deployFiles.push({
-        deployFrom: path.join(foldy, deployFrom),
-        deployTo: path.join(path.dirname(output), deployTo)
-      });
+
+      deployFiles.push([
+        path.join(foldy, deployFrom),
+        path.join(path.dirname(output), deployTo)
+      ]);
     });
 
     deployFiles.some(function (deployFile) {
-      if (fs.existsSync(deployFile.deployFrom)) {
+      const deployFrom = deployFile[0];
+      const deployTo = deployFile[1];
+      if (fs.existsSync(deployFrom)) {
         utils.mkdirp.sync(
-          path.dirname(deployFile.deployTo)
+          path.dirname(deployTo)
         );
         fs.writeFileSync(
-          deployFile.deployTo,
-          fs.readFileSync(deployFile.deployFrom)
+          deployTo,
+          fs.readFileSync(deployFrom)
         );
         fs.chmodSync(
-          deployFile.deployTo,
-          fs.statSync(deployFile.deployFrom).mode.toString(8).slice(-3)
+          deployTo,
+          fs.statSync(deployFrom).mode.toString(8).slice(-3)
         );
       }
     });
