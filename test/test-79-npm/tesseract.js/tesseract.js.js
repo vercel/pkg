@@ -6,10 +6,14 @@ var Tesseract = require('tesseract.js');
 var image = path.join(__dirname, 'hello.jpg');
 
 Tesseract.recognize(image).then(function (data) {
-  if (data.text.toLowerCase().indexOf('hello') >= 0) {
-    console.log('ok');
+  if (data && data.text && typeof data.text === 'string') {
+    if (data.text.toLowerCase().indexOf('hello') >= 0) {
+      console.log('ok');
+    } else {
+      console.log(data.text.replace(/\n/g, '\\n'));
+    }
   } else {
-    console.log(data.text.replace(/\n/g, '\\n'));
+    console.log(data);
   }
 }).catch(function (error) {
   console.log(error);
