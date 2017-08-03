@@ -8,6 +8,8 @@ var image = path.join(__dirname, 'hello.jpg');
 Tesseract.recognize(image).then(function (data) {
   if (data.text.toLowerCase().indexOf('hello') >= 0) {
     console.log('ok');
+  } else {
+    console.log(data.text.replace(/\n/g, '\\n'));
   }
 }).finally(function () {
   fs.unlinkSync('eng.traineddata');
