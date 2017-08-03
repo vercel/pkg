@@ -9,7 +9,9 @@ module.exports = {
       ]
     },
     deployFiles: [
-      [ 'dist', 'electron/dist' ]
+      [ 'dist', 'electron/dist' ],
+      [ '../sliced/index.js', 'node_modules/sliced/index.js' ],
+      [ '../deep-defaults/lib/index.js', 'node_modules/deep-defaults/index.js' ]
     ]
   }
 };
