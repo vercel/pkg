@@ -120,21 +120,37 @@ if (!UPM) {
   stamp = JSON.parse(stamp);
   utils.vacuum.sync(output);
   console.log('Stamp is ' + JSON.stringify(stamp));
-  console.log('Waiting...');
-  utils.pause(5);
+  utils.pause(2);
 }());
 
-const dickies = globby.sync([
+const inputs = globby.sync([
   './*/*.js',
   '!./*/*.config.js',
   '!./*/*.meta.js',
   '!./*/gulpfile.js',
   '!./*/*fixture*'
-]);
+]).map(function (result) {
+  return path.resolve(result);
+});
 
-dickies.some(function (dicky) {
-  let input = path.resolve(dicky);
+let times = {};
+const ci = process.env.CI;
 
+if (ci) {
+  console.log('Getting latest times...');
+
+  const foldyNames = inputs.map(function (input) {
+    const foldy = path.dirname(input);
+    const foldyName = path.basename(foldy);
+    return foldyName;
+  });
+
+  times = JSON.parse(utils.exec.sync(
+    'node times.js ' + foldyNames.join()
+  ));
+}
+
+inputs.some(function (input) {
   const foldy = path.dirname(input);
   const foldyName = path.basename(foldy);
 
@@ -155,24 +171,18 @@ dickies.some(function (dicky) {
   console.log('*********************************************************');
 
   console.log('Testing ' + wordy + '...');
-  const ci = process.env.CI;
 
   if (ci) {
-    const latest = utils.exec.sync(
-      'npm view ' + packyName + ' version'
-    ).trim();
-    const published = new Date(
-      JSON.parse(utils.exec.sync(
-        'npm view ' + packyName + ' time --json'
-      ))[latest]
-    );
-    const diff = Date.now() - published.getTime();
-    const days = diff / 1000 / 60 / 60 / 24 | 0;
-    if (days >= 360) {
-      // no need to pollute changes with this
-      // update(wordy, 'nop', '', 'abandoned');
-      console.log('Last published ' + days + ' days ago!');
-      return;
+    const latestTime = times[foldyName];
+    if (latestTime) {
+      const diff = Date.now() - latestTime;
+      const days = diff / 1000 / 60 / 60 / 24 | 0;
+      if (days >= 360) {
+        // no need to pollute changes with this
+        // update(wordy, 'nop', '', 'abandoned');
+        console.log('Last published ' + days + ' days ago!');
+        return;
+      }
     }
   }
 
