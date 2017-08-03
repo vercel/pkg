@@ -11,6 +11,8 @@ Tesseract.recognize(image).then(function (data) {
   } else {
     console.log(data.text.replace(/\n/g, '\\n'));
   }
+}).catch(function (error) {
+  console.log(error);
 }).finally(function () {
   fs.unlinkSync('eng.traineddata');
   process.exit();
