@@ -147,26 +147,40 @@ function projectToFilesystem (f) {
   var xpdn = require('path').dirname(
     EXECPATH
   );
-  var relative = removeUplevels(
-    require('path').relative(
-      require('path').dirname(
-        DEFAULT_ENTRYPOINT
-      ), f
+
+  var relatives = [];
+  relatives.push(
+    removeUplevels(
+      require('path').relative(
+        require('path').dirname(
+          DEFAULT_ENTRYPOINT
+        ), f
+      )
     )
   );
+  if (relatives[0].startsWith('node_modules')) {
+    // one more relative without starting 'node_modules'
+    relatives.push(relatives[0].slice('node_modules'.length + 1));
+  }
+
   var uplevels = [];
   var maxUplevels = xpdn.split(require('path').sep).length;
   for (var i = 0, u = ''; i < maxUplevels; i += 1) {
     uplevels.push(u);
     u += '/..';
   }
-  return uplevels.map(function (uplevel) {
-    return require('path').join(
-      xpdn,
-      uplevel,
-      relative
-    );
+
+  var results = [];
+  uplevels.forEach(function (uplevel) {
+    relatives.forEach(function (relative) {
+      results.push(require('path').join(
+        xpdn,
+        uplevel,
+        relative
+      ))
+    });
   });
+  return results;
 }
 
 function projectToNearby (f) {
