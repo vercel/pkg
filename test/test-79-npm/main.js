@@ -301,35 +301,40 @@ inputs.some(function (input) {
 
     console.log('Copying addons...');
 
-    const deployFiles = globby.sync(
-      path.join(foldy, 'node_modules', '**', '*.node')
-    ).map(function (deployFrom) {
-      return [
-        deployFrom,
-        path.join(path.dirname(output), path.basename(deployFrom))
-      ];
-    });
+    const deployFiles = [];
 
-    let deployFilesExt = [];
+    if (!meta.deployFiles &&
+        !meta.deployFilesFrom) {
+      globby.sync(
+        path.join(foldy, 'node_modules', '**', '*.node')
+      ).some(function (deployFrom) {
+        deployFiles.push([
+          deployFrom,
+          path.join(path.dirname(output), path.basename(deployFrom))
+        ]);
+      });
+    }
+
+    const deployFilesRelative = [];
 
     if (meta.deployFiles) {
-      deployFilesExt = deployFilesExt.concat(meta.deployFiles);
+      meta.deployFiles.some(function (deployFile) {
+        deployFilesRelative.push(deployFile);
+      });
     }
 
     if (meta.deployFilesFrom) {
       meta.deployFilesFrom.some(function (dictName) {
         const dict = require('../../dictionary/' + dictName);
-        deployFilesExt = deployFilesExt.concat(
-          dict.pkg.deployFiles.map(function (deployFile) {
-            const deployFrom = 'node_modules/' + dictName + '/' + deployFile[0];
-            const deployTo = deployFile[1];
-            return [ deployFrom, deployTo ];
-          })
-        );
+        dict.pkg.deployFiles.some(function (deployFile) {
+          const deployFrom = 'node_modules/' + dictName + '/' + deployFile[0];
+          const deployTo = deployFile[1];
+          deployFilesRelative.push([ deployFrom, deployTo ]);
+        });
       });
     }
 
-    deployFilesExt.some(function (deployFile) {
+    deployFilesRelative.some(function (deployFile) {
       let deployFrom;
       let deployTo;
 
@@ -341,6 +346,7 @@ inputs.some(function (input) {
         deployTo = deployFile;
       }
 
+      // whole directory supported, glob not
       assert(deployFrom.indexOf('*') < 0);
       assert(deployTo.indexOf('*') < 0);
 

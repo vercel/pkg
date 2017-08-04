@@ -1,13 +1,5 @@
 'use strict';
 
-try {
-  // sharp.node is placed deeper to be
-  // able to take ../../vendor/lib/*.dylib
-  // https://github.com/lovell/sharp/issues/826#issuecomment-307613105
-  require('fs').unlinkSync('sharp.node');
-} catch (_) {
-}
-
 var sharp = require('sharp');
 
 var source = Buffer.from(
