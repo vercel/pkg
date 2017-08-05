@@ -13,6 +13,7 @@ module.exports = {
       ]
     },
     deployFiles: [
+      [ 'build/Release/drivelist.node', 'drivelist.node' ],
       [ 'scripts/darwin.sh', 'drivelist/darwin.sh' ],
       [ 'scripts/linux.sh', 'drivelist/linux.sh' ],
       [ 'scripts/win32.bat', 'drivelist/win32.bat' ]
