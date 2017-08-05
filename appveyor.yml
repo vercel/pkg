@@ -1,11 +1,8 @@
 environment:
   nodejs_version: "6"
 
-platform:
-  - x64
-
 install:
-  - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product node $env:nodejs_version x64
   - npm install
 
 test_script:
