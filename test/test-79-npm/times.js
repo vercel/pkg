@@ -41,5 +41,7 @@ function getLatestTime (foldyName, cb) {
     response.on('error', function (error) {
       cb(error);
     });
+  }).on('error', function (error) {
+    cb(error);
   });
 }
