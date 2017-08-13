@@ -1,7 +1,3 @@
 'use strict';
 
-module.exports = function () {
-  return {
-    packages: [ 'pg' ]
-  };
-};
+module.exports = require('./pg-query-stream@1.0.0.meta.js');
