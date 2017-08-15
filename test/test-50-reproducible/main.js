@@ -11,15 +11,23 @@ assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
-const output1 = './test-output.exe';
-const output2 = './test-output.exe';
+const output1 = './test-output-1.exe';
+const output2 = './test-output-2.exe';
+
+// v8 introduced random bits in snapshots
+// version 6.0 (nodejs 8.3.0)
+// TODO make v8 nullify pointers upon serializing
 
 utils.pkg.sync([
+  '--public',
+  '--no-bytecode',
   '--target', target,
   '--output', output1, input
 ]);
 
 utils.pkg.sync([
+  '--public',
+  '--no-bytecode',
   '--target', target,
   '--output', output2, input
 ]);
