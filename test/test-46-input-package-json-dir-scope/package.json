@@ -1,0 +1,4 @@
+{
+  "name": "@org/palookaville",
+  "bin": "test-x-index.js"
+}
