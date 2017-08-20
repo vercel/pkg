@@ -4,7 +4,7 @@ var promisify = require('util').promisify;
 if (!promisify) return console.log('ok');
 
 var execAsync = promisify(require('child_process').exec);
-var existsAsync = promisify(require('fs').exists)
+var existsAsync = promisify(require('fs').exists);
 
 execAsync('whoami').then(function (output) {
   console.log(output);

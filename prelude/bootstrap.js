@@ -158,7 +158,8 @@ function projectToFilesystem (f) {
       )
     )
   );
-  if (relatives[0].startsWith('node_modules')) {
+
+  if (relatives[0].slice(0, 'node_modules'.length) === 'node_modules') {
     // one more relative without starting 'node_modules'
     relatives.push(relatives[0].slice('node_modules'.length + 1));
   }
