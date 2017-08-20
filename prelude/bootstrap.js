@@ -1403,3 +1403,65 @@ function payloadFileSync (pointer) {
     return ancestor.execSync.apply(childProcess, args);
   };
 }());
+
+// /////////////////////////////////////////////////////////////////
+// PROMISIFY ///////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+
+(function () {
+  var promisify = require('util').promisify;
+  if (promisify) {
+    var custom = promisify.custom;
+    var binding = process.binding('util');
+    var createPromise = binding.createPromise;
+    var promiseResolve = binding.promiseResolve;
+    var promiseReject = binding.promiseReject;
+
+    // /////////////////////////////////////////////////////////////
+    // FS //////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////
+
+    Object.defineProperty(require('fs').exists, custom, {
+      value: function (path) {
+        var promise = createPromise();
+
+        require('fs').exists(path, function (exists) {
+          promiseResolve(promise, exists);
+        });
+
+        return promise;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////
+    // CHILD_PROCESS ///////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////
+
+    var customPromiseExecFunction = function (orig) {
+      return function () {
+        var args = Array.from(arguments);
+        var promise = createPromise();
+
+        orig.apply(undefined, args.concat(function (error, stdout, stderr) {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            promiseReject(promise, error);
+          } else {
+            promiseResolve(promise, { stdout: stdout, stderr: stderr });
+          }
+        }));
+
+        return promise;
+      };
+    };
+
+    Object.defineProperty(require('child_process').exec, custom, {
+      value: customPromiseExecFunction(require('child_process').exec)
+    });
+
+    Object.defineProperty(require('child_process').execFile, custom, {
+      value: customPromiseExecFunction(require('child_process').execFile)
+    });
+  }
+}());
