@@ -1410,13 +1410,15 @@ function payloadFileSync (pointer) {
 // /////////////////////////////////////////////////////////////////
 
 (function () {
-  var promisify = require('util').promisify;
+  var util = require('util');
+  var promisify = util.promisify;
   if (promisify) {
     var custom = promisify.custom;
     var binding = process.binding('util');
     var createPromise = binding.createPromise;
     var promiseResolve = binding.promiseResolve;
     var promiseReject = binding.promiseReject;
+    var customPromisifyArgs = require('internal/util').customPromisifyArgs;
 
     // /////////////////////////////////////////////////////////////
     // FS //////////////////////////////////////////////////////////
@@ -1432,6 +1434,14 @@ function payloadFileSync (pointer) {
 
         return promise;
       }
+    });
+
+    Object.defineProperty(require('fs').read, customPromisifyArgs, {
+      value: [ 'bytesRead', 'buffer' ]
+    });
+
+    Object.defineProperty(require('fs').write, customPromisifyArgs, {
+      value: [ 'bytesWritten', 'buffer' ]
     });
 
     // /////////////////////////////////////////////////////////////
