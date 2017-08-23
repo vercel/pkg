@@ -6,8 +6,8 @@ module.exports = {
       'lib/*.js'
     ],
     deployFiles: [
-      [ 'build/Release', 'sharp/build/Release' ],
-      [ 'vendor/lib', 'sharp/vendor/lib' ]
+      [ 'build/Release', 'sharp/build/Release', 'directory' ],
+      [ 'vendor/lib', 'sharp/vendor/lib', 'directory' ]
     ]
   }
 };

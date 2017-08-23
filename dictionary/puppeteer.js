@@ -9,7 +9,7 @@ module.exports = {
       ]
     },
     deployFiles: [
-      [ '.local-chromium', 'puppeteer' ]
+      [ '.local-chromium', 'puppeteer', 'directory' ]
     ]
   }
 };
