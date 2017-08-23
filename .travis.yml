@@ -1,6 +1,6 @@
 language:
   - node_js
-node_js: 6
+node_js: 8
 services:
   - mongodb
 sudo: true
