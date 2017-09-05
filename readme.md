@@ -22,7 +22,7 @@ your application. Deploy it as a single file
 
 ## Usage
 
-```
+```sh
 npm install -g pkg
 ```
 
@@ -64,14 +64,14 @@ don't need to specify anything manually. However your code
 may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
 example views, css, images etc).
-```
+```js
   require('./build/' + cmd + '.js')
   path.join(__dirname, 'views/' + viewName)
 ```
 Such cases are not handled by `pkg`. So you must specify the
 files - scripts and assets - manually in `pkg` property of
 your `package.json` file.
-```
+```json
   "pkg": {
     "scripts": "build/**/*.js",
     "assets": "views/**/*"
@@ -108,7 +108,7 @@ Node.js application can be called with runtime options
 `node --v8-options`. You can "bake" these runtime options into
 packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
-```
+```sh
 pkg app.js --options expose-gc
 ```
 
@@ -210,7 +210,7 @@ with `.node` files.
 `exec(args)` takes an array of command line arguments and returns
 a promise. For example:
 
-```
+```js
 await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
 // do something with app.exe, run, test, upload, deploy, etc
 ```
