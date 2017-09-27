@@ -29,7 +29,6 @@
     "escodegen": "1.8.1",
     "fs-extra": "4.0.1",
     "globby": "6.1.0",
-    "in-publish": "2.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
     "pkg-fetch": "2.3.10",
@@ -53,7 +52,8 @@
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
-    "prepublish": "in-install || (eslint-klopov . && npm run babel && npm run test:no-npm)",
+    "prepare": "npm run babel",
+    "prepublishOnly": "eslint-klopov . && npm run test:no-npm",
     "test": "eslint-klopov . && npm run babel && node test/test.js node0 no-npm && node test/test.js node4 no-npm && node test/test.js node6 no-npm && node test/test.js node7 no-npm && node test/test.js node8 no-npm && node test/test.js host only-npm",
     "test:no-npm": "node test/test.js host no-npm"
   },
