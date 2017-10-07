@@ -39,9 +39,12 @@ var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
 var ARGV0 = process.argv[0];
 var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
-if (ENTRYPOINT === 'PKG_DEFAULT_ENTRYPOINT') {
+
+if (process.env.PKG_EXECPATH !== EXECPATH) {
   ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
 }
+
+delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
 // EXECSTAT ////////////////////////////////////////////////////////
