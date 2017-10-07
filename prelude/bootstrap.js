@@ -41,7 +41,8 @@ var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
 if (process.env.PKG_EXECPATH !== EXECPATH) {
-  ENTRYPOINT = process.argv[1] = DEFAULT_ENTRYPOINT;
+  process.argv.splice(1, 0, DEFAULT_ENTRYPOINT);
+  ENTRYPOINT = process.argv[1];
 }
 
 delete process.env.PKG_EXECPATH;
