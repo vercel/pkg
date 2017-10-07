@@ -1301,6 +1301,15 @@ function payloadFileSync (pointer) {
   ancestor.exec = childProcess.exec;
   ancestor.execSync = childProcess.execSync;
 
+  function setOptsEnv (args) {
+    const lastArg = args[args.length - 1];
+    if (typeof lastArg !== 'object' ||
+        Array.isArray(lastArg)) args.push({});
+    const opts = args[args.length - 1];
+    if (!opts.env) opts.env = require('util')._extend({}, process.env);
+    opts.env.PKG_EXECPATH = EXECPATH;
+  }
+
   function startsWith2 (args, index, name, impostor) {
     var qsName = '"' + name + ' ';
     if (args[index].slice(0, qsName.length) === qsName) {
@@ -1324,18 +1333,9 @@ function payloadFileSync (pointer) {
     var qEXECPATH = '"' + EXECPATH + '"';
     var jsName = JSON.stringify(name);
     var jsEXECPATH = JSON.stringify(EXECPATH);
-    return startsWith2(args, index, name + ' --pkg-fallback',
-                                    EXECPATH + ' --pkg-fallback') ||
-           startsWith2(args, index, qName + ' --pkg-fallback',
-                                    qEXECPATH + ' --pkg-fallback') ||
-           startsWith2(args, index, jsName + ' --pkg-fallback',
-                                    jsEXECPATH + ' --pkg-fallback') ||
-           startsWith2(args, index, name,
-                                    EXECPATH + ' --pkg-fallback') ||
-           startsWith2(args, index, qName,
-                                    qEXECPATH + ' --pkg-fallback') ||
-           startsWith2(args, index, jsName,
-                                    jsEXECPATH + ' --pkg-fallback');
+    return startsWith2(args, index, name, EXECPATH) ||
+           startsWith2(args, index, qName, qEXECPATH) ||
+           startsWith2(args, index, jsName, jsEXECPATH);
   }
 
   function modifyLong (args, index) {
@@ -1356,7 +1356,6 @@ function payloadFileSync (pointer) {
         args[0] === ENTRYPOINT ||
         args[0] === EXECPATH) {
       args[0] = EXECPATH;
-      args[1].unshift('--pkg-fallback');
       if (NODE_VERSION_MAJOR === 0) {
         args[1] = args[1].filter(function (a) {
           return (a.slice(0, 13) !== '--debug-port=');
@@ -1374,36 +1373,42 @@ function payloadFileSync (pointer) {
 
   childProcess.spawn = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
   childProcess.spawnSync = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawnSync.apply(childProcess, args);
   };
 
   childProcess.execFile = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFile.apply(childProcess, args);
   };
 
   childProcess.execFileSync = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFileSync.apply(childProcess, args);
   };
 
   childProcess.exec = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.exec.apply(childProcess, args);
   };
 
   childProcess.execSync = function () {
     var args = cloneArgs(arguments);
+    setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.execSync.apply(childProcess, args);
   };
