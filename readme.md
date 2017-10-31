@@ -214,3 +214,11 @@ a promise. For example:
 await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
 // do something with app.exe, run, test, upload, deploy, etc
 ```
+
+## Troubleshooting
+
+### Error: ENOENT: no such file or directory, uv_chdir
+
+This error can be caused by deleting the directory the application is
+run from. Or, generally, deleting `process.cwd()` directory when the
+application is running.
