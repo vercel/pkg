@@ -28,8 +28,9 @@ utils.pkg.sync([
 
 right = utils.spawn.sync(
   './' + path.basename(output),
-  [ '--pkg-fallback', '--v8-options' ],
-  { cwd: path.dirname(output) }
+  [ '--v8-options' ],
+  { cwd: path.dirname(output),
+    env: { PKG_EXECPATH: 'fallback' } }
 );
 
 assert(left.indexOf('--expose_gc') >= 0);

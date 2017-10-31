@@ -20,8 +20,9 @@ utils.pkg.sync([
 
 utils.spawn.sync(
   './' + path.basename(output),
-  [ '--pkg-fallback', '--debug' ],
+  [ '--debug' ],
   { cwd: path.dirname(output),
+    env: { PKG_EXECPATH: 'fallback' },
     stdio: 'pipe', expect: 9 }
 );
 
