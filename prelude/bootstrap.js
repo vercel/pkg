@@ -1302,10 +1302,10 @@ function payloadFileSync (pointer) {
   ancestor.execSync = childProcess.execSync;
 
   function setOptsEnv (args) {
-    const lastArg = args[args.length - 1];
+    var lastArg = args[args.length - 1];
     if (typeof lastArg !== 'object' ||
         Array.isArray(lastArg)) args.push({});
-    const opts = args[args.length - 1];
+    var opts = args[args.length - 1];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
     opts.env.PKG_EXECPATH = EXECPATH;
   }
