@@ -13,7 +13,7 @@ try {
   child = cp.fork(path.join(
     process.cwd(),
     'test-cpfork-b-child.js'
-  ), [ 'argvx', 'argvy' ]);
+  ), [ 'argvx', '--argvy' ]);
 } catch (e) {
   console.log(e.message);
 }

@@ -9,7 +9,7 @@ var child = spawn(
   process.execPath, [ path.join(
     process.cwd(),
     'test-spawn-b-child.js'
-  ), 'argvx', 'argvy' ],
+  ), 'argvx', '--argvy' ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
