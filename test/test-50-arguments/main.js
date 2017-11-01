@@ -27,4 +27,4 @@ right = utils.spawn.sync(output, [ '-ft' ], {});
 assert.equal(right, '-ft\n');
 right = utils.spawn.sync(output, [ '--fourty-two' ], {});
 assert.equal(right, '--fourty-two\n');
-utils.vacuum.sync(path.dirname(output));
+utils.vacuum.sync(output);
