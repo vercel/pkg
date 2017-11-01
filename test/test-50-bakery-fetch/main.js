@@ -25,7 +25,7 @@ fetch.need({
     [ '--expose-gc',
       '-e', 'if (global.gc) console.log("ok");' ],
     { cwd: path.dirname(needed),
-      env: { PKG_EXECPATH: 'fallback' } }
+      env: { PKG_EXECPATH: 'PKG_TALK_TO_DANA' } }
   );
 
   assert.equal(right, 'ok\n');

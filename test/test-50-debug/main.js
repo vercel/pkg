@@ -22,7 +22,7 @@ utils.spawn.sync(
   './' + path.basename(output),
   [ '--debug' ],
   { cwd: path.dirname(output),
-    env: { PKG_EXECPATH: 'fallback' },
+    env: { PKG_EXECPATH: 'PKG_TALK_TO_DANA' },
     stdio: 'pipe', expect: 9 }
 );
 

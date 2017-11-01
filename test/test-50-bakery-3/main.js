@@ -30,7 +30,7 @@ right = utils.spawn.sync(
   './' + path.basename(output),
   [ '--v8-options' ],
   { cwd: path.dirname(output),
-    env: { PKG_EXECPATH: 'fallback' } }
+    env: { PKG_EXECPATH: 'PKG_TALK_TO_DANA' } }
 );
 
 assert(left.indexOf('--expose_gc') >= 0);
