@@ -40,11 +40,23 @@ var ARGV0 = process.argv[0];
 var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
-if (process.env.PKG_EXECPATH !== EXECPATH) {
-  process.argv.splice(1, 0, DEFAULT_ENTRYPOINT);
-  ENTRYPOINT = process.argv[1];
+if (process.env.PKG_EXECPATH === 'PKG_TALK_TO_DANA') {
+  return;
 }
 
+if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+  // expand once patchless is introduced, that
+  // will obviously lack any work in node_main.cc
+  throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+}
+
+if (process.env.PKG_EXECPATH === EXECPATH) {
+  process.argv.splice(1, 1);
+} else {
+  process.argv[1] = DEFAULT_ENTRYPOINT;
+}
+
+ENTRYPOINT = process.argv[1];
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
@@ -1307,6 +1319,7 @@ function payloadFileSync (pointer) {
         Array.isArray(lastArg)) args.push({});
     var opts = args[args.length - 1];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
+    if (opts.env.PKG_EXECPATH === 'PKG_TALK_TO_DANA') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
 
