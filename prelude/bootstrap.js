@@ -41,6 +41,7 @@ var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
 if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
+  // TODO probably should revert patch + test for it
   return;
 }
 
