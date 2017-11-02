@@ -25,7 +25,7 @@ fetch.need({
     [ '--expose-gc',
       '-e', 'if (global.gc) console.log("ok");' ],
     { cwd: path.dirname(needed),
-      env: { PKG_EXECPATH: 'PKG_TALK_TO_DANA' } }
+      env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } }
   );
 
   assert.equal(right, 'ok\n');

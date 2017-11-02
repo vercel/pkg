@@ -11,8 +11,8 @@ var child = spawnSync(
     stdio: 'pipe',
     // if run under node (process.execPath points to node.exe),
     // then node ignores PKG_EXECPATH, but if run as pkged app,
-    // PKG_TALK_TO_DANA is a hack to access internal nodejs
-    env: { PKG_EXECPATH: 'PKG_TALK_TO_DANA' }
+    // PKG_INVOKE_NODEJS is a hack to access internal nodejs
+    env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' }
   }
 );
 

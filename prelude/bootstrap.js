@@ -40,7 +40,7 @@ var ARGV0 = process.argv[0];
 var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
-if (process.env.PKG_EXECPATH === 'PKG_TALK_TO_DANA') {
+if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return;
 }
 
@@ -1319,7 +1319,7 @@ function payloadFileSync (pointer) {
         Array.isArray(lastArg)) args.push({});
     var opts = args[args.length - 1];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
-    if (opts.env.PKG_EXECPATH === 'PKG_TALK_TO_DANA') return;
+    if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
 
