@@ -20,8 +20,9 @@ utils.pkg.sync([
 
 utils.spawn.sync(
   './' + path.basename(output),
-  [ '--pkg-fallback', '--inspect' ],
+  [ '--inspect' ],
   { cwd: path.dirname(output),
+    env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' },
     stdio: 'pipe', expect: 9 }
 );
 

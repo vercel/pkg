@@ -22,9 +22,10 @@ fetch.need({
 }).then(function (needed) {
   right = utils.spawn.sync(
     './' + path.basename(needed),
-    [ '--pkg-fallback', '--expose-gc',
+    [ '--expose-gc',
       '-e', 'if (global.gc) console.log("ok");' ],
-    { cwd: path.dirname(needed) }
+    { cwd: path.dirname(needed),
+      env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } }
   );
 
   assert.equal(right, 'ok\n');

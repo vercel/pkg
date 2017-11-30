@@ -8,7 +8,7 @@ var exec = require('child_process').exec;
 
 var child = exec(
   process.execPath + ' ' + [
-    require.resolve('./test-exec-child.js'), 'argvx', 'argvy'
+    require.resolve('./test-exec-child.js'), 'argvx', '--argvy'
   ].join(' ')
 );
 
