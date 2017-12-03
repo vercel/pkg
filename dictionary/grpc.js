@@ -7,7 +7,8 @@ module.exports = {
       // C++ files go inside executable
     ],
     assets: [
-      'etc/*.pem'
+      'etc/*.pem',
+      'deps/grpc/etc/*.pem'
     ]
   }
 };
