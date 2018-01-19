@@ -1315,10 +1315,13 @@ function payloadFileSync (pointer) {
   ancestor.execSync = childProcess.execSync;
 
   function setOptsEnv (args) {
-    var lastArg = args[args.length - 1];
-    if (typeof lastArg !== 'object' ||
-        Array.isArray(lastArg)) args.push({});
-    var opts = args[args.length - 1];
+    var pos = args.length - 1;
+    if (typeof args[pos] === 'function') pos -= 1;
+    if (typeof args[pos] !== 'object' || Array.isArray(args[pos])) {
+      pos += 1;
+      args.splice(pos, 0, {});
+    }
+    var opts = args[pos];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
     if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
