@@ -3,7 +3,6 @@
 'use strict';
 
 const assert = require('assert');
-const path = require('path');
 const utils = require('../utils.js');
 
 assert(!module.parent);
