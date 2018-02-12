@@ -20,12 +20,10 @@ const inspect = (standard === 'stdout')
   : [ 'inherit', 'inherit', 'pipe' ];
 
 right = utils.pkg.sync([
-  '--debug',
+  '--permissive',
   '--target', target,
   '--output', output, input
 ], inspect);
-
-assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 
 right = right.split('\n').filter(function (line) {
   return (line.indexOf(' [debug] ') >= 0) ||
@@ -41,26 +39,7 @@ right = right.split('\n').filter(function (line) {
 }).join('\n') + '\n';
 
 assert.equal(right,
-  '> [debug] Module undefined does not have any license\n' +
-  '> Warning Cannot resolve \'reqResSomeVar\'\n' +
-  '> [debug] Cannot resolve \'reqResSomeVarMay\'\n' +
-  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
-  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
-
-  '> Warning Cannot resolve \'reqSomeVar\'\n' +
-  '> [debug] Cannot resolve \'reqSomeVarMay\'\n' +
-  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
-  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
-
-  '> [debug] Cannot resolve \'tryReqResSomeVar\'\n' +
-  '> [debug] Cannot resolve \'tryReqResSomeVarMay\'\n' +
-  '> [debug] Cannot resolve \'tryReqSomeVar\'\n' +
-  '> [debug] Cannot resolve \'tryReqSomeVarMay\'\n' +
-
-  '> [debug] Cannot find module \'reqResSomeLit\'\n' +
-  '> [debug] Cannot find module \'reqResSomeLitMay\'\n' +
-  '> [debug] Cannot find module \'reqSomeLit\'\n' +
-  '> [debug] Cannot find module \'reqSomeLitMay\'\n'
-);
+  '> Warning Permissive flag enabled, about to ignore licenses in package.json\n' +
+  '> Warning Entry \'main\' not found in %1\n');
 
 utils.vacuum.sync(output);
