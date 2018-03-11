@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
 [![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg)
 [![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
-[![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
+[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/pkg)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
