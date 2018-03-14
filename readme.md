@@ -26,7 +26,7 @@ your application. Deploy it as a single file
 ## Usage
 
 ```sh
-npm install -g pkg
+npm i —save git+https://github.com/asaf050/pkg.git
 ```
 
 After installing it, run `pkg --help` without arguments to see list of options.
