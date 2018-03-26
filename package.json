@@ -23,8 +23,8 @@
     ]
   },
   "dependencies": {
-    "acorn": "5.1.1",
-    "acorn-object-rest-spread": "^1.1.0",
+    "acorn": "5.5.3",
+    "acorn-object-rest-spread": "1.1.0",
     "babel-runtime": "6.25.0",
     "chalk": "2.1.0",
     "escodegen": "1.8.1",
