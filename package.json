@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "4.2.5",
+  "version": "4.3.0",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -23,7 +23,8 @@
     ]
   },
   "dependencies": {
-    "acorn": "5.1.1",
+    "acorn": "5.5.3",
+    "acorn-object-rest-spread": "1.1.0",
     "babel-runtime": "6.25.0",
     "chalk": "2.1.0",
     "escodegen": "1.8.1",
@@ -31,7 +32,7 @@
     "globby": "6.1.0",
     "minimist": "1.2.0",
     "multistream": "2.1.0",
-    "pkg-fetch": "2.4.1",
+    "pkg-fetch": "2.5.4",
     "progress": "2.0.0",
     "resolve": "1.4.0",
     "simple-bufferstream": "1.0.0",
@@ -54,7 +55,7 @@
     "lint": "eslint-klopov . || true",
     "prepare": "npm run babel",
     "prepublishOnly": "eslint-klopov . && npm run test:no-npm",
-    "test": "eslint-klopov . && npm run babel && node test/test.js node0 no-npm && node test/test.js node4 no-npm && node test/test.js node6 no-npm && node test/test.js node7 no-npm && node test/test.js node8 no-npm && node test/test.js host only-npm",
+    "test": "eslint-klopov . && npm run babel && node test/test.js node9 no-npm && node test/test.js node8 no-npm && node test/test.js node6 no-npm && node test/test.js host only-npm",
     "test:no-npm": "node test/test.js host no-npm"
   },
   "eslintConfig": {

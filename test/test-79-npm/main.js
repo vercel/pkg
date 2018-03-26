@@ -18,7 +18,7 @@ assert(__dirname === process.cwd());
 const host = 'node' + process.version[1];
 const target = process.argv[2] || host;
 const windows = process.platform === 'win32';
-const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5 }[
+const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5 }[
   process.version.match(/^(node|v)?(\d+)/)[2] | 0];
 assert(npm !== undefined);
 

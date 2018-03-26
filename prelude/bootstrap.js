@@ -40,11 +40,24 @@ var ARGV0 = process.argv[0];
 var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
-if (process.env.PKG_EXECPATH !== EXECPATH) {
-  process.argv.splice(1, 0, DEFAULT_ENTRYPOINT);
-  ENTRYPOINT = process.argv[1];
+if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
+  // TODO probably should revert patch + test for it
+  return;
 }
 
+if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+  // expand once patchless is introduced, that
+  // will obviously lack any work in node_main.cc
+  throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+}
+
+if (process.env.PKG_EXECPATH === EXECPATH) {
+  process.argv.splice(1, 1);
+} else {
+  process.argv[1] = DEFAULT_ENTRYPOINT;
+}
+
+ENTRYPOINT = process.argv[1];
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
@@ -1302,11 +1315,15 @@ function payloadFileSync (pointer) {
   ancestor.execSync = childProcess.execSync;
 
   function setOptsEnv (args) {
-    const lastArg = args[args.length - 1];
-    if (typeof lastArg !== 'object' ||
-        Array.isArray(lastArg)) args.push({});
-    const opts = args[args.length - 1];
+    var pos = args.length - 1;
+    if (typeof args[pos] === 'function') pos -= 1;
+    if (typeof args[pos] !== 'object' || Array.isArray(args[pos])) {
+      pos += 1;
+      args.splice(pos, 0, {});
+    }
+    var opts = args[pos];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
+    if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
 

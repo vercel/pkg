@@ -9,21 +9,26 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const target = process.argv[2] || 'host';
+const host = 'node' + process.version[1];
+const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
+
+if (/^(node|v)?0/.test(target)) return;
+if (/^(node|v)?4/.test(target)) return;
+if (/^(node|v)?6/.test(target)) return;
+
+let right;
 
 utils.pkg.sync([
   '--target', target,
   '--output', output, input
 ]);
 
-utils.spawn.sync(
-  './' + path.basename(output),
-  [ '--debug' ],
-  { cwd: path.dirname(output),
-    env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' },
-    stdio: 'pipe', expect: 9 }
+right = utils.spawn.sync(
+  './' + path.basename(output), [],
+  { cwd: path.dirname(output) }
 );
 
+assert.equal(right, 'ok\n');
 utils.vacuum.sync(output);

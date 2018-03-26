@@ -10,7 +10,7 @@ if (process.send) {
 }
 
 var child = spawn(
-  process.execPath, [ process.argv[1], 'argvx', 'argvy' ],
+  process.execPath, [ process.argv[1], 'argvx', '--argvy' ],
   { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
