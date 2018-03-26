@@ -1,5 +1,8 @@
 'use strict';
 
+// anyway testing in ci
+require('ci-info').isCI = false;
+
 var spawnWasCalled;
 var save = require('child_process').spawn;
 require('child_process').spawn = function () {

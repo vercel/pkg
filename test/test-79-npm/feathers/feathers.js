@@ -1,8 +1,8 @@
 'use strict';
 
-const feathers = require('feathers');
-const http = require('http');
-const app = feathers();
+var feathers = require('feathers');
+var http = require('http');
+var app = feathers();
 
 app.get('/', function (req, res) {
   res.end('Hello there!');

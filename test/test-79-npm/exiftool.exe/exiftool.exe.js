@@ -1,7 +1,6 @@
 'use strict';
 
-const fs = require('fs');
-
+var fs = require('fs');
 var exiftool = require('exiftool.exe');
 
 if (fs.existsSync(exiftool)) {
