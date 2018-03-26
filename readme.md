@@ -6,9 +6,6 @@
 [![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
 [![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/pkg)
 
-This fork created to support the spread operator.
-
-
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
 ## Use Cases
@@ -26,7 +23,7 @@ your application. Deploy it as a single file
 ## Usage
 
 ```sh
-npm i —save git+https://github.com/asaf050/pkg.git
+npm install -g pkg
 ```
 
 After installing it, run `pkg --help` without arguments to see list of options.
