@@ -373,32 +373,34 @@ function payloadFileSync (pointer) {
 (function () {
   var fs = require('fs');
   var ancestor = {};
-  ancestor.openSync =         fs.openSync;
-  ancestor.open =             fs.open;
-  ancestor.readSync =         fs.readSync;
-  ancestor.read =             fs.read;
-  ancestor.writeSync =        fs.writeSync;
-  ancestor.write =            fs.write;
-  ancestor.closeSync =        fs.closeSync;
-  ancestor.close =            fs.close;
-  ancestor.readFileSync =     fs.readFileSync;
-  ancestor.readFile =         fs.readFile;
-  // ancestor.writeFileSync = fs.writeFileSync; // based on openSync/writeSync/closeSync
-  // ancestor.writeFile =     fs.writeFile; // based on open/write/close
-  ancestor.readdirSync =      fs.readdirSync;
-  ancestor.readdir =          fs.readdir;
-  ancestor.realpathSync =     fs.realpathSync;
-  ancestor.realpath =         fs.realpath;
-  ancestor.statSync =         fs.statSync;
-  ancestor.stat =             fs.stat;
-  ancestor.lstatSync =        fs.lstatSync;
-  ancestor.lstat =            fs.lstat;
-  ancestor.fstatSync =        fs.fstatSync;
-  ancestor.fstat =            fs.fstat;
-  ancestor.existsSync =       fs.existsSync;
-  ancestor.exists =           fs.exists;
-  ancestor.accessSync =       fs.accessSync;
-  ancestor.access =           fs.access;
+  ancestor.openSync =            fs.openSync;
+  ancestor.open =                fs.open;
+  ancestor.readSync =            fs.readSync;
+  ancestor.read =                fs.read;
+  ancestor.writeSync =           fs.writeSync;
+  ancestor.write =               fs.write;
+  ancestor.closeSync =           fs.closeSync;
+  ancestor.close =               fs.close;
+  ancestor.readFileSync =        fs.readFileSync;
+  ancestor.readFile =            fs.readFile;
+  // ancestor.writeFileSync =    fs.writeFileSync; // based on openSync/writeSync/closeSync
+  // ancestor.writeFile =        fs.writeFile; // based on open/write/close
+  ancestor.readdirSync =         fs.readdirSync;
+  ancestor.readdir =             fs.readdir;
+  ancestor.realpathSync =        fs.realpathSync;
+  ancestor.realpathSync.native = fs.realpathSync;
+  ancestor.realpath =            fs.realpath;
+  ancestor.realpath.native =     fs.realpath;
+  ancestor.statSync =            fs.statSync;
+  ancestor.stat =                fs.stat;
+  ancestor.lstatSync =           fs.lstatSync;
+  ancestor.lstat =               fs.lstat;
+  ancestor.fstatSync =           fs.fstatSync;
+  ancestor.fstat =               fs.fstat;
+  ancestor.existsSync =          fs.existsSync;
+  ancestor.exists =              fs.exists;
+  ancestor.accessSync =          fs.accessSync;
+  ancestor.access =              fs.access;
 
   var windows = process.platform === 'win32';
 
@@ -828,6 +830,9 @@ function payloadFileSync (pointer) {
     var callback = dezalgo(maybeCallback(arguments));
     callback(null, realpathFromSnapshot(path));
   };
+
+  fs.realpathSync.native = fs.realpathSync;
+  fs.realpath.native = fs.realpath;
 
   // ///////////////////////////////////////////////////////////////
   // stat //////////////////////////////////////////////////////////
