@@ -20,7 +20,8 @@ console.log('');
 if (process.env.CI) {
   if (target === 'node0' ||
       target === 'node4' ||
-      target === 'node7') {
+      target === 'node7' ||
+      target === 'node9') {
     console.log(target + ' is skipped in CI!');
     console.log('');
     process.exit();
