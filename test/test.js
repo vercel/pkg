@@ -34,8 +34,8 @@ if (modify === 'only-npm') {
 } else {
   list.push(path.join(__dirname, '*/main.js'));
   if (modify === 'no-npm') {
-    list.push('!' + path.join(__dirname, 'test-42-fetch-all/**/*'));
-    list.push('!' + path.join(__dirname, 'test-79-npm/**/*'));
+    list.push('!' + path.join(__dirname, 'test-42-fetch-all'));
+    list.push('!' + path.join(__dirname, 'test-79-npm'));
   }
 }
 
