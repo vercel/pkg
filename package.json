@@ -34,7 +34,7 @@
     "multistream": "2.1.0",
     "pkg-fetch": "2.5.5",
     "progress": "2.0.0",
-    "resolve": "1.7.1",
+    "resolve": "1.6.0",
     "simple-bufferstream": "1.0.0",
     "stream-meter": "1.0.4"
   },
