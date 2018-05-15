@@ -17,11 +17,13 @@ const output = './run-time/test-output.exe';
 // see readFromSnapshot "NODE_VERSION_MAJOR"
 
 function bitty (version) {
-  return (2 * (/^(node|v)?4/.test(version))) |
-         (2 * (/^(node|v)?5/.test(version))) |
-         (4 * (/^(node|v)?6/.test(version))) |
-         (4 * (/^(node|v)?7/.test(version))) |
-         (4 * (/^(node|v)?8/.test(version)));
+  return (2 *  (/^(node|v)?4/.test(version))) |
+         (2 *  (/^(node|v)?5/.test(version))) |
+         (4 *  (/^(node|v)?6/.test(version))) |
+         (4 *  (/^(node|v)?7/.test(version))) |
+         (4 *  (/^(node|v)?8/.test(version))) |
+         (4 *  (/^(node|v)?9/.test(version))) |
+         (8 * (/^(node|v)?10/.test(version)));
 }
 
 const version1 = process.version;
