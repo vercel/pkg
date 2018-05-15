@@ -1,3 +1,3 @@
 'use strict';
 
-console.log(typeof gc);
+console.log('should not be executed');

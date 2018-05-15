@@ -326,7 +326,7 @@ function payloadCopyManySync (source, target, targetStart, sourceStart) {
 }
 
 function payloadFile (pointer, cb) {
-  var target = new Buffer(pointer[1]);
+  var target = Buffer.alloc(pointer[1]);
   payloadCopyMany(pointer, target, 0, 0, function (error) {
     if (error) return cb(error);
     cb(null, target);
@@ -334,7 +334,7 @@ function payloadFile (pointer, cb) {
 }
 
 function payloadFileSync (pointer) {
-  var target = new Buffer(pointer[1]);
+  var target = Buffer.alloc(pointer[1]);
   payloadCopyManySync(pointer, target, 0, 0);
   return target;
 }
@@ -649,7 +649,7 @@ function payloadFileSync (pointer) {
     var entityContent = entity[STORE_CONTENT];
     if (entityContent) return readFileFromSnapshotSub(entityContent, cb);
     var entityBlob = entity[STORE_BLOB];
-    if (entityBlob) return cb2(null, new Buffer('source-code-not-available'));
+    if (entityBlob) return cb2(null, Buffer.from('source-code-not-available'));
 
     // why return empty buffer?
     // otherwise this error will arise:
@@ -1111,7 +1111,7 @@ function payloadFileSync (pointer) {
     return -ENOENT;
   };
 
-  fs.internalModuleReadFile = function (long) {
+  fs.internalModuleReadFile = fs.internalModuleReadJSON = function (long) {
     // from node comments:
     // Used to speed up module loading. Returns the contents of the file as
     // a string or undefined when the file cannot be opened. The speedup
@@ -1173,7 +1173,7 @@ function payloadFileSync (pointer) {
     }
   };
 
-  var makeRequireFunction;
+  var im, makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
     makeRequireFunction = function (self) {
@@ -1188,8 +1188,9 @@ function payloadFileSync (pointer) {
       rqfn.cache = Module._cache;
       return rqfn;
     };
-  } else {
-    var im = require('internal/module');
+  } else
+  if (NODE_VERSION_MAJOR <= 9) {
+    im = require('internal/module');
     if (NODE_VERSION_MAJOR <= 7) {
       makeRequireFunction = function (m) {
         return im.makeRequireFunction.call(m);
@@ -1197,6 +1198,10 @@ function payloadFileSync (pointer) {
     } else {
       makeRequireFunction = im.makeRequireFunction;
     }
+  } else {
+    im = require('internal/modules/cjs/helpers');
+    makeRequireFunction = im.makeRequireFunction;
+    // TODO esm modules along with cjs
   }
 
   Module.prototype._compile = function (content, filename_) {
