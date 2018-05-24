@@ -50,7 +50,7 @@ dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
-system-wide Node.js installation (it's version and arch).
+system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
 are taken from current platform/Node.js. By default targets are
 `linux,macos,win` for current Node.js version and arch.
