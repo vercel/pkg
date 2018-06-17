@@ -110,6 +110,7 @@ packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
 ```sh
 pkg app.js --options expose-gc
+pkg app.js --options max_old_space_size=4096
 ```
 
 ### Output
