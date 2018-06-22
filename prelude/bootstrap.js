@@ -1123,11 +1123,14 @@ function payloadFileSync (pointer) {
 
     var path = revertMakingLong(long);
 
+    // https://github.com/nodejs/node/commit/fea1e05ba5
+    var moduleReadMethod = NODE_VERSION_MAJOR < 10 ? 'internalModuleReadFile' : 'internalModuleReadJSON';
+    
     if (!insideSnapshot(path)) {
-      return process.binding('fs').internalModuleReadFile(long);
+      return process.binding('fs')[moduleReadMethod](long);
     }
     if (insideMountpoint(path)) {
-      return process.binding('fs').internalModuleReadFile(makeLong(translate(path)));
+      return process.binding('fs')[moduleReadMethod](makeLong(translate(path)));
     }
 
     path = normalizePath(path);
