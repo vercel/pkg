@@ -68,7 +68,8 @@
     "extends": "klopov",
     "parser": "babel-eslint",
     "rules": {
-      "wrap-iife": "off"
+      "wrap-iife": "off",
+      "linebreak-style": "off"
     }
   },
   "greenkeeper": {
