@@ -1125,7 +1125,7 @@ function payloadFileSync (pointer) {
 
     // https://github.com/nodejs/node/commit/fea1e05ba5
     var moduleReadMethod = NODE_VERSION_MAJOR < 10 ? 'internalModuleReadFile' : 'internalModuleReadJSON';
-    
+
     if (!insideSnapshot(path)) {
       return process.binding('fs')[moduleReadMethod](long);
     }
