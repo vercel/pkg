@@ -1124,10 +1124,14 @@ function payloadFileSync (pointer) {
     var path = revertMakingLong(long);
 
     if (!insideSnapshot(path)) {
-      return process.binding('fs').internalModuleReadFile(long);
+      return process.binding('fs').internalModuleReadJSON
+        ? process.binding('fs').internalModuleReadJSON(long)
+        : process.binding('fs').internalModuleReadFile(long);
     }
     if (insideMountpoint(path)) {
-      return process.binding('fs').internalModuleReadFile(makeLong(translate(path)));
+      return process.binding('fs').internalModuleReadJSON
+        ? process.binding('fs').internalModuleReadJSON(makeLong(translate(path)))
+        : process.binding('fs').internalModuleReadFile(makeLong(translate(path)));
     }
 
     path = normalizePath(path);
