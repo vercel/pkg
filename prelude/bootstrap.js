@@ -74,7 +74,12 @@ if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
   }
 }
 
-if (process.env.PKG_EXECPATH === EXECPATH) {
+if (process.send) {
+  // if process.send is set, it means the process was forked,
+  // and the runtime file is the third argument
+  process.argv[1] = process.argv[2];
+  process.argv.splice(2, 1);
+} else if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv.splice(1, 1);
 
   if (process.argv[1] && process.argv[1] !== '-') {
