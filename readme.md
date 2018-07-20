@@ -45,7 +45,7 @@ option. A canonical target consists of 3 elements, separated by
 dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 * **nodeRange** node${n} or latest
-* **platform** freebsd, linux, macos, win
+* **platform** freebsd, linux, alpine, macos, win
 * **arch** x64, x86, armv6, armv7
 
 You may omit any element (and specify just `node6` for example).
