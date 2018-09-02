@@ -77,6 +77,10 @@ your `package.json` file.
     "assets": "views/**/*"
   }
 ```
+You may also specify arrays of globs:
+```
+    "assets": ["assets/**/*", "images/**/*"]
+```
 Just be sure to call `pkg package.json` or `pkg .` to make use
 of `scripts` and `assets` entries.
 
