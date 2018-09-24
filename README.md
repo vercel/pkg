@@ -1,4 +1,4 @@
-![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-banner.png)
+![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
