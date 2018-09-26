@@ -1,24 +1,27 @@
 'use strict';
 
 class AsyncIterator {
-
-    constructor() {
+    constructor () {
         this.limit = 5;
-        this.current = 1;
+        this.current = 0;
     }
 
-    next() {
+    next () {
+        this.current += 1;
         let done = (this.current > this.limit);
         return Promise.resolve({
-            value: done ? undefined : this.current++,
+            value: done ? undefined : this.current,
             done
         });
     }
 
-    [Symbol.asyncIterator]() { return this; }
+    [Symbol.asyncIterator] () { return this; }
 }
 
-async function t() {
+// The function does have an await (in the for-await-of loop), ESLint just doesn't seem to detect it
+/* eslint-disable require-await */
+async function t () {
+/* eslint-enable require-await */
     let it = new AsyncIterator();
     for await (let x of it) {
         console.log(x);
