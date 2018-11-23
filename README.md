@@ -60,25 +60,33 @@ are taken from current platform/Node.js. By default targets are
 During packaging process `pkg` parses your sources, detects
 calls to `require`, traverses the dependencies of your project
 and includes them into executable. In most cases you
-don't need to specify anything manually. However your code
-may have `require(variable)` calls (so called non-literal
+don't need to specify anything manually.
+However, there are some special cases. You may use 
+`require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
 example views, css, images etc).
 ```js
   require('./build/' + cmd + '.js')
   path.join(__dirname, 'views/' + viewName)
 ```
-Such cases are not handled by `pkg`. So you must specify the
-files - scripts and assets - manually in `pkg` property of
-your `package.json` file.
+You may also wish to limit `pkg` to only building for a
+particular target, or you may wish to place all executables
+in a specific output directory, so that git will ignore them.
+For such use-cases, you must manually specify the `pkg`
+property of `package.json`.
 ```json
   "pkg": {
     "scripts": "build/**/*.js",
-    "assets": "views/**/*"
+    "assets": "views/**/*",
+    "targets": [ "node4-linux-armv6" ],
+    "outputPath: "dist"
   }
 ```
-Just be sure to call `pkg package.json` or `pkg .` to make use
-of `scripts` and `assets` entries.
+The above example will include everything in "assets/" and
+every .js file in "build/", build only for "node4-linux-armv6",
+and place the executable inside "dist/".
+Just be sure to call `pkg package.json` or `pkg .` to make
+use of `package.json` configuration.
 
 ### Scripts
 
