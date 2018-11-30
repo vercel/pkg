@@ -9,11 +9,11 @@ const utils = require('./utils.js');
 const host = 'node' + process.version.match(/^v(\d+)/)[1];
 let target = process.argv[2] || 'host';
 if (target === 'host') target = host;
-const modify = process.argv[3] || 'all';
+const flavor = process.argv[3] || 'all';
 
 console.log('');
 console.log('*************************************');
-console.log(target + ' ' + modify);
+console.log(target + ' ' + flavor);
 console.log('*************************************');
 console.log('');
 
@@ -30,11 +30,11 @@ if (process.env.CI) {
 
 const list = [];
 
-if (modify === 'only-npm') {
+if (flavor === 'only-npm') {
   list.push(path.join(__dirname, 'test-79-npm/main.js'));
 } else {
   list.push(path.join(__dirname, '*/main.js'));
-  if (modify === 'no-npm') {
+  if (flavor === 'no-npm') {
     list.push('!' + path.join(__dirname, 'test-42-fetch-all'));
     list.push('!' + path.join(__dirname, 'test-79-npm'));
   }
