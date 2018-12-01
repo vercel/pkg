@@ -1124,7 +1124,7 @@ function payloadFileSync (pointer) {
     var path = revertMakingLong(long);
     var bindingFs = process.binding('fs');
     var readFile = (bindingFs.internalModuleReadFile ||
-                       bindingFs.internalModuleReadJSON).bind(bindingFs);
+                    bindingFs.internalModuleReadJSON).bind(bindingFs);
     if (!insideSnapshot(path)) {
       return readFile(long);
     }
