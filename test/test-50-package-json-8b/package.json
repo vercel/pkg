@@ -1,0 +1,7 @@
+{
+  "bin": "sub/test-x-index.js",
+  "files": [
+    "/sub/sub",
+    "/test-z-data.css"
+  ]
+}
