@@ -224,6 +224,9 @@ function test03 () {
   console.log('bytesRead_n', bytesRead, 'buffer', buffer[0], buffer[1]);
   bytesRead = fs.readSync(fd, buffer, 0, 6, 80);
   console.log('bytesRead_o', bytesRead, 'buffer', buffer[0], buffer[1]);
+  // this does not work properly. TODO some rework of readFromSnapshot is needed
+  // try { bytesRead = fs.readSync(fd, buffer, 424242, 1); } catch (error) { dumpError(error); }
+  // console.log('bytesRead_p', bytesRead, 'buffer', buffer[0], buffer[1]);
   fs.closeSync(fd);
   test04();
 }

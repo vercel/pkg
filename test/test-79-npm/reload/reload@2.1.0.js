@@ -1,6 +1,6 @@
 'use strict';
 
-const http = require('http');
+var http = require('http');
 require('reload/bin/reload');
 
 setTimeout(function () {

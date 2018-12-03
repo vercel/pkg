@@ -10,6 +10,7 @@ var child = exec(
   process.execPath + ' ' + [
     require.resolve('./test-exec-child.js'), 'argvx', '--argvy'
   ].join(' ')
+  // leave without callback for coverage
 );
 
 child.stdout.pipe(process.stdout);

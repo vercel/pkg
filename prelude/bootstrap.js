@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable new-cap */
 /* eslint-disable no-buffer-constructor */
 /* eslint-disable no-multi-spaces */
@@ -41,8 +42,7 @@ var EXECPATH = process.execPath;
 var ENTRYPOINT = process.argv[1];
 
 if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
-  // TODO probably should revert patch + test for it
-  return;
+  return { undoPatch: true };
 }
 
 if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
@@ -326,7 +326,7 @@ function payloadCopyManySync (source, target, targetStart, sourceStart) {
 }
 
 function payloadFile (pointer, cb) {
-  var target = new Buffer(pointer[1]);
+  var target = Buffer.alloc(pointer[1]);
   payloadCopyMany(pointer, target, 0, 0, function (error) {
     if (error) return cb(error);
     cb(null, target);
@@ -334,7 +334,7 @@ function payloadFile (pointer, cb) {
 }
 
 function payloadFileSync (pointer) {
-  var target = new Buffer(pointer[1]);
+  var target = Buffer.alloc(pointer[1]);
   payloadCopyManySync(pointer, target, 0, 0);
   return target;
 }
@@ -527,9 +527,13 @@ function payloadFileSync (pointer) {
 
   function readFromSnapshot (fd, buffer, offset, length, position, cb) {
     var cb2 = cb || rethrow;
+    if ((offset < 0) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
+      'The value of "offset" is out of range. It must be >= 0 && <= ' + buffer.length.toString() + '. Received ' + offset));
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
     if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return cb2(null, 0);
     if (offset >= buffer.length) return cb2(new Error('Offset is out of bounds'));
+    if ((offset + length > buffer.length) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
+      'The value of "length" is out of range. It must be >= 0 && <= ' + (buffer.length - offset).toString() + '. Received ' + length.toString()));
     if (offset + length > buffer.length) return cb2(new Error('Length extends beyond buffer'));
 
     var dock = docks[fd];
@@ -649,7 +653,7 @@ function payloadFileSync (pointer) {
     var entityContent = entity[STORE_CONTENT];
     if (entityContent) return readFileFromSnapshotSub(entityContent, cb);
     var entityBlob = entity[STORE_BLOB];
-    if (entityBlob) return cb2(null, new Buffer('source-code-not-available'));
+    if (entityBlob) return cb2(null, Buffer.from('source-code-not-available'));
 
     // why return empty buffer?
     // otherwise this error will arise:
@@ -1111,19 +1115,21 @@ function payloadFileSync (pointer) {
     return -ENOENT;
   };
 
-  fs.internalModuleReadFile = function (long) {
+  fs.internalModuleReadFile = fs.internalModuleReadJSON = function (long) {
     // from node comments:
     // Used to speed up module loading. Returns the contents of the file as
     // a string or undefined when the file cannot be opened. The speedup
     // comes from not creating Error objects on failure.
 
     var path = revertMakingLong(long);
-
+    var bindingFs = process.binding('fs');
+    var readFile = (bindingFs.internalModuleReadFile ||
+                    bindingFs.internalModuleReadJSON).bind(bindingFs);
     if (!insideSnapshot(path)) {
-      return process.binding('fs').internalModuleReadFile(long);
+      return readFile(long);
     }
     if (insideMountpoint(path)) {
-      return process.binding('fs').internalModuleReadFile(makeLong(translate(path)));
+      return readFile(makeLong(translate(path)));
     }
 
     path = normalizePath(path);
@@ -1173,7 +1179,7 @@ function payloadFileSync (pointer) {
     }
   };
 
-  var makeRequireFunction;
+  var im, makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
     makeRequireFunction = function (self) {
@@ -1188,8 +1194,9 @@ function payloadFileSync (pointer) {
       rqfn.cache = Module._cache;
       return rqfn;
     };
-  } else {
-    var im = require('internal/module');
+  } else
+  if (NODE_VERSION_MAJOR <= 9) {
+    im = require('internal/module');
     if (NODE_VERSION_MAJOR <= 7) {
       makeRequireFunction = function (m) {
         return im.makeRequireFunction.call(m);
@@ -1197,6 +1204,10 @@ function payloadFileSync (pointer) {
     } else {
       makeRequireFunction = im.makeRequireFunction;
     }
+  } else {
+    im = require('internal/modules/cjs/helpers');
+    makeRequireFunction = im.makeRequireFunction;
+    // TODO esm modules along with cjs
   }
 
   Module.prototype._compile = function (content, filename_) {
@@ -1315,10 +1326,13 @@ function payloadFileSync (pointer) {
   ancestor.execSync = childProcess.execSync;
 
   function setOptsEnv (args) {
-    var lastArg = args[args.length - 1];
-    if (typeof lastArg !== 'object' ||
-        Array.isArray(lastArg)) args.push({});
-    var opts = args[args.length - 1];
+    var pos = args.length - 1;
+    if (typeof args[pos] === 'function') pos -= 1;
+    if (typeof args[pos] !== 'object' || Array.isArray(args[pos])) {
+      pos += 1;
+      args.splice(pos, 0, {});
+    }
+    var opts = args[pos];
     if (!opts.env) opts.env = require('util')._extend({}, process.env);
     if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;

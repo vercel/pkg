@@ -1,10 +1,10 @@
-![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-banner.png)
+![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
 [![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg)
 [![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
-[![Slack Channel](http://zeit-slackin.now.sh/badge.svg)](https://zeit.chat/)
+[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/zeit)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
@@ -45,12 +45,12 @@ option. A canonical target consists of 3 elements, separated by
 dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 * **nodeRange** node${n} or latest
-* **platform** freebsd, linux, macos, win
+* **platform** freebsd, linux, alpine, macos, win
 * **arch** x64, x86, armv6, armv7
 
 You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
-system-wide Node.js installation (it's version and arch).
+system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
 are taken from current platform/Node.js. By default targets are
 `linux,macos,win` for current Node.js version and arch.
@@ -76,6 +76,10 @@ your `package.json` file.
     "scripts": "build/**/*.js",
     "assets": "views/**/*"
   }
+```
+You may also specify arrays of globs:
+```
+    "assets": [ "assets/**/*", "images/**/*" ]
 ```
 Just be sure to call `pkg package.json` or `pkg .` to make use
 of `scripts` and `assets` entries.
@@ -110,6 +114,7 @@ packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
 ```sh
 pkg app.js --options expose-gc
+pkg app.js --options max_old_space_size=4096
 ```
 
 ### Output
