@@ -45,12 +45,12 @@ option. A canonical target consists of 3 elements, separated by
 dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
 * **nodeRange** node${n} or latest
-* **platform** freebsd, linux, macos, win
+* **platform** freebsd, linux, alpine, macos, win
 * **arch** x64, x86, armv6, armv7
 
 You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
-system-wide Node.js installation (it's version and arch).
+system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
 are taken from current platform/Node.js. By default targets are
 `linux,macos,win` for current Node.js version and arch.
@@ -61,8 +61,8 @@ During packaging process `pkg` parses your sources, detects
 calls to `require`, traverses the dependencies of your project
 and includes them into executable. In most cases you
 don't need to specify anything manually.
-However, there are some special cases. You may use 
-`require(variable)` calls (so called non-literal
+
+However your code may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
 example views, css, images etc).
 ```js
@@ -72,6 +72,7 @@ example views, css, images etc).
 You may also wish to limit `pkg` to only building for a
 particular target, or you may wish to place all executables
 in a specific output directory, so that git will ignore them.
+
 For such use-cases, you must manually specify the `pkg`
 property of `package.json`.
 ```json
@@ -82,9 +83,12 @@ property of `package.json`.
     "outputPath: "dist"
   }
 ```
-The above example will include everything in "assets/" and
-every .js file in "build/", build only for "node4-linux-armv6",
-and place the executable inside "dist/".
+The above example will include everything in `assets/` and
+every .js file in `build/`, build only for `node4-linux-armv6`,
+and place the executable inside `dist/`.
+
+`scripts` and `assets` may be strings or arrays of strings.
+
 Just be sure to call `pkg package.json` or `pkg .` to make
 use of `package.json` configuration.
 
