@@ -35,7 +35,7 @@
     "chalk": "2.4.1",
     "escodegen": "1.11.0",
     "fs-extra": "7.0.1",
-    "globby": "8.0.1",
+    "globby": "8.0.2",
     "into-stream": "4.0.0",
     "minimist": "1.2.0",
     "multistream": "2.1.1",
