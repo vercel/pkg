@@ -5,6 +5,4 @@
  * e.g. go get -u github.com/fogleman/primitive
  */
 module.exports = {
-  pkg: {
-  }
 };

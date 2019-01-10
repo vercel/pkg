@@ -2,5 +2,5 @@
 
 var tinify = require('tinify');
 if (tinify !== undefined) {
-    console.log('ok');
+  console.log('ok');
 }

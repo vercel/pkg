@@ -2,5 +2,5 @@
 
 var svgo = require('svgo');
 if (svgo !== undefined) {
-    console.log('ok');
+  console.log('ok');
 }
