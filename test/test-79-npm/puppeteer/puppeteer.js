@@ -5,12 +5,15 @@ var puppeteer = require('puppeteer');
 
 puppeteer.launch().then(function (browser) {
   browser.newPage().then(function (page) {
-    page.goto('https://example.com').then(function () {
-      page.screenshot({ path: 'example.png' }).then(function () {
+    page.goto('https://zeit.co').then(function () {
+      page.screenshot({ path: 'zeit.png' }).then(function () {
         browser.close();
-        fs.unlinkSync('example.png');
+        fs.unlinkSync('zeit.png');
         console.log('ok');
       });
+    }).catch((error) => {
+      console.error(error);
+      process.exit(1);
     });
   });
 });

@@ -15,11 +15,11 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const host = 'node' + process.version[1];
+const hostVersion = process.version.match(/^v(\d+)/)[1];
+const host = 'node' + hostVersion;
 const target = process.argv[2] || host;
 const windows = process.platform === 'win32';
-const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5 }[
-  process.version.match(/^(node|v)?(\d+)/)[2] | 0];
+const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5, 10: 5 }[hostVersion];
 assert(npm !== undefined);
 
 function applyMetaToRight (right, meta) {

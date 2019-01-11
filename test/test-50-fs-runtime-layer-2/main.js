@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-multi-spaces */
+
 'use strict';
 
 const path = require('path');
@@ -9,7 +11,7 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-const host = 'node' + process.version[1];
+const host = 'node' + process.version.match(/^v(\d+)/)[1];
 const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './run-time/test-output.exe';
@@ -17,11 +19,13 @@ const output = './run-time/test-output.exe';
 // see readFromSnapshot "NODE_VERSION_MAJOR"
 
 function bitty (version) {
-  return (2 * (/^(node|v)?4/.test(version))) |
-         (2 * (/^(node|v)?5/.test(version))) |
-         (4 * (/^(node|v)?6/.test(version))) |
-         (4 * (/^(node|v)?7/.test(version))) |
-         (4 * (/^(node|v)?8/.test(version)));
+  return (2 *  (/^(node|v)?4/.test(version))) |
+         (2 *  (/^(node|v)?5/.test(version))) |
+         (4 *  (/^(node|v)?6/.test(version))) |
+         (4 *  (/^(node|v)?7/.test(version))) |
+         (4 *  (/^(node|v)?8/.test(version))) |
+         (4 *  (/^(node|v)?9/.test(version))) |
+         (8 * (/^(node|v)?10/.test(version)));
 }
 
 const version1 = process.version;

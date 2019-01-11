@@ -13,7 +13,7 @@ function nodeRangeToNodeVersion (nodeRange) {
   return 'v' + nodeRange.slice(4);
 }
 
-for (const nodeRange of [ 'node0', 'node4', 'node6', 'node8', 'node9' ]) {
+for (const nodeRange of [ 'node0', 'node4', 'node6', 'node8', 'node10' ]) {
   const nodeVersion = nodeRangeToNodeVersion(nodeRange);
   for (const platform of knownPlatforms) {
     const archs = [ 'x86', 'x64' ];

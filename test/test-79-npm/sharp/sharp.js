@@ -9,5 +9,15 @@ var source = Buffer.from(
 sharp(source).rotate().toBuffer().then(function (output) {
   if (output.slice(1, 4).toString() === 'PNG') {
     console.log('ok');
+    process.exit();
   }
+}).catch((error) => {
+  console.error(error);
+  process.exit(1);
 });
+
+setTimeout(() => {
+  // if test does not pass, it blocks
+  // any other way to exit
+  process.kill(process.pid);
+}, 3000);

@@ -40,26 +40,26 @@ right = right.split('\n').filter(function (line) {
   } else return line;
 }).join('\n') + '\n';
 
-assert.equal(right,
-  '> Warning Cannot resolve \'reqResSomeVar\'\n' +
-  '> [debug] Cannot resolve \'reqResSomeVarMay\'\n' +
-  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
-  '> Warning Malformed requirement for \'reqResSomeVar\'\n' +
+assert.deepEqual(right.split('\n').slice(0, 16), [
+  '> Warning Cannot resolve \'reqResSomeVar\'',
+  '> [debug] Cannot resolve \'reqResSomeVarMay\'',
+  '> Warning Malformed requirement for \'reqResSomeVar\'',
+  '> Warning Malformed requirement for \'reqResSomeVar\'',
 
-  '> Warning Cannot resolve \'reqSomeVar\'\n' +
-  '> [debug] Cannot resolve \'reqSomeVarMay\'\n' +
-  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
-  '> Warning Malformed requirement for \'reqSomeVar\'\n' +
+  '> Warning Cannot resolve \'reqSomeVar\'',
+  '> [debug] Cannot resolve \'reqSomeVarMay\'',
+  '> Warning Malformed requirement for \'reqSomeVar\'',
+  '> Warning Malformed requirement for \'reqSomeVar\'',
 
-  '> [debug] Cannot resolve \'tryReqResSomeVar\'\n' +
-  '> [debug] Cannot resolve \'tryReqResSomeVarMay\'\n' +
-  '> [debug] Cannot resolve \'tryReqSomeVar\'\n' +
-  '> [debug] Cannot resolve \'tryReqSomeVarMay\'\n' +
+  '> [debug] Cannot resolve \'tryReqResSomeVar\'',
+  '> [debug] Cannot resolve \'tryReqResSomeVarMay\'',
+  '> [debug] Cannot resolve \'tryReqSomeVar\'',
+  '> [debug] Cannot resolve \'tryReqSomeVarMay\'',
 
-  '> [debug] Cannot find module \'reqResSomeLit\'\n' +
-  '> [debug] Cannot find module \'reqResSomeLitMay\'\n' +
-  '> [debug] Cannot find module \'reqSomeLit\'\n' +
-  '> [debug] Cannot find module \'reqSomeLitMay\'\n'
-);
+  '> [debug] Cannot find module \'reqResSomeLit\'',
+  '> [debug] Cannot find module \'reqResSomeLitMay\'',
+  '> [debug] Cannot find module \'reqSomeLit\'',
+  '> [debug] Cannot find module \'reqSomeLitMay\''
+]);
 
 utils.vacuum.sync(output);
