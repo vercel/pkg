@@ -1122,12 +1122,14 @@ function payloadFileSync (pointer) {
     // comes from not creating Error objects on failure.
 
     var path = revertMakingLong(long);
-
+    var bindingFs = process.binding('fs');
+    var readFile = (bindingFs.internalModuleReadFile ||
+                    bindingFs.internalModuleReadJSON).bind(bindingFs);
     if (!insideSnapshot(path)) {
-      return process.binding('fs').internalModuleReadFile(long);
+      return readFile(long);
     }
     if (insideMountpoint(path)) {
-      return process.binding('fs').internalModuleReadFile(makeLong(translate(path)));
+      return readFile(makeLong(translate(path)));
     }
 
     path = normalizePath(path);

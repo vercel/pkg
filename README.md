@@ -87,8 +87,6 @@ The above example will include everything in `assets/` and
 every .js file in `build/`, build only for `node4-linux-armv6`,
 and place the executable inside `dist/`.
 
-`scripts` and `assets` may be strings or arrays of strings.
-
 Just be sure to call `pkg package.json` or `pkg .` to make
 use of `package.json` configuration.
 
