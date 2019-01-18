@@ -1,0 +1,28 @@
+{
+  "name": "express-example",
+  "license": "ISC",
+  "bin": "index.js",
+  "dependencies": {
+    "express": "4.15.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.2.3",
+    "@babel/core": "7.2.2",
+    "@babel/preset-env": "7.2.3",
+    "@babel/register": "7.0.0"
+  },
+  "pkg": {
+    "assets": [
+      "views/**/*"
+    ],
+    "targets": [
+      "node8"
+    ],
+    "preprocessors": [
+      {
+        "test": "^(?!.*node_modules).*$",
+        "transform": "babeltransform.js"
+      }
+    ]
+  }
+}
