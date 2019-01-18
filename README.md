@@ -140,6 +140,46 @@ option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
+### Preprocessors
+
+Use preprocessors to modify code before it gets packed into the binary.
+It is similar to rules in the webpack config.
+It could be used to compile es6, typescript or flow code.
+No need to create a extra build step and pkg afterwards!
+Minification would be another use case to reduce bundle size.
+
+Preprocessors can be defined in the `package.json`.
+```
+"pkg": {
+    "assets": [
+      "views/**/*"
+    ],
+    "targets": [
+      "node8"
+    ],
+    "preprocessors": [
+      {
+        "test": "^(?!.*node_modules).*$",
+        "transform": "babeltransform.js"
+      }
+    ]
+  }
+```
+
+The transform module has to export a function which receives the filename and its content as inputs.
+Babel example:
+```
+var babelTransform = require('@babel/core').transformSync;
+
+const babelOptions = require('./.babelrc.js');
+
+module.exports = function(filename, content) {
+  let opts = Object.assign({}, {filename}, babelOptions);
+  return babelTransform(content, opts).code;
+}
+```
+
+
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
