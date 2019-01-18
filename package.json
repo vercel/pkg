@@ -59,6 +59,7 @@
   },
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
+    "watch:babel": "node test/rimraf-es5.js && babel lib --watch --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
     "prepare": "npm run babel",
     "prepublishOnly": "eslint-klopov . && npm run test:no-npm",
