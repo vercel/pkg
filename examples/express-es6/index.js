@@ -1,10 +1,12 @@
+/* eslint-disable */
+
 'use strict';
 
 import express from 'express';
 import { Server } from 'http';
 
-let app = express();
-var server = new Server(app);
+const app = express();
+const server = new Server(app);
 
 server.listen(4200);
 
@@ -13,6 +15,6 @@ server.listen(4200);
 // https://github.com/zeit/pkg#snapshot-filesystem
 app.use('/', express.static(__dirname + '/views'));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });

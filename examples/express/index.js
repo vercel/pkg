@@ -5,7 +5,7 @@ var app = express();
 var Server = require('http').Server;
 var server = new Server(app);
 
-server.listen(8080);
+server.listen(4200);
 
 // __dirname is used here along with package.json.pkg.assets
 // see https://github.com/zeit/pkg#config and
