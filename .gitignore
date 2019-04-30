@@ -6,3 +6,13 @@
 
 # logs
 npm-debug.log
+
+# General macOS
+.DS_Store
+examples/.DS_Store
+
+# Example pkg'd application
+examples/express/express-example
+
+# Example dependencies
+examples/express/node_modules

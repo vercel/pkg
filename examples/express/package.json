@@ -10,7 +10,7 @@
       "views/**/*"
     ],
     "targets": [
-      "node7"
+      "node8"
     ]
   }
 }
