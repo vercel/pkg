@@ -2,6 +2,7 @@
 
 'use strict';
 
+var path = require('path');
 var spawn = require('child_process').spawn;
 
 if (process.send) {
@@ -10,8 +11,9 @@ if (process.send) {
 }
 
 var child = spawn(
-  process.execPath, [ process.argv[1], 'argvx', '--argvy' ],
-  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
+  process.argv[0], [
+    path.join(process.cwd(), path.basename(__filename)), 'argvx', '--argvy'
+  ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
 child.on('message', function (value) {
