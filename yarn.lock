@@ -52,10 +52,15 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@babel/parser@^7.0.0", "@babel/parser@^7.4.0", "@babel/parser@^7.4.3", "@babel/parser@~7.4.3":
+"@babel/parser@^7.0.0", "@babel/parser@^7.4.0", "@babel/parser@^7.4.3":
   version "7.4.3"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.4.3.tgz#eb3ac80f64aa101c907d4ce5406360fe75b7895b"
   integrity sha512-gxpEUhTS1sGA63EGQGuA+WESPR/6tz6ng7tSHFCmaTJK/cGK8y37cBTspX+U2xCAue2IQVvF6Z0oigmjwD8YGQ==
+
+"@babel/parser@~7.4.4":
+  version "7.4.4"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.4.4.tgz#5977129431b8fe33471730d255ce8654ae1250b6"
+  integrity sha512-5pCS4mOsL+ANsFZGdvNLybx4wtqAZJ0MJjMHxvzI3bvIsz6sQvzW8XX92EYIkiPtIvcfG3Aj+Ir5VNyjnZhP7w==
 
 "@babel/template@^7.1.0":
   version "7.4.0"
@@ -2657,10 +2662,10 @@ pify@^4.0.1:
   resolved "https://registry.yarnpkg.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
   integrity sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==
 
-pkg-fetch@~2.5.8:
-  version "2.5.8"
-  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-2.5.8.tgz#65a03358ffcf3a1ba08bc16e9142ed863529fec5"
-  integrity sha512-GgC6FE/DLryqlsIuZc88Pe1Qn6BTEQk/8rMMRWU+FW5MOuxu7liX9lGe0/6ieaXrLaEvKVCieh+q8kGehKtooQ==
+pkg-fetch@~2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-2.6.1.tgz#501087c15eaeef2cb4ba3a9d15b75efd3c37e220"
+  integrity sha512-cYfZ+IJlbIVK56iKFndJWA+R3Ynjg4QwWwRXF3kkbSmSlXNB57G2toHjlGPExfYuzI8BWZFUHW4ZW7IkTmBbXw==
   dependencies:
     babel-runtime "~6.26.0"
     byline "~5.0.0"

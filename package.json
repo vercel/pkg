@@ -30,7 +30,7 @@
     ]
   },
   "dependencies": {
-    "@babel/parser": "~7.4.3",
+    "@babel/parser": "~7.4.4",
     "babel-runtime": "~6.26.0",
     "chalk": "~2.4.2",
     "escodegen": "~1.11.1",
@@ -39,7 +39,7 @@
     "into-stream": "~5.1.0",
     "minimist": "~1.2.0",
     "multistream": "~2.1.1",
-    "pkg-fetch": "~2.5.8",
+    "pkg-fetch": "~2.6.1",
     "progress": "~2.0.3",
     "resolve": "1.6.0",
     "stream-meter": "~1.0.4"
