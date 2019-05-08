@@ -45,10 +45,12 @@ if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };
 }
 
-if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
-  // expand once patchless is introduced, that
-  // will obviously lack any work in node_main.cc
-  throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
+  if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+    // expand once patchless is introduced, that
+    // will obviously lack any work in node_main.cc
+    throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+  }
 }
 
 if (process.env.PKG_EXECPATH === EXECPATH) {
