@@ -1458,11 +1458,25 @@ function payloadFileSync (pointer) {
   var promisify = util.promisify;
   if (promisify) {
     var custom = promisify.custom;
-    var binding = process.binding('util');
-    var createPromise = binding.createPromise;
-    var promiseResolve = binding.promiseResolve;
-    var promiseReject = binding.promiseReject;
     var customPromisifyArgs = require('internal/util').customPromisifyArgs;
+    var createPromise;
+
+    if (NODE_VERSION_MAJOR <= 8) {
+      var binding = process.binding('util');
+      var promiseResolve = binding.promiseResolve;
+      var promiseReject = binding.promiseReject;
+      createPromise = function (fn) {
+        var p = binding.createPromise;
+        var resolve = promiseResolve.bind(p);
+        var reject = promiseReject.bind(p);
+        fn(resolve, reject);
+        return p;
+      };
+    } else {
+      createPromise = function (fn) {
+        return new Promise(fn);
+      };
+    }
 
     // /////////////////////////////////////////////////////////////
     // FS //////////////////////////////////////////////////////////
@@ -1470,13 +1484,11 @@ function payloadFileSync (pointer) {
 
     Object.defineProperty(require('fs').exists, custom, {
       value: function (path) {
-        var promise = createPromise();
-
-        require('fs').exists(path, function (exists) {
-          promiseResolve(promise, exists);
+        return createPromise(function (resolve) {
+          require('fs').exists(path, function (exists) {
+            resolve(exists);
+          });
         });
-
-        return promise;
       }
     });
 
@@ -1492,22 +1504,20 @@ function payloadFileSync (pointer) {
     // CHILD_PROCESS ///////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
-    var customPromiseExecFunction = function (orig) {
+    var customPromiseExecFunction = function (o) {
       return function () {
         var args = Array.from(arguments);
-        var promise = createPromise();
-
-        orig.apply(undefined, args.concat(function (error, stdout, stderr) {
-          if (error !== null) {
-            error.stdout = stdout;
-            error.stderr = stderr;
-            promiseReject(promise, error);
-          } else {
-            promiseResolve(promise, { stdout: stdout, stderr: stderr });
-          }
-        }));
-
-        return promise;
+        return createPromise(function (resolve, reject) {
+          o.apply(undefined, args.concat(function (error, stdout, stderr) {
+            if (error !== null) {
+              error.stdout = stdout;
+              error.stderr = stderr;
+              reject(error);
+            } else {
+              resolve({ stdout: stdout, stderr: stderr });
+            }
+          }));
+        });
       };
     };
 
