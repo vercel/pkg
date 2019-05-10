@@ -16,8 +16,8 @@ function nodeRangeToNodeVersion (nodeRange) {
 
 for (const platform of knownPlatforms) {
   const nodeRanges = [ 'node8', 'node10', 'node12' ];
+  if (platform === 'linux' || platform === 'alpine') nodeRanges.unshift('node6');
   if (platform === 'linux') nodeRanges.unshift('node4');
-  if (platform !== 'macos' && platform !== 'win') nodeRanges.unshift('node6');
   for (const nodeRange of nodeRanges) {
     const nodeVersion = nodeRangeToNodeVersion(nodeRange);
     const archs = [ 'x64' ];

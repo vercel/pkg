@@ -9,6 +9,9 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
+// only linux and alpine have node6
+if (process.platform !== 'linux' && process.platform !== 'alpine') return;
+
 const target = 'node6';
 const inputs = { index: './test-x-index.js', warmup: './test-x-warmup.js' };
 const output = './run-time/test-output.exe';
