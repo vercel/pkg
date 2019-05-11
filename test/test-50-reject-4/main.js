@@ -9,6 +9,9 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
+// only linux has node4
+if (process.platform !== 'linux') return;
+
 const target = 'node4';
 const inputs = { index: './test-x-index.js', warmup: './test-x-warmup.js' };
 const output = './run-time/test-output.exe';

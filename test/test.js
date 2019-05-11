@@ -20,8 +20,10 @@ console.log('');
 if (process.env.CI) {
   if (target === 'node0' ||
       target === 'node4' ||
+      target === 'node6' ||
       target === 'node7' ||
-      target === 'node9') {
+      target === 'node9' ||
+      target === 'node11') {
     console.log(target + ' is skipped in CI!');
     console.log('');
     process.exit();
@@ -36,6 +38,8 @@ if (flavor === 'only-npm') {
   list.push(path.join(__dirname, '*/main.js'));
   if (flavor === 'no-npm') {
     list.push('!' + path.join(__dirname, 'test-42-fetch-all'));
+    list.push('!' + path.join(__dirname, 'test-46-multi-arch'));
+    list.push('!' + path.join(__dirname, 'test-46-multi-arch-2'));
     list.push('!' + path.join(__dirname, 'test-79-npm'));
   }
 }

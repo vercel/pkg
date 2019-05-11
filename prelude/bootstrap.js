@@ -45,14 +45,21 @@ if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };
 }
 
-if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
-  // expand once patchless is introduced, that
-  // will obviously lack any work in node_main.cc
-  throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
+  if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+    // expand once patchless is introduced, that
+    // will obviously lack any work in node_main.cc
+    throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+  }
 }
 
 if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv.splice(1, 1);
+
+  if (process.argv[1] && process.argv[1] !== '-') {
+    // https://github.com/nodejs/node/blob/1a96d83a223ff9f05f7d942fb84440d323f7b596/lib/internal/bootstrap/node.js#L269
+    process.argv[1] = require('path').resolve(process.argv[1]);
+  }
 } else {
   process.argv[1] = DEFAULT_ENTRYPOINT;
 }
@@ -1456,10 +1463,6 @@ function payloadFileSync (pointer) {
   var promisify = util.promisify;
   if (promisify) {
     var custom = promisify.custom;
-    var binding = process.binding('util');
-    var createPromise = binding.createPromise;
-    var promiseResolve = binding.promiseResolve;
-    var promiseReject = binding.promiseReject;
     var customPromisifyArgs = require('internal/util').customPromisifyArgs;
 
     // /////////////////////////////////////////////////////////////
@@ -1468,13 +1471,11 @@ function payloadFileSync (pointer) {
 
     Object.defineProperty(require('fs').exists, custom, {
       value: function (path) {
-        var promise = createPromise();
-
-        require('fs').exists(path, function (exists) {
-          promiseResolve(promise, exists);
+        return new Promise(function (resolve) {
+          require('fs').exists(path, function (exists) {
+            resolve(exists);
+          });
         });
-
-        return promise;
       }
     });
 
@@ -1490,22 +1491,20 @@ function payloadFileSync (pointer) {
     // CHILD_PROCESS ///////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
-    var customPromiseExecFunction = function (orig) {
+    var customPromiseExecFunction = function (o) {
       return function () {
         var args = Array.from(arguments);
-        var promise = createPromise();
-
-        orig.apply(undefined, args.concat(function (error, stdout, stderr) {
-          if (error !== null) {
-            error.stdout = stdout;
-            error.stderr = stderr;
-            promiseReject(promise, error);
-          } else {
-            promiseResolve(promise, { stdout: stdout, stderr: stderr });
-          }
-        }));
-
-        return promise;
+        return new Promise(function (resolve, reject) {
+          o.apply(undefined, args.concat(function (error, stdout, stderr) {
+            if (error !== null) {
+              error.stdout = stdout;
+              error.stderr = stderr;
+              reject(error);
+            } else {
+              resolve({ stdout: stdout, stderr: stderr });
+            }
+          }));
+        });
       };
     };
 

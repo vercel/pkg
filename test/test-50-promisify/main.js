@@ -14,10 +14,6 @@ const target = process.argv[2] || host;
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-const version1 = process.version.match(/^v(\d+)/)[1];
-const version2 = target.match(/^node(\d+)/)[1];
-if (version1 !== version2) return;
-
 let left, right;
 
 left = utils.spawn.sync(
