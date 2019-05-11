@@ -1459,24 +1459,6 @@ function payloadFileSync (pointer) {
   if (promisify) {
     var custom = promisify.custom;
     var customPromisifyArgs = require('internal/util').customPromisifyArgs;
-    var createPromise;
-
-    if (NODE_VERSION_MAJOR <= 8) {
-      var binding = process.binding('util');
-      var promiseResolve = binding.promiseResolve;
-      var promiseReject = binding.promiseReject;
-      createPromise = function (fn) {
-        var p = binding.createPromise;
-        var resolve = promiseResolve.bind(p);
-        var reject = promiseReject.bind(p);
-        fn(resolve, reject);
-        return p;
-      };
-    } else {
-      createPromise = function (fn) {
-        return new Promise(fn);
-      };
-    }
 
     // /////////////////////////////////////////////////////////////
     // FS //////////////////////////////////////////////////////////
@@ -1484,7 +1466,7 @@ function payloadFileSync (pointer) {
 
     Object.defineProperty(require('fs').exists, custom, {
       value: function (path) {
-        return createPromise(function (resolve) {
+        return new Promise(function (resolve) {
           require('fs').exists(path, function (exists) {
             resolve(exists);
           });
@@ -1507,7 +1489,7 @@ function payloadFileSync (pointer) {
     var customPromiseExecFunction = function (o) {
       return function () {
         var args = Array.from(arguments);
-        return createPromise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
           o.apply(undefined, args.concat(function (error, stdout, stderr) {
             if (error !== null) {
               error.stdout = stdout;
