@@ -123,7 +123,14 @@ exports.substituteDenominator = function (f, denominator) {
   return f.slice(0, rootLength) + f.slice(denominator);
 };
 
-exports.snapshotify = function (file, slash) {
+exports.snapshotify = function (file, slash, config) {
+  // other file types like .ts can be preprocessed but have to be saved as js files
+  if (config && config.extensionReplacements) {
+    config.extensionReplacements.forEach(([ from, to ]) => {
+      file = file.replace(from, to);
+    });
+  }
+
   assert.equal(file, normalizePath(file));
   return injectSnapshot(replaceSlashes(file, slash));
 };

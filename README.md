@@ -147,6 +147,11 @@ It is similar to rules in the webpack config.
 It could be used to compile es6, typescript or flow code.
 No need to create a extra build step and pkg afterwards!
 Minification would be another use case to reduce bundle size.
+Optionaly change the extensions which should be parsed with the `extensions` option.
+The default extensions are `['.js', '.json', '.node']`.
+When using e.g. ts files you have to rename the file extension to js after preprocessing.
+Otherwise the the transpiled ts file would be saved as `.ts` and node doesnt search for `.ts` files.
+Add the `extensionReplacements` property to achieve the renaming.
 
 Preprocessors can be defined in the `package.json`.
 ```
@@ -162,6 +167,11 @@ Preprocessors can be defined in the `package.json`.
         "test": "^(?!.*node_modules).*$",
         "transform": "babeltransform.js"
       }
+    ],
+    ,
+    "extensions": [".js", ".json", ".ts"],
+    "extensionReplacements": [
+      [".ts", ".js"] // ts extension will be replaced with js in the snapshot
     ]
   }
 ```
