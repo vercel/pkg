@@ -1,9 +1,5 @@
-/* eslint-disable */
-
-'use strict';
-
-import express from 'express';
 import { Server } from 'http';
+import express from 'express';
 
 const app = express();
 const server = new Server(app);

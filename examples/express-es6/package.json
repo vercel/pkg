@@ -24,5 +24,11 @@
         "transform": "babeltransform.js"
       }
     ]
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module"
+    }
   }
 }

@@ -1,5 +1,3 @@
-'use strict';
-
 var babelTransform = require('@babel/core').transformSync;
 
 const babelOptions = require('./.babelrc.js');
