@@ -30,17 +30,23 @@ if (process.env.CI) {
   }
 }
 
+function joinAndForward (d) {
+  let r = path.join(__dirname, d);
+  if (process.platform === 'win32') r = r.replace(/\\/g, '/');
+  return r;
+}
+
 const list = [];
 
 if (flavor === 'only-npm') {
-  list.push(path.join(__dirname, 'test-79-npm/main.js'));
+  list.push(joinAndForward('test-79-npm/main.js'));
 } else {
-  list.push(path.join(__dirname, '*/main.js'));
+  list.push(joinAndForward('*/main.js'));
   if (flavor === 'no-npm') {
-    list.push('!' + path.join(__dirname, 'test-42-fetch-all'));
-    list.push('!' + path.join(__dirname, 'test-46-multi-arch'));
-    list.push('!' + path.join(__dirname, 'test-46-multi-arch-2'));
-    list.push('!' + path.join(__dirname, 'test-79-npm'));
+    list.push('!' + joinAndForward('test-42-fetch-all'));
+    list.push('!' + joinAndForward('test-46-multi-arch'));
+    list.push('!' + joinAndForward('test-46-multi-arch-2'));
+    list.push('!' + joinAndForward('test-79-npm'));
   }
 }
 

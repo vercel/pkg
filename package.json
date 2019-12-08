@@ -39,7 +39,7 @@
     "into-stream": "^5.1.1",
     "minimist": "^1.2.0",
     "multistream": "^2.1.1",
-    "pkg-fetch": "^2.6.3",
+    "pkg-fetch": "^2.6.4",
     "progress": "^2.0.3",
     "resolve": "1.6.0",
     "stream-meter": "^1.0.4"
