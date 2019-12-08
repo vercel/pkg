@@ -41,7 +41,7 @@
     "multistream": "^2.1.1",
     "pkg-fetch": "^2.6.4",
     "progress": "^2.0.3",
-    "resolve": "1.6.0",
+    "resolve": "^1.13.1",
     "stream-meter": "^1.0.4"
   },
   "devDependencies": {

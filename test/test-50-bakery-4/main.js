@@ -13,6 +13,9 @@ const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './run-time/test-output.exe';
 
+if (/^(node|v)?0/.test(target)) return;
+if (/^(node|v)?4/.test(target)) return;
+if (/^(node|v)?6/.test(target)) return;
 if (/^(node|v)?8/.test(target)) return;
 
 let left;
