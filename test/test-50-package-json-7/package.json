@@ -1,6 +1,7 @@
 {
   "bin": "test-x-index.js",
   "dependencies": {
-    "delta": "*"
+    "delta": "*",
+    "normalize.css": "*"
   }
 }
