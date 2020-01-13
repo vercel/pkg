@@ -9,6 +9,6 @@ module.exports = function (stamp, flags) {
   }
 
   return {
-    deployFilesFrom: [ 'opn' ]
+    deployFilesFrom: [ 'open' ]
   };
 };
