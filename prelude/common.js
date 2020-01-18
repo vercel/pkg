@@ -105,12 +105,16 @@ function longestCommonLength (s1, s2) {
   return length;
 }
 
+function withoutNodeModules (file) {
+  return file.split(path.sep + 'node_modules' + path.sep)[0];
+}
+
 exports.retrieveDenominator = function (files) {
   assert(files.length > 0);
 
-  var s1 = files[0] + path.sep;
+  var s1 = withoutNodeModules(files[0]) + path.sep;
   for (var i = 1; i < files.length; i += 1) {
-    var s2 = files[i] + path.sep;
+    var s2 = withoutNodeModules(files[i]) + path.sep;
     s1 = s1.slice(0, longestCommonLength(s1, s2));
   }
 
