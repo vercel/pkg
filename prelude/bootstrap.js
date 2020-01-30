@@ -1311,7 +1311,7 @@ function payloadFileSync (pointer) {
         fs.statSync(tmpModulePath);
       } catch (e) {
         // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, {mode: 0o444});
+        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
       }
       return tmpModulePath;
     }
