@@ -1299,23 +1299,6 @@ function payloadFileSync (pointer) {
       return filename;
     }
 
-    if (common.isDotNODE(filename)) {
-      // Node addon files are not classic modules, they are loaded with process.dlopen which needs a filesystem path
-      // we need to write the file somewhere on disk first and then load it
-      const fs = require('fs');
-      const moduleContent = fs.readFileSync(filename);
-      const moduleBaseName = require('path').basename(filename);
-      const hash = require('crypto').createHash('sha256').update(moduleContent).digest('hex');
-      const tmpModulePath = `${require('os').tmpdir()}/${hash}_${moduleBaseName}`;
-      try {
-        fs.statSync(tmpModulePath);
-      } catch (e) {
-        // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
-      }
-      return tmpModulePath;
-    }
-
     if (flagWasOn) {
       FLAG_ENABLE_PROJECT = true;
       try {
@@ -1527,5 +1510,35 @@ function payloadFileSync (pointer) {
     Object.defineProperty(require('child_process').execFile, custom, {
       value: customPromiseExecFunction(require('child_process').execFile)
     });
+  }
+}());
+
+// /////////////////////////////////////////////////////////////////
+// PATCH PROCESS ///////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+
+(function() {
+  const fs = require('fs');
+  var ancestor = {};
+  ancestor.dlopen = process.dlopen;
+
+  process.dlopen = function () {
+    const args = cloneArgs(arguments);
+    if (insideSnapshot(args[1])) {
+      // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
+      // we need to write the file somewhere on disk first and then load it
+      const moduleContent = fs.readFileSync(args[1]);
+      const moduleBaseName = require('path').basename(args[1]);
+      const hash = require('crypto').createHash('sha256').update(moduleContent).digest('hex');
+      const tmpModulePath = `${require('os').tmpdir()}/${hash}_${moduleBaseName}`;
+      try {
+        fs.statSync(tmpModulePath);
+      } catch (e) {
+        // Most likely this means the module is not on disk yet
+        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
+      }
+      args[1] = tmpModulePath;
+    }
+    return ancestor.dlopen.apply(process, args);
   }
 }());
