@@ -1524,11 +1524,13 @@ function payloadFileSync (pointer) {
 
   process.dlopen = function () {
     const args = cloneArgs(arguments);
-    if (insideSnapshot(args[1])) {
+    const modulePath = args[1];
+    const moduleDirname = require('path').dirname(modulePath);
+    if (insideSnapshot(modulePath)) {
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
-      const moduleContent = fs.readFileSync(args[1]);
-      const moduleBaseName = require('path').basename(args[1]);
+      const moduleContent = fs.readFileSync(modulePath);
+      const moduleBaseName = require('path').basename(modulePath);
       const hash = require('crypto').createHash('sha256').update(moduleContent).digest('hex');
       const tmpModulePath = `${require('os').tmpdir()}/${hash}_${moduleBaseName}`;
       try {
@@ -1539,6 +1541,36 @@ function payloadFileSync (pointer) {
       }
       args[1] = tmpModulePath;
     }
-    return ancestor.dlopen.apply(process, args);
+
+    const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
+    const tryImporting = function (previousErrorMessage) {
+      try {
+        const res = ancestor.dlopen.apply(process, args);
+        return res;
+      } catch (e) {
+        if (e.message === previousErrorMessage) {
+          // we already tried to fix this and it didn't work, give up
+          throw e;
+        }
+        if (e.message.match(unknownModuleErrorRegex)) {
+          // some modules are packaged with dynamic linking and needs to open other files that should be in
+          // the same directory, in this case, we write this file in the same /tmp directory and try to
+          // import the module again
+          const moduleName = e.message.match(unknownModuleErrorRegex)[1];
+          const modulePath = `${moduleDirname}/${moduleName}`;
+          const moduleContent = fs.readFileSync(modulePath);
+          const moduleBaseName = require('path').basename(modulePath);
+          const tmpModulePath = `${require('os').tmpdir()}/${moduleBaseName}`;
+          try {
+            fs.statSync(tmpModulePath);
+          } catch (e) {
+            fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
+          }
+          return tryImporting(e.message);
+        }
+        throw e;
+      }
+    }
+    tryImporting();
   }
 }());
