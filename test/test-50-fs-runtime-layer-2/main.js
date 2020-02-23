@@ -57,6 +57,9 @@ right = right.split('\n');
 // right may have less lines, premature exit,
 // less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
+  // TODO remove when latest node12 lands pkg-fetch
+  if (left[i] === 'The "fd" argument must be of type number. Received type string (\'incorrect fd as string\')' &&
+      right[i] === 'The "fd" argument must be of type number. Received type string') continue;
   assert.equal(left[i], right[i]);
 }
 
