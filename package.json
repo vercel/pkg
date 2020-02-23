@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "4.4.2",
+  "version": "4.4.3",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -33,15 +33,15 @@
     "@babel/parser": "^7.7.5",
     "@babel/runtime": "^7.7.5",
     "chalk": "^3.0.0",
-    "escodegen": "^1.12.0",
+    "escodegen": "^1.13.0",
     "fs-extra": "^8.1.0",
-    "globby": "^10.0.1",
+    "globby": "^11.0.0",
     "into-stream": "^5.1.1",
     "minimist": "^1.2.0",
     "multistream": "^2.1.1",
     "pkg-fetch": "^2.6.4",
     "progress": "^2.0.3",
-    "resolve": "^1.13.1",
+    "resolve": "^1.15.0",
     "stream-meter": "^1.0.4"
   },
   "devDependencies": {
@@ -55,8 +55,8 @@
     "eslint": "^6.7.2",
     "eslint-config-klopov": "^1.0.2",
     "json-stable-stringify": "^1.0.1",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^3.0.0"
+    "mkdirp": "^1.0.3",
+    "rimraf": "^3.0.1"
   },
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",

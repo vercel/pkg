@@ -2,7 +2,7 @@
 
 ---
 
-![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
+![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
@@ -93,7 +93,7 @@ of `scripts` and `assets` entries.
 `scripts` is a [glob](https://github.com/sindresorhus/globby)
 or list of globs. Files specified as `scripts` will be compiled
 using `v8::ScriptCompiler` and placed into executable without
-sources. They must conform JS standards of those Node.js versions
+sources. They must conform to the JS standards of those Node.js versions
 you target (see [Targets](#targets)), i.e. be already transpiled.
 
 ### Assets
@@ -101,8 +101,8 @@ you target (see [Targets](#targets)), i.e. be already transpiled.
 `assets` is a [glob](https://github.com/sindresorhus/globby)
 or list of globs. Files specified as `assets` will be packaged
 into executable as raw content without modifications. Javascript
-files may be specified as `assets` as well. Their sources will
-not be stripped. It improves performance of execution of those
+files may also be specified as `assets`. Their sources will
+not be stripped as it improves execution performance of the
 files and simplifies debugging.
 
 See also
