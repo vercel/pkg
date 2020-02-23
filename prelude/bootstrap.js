@@ -752,6 +752,37 @@ function payloadFileSync (pointer) {
     }
   }
 
+  function Dirent (name, type) {
+    this.name = name;
+    this.type = type;
+  }
+
+  Dirent.prototype.isDirectory = function () {
+    return this.type === 2;
+  };
+
+  Dirent.prototype.isFile = function () {
+    return this.type === 1;
+  };
+
+  Dirent.prototype.isBlockDevice =
+  Dirent.prototype.isCharacterDevice =
+  Dirent.prototype.isSymbolicLink =
+  Dirent.prototype.isFIFO =
+  Dirent.prototype.isSocket = function () {
+    return false;
+  };
+
+  function getFileTypes (path_, entries) {
+    return entries.map(function (entry) {
+      var path = require('path').join(path_, entry);
+      var entity = VIRTUAL_FILESYSTEM[path];
+      if (entity[STORE_BLOB] || entity[STORE_CONTENT]) return new Dirent(entry, 1);
+      if (entity[STORE_LINKS]) return new Dirent(entry, 2);
+      throw new Error('UNEXPECTED-24');
+    });
+  }
+
   function readdirRoot (path, cb) {
     if (cb) {
       ancestor.readdir(path, function (error, entries) {
@@ -811,7 +842,7 @@ function payloadFileSync (pointer) {
     }
 
     var entries = readdirFromSnapshot(path, isRoot);
-    if (options.withFileTypes) entries = getFileTypes(entries);
+    if (options.withFileTypes) entries = getFileTypes(path, entries);
     return entries;
   };
 
@@ -834,7 +865,7 @@ function payloadFileSync (pointer) {
     var callback = dezalgo(maybeCallback(arguments));
     readdirFromSnapshot(path, isRoot, function (error, entries) {
       if (error) return callback(error);
-      if (options.withFileTypes) entries = getFileTypes(entries);
+      if (options.withFileTypes) entries = getFileTypes(path, entries);
       callback(null, entries);
     });
   };
