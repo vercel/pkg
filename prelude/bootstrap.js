@@ -698,6 +698,7 @@ function payloadFileSync (pointer) {
 
     var encoding = options.encoding;
     assertEncoding(encoding);
+
     var buffer = readFileFromSnapshot(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
@@ -809,7 +810,8 @@ function payloadFileSync (pointer) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
-    return readdirFromSnapshot(path, isRoot);
+    var entries = readdirFromSnapshot(path, isRoot);
+    return entries;
   };
 
   fs.readdir = function (path, options_) {
@@ -829,7 +831,10 @@ function payloadFileSync (pointer) {
     }
 
     var callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path, isRoot, callback);
+    readdirFromSnapshot(path, isRoot, function (error, entries) {
+      if (error) return callback(error);
+      callback(null, entries);
+    });
   };
 
   // ///////////////////////////////////////////////////////////////
