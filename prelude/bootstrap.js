@@ -739,6 +739,18 @@ function payloadFileSync (pointer) {
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  function readdirOptions (options, hasCallback) {
+    if (!options || (hasCallback && typeof options === 'function')) {
+      return { encoding: null };
+    } else if (typeof options === 'string') {
+      return { encoding: options };
+    } else if (typeof options === 'object') {
+      return options;
+    } else {
+      return null;
+    }
+  }
+
   function readdirRoot (path, cb) {
     if (cb) {
       ancestor.readdir(path, function (error, entries) {
