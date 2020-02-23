@@ -164,6 +164,7 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 
 function isRootPath (p) {
+  if (p === '.') p = require('path').resolve(p);
   return require('path').dirname(p) === p;
 }
 
@@ -780,7 +781,7 @@ function payloadFileSync (pointer) {
     return cb2(new Error('UNEXPECTED-25'));
   }
 
-  fs.readdirSync = function (path) {
+  fs.readdirSync = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -790,10 +791,16 @@ function payloadFileSync (pointer) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
+    var options = readdirOptions(options_, false);
+
+    if (!options) {
+      return ancestor.readdirSync.apply(fs, arguments);
+    }
+
     return readdirFromSnapshot(path, isRoot);
   };
 
-  fs.readdir = function (path) {
+  fs.readdir = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -801,6 +808,12 @@ function payloadFileSync (pointer) {
     }
     if (insideMountpoint(path)) {
       return ancestor.readdir.apply(fs, translateNth(arguments, 0, path));
+    }
+
+    var options = readdirOptions(options_, true);
+
+    if (!options) {
+      return ancestor.readdir.apply(fs, arguments);
     }
 
     var callback = dezalgo(maybeCallback(arguments));
