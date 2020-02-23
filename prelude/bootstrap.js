@@ -811,6 +811,7 @@ function payloadFileSync (pointer) {
     }
 
     var entries = readdirFromSnapshot(path, isRoot);
+    if (options.withFileTypes) entries = getFileTypes(entries);
     return entries;
   };
 
@@ -833,6 +834,7 @@ function payloadFileSync (pointer) {
     var callback = dezalgo(maybeCallback(arguments));
     readdirFromSnapshot(path, isRoot, function (error, entries) {
       if (error) return callback(error);
+      if (options.withFileTypes) entries = getFileTypes(entries);
       callback(null, entries);
     });
   };
