@@ -3,7 +3,8 @@
   "license": "ISC",
   "bin": "index.js",
   "dependencies": {
-    "express": "4.15.2"
+    "express": "4.15.2",
+    "open": "^7.0.3"
   },
   "pkg": {
     "assets": [
