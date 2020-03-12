@@ -10,7 +10,7 @@ var port = 8080;
 server.listen(port, () => {
   console.log(`Server is listening on ${port}`);
   console.log(`Try to open firefox => http://localhost:${port}`);
-  open(`localhost:${port}`, {app: 'firefox'});
+  open(`localhost:${port}`, { app: 'firefox' });
 });
 
 // __dirname is used here along with package.json.pkg.assets
