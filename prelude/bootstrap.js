@@ -1548,17 +1548,25 @@ function payloadFileSync (pointer) {
     var customPromiseExecFunction = function (o) {
       return function () {
         var args = Array.from(arguments);
-        return new Promise(function (resolve, reject) {
-          o.apply(undefined, args.concat(function (error, stdout, stderr) {
-            if (error !== null) {
-              error.stdout = stdout;
-              error.stderr = stderr;
-              reject(error);
-            } else {
-              resolve({ stdout: stdout, stderr: stderr });
-            }
-          }));
+
+        var res;
+        var rej;
+        var p = new Promise(function (resolve, reject) {
+          res = resolve;
+          rej = reject;
         });
+
+        p.child = o.apply(undefined, args.concat(function (error, stdout, stderr) {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            rej(error);
+          } else {
+            res({ stdout: stdout, stderr: stderr });
+          }
+        }));
+
+        return p;
       };
     };
 
