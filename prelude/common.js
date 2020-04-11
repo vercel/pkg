@@ -10,6 +10,8 @@ exports.STORE_STAT = 3;
 exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
+var hasURL = typeof URL !== 'undefined';
+
 function uppercaseDriveLetter (f) {
   if (f.slice(1, 3) !== ':\\') return f;
   return f[0].toUpperCase() + f.slice(1);
@@ -41,7 +43,9 @@ function removeTrailingSlashes (f) {
 
 function normalizePath (f) {
   var file = f;
-  if (!(/^.:$/.test(f))) file = path.normalize(file); // 'c:' -> 'c:.'
+  if (Buffer.isBuffer(file)) file = file.toString();
+  if (hasURL && file instanceof URL) file = file.pathname;
+  if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
   file = uppercaseDriveLetter(file);
   file = removeTrailingSlashes(file);
   return file;
@@ -134,6 +138,8 @@ exports.snapshotify = function (file, slash) {
 
 if (win32) {
   exports.insideSnapshot = function insideSnapshot (f) {
+    if (Buffer.isBuffer(f)) f = f.toString();
+    if (hasURL && f instanceof URL) f = f.pathname;
     if (typeof f !== 'string') return false;
     var slice112 = f.slice(1, 12);
     if (slice112 === ':\\snapshot\\' ||
@@ -146,6 +152,8 @@ if (win32) {
   };
 } else {
   exports.insideSnapshot = function insideSnapshot (f) {
+    if (Buffer.isBuffer(f)) f = f.toString();
+    if (hasURL && f instanceof URL) f = f.pathname;
     if (typeof f !== 'string') return false;
     var slice010 = f.slice(0, 10);
     if (slice010 === '/snapshot/' ||
