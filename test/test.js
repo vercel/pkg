@@ -41,7 +41,7 @@ const list = [];
 if (flavor === 'only-npm') {
   list.push(joinAndForward('test-79-npm/main.js'));
 } else {
-  list.push(joinAndForward('*/main.js'));
+  list.push(joinAndForward('**/main.js'));
   if (flavor === 'no-npm') {
     list.push('!' + joinAndForward('test-42-fetch-all'));
     list.push('!' + joinAndForward('test-46-multi-arch'));

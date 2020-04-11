@@ -19,15 +19,15 @@ const output = './run-time/test-output.exe';
 // see readFromSnapshot "NODE_VERSION_MAJOR"
 
 function bitty (version) {
-  return (2 *  (/^(node|v)?4/.test(version))) |
-         (2 *  (/^(node|v)?5/.test(version))) |
-         (4 *  (/^(node|v)?6/.test(version))) |
-         (4 *  (/^(node|v)?7/.test(version))) |
-         (4 *  (/^(node|v)?8/.test(version))) |
-         (4 *  (/^(node|v)?9/.test(version))) |
-         (8 * (/^(node|v)?10/.test(version))) |
-         (8 * (/^(node|v)?11/.test(version))) |
-         (8 * (/^(node|v)?12/.test(version)));
+  return (2  *  (/^(node|v)?4/.test(version))) |
+         (2  *  (/^(node|v)?5/.test(version))) |
+         (4  *  (/^(node|v)?6/.test(version))) |
+         (4  *  (/^(node|v)?7/.test(version))) |
+         (4  *  (/^(node|v)?8/.test(version))) |
+         (4  *  (/^(node|v)?9/.test(version))) |
+         (8  * (/^(node|v)?10/.test(version))) |
+         (8  * (/^(node|v)?11/.test(version))) |
+         (16 * (/^(node|v)?12/.test(version)));
 }
 
 const version1 = process.version;
@@ -57,9 +57,6 @@ right = right.split('\n');
 // right may have less lines, premature exit,
 // less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
-  // TODO remove when latest node12 lands pkg-fetch
-  if (left[i] === 'The "fd" argument must be of type number. Received type string (\'incorrect fd as string\')' &&
-      right[i] === 'The "fd" argument must be of type number. Received type string') continue;
   assert.equal(left[i], right[i]);
 }
 
