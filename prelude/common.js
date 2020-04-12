@@ -41,6 +41,15 @@ function removeTrailingSlashes (f) {
   return f;
 }
 
+function isRootPath (p) {
+  if (Buffer.isBuffer(p)) p = p.toString();
+  if (hasURL && p instanceof URL) p = p.pathname;
+  if (p === '.') p = path.resolve(p);
+  return path.dirname(p) === p;
+}
+
+exports.isRootPath = isRootPath;
+
 function normalizePath (f) {
   var file = f;
   if (Buffer.isBuffer(file)) file = file.toString();
