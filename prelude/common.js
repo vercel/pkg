@@ -69,7 +69,6 @@ if (win32) {
     if (Buffer.isBuffer(file)) file = file.toString();
     if (hasURL && file instanceof URL) file = file.pathname;
     if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
-    file = uppercaseDriveLetter(file);
     file = removeTrailingSlashes(file);
     return file;
   };
