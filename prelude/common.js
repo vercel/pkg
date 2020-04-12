@@ -10,6 +10,7 @@ exports.STORE_STAT = 3;
 exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
+var win32 = process.platform === 'win32';
 var hasURL = typeof URL !== 'undefined';
 
 function uppercaseDriveLetter (f) {
@@ -50,14 +51,28 @@ function isRootPath (p) {
 
 exports.isRootPath = isRootPath;
 
-function normalizePath (f) {
-  var file = f;
-  if (Buffer.isBuffer(file)) file = file.toString();
-  if (hasURL && file instanceof URL) file = file.pathname;
-  if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
-  file = uppercaseDriveLetter(file);
-  file = removeTrailingSlashes(file);
-  return file;
+var normalizePath;
+
+if (win32) {
+  normalizePath = function (f) {
+    var file = f;
+    if (Buffer.isBuffer(file)) file = file.toString();
+    if (hasURL && file instanceof URL) file = file.pathname.replace(/^\//, '');
+    if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
+    file = uppercaseDriveLetter(file);
+    file = removeTrailingSlashes(file);
+    return file;
+  };
+} else {
+  normalizePath = function (f) {
+    var file = f;
+    if (Buffer.isBuffer(file)) file = file.toString();
+    if (hasURL && file instanceof URL) file = file.pathname;
+    if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
+    file = uppercaseDriveLetter(file);
+    file = removeTrailingSlashes(file);
+    return file;
+  };
 }
 
 exports.normalizePath = normalizePath;
@@ -106,8 +121,6 @@ function injectSnapshot (file) {
   return file;
 }
 
-var win32 = process.platform === 'win32';
-
 function longestCommonLength (s1, s2) {
   var length = Math.min(s1.length, s2.length);
   for (var i = 0; i < length; i += 1) {
@@ -148,7 +161,7 @@ exports.snapshotify = function (file, slash) {
 if (win32) {
   exports.insideSnapshot = function insideSnapshot (f) {
     if (Buffer.isBuffer(f)) f = f.toString();
-    if (hasURL && f instanceof URL) f = f.pathname;
+    if (hasURL && f instanceof URL) f = f.pathname.replace(/^\//, '');
     if (typeof f !== 'string') return false;
     var slice112 = f.slice(1, 12);
     if (slice112 === ':\\snapshot\\' ||
