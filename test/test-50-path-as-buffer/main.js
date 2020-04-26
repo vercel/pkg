@@ -25,7 +25,9 @@ function bitty (version) {
          (4 *  (/^(node|v)?9/.test(version))) |
          (4 * (/^(node|v)?10/.test(version))) |
          (4 * (/^(node|v)?11/.test(version))) |
-         (4 * (/^(node|v)?12/.test(version)));  // 4 = has URL
+         (4 * (/^(node|v)?12/.test(version))) |
+         (4 * (/^(node|v)?13/.test(version))) |
+         (4 * (/^(node|v)?14/.test(version)));  // 4 = has URL
 }
 
 const version1 = process.version;
