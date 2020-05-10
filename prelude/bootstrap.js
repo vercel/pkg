@@ -23,6 +23,7 @@ var STORE_CONTENT = common.STORE_CONTENT;
 var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
 
+var isRootPath = common.isRootPath;
 var normalizePath = common.normalizePath;
 var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
@@ -162,11 +163,6 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 // PROJECT /////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-
-function isRootPath (p) {
-  if (p === '.') p = require('path').resolve(p);
-  return require('path').dirname(p) === p;
-}
 
 function projectToFilesystem (f) {
   var xpdn = require('path').dirname(
