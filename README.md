@@ -1,8 +1,12 @@
-**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using ZEIT Now, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
+**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using [Vercel](https://vercel.com), this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
 
 ---
 
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
+
+<a aria-label="Vercel logo" href="https://vercel.com">
+  <img src="https://img.shields.io/badge/MADE%20BY%20Vercel-000000.svg?style=for-the-badge&logo=ZEIT&labelColor=000000&logoWidth=20">
+</a>
 
 [![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
 [![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
