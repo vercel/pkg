@@ -1576,7 +1576,7 @@ function payloadFileSync (pointer) {
 // PATCH PROCESS ///////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-(function() {
+(function () {
   const fs = require('fs');
   var ancestor = {};
   ancestor.dlopen = process.dlopen;
@@ -1616,20 +1616,20 @@ function payloadFileSync (pointer) {
           // the same directory, in this case, we write this file in the same /tmp directory and try to
           // import the module again
           const moduleName = e.message.match(unknownModuleErrorRegex)[1];
-          const modulePath = `${moduleDirname}/${moduleName}`;
-          const moduleContent = fs.readFileSync(modulePath);
-          const moduleBaseName = require('path').basename(modulePath);
+          const importModulePath = `${moduleDirname}/${moduleName}`;
+          const moduleContent = fs.readFileSync(importModulePath);
+          const moduleBaseName = require('path').basename(importModulePath);
           const tmpModulePath = `${require('os').tmpdir()}/${moduleBaseName}`;
           try {
             fs.statSync(tmpModulePath);
-          } catch (e) {
+          } catch (err) {
             fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
           }
           return tryImporting(e.message);
         }
         throw e;
       }
-    }
+    };
     tryImporting();
-  }
+  };
 }());
