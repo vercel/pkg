@@ -23,7 +23,8 @@ if (process.env.CI) {
       target === 'node6' ||
       target === 'node7' ||
       target === 'node9' ||
-      target === 'node11') {
+      target === 'node11' ||
+      target === 'node13') {
     console.log(target + ' is skipped in CI!');
     console.log('');
     process.exit();
@@ -41,7 +42,7 @@ const list = [];
 if (flavor === 'only-npm') {
   list.push(joinAndForward('test-79-npm/main.js'));
 } else {
-  list.push(joinAndForward('*/main.js'));
+  list.push(joinAndForward('**/main.js'));
   if (flavor === 'no-npm') {
     list.push('!' + joinAndForward('test-42-fetch-all'));
     list.push('!' + joinAndForward('test-46-multi-arch'));

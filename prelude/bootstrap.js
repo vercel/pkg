@@ -23,6 +23,7 @@ var STORE_CONTENT = common.STORE_CONTENT;
 var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
 
+var isRootPath = common.isRootPath;
 var normalizePath = common.normalizePath;
 var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
@@ -162,10 +163,6 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 // PROJECT /////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-
-function isRootPath (p) {
-  return require('path').dirname(p) === p;
-}
 
 function projectToFilesystem (f) {
   var xpdn = require('path').dirname(
@@ -697,6 +694,7 @@ function payloadFileSync (pointer) {
 
     var encoding = options.encoding;
     assertEncoding(encoding);
+
     var buffer = readFileFromSnapshot(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
@@ -737,6 +735,49 @@ function payloadFileSync (pointer) {
   // ///////////////////////////////////////////////////////////////
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
+
+  function readdirOptions (options, hasCallback) {
+    if (!options || (hasCallback && typeof options === 'function')) {
+      return { encoding: null };
+    } else if (typeof options === 'string') {
+      return { encoding: options };
+    } else if (typeof options === 'object') {
+      return options;
+    } else {
+      return null;
+    }
+  }
+
+  function Dirent (name, type) {
+    this.name = name;
+    this.type = type;
+  }
+
+  Dirent.prototype.isDirectory = function () {
+    return this.type === 2;
+  };
+
+  Dirent.prototype.isFile = function () {
+    return this.type === 1;
+  };
+
+  Dirent.prototype.isBlockDevice =
+  Dirent.prototype.isCharacterDevice =
+  Dirent.prototype.isSymbolicLink =
+  Dirent.prototype.isFIFO =
+  Dirent.prototype.isSocket = function () {
+    return false;
+  };
+
+  function getFileTypes (path_, entries) {
+    return entries.map(function (entry) {
+      var path = require('path').join(path_, entry);
+      var entity = VIRTUAL_FILESYSTEM[path];
+      if (entity[STORE_BLOB] || entity[STORE_CONTENT]) return new Dirent(entry, 1);
+      if (entity[STORE_LINKS]) return new Dirent(entry, 2);
+      throw new Error('UNEXPECTED-24');
+    });
+  }
 
   function readdirRoot (path, cb) {
     if (cb) {
@@ -780,7 +821,7 @@ function payloadFileSync (pointer) {
     return cb2(new Error('UNEXPECTED-25'));
   }
 
-  fs.readdirSync = function (path) {
+  fs.readdirSync = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -790,10 +831,18 @@ function payloadFileSync (pointer) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return readdirFromSnapshot(path, isRoot);
+    var options = readdirOptions(options_, false);
+
+    if (!options) {
+      return ancestor.readdirSync.apply(fs, arguments);
+    }
+
+    var entries = readdirFromSnapshot(path, isRoot);
+    if (options.withFileTypes) entries = getFileTypes(path, entries);
+    return entries;
   };
 
-  fs.readdir = function (path) {
+  fs.readdir = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -803,8 +852,18 @@ function payloadFileSync (pointer) {
       return ancestor.readdir.apply(fs, translateNth(arguments, 0, path));
     }
 
+    var options = readdirOptions(options_, true);
+
+    if (!options) {
+      return ancestor.readdir.apply(fs, arguments);
+    }
+
     var callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path, isRoot, callback);
+    readdirFromSnapshot(path, isRoot, function (error, entries) {
+      if (error) return callback(error);
+      if (options.withFileTypes) entries = getFileTypes(path, entries);
+      callback(null, entries);
+    });
   };
 
   // ///////////////////////////////////////////////////////////////
