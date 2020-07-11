@@ -1,6 +1,4 @@
-**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using ZEIT Now, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
-
----
+**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using Vercel, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
 
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
