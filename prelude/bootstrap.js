@@ -531,11 +531,15 @@ function payloadFileSync (pointer) {
 
   function readFromSnapshot (fd, buffer, offset, length, position, cb) {
     var cb2 = cb || rethrow;
+    if ((offset < 0) && (NODE_VERSION_MAJOR >= 14)) return cb2(new Error(
+      'The value of "offset" is out of range. It must be >= 0. Received ' + offset));
     if ((offset < 0) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
       'The value of "offset" is out of range. It must be >= 0 && <= ' + buffer.length.toString() + '. Received ' + offset));
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
     if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return cb2(null, 0);
     if (offset >= buffer.length) return cb2(new Error('Offset is out of bounds'));
+    if ((offset + length > buffer.length) && (NODE_VERSION_MAJOR >= 14)) return cb2(new Error(
+      'The value of "length" is out of range. It must be <= ' + (buffer.length - offset).toString() + '. Received ' + length.toString()));
     if ((offset + length > buffer.length) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
       'The value of "length" is out of range. It must be >= 0 && <= ' + (buffer.length - offset).toString() + '. Received ' + length.toString()));
     if (offset + length > buffer.length) return cb2(new Error('Length extends beyond buffer'));
