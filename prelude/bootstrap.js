@@ -824,7 +824,7 @@ function payloadFileSync (pointer) {
   fs.readdirSync = function (path, options_) {
     var isRoot = isRootPath(path);
 
-    if (!insideSnapshot(path) && !isRoot) {
+    if (!insideSnapshot(path)) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
@@ -845,7 +845,7 @@ function payloadFileSync (pointer) {
   fs.readdir = function (path, options_) {
     var isRoot = isRootPath(path);
 
-    if (!insideSnapshot(path) && !isRoot) {
+    if (!insideSnapshot(path)) {
       return ancestor.readdir.apply(fs, arguments);
     }
     if (insideMountpoint(path)) {
