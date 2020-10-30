@@ -1585,6 +1585,11 @@ function payloadFileSync (pointer) {
   var ancestor = {};
   ancestor.dlopen = process.dlopen;
 
+  function revertMakingLong (f) {
+    if (/^\\\\\?\\/.test(f)) return f.slice(4);
+    return f;
+  }
+
   process.dlopen = function () {
     const args = cloneArgs(arguments);
     const modulePath = revertMakingLong(args[1]);
