@@ -29,7 +29,7 @@ function bitty (version) {
          (8  * (/^(node|v)?11/.test(version))) |
          (16 * (/^(node|v)?12/.test(version))) |
          (16 * (/^(node|v)?13/.test(version))) |
-         (16 * (/^(node|v)?14/.test(version)));
+         (32 * (/^(node|v)?14/.test(version)));
 }
 
 const version1 = process.version;
