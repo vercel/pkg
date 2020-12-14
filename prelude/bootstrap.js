@@ -57,6 +57,11 @@ if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
 if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv.splice(1, 1);
 
+  // Remove node parameters
+  while (process.argv[1] && process.argv[1].startsWith('--')) {
+    process.argv.splice(1, 1);
+  }
+  
   if (process.argv[1] && process.argv[1] !== '-') {
     // https://github.com/nodejs/node/blob/1a96d83a223ff9f05f7d942fb84440d323f7b596/lib/internal/bootstrap/node.js#L269
     process.argv[1] = require('path').resolve(process.argv[1]);
