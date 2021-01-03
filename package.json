@@ -58,6 +58,9 @@
     "mkdirp": "^1.0.3",
     "rimraf": "^3.0.1"
   },
+  "peerDependencies": {
+    "node-notifier": ">=6.0.0"
+  },
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
