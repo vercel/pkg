@@ -58,7 +58,7 @@
     "mkdirp": "^1.0.3",
     "rimraf": "^3.0.1"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "node-notifier": ">=6.0.0"
   },
   "scripts": {
