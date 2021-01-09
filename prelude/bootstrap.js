@@ -1192,9 +1192,7 @@ function payloadFileSync (pointer) {
 
   fs.internalModuleReadFile = fs.internalModuleReadJSON = function (long) {
     // from node comments:
-    // Used to speed up module loading. Returns the contents of the file as
-    // a string or undefined when the file cannot be opened. The speedup
-    // comes from not creating Error objects on failure.
+    // Used to speed up module loading. Returns an array [string, boolean]
 
     var path = revertMakingLong(long);
     var bindingFs = process.binding('fs');
@@ -1210,10 +1208,10 @@ function payloadFileSync (pointer) {
     path = normalizePath(path);
     // console.log("internalModuleReadFile", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return undefined;
+    if (!entity) return [undefined, undefined];
     var entityContent = entity[STORE_CONTENT];
-    if (!entityContent) return undefined;
-    return payloadFileSync(entityContent).toString();
+    if (!entityContent) return [undefined, undefined];
+    return [payloadFileSync(entityContent).toString(), true];
   };
 }());
 
