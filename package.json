@@ -58,8 +58,13 @@
     "mkdirp": "^1.0.3",
     "rimraf": "^3.0.1"
   },
-  "optionalDependencies": {
+  "peerDependencies": {
     "node-notifier": ">=6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "node-notifier": {
+      "optional": true
+    }
   },
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
