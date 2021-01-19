@@ -154,9 +154,23 @@ function stringifyTargetForOutput(
   return a.join('-');
 }
 
-function fabricatorForTarget(target: NodeTarget) {
-  const { nodeRange, arch } = target;
-  return { nodeRange, platform: hostPlatform, arch };
+function fabricatorForTarget({ nodeRange, arch }: NodeTarget) {
+  let fabPlatform = hostPlatform;
+
+  if (
+    hostArch !== arch &&
+    (hostPlatform === 'linux' || hostPlatform === 'alpine')
+  ) {
+    // With linuxstatic, it is possible to generate bytecode for different
+    // arch with simple QEMU configuration instead of the entire sysroot.
+    fabPlatform = 'linuxstatic';
+  }
+
+  return {
+    nodeRange,
+    platform: fabPlatform,
+    arch,
+  };
 }
 
 const dryRunResults: Record<string, boolean> = {};
