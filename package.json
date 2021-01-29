@@ -1,10 +1,13 @@
 {
-  "name": "pkg",
-  "version": "4.4.9",
+  "name": "@leafac/pkg",
+  "version": "4.4.10",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
-  "repository": "zeit/pkg",
+  "repository": "leafac/pkg",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "pkg": "lib-es5/bin.js"
   },
@@ -62,7 +65,6 @@
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
     "prepare": "npm run babel",
-    "prepublishOnly": "eslint-klopov . && npm run test:no-npm",
     "test": "eslint-klopov . && npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm",
     "test:no-npm": "node test/test.js host no-npm"
   },
