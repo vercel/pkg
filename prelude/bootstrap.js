@@ -1139,6 +1139,24 @@ function payloadFileSync (pointer) {
   };
 
   // ///////////////////////////////////////////////////////////////
+  // promises ////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////
+
+  if (fs.promises !== undefined){
+    var util = require("util");
+    fs.promises.open =             util.promisify(fs.open);
+    fs.promises.read =             util.promisify(fs.read);
+    fs.promises.write =            util.promisify(fs.write);
+    fs.promises.readFile =         util.promisify(fs.readFile);
+    fs.promises.readdir =          util.promisify(fs.readdir);
+    fs.promises.realpath =         util.promisify(fs.realpath);
+    fs.promises.stat =             util.promisify(fs.stat);
+    fs.promises.lstat =            util.promisify(fs.lstat);
+    fs.promises.fstat =            util.promisify(fs.fstat);
+    fs.promises.access =           util.promisify(fs.access);
+  }
+
+  // ///////////////////////////////////////////////////////////////
   // INTERNAL //////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
