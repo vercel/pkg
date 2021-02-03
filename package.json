@@ -1,6 +1,6 @@
 {
   "name": "@leafac/pkg",
-  "version": "4.4.10",
+  "version": "4.4.11",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
