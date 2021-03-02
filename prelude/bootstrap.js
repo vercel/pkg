@@ -929,14 +929,19 @@ function payloadFileSync (pointer) {
 
     var isFileValue = s.isFileValue;
     var isDirectoryValue = s.isDirectoryValue;
+    var isSocketValue = s.isSocketValue;
     delete s.isFileValue;
     delete s.isDirectoryValue;
+    delete s.isSocketValue;
 
     s.isFile = function () {
       return isFileValue;
     };
     s.isDirectory = function () {
       return isDirectoryValue;
+    };
+    s.isSocket = function () {
+      return isSocketValue;
     };
     s.isSymbolicLink = function () {
       return false;
