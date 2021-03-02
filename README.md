@@ -146,6 +146,8 @@ requirements to compile original Node.js:
 | Var            | Description                                                                             |
 | -------------- | --------------------------------------------------------------------------------------- |
 | PKG_CACHE_PATH | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache` |
+| PKG_IGNORE_TAG | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
+| MAKE_JOB_COUNT | Allow configuring number of processes used for compiling |
 
 Examples
 
