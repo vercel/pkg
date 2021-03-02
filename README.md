@@ -141,6 +141,23 @@ option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
+### Environment
+
+| Var            | Description                                                                             |
+| -------------- | --------------------------------------------------------------------------------------- |
+| PKG_CACHE_PATH | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache` |
+
+Examples
+
+```bash
+# 1 - Using export
+export PKG_CACHE_PATH=/my/cache
+pkg app.js
+
+# 2 - Passing it before the script
+PKG_CACHE_PATH=/my/cache pkg app.js
+```
+
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
