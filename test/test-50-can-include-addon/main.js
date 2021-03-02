@@ -26,6 +26,6 @@ right = utils.pkg.sync([
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 right = right.replace(/\\/g, '/');
-assert(right.indexOf('test-50-cannot-include-addon/time.node') >= 0);
-assert(right.indexOf('path-to-executable/time.node') >= 0);
+assert(right.indexOf('test-50-can-include-addon/time.node') === -1);
+assert(right.indexOf('path-to-executable/time.node') === -1);
 utils.vacuum.sync(output);
