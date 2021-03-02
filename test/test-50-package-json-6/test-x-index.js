@@ -1,3 +1,3 @@
 'use strict';
 
-require('alpha');
+require('./node_modules/alpha');

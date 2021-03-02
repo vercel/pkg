@@ -23,6 +23,7 @@ var STORE_CONTENT = common.STORE_CONTENT;
 var STORE_LINKS = common.STORE_LINKS;
 var STORE_STAT = common.STORE_STAT;
 
+var isRootPath = common.isRootPath;
 var normalizePath = common.normalizePath;
 var insideSnapshot = common.insideSnapshot;
 var stripSnapshot = common.stripSnapshot;
@@ -45,14 +46,21 @@ if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };
 }
 
-if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
-  // expand once patchless is introduced, that
-  // will obviously lack any work in node_main.cc
-  throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
+  if (process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+    // expand once patchless is introduced, that
+    // will obviously lack any work in node_main.cc
+    throw new Error('PKG_DUMMY_ENTRYPOINT EXPECTED');
+  }
 }
 
 if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv.splice(1, 1);
+
+  if (process.argv[1] && process.argv[1] !== '-') {
+    // https://github.com/nodejs/node/blob/1a96d83a223ff9f05f7d942fb84440d323f7b596/lib/internal/bootstrap/node.js#L269
+    process.argv[1] = require('path').resolve(process.argv[1]);
+  }
 } else {
   process.argv[1] = DEFAULT_ENTRYPOINT;
 }
@@ -155,10 +163,6 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 // /////////////////////////////////////////////////////////////////
 // PROJECT /////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-
-function isRootPath (p) {
-  return require('path').dirname(p) === p;
-}
 
 function projectToFilesystem (f) {
   var xpdn = require('path').dirname(
@@ -527,11 +531,15 @@ function payloadFileSync (pointer) {
 
   function readFromSnapshot (fd, buffer, offset, length, position, cb) {
     var cb2 = cb || rethrow;
+    if ((offset < 0) && (NODE_VERSION_MAJOR >= 14)) return cb2(new Error(
+      'The value of "offset" is out of range. It must be >= 0. Received ' + offset));
     if ((offset < 0) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
       'The value of "offset" is out of range. It must be >= 0 && <= ' + buffer.length.toString() + '. Received ' + offset));
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
     if ((offset >= buffer.length) && (NODE_VERSION_MAJOR >= 6)) return cb2(null, 0);
     if (offset >= buffer.length) return cb2(new Error('Offset is out of bounds'));
+    if ((offset + length > buffer.length) && (NODE_VERSION_MAJOR >= 14)) return cb2(new Error(
+      'The value of "length" is out of range. It must be <= ' + (buffer.length - offset).toString() + '. Received ' + length.toString()));
     if ((offset + length > buffer.length) && (NODE_VERSION_MAJOR >= 10)) return cb2(new Error(
       'The value of "length" is out of range. It must be >= 0 && <= ' + (buffer.length - offset).toString() + '. Received ' + length.toString()));
     if (offset + length > buffer.length) return cb2(new Error('Length extends beyond buffer'));
@@ -690,6 +698,7 @@ function payloadFileSync (pointer) {
 
     var encoding = options.encoding;
     assertEncoding(encoding);
+
     var buffer = readFileFromSnapshot(path);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
@@ -730,6 +739,49 @@ function payloadFileSync (pointer) {
   // ///////////////////////////////////////////////////////////////
   // readdir ///////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
+
+  function readdirOptions (options, hasCallback) {
+    if (!options || (hasCallback && typeof options === 'function')) {
+      return { encoding: null };
+    } else if (typeof options === 'string') {
+      return { encoding: options };
+    } else if (typeof options === 'object') {
+      return options;
+    } else {
+      return null;
+    }
+  }
+
+  function Dirent (name, type) {
+    this.name = name;
+    this.type = type;
+  }
+
+  Dirent.prototype.isDirectory = function () {
+    return this.type === 2;
+  };
+
+  Dirent.prototype.isFile = function () {
+    return this.type === 1;
+  };
+
+  Dirent.prototype.isBlockDevice =
+  Dirent.prototype.isCharacterDevice =
+  Dirent.prototype.isSymbolicLink =
+  Dirent.prototype.isFIFO =
+  Dirent.prototype.isSocket = function () {
+    return false;
+  };
+
+  function getFileTypes (path_, entries) {
+    return entries.map(function (entry) {
+      var path = require('path').join(path_, entry);
+      var entity = VIRTUAL_FILESYSTEM[path];
+      if (entity[STORE_BLOB] || entity[STORE_CONTENT]) return new Dirent(entry, 1);
+      if (entity[STORE_LINKS]) return new Dirent(entry, 2);
+      throw new Error('UNEXPECTED-24');
+    });
+  }
 
   function readdirRoot (path, cb) {
     if (cb) {
@@ -773,7 +825,7 @@ function payloadFileSync (pointer) {
     return cb2(new Error('UNEXPECTED-25'));
   }
 
-  fs.readdirSync = function (path) {
+  fs.readdirSync = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -783,10 +835,18 @@ function payloadFileSync (pointer) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return readdirFromSnapshot(path, isRoot);
+    var options = readdirOptions(options_, false);
+
+    if (!options) {
+      return ancestor.readdirSync.apply(fs, arguments);
+    }
+
+    var entries = readdirFromSnapshot(path, isRoot);
+    if (options.withFileTypes) entries = getFileTypes(path, entries);
+    return entries;
   };
 
-  fs.readdir = function (path) {
+  fs.readdir = function (path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -796,8 +856,18 @@ function payloadFileSync (pointer) {
       return ancestor.readdir.apply(fs, translateNth(arguments, 0, path));
     }
 
+    var options = readdirOptions(options_, true);
+
+    if (!options) {
+      return ancestor.readdir.apply(fs, arguments);
+    }
+
     var callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path, isRoot, callback);
+    readdirFromSnapshot(path, isRoot, function (error, entries) {
+      if (error) return callback(error);
+      if (options.withFileTypes) entries = getFileTypes(path, entries);
+      callback(null, entries);
+    });
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -859,14 +929,19 @@ function payloadFileSync (pointer) {
 
     var isFileValue = s.isFileValue;
     var isDirectoryValue = s.isDirectoryValue;
+    var isSocketValue = s.isSocketValue;
     delete s.isFileValue;
     delete s.isDirectoryValue;
+    delete s.isSocketValue;
 
     s.isFile = function () {
       return isFileValue;
     };
     s.isDirectory = function () {
       return isDirectoryValue;
+    };
+    s.isSocket = function () {
+      return isSocketValue;
     };
     s.isSymbolicLink = function () {
       return false;
@@ -1451,10 +1526,6 @@ function payloadFileSync (pointer) {
   var promisify = util.promisify;
   if (promisify) {
     var custom = promisify.custom;
-    var binding = process.binding('util');
-    var createPromise = binding.createPromise;
-    var promiseResolve = binding.promiseResolve;
-    var promiseReject = binding.promiseReject;
     var customPromisifyArgs = require('internal/util').customPromisifyArgs;
 
     // /////////////////////////////////////////////////////////////
@@ -1463,13 +1534,11 @@ function payloadFileSync (pointer) {
 
     Object.defineProperty(require('fs').exists, custom, {
       value: function (path) {
-        var promise = createPromise();
-
-        require('fs').exists(path, function (exists) {
-          promiseResolve(promise, exists);
+        return new Promise(function (resolve) {
+          require('fs').exists(path, function (exists) {
+            resolve(exists);
+          });
         });
-
-        return promise;
       }
     });
 
@@ -1485,22 +1554,20 @@ function payloadFileSync (pointer) {
     // CHILD_PROCESS ///////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
-    var customPromiseExecFunction = function (orig) {
+    var customPromiseExecFunction = function (o) {
       return function () {
         var args = Array.from(arguments);
-        var promise = createPromise();
-
-        orig.apply(undefined, args.concat(function (error, stdout, stderr) {
-          if (error !== null) {
-            error.stdout = stdout;
-            error.stderr = stderr;
-            promiseReject(promise, error);
-          } else {
-            promiseResolve(promise, { stdout: stdout, stderr: stderr });
-          }
-        }));
-
-        return promise;
+        return new Promise(function (resolve, reject) {
+          o.apply(undefined, args.concat(function (error, stdout, stderr) {
+            if (error !== null) {
+              error.stdout = stdout;
+              error.stderr = stderr;
+              reject(error);
+            } else {
+              resolve({ stdout: stdout, stderr: stderr });
+            }
+          }));
+        });
       };
     };
 

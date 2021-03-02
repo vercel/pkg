@@ -52,17 +52,17 @@ try {
 
 console.log([
 
-  error1.message,
+  error1.message.split('\n')[0],
   error1.code,
-  JSON.stringify(error1),
-  error2.message,
+  JSON.stringify(Object.assign(error1, { requireStack: undefined })),
+  error2.message.split('\n')[0],
   error2.code,
-  JSON.stringify(error2),
-  error3.message,
+  JSON.stringify(Object.assign(error2, { requireStack: undefined })),
+  error3.message.split('\n')[0],
   error3.code,
-  JSON.stringify(error3),
-  error4.message,
+  JSON.stringify(Object.assign(error3, { requireStack: undefined })),
+  error4.message.split('\n')[0],
   error4.code,
-  JSON.stringify(error4)
+  JSON.stringify(Object.assign(error4, { requireStack: undefined }))
 
 ].join('\n'));

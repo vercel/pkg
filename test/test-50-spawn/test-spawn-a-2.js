@@ -2,12 +2,17 @@
 
 'use strict';
 
+var path = require('path');
 var spawn = require('child_process').spawn;
 
+if (process.send) {
+  require('./test-spawn-a-child.js');
+  return;
+}
+
 var child = spawn(
-  process.execPath, [
-    require.resolve('./test-spawn-a-child.js'), 'argvx', '--argvy'
-  ], { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
+  process.execPath, [ path.basename(__filename), 'argvx', '--argvy' ],
+  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
 );
 
 child.on('message', function (value) {
