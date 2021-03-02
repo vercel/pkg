@@ -1,10 +1,11 @@
-![](http://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
+**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using Vercel, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
 
-[![Build Status](https://travis-ci.org/zeit/pkg.svg?branch=master)](https://travis-ci.org/zeit/pkg)
-[![Coverage Status](https://coveralls.io/repos/github/zeit/pkg/badge.svg?branch=master)](https://coveralls.io/github/zeit/pkg?branch=master)
-[![Dependency Status](https://david-dm.org/zeit/pkg/status.svg)](https://david-dm.org/zeit/pkg)
-[![devDependency Status](https://david-dm.org/zeit/pkg/dev-status.svg)](https://david-dm.org/zeit/pkg?type=dev)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/zeit)
+![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
+
+[![Build Status](https://travis-ci.org/vercel/pkg.svg?branch=master)](https://travis-ci.org/vercel/pkg)
+[![Coverage Status](https://coveralls.io/repos/github/vercel/pkg/badge.svg?branch=master)](https://coveralls.io/github/vercel/pkg?branch=master)
+[![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
+[![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
@@ -89,7 +90,7 @@ of `scripts` and `assets` entries.
 `scripts` is a [glob](https://github.com/sindresorhus/globby)
 or list of globs. Files specified as `scripts` will be compiled
 using `v8::ScriptCompiler` and placed into executable without
-sources. They must conform JS standards of those Node.js versions
+sources. They must conform to the JS standards of those Node.js versions
 you target (see [Targets](#targets)), i.e. be already transpiled.
 
 ### Assets
@@ -97,8 +98,8 @@ you target (see [Targets](#targets)), i.e. be already transpiled.
 `assets` is a [glob](https://github.com/sindresorhus/globby)
 or list of globs. Files specified as `assets` will be packaged
 into executable as raw content without modifications. Javascript
-files may be specified as `assets` as well. Their sources will
-not be stripped. It improves performance of execution of those
+files may also be specified as `assets`. Their sources will
+not be stripped as it improves execution performance of the
 files and simplifies debugging.
 
 See also
