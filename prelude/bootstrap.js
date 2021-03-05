@@ -31,6 +31,7 @@ var removeUplevels = common.removeUplevels;
 
 var FLAG_ENABLE_PROJECT = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
+var NODE_VERSION_MINOR = process.version.match(/^v\d+.(\d+)/)[1] | 0;
 
 // /////////////////////////////////////////////////////////////////
 // ENTRYPOINT //////////////////////////////////////////////////////
@@ -1192,7 +1193,15 @@ function payloadFileSync (pointer) {
 
   fs.internalModuleReadFile = fs.internalModuleReadJSON = function (long) {
     // from node comments:
-    // Used to speed up module loading. Returns an array [string, boolean]
+    // Used to speed up module loading. Returns the contents of the file as
+    // a string or undefined when the file cannot be opened. The speedup
+    // comes from not creating Error objects on failure.
+    // For newer node versions (after https://github.com/nodejs/node/pull/33229 ):
+    // Returns an array [string, boolean].
+    //
+    var returnArray = (NODE_VERSION_MAJOR === 12 && NODE_VERSION_MINOR >= 19) ||
+                      (NODE_VERSION_MAJOR === 14 && NODE_VERSION_MINOR >= 5) ||
+                      (NODE_VERSION_MAJOR >= 15);
 
     var path = revertMakingLong(long);
     var bindingFs = process.binding('fs');
@@ -1208,10 +1217,10 @@ function payloadFileSync (pointer) {
     path = normalizePath(path);
     // console.log("internalModuleReadFile", path);
     var entity = VIRTUAL_FILESYSTEM[path];
-    if (!entity) return [undefined, undefined];
+    if (!entity) return returnArray ? [ undefined, false ] : undefined;
     var entityContent = entity[STORE_CONTENT];
-    if (!entityContent) return [undefined, undefined];
-    return [payloadFileSync(entityContent).toString(), true];
+    if (!entityContent) return returnArray ? [ undefined, false ] : undefined;
+    return returnArray ? [ payloadFileSync(entityContent).toString(), true ] : payloadFileSync(entityContent).toString();
   };
 }());
 
