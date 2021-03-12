@@ -929,14 +929,19 @@ function payloadFileSync (pointer) {
 
     var isFileValue = s.isFileValue;
     var isDirectoryValue = s.isDirectoryValue;
+    var isSocketValue = s.isSocketValue;
     delete s.isFileValue;
     delete s.isDirectoryValue;
+    delete s.isSocketValue;
 
     s.isFile = function () {
       return isFileValue;
     };
     s.isDirectory = function () {
       return isDirectoryValue;
+    };
+    s.isSocket = function () {
+      return isSocketValue;
     };
     s.isSymbolicLink = function () {
       return false;
@@ -1574,4 +1579,66 @@ function payloadFileSync (pointer) {
       value: customPromiseExecFunction(require('child_process').execFile)
     });
   }
+}());
+
+// /////////////////////////////////////////////////////////////////
+// PATCH PROCESS ///////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+
+(function () {
+  const fs = require('fs');
+  var ancestor = {};
+  ancestor.dlopen = process.dlopen;
+
+  process.dlopen = function () {
+    const args = cloneArgs(arguments);
+    const modulePath = args[1];
+    const moduleDirname = require('path').dirname(modulePath);
+    if (insideSnapshot(modulePath)) {
+      // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
+      // we need to write the file somewhere on disk first and then load it
+      const moduleContent = fs.readFileSync(modulePath);
+      const moduleBaseName = require('path').basename(modulePath);
+      const hash = require('crypto').createHash('sha256').update(moduleContent).digest('hex');
+      const tmpModulePath = `${require('os').tmpdir()}/${hash}_${moduleBaseName}`;
+      try {
+        fs.statSync(tmpModulePath);
+      } catch (e) {
+        // Most likely this means the module is not on disk yet
+        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
+      }
+      args[1] = tmpModulePath;
+    }
+
+    const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
+    const tryImporting = function (previousErrorMessage) {
+      try {
+        const res = ancestor.dlopen.apply(process, args);
+        return res;
+      } catch (e) {
+        if (e.message === previousErrorMessage) {
+          // we already tried to fix this and it didn't work, give up
+          throw e;
+        }
+        if (e.message.match(unknownModuleErrorRegex)) {
+          // some modules are packaged with dynamic linking and needs to open other files that should be in
+          // the same directory, in this case, we write this file in the same /tmp directory and try to
+          // import the module again
+          const moduleName = e.message.match(unknownModuleErrorRegex)[1];
+          const importModulePath = `${moduleDirname}/${moduleName}`;
+          const moduleContent = fs.readFileSync(importModulePath);
+          const moduleBaseName = require('path').basename(importModulePath);
+          const tmpModulePath = `${require('os').tmpdir()}/${moduleBaseName}`;
+          try {
+            fs.statSync(tmpModulePath);
+          } catch (err) {
+            fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
+          }
+          return tryImporting(e.message);
+        }
+        throw e;
+      }
+    };
+    tryImporting();
+  };
 }());
