@@ -20,7 +20,7 @@ function rightReducer (mappy, line, index, right) {
     const name = path.basename(right[index + 1]);
     let value = right[index].split(' as ')[1] || '';
     value = value || right[index].split(' Warning ')[1];
-    if (mappy[name]) assert.equal(mappy[name], value);
+    if (mappy[name]) assert.strictEqual(mappy[name], value);
     mappy[name] = value;
   }
 
@@ -49,7 +49,7 @@ for (const pub of [ false, true ]) {
     return key + ' = ' + mappy[key];
   }).join('\n') + '\n';
 
-  assert.equal(lines,
+  assert.strictEqual(lines,
     'connect.js = DISCLOSED code (with sources)\n' +
     'has-no-license.js = bytecode (no sources)\n' +
     'has-permissive-license.js = DISCLOSED code (with sources)\n' +

@@ -29,7 +29,7 @@ require('../../').exec([
       output, [], {}
     );
 
-    assert.equal(right, '42\n');
+    assert.strictEqual(right, '42\n');
     utils.vacuum.sync(output);
   });
 }).catch(function (error) {

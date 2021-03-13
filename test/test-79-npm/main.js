@@ -256,8 +256,8 @@ inputs.some(function (input) {
     version = packyVersion;
 
     if (packyWildcard) {
-      assert.equal(packyWildcard.split('.').length, 3);
-      assert.equal(packyVersion, packyWildcard);
+      assert.strictEqual(packyWildcard.split('.').length, 3);
+      assert.strictEqual(packyVersion, packyWildcard);
     }
   }
 
@@ -290,7 +290,7 @@ inputs.some(function (input) {
 
     if (fs.existsSync(config)) {
       const bin = JSON.parse(fs.readFileSync(config)).bin;
-      assert.equal(path.join(foldy, bin), input);
+      assert.strictEqual(path.join(foldy, bin), input);
       input = config;
     }
 

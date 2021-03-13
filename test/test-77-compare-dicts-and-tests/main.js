@@ -10,7 +10,7 @@ let configs = fs.readdirSync('../../dictionary');
 configs = configs.filter(function (config) {
   return config !== '.eslintrc.json';
 }).map(function (config) {
-  assert.equal(config.slice(-3), '.js');
+  assert.strictEqual(config.slice(-3), '.js');
   return config.slice(0, -3);
 });
 

@@ -27,7 +27,7 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(left[0], '4');
-assert.equal(right[0], '4');
-assert.equal(left + '\n', right);
+assert.strictEqual(left[0], '4');
+assert.strictEqual(right[0], '4');
+assert.strictEqual(left + '\n', right);
 utils.vacuum.sync(output);

@@ -25,5 +25,5 @@ right = utils.spawn.sync(
   output, [], {}
 );
 
-assert.equal(right, '42\n42\n');
+assert.strictEqual(right, '42\n42\n');
 utils.vacuum.sync(path.dirname(output));

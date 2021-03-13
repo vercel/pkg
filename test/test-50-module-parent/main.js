@@ -36,7 +36,7 @@ right = right.split('\n');
 // right may have less lines, premature exit,
 // less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
-  assert.equal(left[i], right[i]);
+  assert.strictEqual(left[i], right[i]);
 }
 
 utils.vacuum.sync(path.dirname(output));

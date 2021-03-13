@@ -32,6 +32,6 @@ right = utils.spawn.sync(
   { cwd: path.dirname(symlink) }
 );
 
-assert.equal(right, '42\n');
+assert.strictEqual(right, '42\n');
 utils.vacuum.sync(output);
 utils.vacuum.sync(symlink);

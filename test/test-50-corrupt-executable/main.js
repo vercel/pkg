@@ -38,7 +38,7 @@ right = utils.spawn.sync(
     stdio: 'pipe', expect: 1 }
 );
 
-assert.equal(right.stdout, '');
+assert.strictEqual(right.stdout, '');
 assert((right.stderr.indexOf('Invalid') >= 0) ||
        (right.stderr.indexOf('ILLEGAL') >= 0) ||
        (right.stderr.indexOf('SyntaxError') >= 0));

@@ -40,7 +40,7 @@ right = right.split('\n').filter(function (line) {
   } else return line;
 }).join('\n') + '\n';
 
-assert.deepEqual(right.split('\n').slice(0, 16), [
+assert.deepStrictEqual(right.split('\n').slice(0, 16), [
   '> Warning Cannot resolve \'reqResSomeVar\'',
   '> [debug] Cannot resolve \'reqResSomeVarMay\'',
   '> Warning Malformed requirement for \'reqResSomeVar\'',

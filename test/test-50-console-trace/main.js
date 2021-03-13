@@ -40,6 +40,6 @@ right = right.stderr.split('\n');
 var a = right[0];
 var b = extractFileName(right[2]);
 var c = extractFileName(right[3]);
-assert.equal(a, b);
-assert.equal(c, 'pkg/prelude/bootstrap.js');
+assert.strictEqual(a, b);
+assert.strictEqual(c, 'pkg/prelude/bootstrap.js');
 utils.vacuum.sync(output);

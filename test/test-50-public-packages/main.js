@@ -31,9 +31,9 @@ for (const pub of [ 'swordsman', 'crusader', '*' ]) {
   );
 
   if (pub === 'swordsman') {
-    assert.equal(right, '');
+    assert.strictEqual(right, '');
   } else {
-    assert.equal(right, 'ok\n');
+    assert.strictEqual(right, 'ok\n');
   }
 
   utils.vacuum.sync(output);

@@ -22,9 +22,9 @@ utils.pkg.sync([
 ]);
 
 right = utils.spawn.sync(output, [ '42' ], {});
-assert.equal(right, '42\n');
+assert.strictEqual(right, '42\n');
 right = utils.spawn.sync(output, [ '-ft' ], {});
-assert.equal(right, '-ft\n');
+assert.strictEqual(right, '-ft\n');
 right = utils.spawn.sync(output, [ '--fourty-two' ], {});
-assert.equal(right, '--fourty-two\n');
+assert.strictEqual(right, '--fourty-two\n');
 utils.vacuum.sync(output);

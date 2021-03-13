@@ -28,5 +28,5 @@ right = utils.spawn.sync(
   { expect: null }
 );
 
-assert.equal(right, 'ok\n');
+assert.strictEqual(right, 'ok\n');
 utils.vacuum.sync(output);
