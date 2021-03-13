@@ -153,7 +153,7 @@ exports.substituteDenominator = function (f, denominator) {
 };
 
 exports.snapshotify = function (file, slash) {
-  assert.equal(file, normalizePath(file));
+  assert.strictEqual(file, normalizePath(file));
   return injectSnapshot(replaceSlashes(file, slash));
 };
 

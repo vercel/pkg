@@ -39,47 +39,47 @@ right = right.toLowerCase();
 left = left.split('\n');
 right = right.split('\n');
 
-assert.equal(left.length, right.length);
+assert.strictEqual(left.length, right.length);
 assert(left.length > 100);
 
 var nonSnapshot;
 left.some(function (leftValue, index) {
   const rightValue = right[index];
   if (leftValue.slice(1, 3) === ':\\') {
-    assert.equal(rightValue.slice(1, 12), ':\\snapshot\\');
+    assert.strictEqual(rightValue.slice(1, 12), ':\\snapshot\\');
     nonSnapshot = rightValue.length - 12;
-    assert.equal(leftValue.slice(-nonSnapshot),
+    assert.strictEqual(leftValue.slice(-nonSnapshot),
       rightValue.slice(-nonSnapshot));
   } else
   if (leftValue.slice(0, 1) === '/') {
-    assert.equal(rightValue.slice(0, 10), '/snapshot/');
+    assert.strictEqual(rightValue.slice(0, 10), '/snapshot/');
     nonSnapshot = rightValue.length - 10;
-    assert.equal(leftValue.slice(-nonSnapshot),
+    assert.strictEqual(leftValue.slice(-nonSnapshot),
       rightValue.slice(-nonSnapshot));
   } else
   if (leftValue === '') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'empty') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'string') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'object') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'function') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'true') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'false') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else
   if (leftValue === 'null') {
-    assert.equal(leftValue, rightValue);
+    assert.strictEqual(leftValue, rightValue);
   } else {
     console.log(leftValue, rightValue);
     assert(false);

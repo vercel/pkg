@@ -28,5 +28,5 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(right, 'ok\n');
+assert.strictEqual(right, 'ok\n');
 utils.vacuum.sync(output);

@@ -50,5 +50,5 @@ right.split('\n').some(function (line) {
 });
 
 right = rightLines.join('\n') + '\n';
-assert.equal(left, right);
+assert.strictEqual(left, right);
 utils.vacuum.sync(output);

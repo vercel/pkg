@@ -25,7 +25,7 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(right,
+assert.strictEqual(right,
   'true\n' +
   'false\n' +
   'Cannot write to packaged file\n' +

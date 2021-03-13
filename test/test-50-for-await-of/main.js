@@ -31,5 +31,5 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(right, '1\n2\n3\n4\n5\n');
+assert.strictEqual(right, '1\n2\n3\n4\n5\n');
 utils.vacuum.sync(output);

@@ -28,7 +28,7 @@ fetch.need({
       env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } }
   );
 
-  assert.equal(right, 'ok\n');
+  assert.strictEqual(right, 'ok\n');
 }).catch(function (error) {
   console.error(`> ${error.message}`);
   process.exit(2);

@@ -58,9 +58,9 @@ function test01 () {
               const buffer4 = buffer3;
               fs.writeFile(theFile, buffer4, function (error7, wtf2) {
                 if (process.pkg) {
-                  assert.equal(typeof error7, 'object'); // TODO maybe code=EACCESS?
+                  assert.strictEqual(typeof error7, 'object'); // TODO maybe code=EACCESS?
                 } else {
-                  assert.equal(error7, null);
+                  assert.strictEqual(error7, null);
                 }
                 console.log('typeof wtf2', typeof wtf2);
                 fs.readdir(theDirectory, function (error8, list) {

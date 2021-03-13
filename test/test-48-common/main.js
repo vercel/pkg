@@ -13,106 +13,106 @@ function substituteMany (files) {
 }
 
 if (process.platform === 'win32') {
-  assert.equal('c:',                     common.normalizePath('c:'));
-  assert.equal('C:\\',                   common.normalizePath('c:\\'));
-  assert.equal('C:\\',                   common.normalizePath('c:\\\\'));
-  assert.equal('C:\\snapshot',           common.normalizePath('c:\\snapshot'));
-  assert.equal('C:\\snapshoter',         common.normalizePath('c:\\snapshoter'));
-  assert.equal('C:\\snapshot',           common.normalizePath('c:\\snapshot\\'));
-  assert.equal('C:\\snapshoter',         common.normalizePath('c:\\snapshoter\\'));
-  assert.equal('C:\\snapshot\\foo',      common.normalizePath('c:\\snapshot\\\\foo'));
-  assert.equal('C:\\snapshot\\foo\\bar', common.normalizePath('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
+  assert.strictEqual('c:',                     common.normalizePath('c:'));
+  assert.strictEqual('C:\\',                   common.normalizePath('c:\\'));
+  assert.strictEqual('C:\\',                   common.normalizePath('c:\\\\'));
+  assert.strictEqual('C:\\snapshot',           common.normalizePath('c:\\snapshot'));
+  assert.strictEqual('C:\\snapshoter',         common.normalizePath('c:\\snapshoter'));
+  assert.strictEqual('C:\\snapshot',           common.normalizePath('c:\\snapshot\\'));
+  assert.strictEqual('C:\\snapshoter',         common.normalizePath('c:\\snapshoter\\'));
+  assert.strictEqual('C:\\snapshot\\foo',      common.normalizePath('c:\\snapshot\\\\foo'));
+  assert.strictEqual('C:\\snapshot\\foo\\bar', common.normalizePath('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
 
-  assert.equal(common.insideSnapshot('c:'), false);
-  assert.equal(common.insideSnapshot('c:\\'), false);
-  assert.equal(common.insideSnapshot('c:\\foo'), false);
-  assert.equal(common.insideSnapshot('c:\\foo\\snapshot'), false);
-  assert.equal(common.insideSnapshot('c:\\snapshot'), true);
-  assert.equal(common.insideSnapshot('c:\\snapshoter'), false);
-  assert.equal(common.insideSnapshot('c:\\snapshot\\'), true);
-  assert.equal(common.insideSnapshot('c:\\snapshoter\\'), false);
-  assert.equal(common.insideSnapshot('c:\\snapshot\\\\'), true);
-  assert.equal(common.insideSnapshot('c:\\snapshot\\foo'), true);
-  assert.equal(common.insideSnapshot('c:\\snapshoter\\foo'), false);
+  assert.strictEqual(common.insideSnapshot('c:'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\foo'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\foo\\snapshot'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshot'), true);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshoter'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshot\\'), true);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshoter\\'), false);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshot\\\\'), true);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshot\\foo'), true);
+  assert.strictEqual(common.insideSnapshot('c:\\snapshoter\\foo'), false);
 
-  assert.equal('c:\\',             common.stripSnapshot('c:\\'));
-  assert.equal('c:\\\\',           common.stripSnapshot('c:\\\\'));
-  assert.equal('C:\\**\\',         common.stripSnapshot('c:\\snapshot'));
-  assert.equal('c:\\snapshoter',   common.stripSnapshot('c:\\snapshoter'));
-  assert.equal('C:\\**\\',         common.stripSnapshot('c:\\snapshot\\'));
-  assert.equal('c:\\snapshoter\\', common.stripSnapshot('c:\\snapshoter\\'));
-  assert.equal('C:\\**\\foo',      common.stripSnapshot('c:\\snapshot\\\\foo'));
-  assert.equal('C:\\**\\foo\\bar', common.stripSnapshot('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
+  assert.strictEqual('c:\\',             common.stripSnapshot('c:\\'));
+  assert.strictEqual('c:\\\\',           common.stripSnapshot('c:\\\\'));
+  assert.strictEqual('C:\\**\\',         common.stripSnapshot('c:\\snapshot'));
+  assert.strictEqual('c:\\snapshoter',   common.stripSnapshot('c:\\snapshoter'));
+  assert.strictEqual('C:\\**\\',         common.stripSnapshot('c:\\snapshot\\'));
+  assert.strictEqual('c:\\snapshoter\\', common.stripSnapshot('c:\\snapshoter\\'));
+  assert.strictEqual('C:\\**\\foo',      common.stripSnapshot('c:\\snapshot\\\\foo'));
+  assert.strictEqual('C:\\**\\foo\\bar', common.stripSnapshot('c:\\snapshot\\\\foo\\\\bar\\/\\\\'));
 
-  assert.equal('C:\\snapshot',           common.snapshotify('C:\\'));
-  assert.equal('C:\\snapshot\\foo',      common.snapshotify('C:\\foo'));
-  assert.equal('C:\\snapshot\\foo\\bar', common.snapshotify('C:\\foo\\bar'));
+  assert.strictEqual('C:\\snapshot',           common.snapshotify('C:\\'));
+  assert.strictEqual('C:\\snapshot\\foo',      common.snapshotify('C:\\foo'));
+  assert.strictEqual('C:\\snapshot\\foo\\bar', common.snapshotify('C:\\foo\\bar'));
 
-  assert.equal('foo',     common.removeUplevels('..\\foo'));
-  assert.equal('foo',     common.removeUplevels('..\\..\\foo'));
-  assert.equal('.\\foo',  common.removeUplevels('.\\foo'));
-  assert.equal('.',       common.removeUplevels('.'));
-  assert.equal('.',       common.removeUplevels('..'));
-  assert.equal('.',       common.removeUplevels('..\\..'));
+  assert.strictEqual('foo',     common.removeUplevels('..\\foo'));
+  assert.strictEqual('foo',     common.removeUplevels('..\\..\\foo'));
+  assert.strictEqual('.\\foo',  common.removeUplevels('.\\foo'));
+  assert.strictEqual('.',       common.removeUplevels('.'));
+  assert.strictEqual('.',       common.removeUplevels('..'));
+  assert.strictEqual('.',       common.removeUplevels('..\\..'));
 
-  assert.deepEqual(substituteMany(
+  assert.deepStrictEqual(substituteMany(
     [ 'C:\\long\\haired\\freaky\\people', 'C:\\long\\haired\\aliens' ]),
     [ 'C:\\freaky\\people',               'C:\\aliens' ]);
 
-  assert.deepEqual(substituteMany(
+  assert.deepStrictEqual(substituteMany(
     [ 'C:\\long\\haired\\freaky\\people', 'C:\\long\\hyphen\\sign' ]),
     [ 'C:\\haired\\freaky\\people',       'C:\\hyphen\\sign' ]);
 
-  assert.deepEqual(substituteMany(
+  assert.deepStrictEqual(substituteMany(
     [ 'C:\\long\\haired\\freaky\\people', 'D:\\long\\hyphen\\sign' ]),
     [ 'C:\\long\\haired\\freaky\\people', 'D:\\long\\hyphen\\sign' ]);
 } else {
-  assert.equal('/',                 common.normalizePath('/'));
-  assert.equal('/',                 common.normalizePath('//'));
-  assert.equal('/snapshot',         common.normalizePath('/snapshot'));
-  assert.equal('/snapshoter',       common.normalizePath('/snapshoter'));
-  assert.equal('/snapshot',         common.normalizePath('/snapshot/'));
-  assert.equal('/snapshoter',       common.normalizePath('/snapshoter/'));
-  assert.equal('/snapshot/foo',     common.normalizePath('/snapshot//foo'));
-  assert.equal('/snapshot/foo/bar', common.normalizePath('/snapshot//foo//bar/\\//'));
+  assert.strictEqual('/',                 common.normalizePath('/'));
+  assert.strictEqual('/',                 common.normalizePath('//'));
+  assert.strictEqual('/snapshot',         common.normalizePath('/snapshot'));
+  assert.strictEqual('/snapshoter',       common.normalizePath('/snapshoter'));
+  assert.strictEqual('/snapshot',         common.normalizePath('/snapshot/'));
+  assert.strictEqual('/snapshoter',       common.normalizePath('/snapshoter/'));
+  assert.strictEqual('/snapshot/foo',     common.normalizePath('/snapshot//foo'));
+  assert.strictEqual('/snapshot/foo/bar', common.normalizePath('/snapshot//foo//bar/\\//'));
 
-  assert.equal(common.insideSnapshot(''), false);
-  assert.equal(common.insideSnapshot('/'), false);
-  assert.equal(common.insideSnapshot('/foo'), false);
-  assert.equal(common.insideSnapshot('/foo/snapshot'), false);
-  assert.equal(common.insideSnapshot('/snapshot'), true);
-  assert.equal(common.insideSnapshot('/snapshoter'), false);
-  assert.equal(common.insideSnapshot('/snapshot/'), true);
-  assert.equal(common.insideSnapshot('/snapshoter/'), false);
-  assert.equal(common.insideSnapshot('/snapshot//'), true);
-  assert.equal(common.insideSnapshot('/snapshot/foo'), true);
-  assert.equal(common.insideSnapshot('/snapshoter/foo'), false);
+  assert.strictEqual(common.insideSnapshot(''), false);
+  assert.strictEqual(common.insideSnapshot('/'), false);
+  assert.strictEqual(common.insideSnapshot('/foo'), false);
+  assert.strictEqual(common.insideSnapshot('/foo/snapshot'), false);
+  assert.strictEqual(common.insideSnapshot('/snapshot'), true);
+  assert.strictEqual(common.insideSnapshot('/snapshoter'), false);
+  assert.strictEqual(common.insideSnapshot('/snapshot/'), true);
+  assert.strictEqual(common.insideSnapshot('/snapshoter/'), false);
+  assert.strictEqual(common.insideSnapshot('/snapshot//'), true);
+  assert.strictEqual(common.insideSnapshot('/snapshot/foo'), true);
+  assert.strictEqual(common.insideSnapshot('/snapshoter/foo'), false);
 
-  assert.equal('/',            common.stripSnapshot('/'));
-  assert.equal('//',           common.stripSnapshot('//'));
-  assert.equal('/**/',         common.stripSnapshot('/snapshot'));
-  assert.equal('/snapshoter',  common.stripSnapshot('/snapshoter'));
-  assert.equal('/**/',         common.stripSnapshot('/snapshot/'));
-  assert.equal('/snapshoter/', common.stripSnapshot('/snapshoter/'));
-  assert.equal('/**/foo',      common.stripSnapshot('/snapshot//foo'));
-  assert.equal('/**/foo/bar',  common.stripSnapshot('/snapshot//foo//bar/\\//'));
+  assert.strictEqual('/',            common.stripSnapshot('/'));
+  assert.strictEqual('//',           common.stripSnapshot('//'));
+  assert.strictEqual('/**/',         common.stripSnapshot('/snapshot'));
+  assert.strictEqual('/snapshoter',  common.stripSnapshot('/snapshoter'));
+  assert.strictEqual('/**/',         common.stripSnapshot('/snapshot/'));
+  assert.strictEqual('/snapshoter/', common.stripSnapshot('/snapshoter/'));
+  assert.strictEqual('/**/foo',      common.stripSnapshot('/snapshot//foo'));
+  assert.strictEqual('/**/foo/bar',  common.stripSnapshot('/snapshot//foo//bar/\\//'));
 
-  assert.equal('/snapshot',         common.snapshotify('/'));
-  assert.equal('/snapshot/foo',     common.snapshotify('/foo'));
-  assert.equal('/snapshot/foo/bar', common.snapshotify('/foo/bar'));
+  assert.strictEqual('/snapshot',         common.snapshotify('/'));
+  assert.strictEqual('/snapshot/foo',     common.snapshotify('/foo'));
+  assert.strictEqual('/snapshot/foo/bar', common.snapshotify('/foo/bar'));
 
-  assert.equal('foo',     common.removeUplevels('../foo'));
-  assert.equal('foo',     common.removeUplevels('../../foo'));
-  assert.equal('./foo',   common.removeUplevels('./foo'));
-  assert.equal('.',       common.removeUplevels('.'));
-  assert.equal('.',       common.removeUplevels('..'));
-  assert.equal('.',       common.removeUplevels('../..'));
+  assert.strictEqual('foo',     common.removeUplevels('../foo'));
+  assert.strictEqual('foo',     common.removeUplevels('../../foo'));
+  assert.strictEqual('./foo',   common.removeUplevels('./foo'));
+  assert.strictEqual('.',       common.removeUplevels('.'));
+  assert.strictEqual('.',       common.removeUplevels('..'));
+  assert.strictEqual('.',       common.removeUplevels('../..'));
 
-  assert.deepEqual(substituteMany(
+  assert.deepStrictEqual(substituteMany(
     [ '/long/haired/freaky/people', '/long/haired/aliens' ]),
     [ '/freaky/people',             '/aliens' ]);
 
-  assert.deepEqual(substituteMany(
+  assert.deepStrictEqual(substituteMany(
     [ '/long/haired/freaky/people', '/long/hyphen/sign' ]),
     [ '/haired/freaky/people',      '/hyphen/sign' ]);
 }

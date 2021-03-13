@@ -111,7 +111,7 @@ if (right3.length === 0) {
   right3 = 'right3 is empty';
 }
 
-assert.equal(left, right);
-assert.equal(left, right3);
+assert.strictEqual(left, right);
+assert.strictEqual(left, right3);
 utils.vacuum.sync(path.dirname(output));
 utils.vacuum.sync(path.dirname(output3));

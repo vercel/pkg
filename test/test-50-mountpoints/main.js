@@ -33,7 +33,7 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(right,
+assert.strictEqual(right,
   'I am C\n' +
   'I am D\n' +
   'test-x-index.js\n' +

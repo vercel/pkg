@@ -31,6 +31,6 @@ right = utils.spawn.sync(
   { cwd: path.dirname(output) }
 );
 
-assert.equal(left, 'undefined\n');
-assert.equal(right, 'undefined\n');
+assert.strictEqual(left, 'undefined\n');
+assert.strictEqual(right, 'undefined\n');
 utils.vacuum.sync(path.dirname(output));

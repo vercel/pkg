@@ -26,5 +26,5 @@ right = utils.spawn.sync(
     env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } }
 );
 
-assert.equal(right, 'ok\n');
+assert.strictEqual(right, 'ok\n');
 utils.vacuum.sync(output);
