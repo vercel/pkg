@@ -1,0 +1,42 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build_on_windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+    - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-4.8 g++-4.8
+    - run: sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install libavahi-compat-libdnssd-dev # npm install mdns
+    - run: export CXX="g++-4.8" CC="gcc-4.8"
+    - run: npm install
+    - run: npm test
