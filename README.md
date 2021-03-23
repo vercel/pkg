@@ -254,3 +254,22 @@ await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
 This error can be caused by deleting the directory the application is
 run from. Or, generally, deleting `process.cwd()` directory when the
 application is running.
+
+### Error: ERR_INSPECTOR_NOT_AVAILABLE
+
+This error can be caused by using `NODE_OPTIONS` variable to force to
+run `node` with the debug mode enabled. Debugging options are disallowed
+, as **pkg** executables are usually used for production environments.
+If you do need to use inspector, you can [build a debuggable Node.js](https://github.com/vercel/pkg/issues/93#issuecomment-301210543) yourself.
+
+### Error: require(...).internalModuleStat is not a function
+
+This error can be caused by using `NODE_OPTIONS` variable with some
+bootstrap or `node` options causing conflicts with **pkg**. Some
+IDEs, such as **VS Code**, may add this env variable automatically.
+
+You could check on **Unix systems** (Linux/macOS) in `bash`:
+
+```bash
+$ printenv | grep NODE
+```
