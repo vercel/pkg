@@ -258,9 +258,9 @@ application is running.
 ### Error: ERR_INSPECTOR_NOT_AVAILABLE
 
 This error can be caused by using `NODE_OPTIONS` variable to force to
-run `node` with the debug mode enabled. **Pkg** doesn't support for
-now to run with inspector enabled. If you need that feature, you
-could [try by yourself](https://github.com/vercel/pkg/issues/93#issuecomment-301210543).
+run `node` with the debug mode enabled. Debugging options are disallowed
+, as **pkg** executables are usually used for production environments.
+If you do need to use inspector, you can [build a debuggable Node.js](https://github.com/vercel/pkg/issues/93#issuecomment-301210543) yourself.
 
 ### Error: require(...).internalModuleStat is not a function
 
