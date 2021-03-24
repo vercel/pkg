@@ -3,7 +3,7 @@
 var chokidar = require('chokidar');
 
 var watcher = chokidar.watch('./chokidar.js', {
-  persistent: true
+  persistent: true,
 });
 
 watcher.on('ready', function () {

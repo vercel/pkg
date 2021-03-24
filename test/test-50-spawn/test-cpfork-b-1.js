@@ -10,10 +10,7 @@ var child;
 assert(!process.send);
 
 try {
-  child = cp.fork(path.join(
-    process.cwd(),
-    'test-cpfork-b-child.js'
-  ));
+  child = cp.fork(path.join(process.cwd(), 'test-cpfork-b-child.js'));
 } catch (e) {
   console.log(e.message);
 }

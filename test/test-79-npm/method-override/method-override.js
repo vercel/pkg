@@ -1,7 +1,7 @@
 'use strict';
 
 var override = require('method-override');
-var req = { method: 'GET', headers: { } };
+var req = { method: 'GET', headers: {} };
 var res = {};
 
 var middleware = override();

@@ -8,6 +8,6 @@
 module.exports = function () {
   return {
     allow: false,
-    note: 'hard to meet various requirements'
+    note: 'hard to meet various requirements',
   };
 };

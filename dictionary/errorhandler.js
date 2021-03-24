@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'public/**/*'
-    ]
-  }
+    assets: ['public/**/*'],
+  },
 };

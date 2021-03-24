@@ -21,15 +21,21 @@ const output2 = './test-output-2.exe';
 utils.pkg.sync([
   '--public',
   '--no-bytecode',
-  '--target', target,
-  '--output', output1, input
+  '--target',
+  target,
+  '--output',
+  output1,
+  input,
 ]);
 
 utils.pkg.sync([
   '--public',
   '--no-bytecode',
-  '--target', target,
-  '--output', output2, input
+  '--target',
+  target,
+  '--output',
+  output2,
+  input,
 ]);
 
 const content1 = fs.readFileSync(output1);

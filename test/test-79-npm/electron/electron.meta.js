@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    deployFilesFrom: [ 'electron' ]
+    deployFilesFrom: ['electron'],
   };
 };

@@ -15,18 +15,15 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output),
-    stdio: 'pipe', expect: 0 }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+  stdio: 'pipe',
+  expect: 0,
+});
 
-function extractFileName (line) {
+function extractFileName(line) {
   let m = line.match(/^.+\((.+):\d+:\d+\)$/);
   if (m) return m[1];
   m = line.match(/^.+\((.+):\d+\)$/);

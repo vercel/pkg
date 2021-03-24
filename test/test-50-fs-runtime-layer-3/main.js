@@ -15,28 +15,25 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
-assert.strictEqual(right,
+assert.strictEqual(
+  right,
   'true\n' +
-  'false\n' +
-  'Cannot write to packaged file\n' +
-  'true\n' +
-  'closed\n' +
-  'false\n' +
-  'Cannot write to packaged file\n' +
-  'Cannot write to packaged file\n' +
-  'undefined\n' +
-  'Cannot write to packaged file\n' +
-  'undefined\n'
+    'false\n' +
+    'Cannot write to packaged file\n' +
+    'true\n' +
+    'closed\n' +
+    'false\n' +
+    'Cannot write to packaged file\n' +
+    'Cannot write to packaged file\n' +
+    'undefined\n' +
+    'Cannot write to packaged file\n' +
+    'undefined\n'
 );
 
 utils.vacuum.sync(output);

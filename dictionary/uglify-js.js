@@ -4,9 +4,6 @@ module.exports = {
   pkg: {
     // assets, not scripts because of custom
     // load_global (readFileSync + runInContext)
-    assets: [
-      'lib/**/*.js',
-      'tools/*.js'
-    ]
-  }
+    assets: ['lib/**/*.js', 'tools/*.js'],
+  },
 };

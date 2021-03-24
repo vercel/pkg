@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'later.js'
-    ]
-  }
+    scripts: ['later.js'],
+  },
 };

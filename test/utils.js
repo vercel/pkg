@@ -13,10 +13,10 @@ const stableStringify = require('json-stable-stringify');
 module.exports.mkdirp = mkdirp;
 
 module.exports.pause = function (seconds) {
-  spawnSync(
-    'ping', [ '127.0.0.1',
-      process.platform === 'win32' ? '-n' : '-c',
-    (seconds + 1).toString()
+  spawnSync('ping', [
+    '127.0.0.1',
+    process.platform === 'win32' ? '-n' : '-c',
+    (seconds + 1).toString(),
   ]);
 };
 
@@ -63,10 +63,9 @@ module.exports.spawn.sync = function (command, args, opts) {
 
   const d = opts.stdio;
   if (!d) {
-    opts.stdio = [ 'pipe', 'pipe', 'inherit' ];
-  } else
-  if (typeof d === 'string') {
-    opts.stdio = [ d, d, d ];
+    opts.stdio = ['pipe', 'pipe', 'inherit'];
+  } else if (typeof d === 'string') {
+    opts.stdio = [d, d, d];
   }
 
   let expect = opts.expect === undefined ? 0 : opts.expect;
@@ -77,11 +76,10 @@ module.exports.spawn.sync = function (command, args, opts) {
   // conform old node vers to https://github.com/nodejs/node/pull/11288
   if (child.signal) s = null;
 
-  if (child.error || (s !== expect)) {
+  if (child.error || s !== expect) {
     if (opts.stdio[1] === 'pipe' && child.stdout) {
       process.stdout.write(child.stdout);
-    } else
-    if (opts.stdio[2] === 'pipe' && child.stderr) {
+    } else if (opts.stdio[2] === 'pipe' && child.stderr) {
       process.stdout.write(child.stderr);
     }
     console.log('> ' + command + ' ' + args.join(' '));
@@ -93,21 +91,19 @@ module.exports.spawn.sync = function (command, args, opts) {
   if (s !== expect) {
     if (s === null) s = 'null';
     if (expect === null) expect = 'null';
-    throw new Error('Status ' + s.toString() +
-      ', expected ' + expect.toString());
+    throw new Error(
+      'Status ' + s.toString() + ', expected ' + expect.toString()
+    );
   }
 
-  if ((opts.stdio[1] === 'pipe') &&
-      (opts.stdio[2] === 'pipe')) {
+  if (opts.stdio[1] === 'pipe' && opts.stdio[2] === 'pipe') {
     return {
       stdout: child.stdout.toString(),
-      stderr: child.stderr.toString()
+      stderr: child.stderr.toString(),
     };
-  } else
-  if (opts.stdio[1] === 'pipe') {
+  } else if (opts.stdio[1] === 'pipe') {
     return child.stdout.toString();
-  } else
-  if (opts.stdio[2] === 'pipe') {
+  } else if (opts.stdio[2] === 'pipe') {
     return child.stderr.toString();
   } else {
     return '';
@@ -161,9 +157,9 @@ module.exports.filesAfter = function (b, n) {
       d.push(ai);
     }
   }
-  assert(d.length === n.length, JSON.stringify([ d, n ]));
+  assert(d.length === n.length, JSON.stringify([d, n]));
   for (const ni of n) {
-    assert(d.indexOf(ni) >= 0, JSON.stringify([ d, n ]));
+    assert(d.indexOf(ni) >= 0, JSON.stringify([d, n]));
   }
   for (const ni of n) {
     module.exports.vacuum.sync(ni);

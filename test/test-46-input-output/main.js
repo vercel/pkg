@@ -9,12 +9,10 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const input = './test-x-index';
-const exe = (process.platform === 'win32' ? '.exe' : '');
-const newcomers = [ 'test-output' + exe ];
+const exe = process.platform === 'win32' ? '.exe' : '';
+const newcomers = ['test-output' + exe];
 const before = utils.filesBefore(newcomers);
 
-utils.pkg.sync([
-  '--output', 'test-output', input
-], { stdio: 'inherit' });
+utils.pkg.sync(['--output', 'test-output', input], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);

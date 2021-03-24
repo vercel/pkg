@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    deployFilesFrom: [ 'exiftool.exe' ]
+    deployFilesFrom: ['exiftool.exe'],
   };
 };

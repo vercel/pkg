@@ -11,8 +11,9 @@ if (process.send) {
 }
 
 var child = spawn(
-  process.execPath, [ path.basename(__filename), 'argvx', '--argvy' ],
-  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
+  process.execPath,
+  [path.basename(__filename), 'argvx', '--argvy'],
+  { stdio: ['inherit', 'inherit', 'inherit', 'ipc'] }
 );
 
 child.on('message', function (value) {

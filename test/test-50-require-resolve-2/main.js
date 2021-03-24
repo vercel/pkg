@@ -19,10 +19,9 @@ let left, right, right3;
 utils.mkdirp.sync(path.dirname(output));
 utils.mkdirp.sync(path.dirname(output3));
 
-left = utils.spawn.sync(
-  'node', [ path.basename(input) ],
-  { cwd: path.dirname(input) }
-);
+left = utils.spawn.sync('node', [path.basename(input)], {
+  cwd: path.dirname(input),
+});
 
 fs.readdirSync('./').some(function (file) {
   if (/^test-/.test(file)) {
@@ -33,9 +32,7 @@ fs.readdirSync('./').some(function (file) {
     );
     fs.writeFileSync(
       nf,
-      fs.readFileSync(file, 'utf8').replace(
-        'compile-time', 'run-time'
-      )
+      fs.readFileSync(file, 'utf8').replace('compile-time', 'run-time')
     );
     const nf3 = path.join(
       path.dirname(file),
@@ -44,57 +41,40 @@ fs.readdirSync('./').some(function (file) {
     );
     fs.writeFileSync(
       nf3,
-      fs.readFileSync(file, 'utf8').replace(
-        'compile-time', 'run-time-3'
-      )
+      fs.readFileSync(file, 'utf8').replace('compile-time', 'run-time-3')
     );
   }
 });
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 right3 = utils.spawn.sync(
-  './' + path.join('..', path.dirname(output), path.basename(output)), [],
+  './' + path.join('..', path.dirname(output), path.basename(output)),
+  [],
   { cwd: path.dirname(output3) }
 );
 
-right = [
-  'require-code-J',
-  'require-content-K',
-  'require-content-L'
-].reduce(function (x, y) {
-  const r = x.replace(
-    new RegExp(y + '-run-time', 'g'),
-               y + '-compile-time');
-  // assert(r !== x);
-  return r;
-}, right);
+right = ['require-code-J', 'require-content-K', 'require-content-L'].reduce(
+  function (x, y) {
+    const r = x.replace(new RegExp(y + '-run-time', 'g'), y + '-compile-time');
+    // assert(r !== x);
+    return r;
+  },
+  right
+);
 
-right3 = [
-  'require-code-J'
-].reduce(function (x, y) {
-  const r = x.replace(
-    new RegExp(y + '-run-time', 'g'),
-               y + '-compile-time');
+right3 = ['require-code-J'].reduce(function (x, y) {
+  const r = x.replace(new RegExp(y + '-run-time', 'g'), y + '-compile-time');
   // assert(r !== x);
   return r;
 }, right3);
 
-right3 = [
-  'require-content-K',
-  'require-content-L'
-].reduce(function (x, y) {
-  const r = x.replace(
-    new RegExp(y + '-run-time-3', 'g'),
-               y + '-compile-time');
+right3 = ['require-content-K', 'require-content-L'].reduce(function (x, y) {
+  const r = x.replace(new RegExp(y + '-run-time-3', 'g'), y + '-compile-time');
   // assert(r !== x);
   return r;
 }, right3);

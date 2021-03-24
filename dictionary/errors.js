@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'lib/static/*'
-    ]
-  }
+    assets: ['lib/static/*'],
+  },
 };

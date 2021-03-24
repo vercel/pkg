@@ -16,20 +16,15 @@ const output = './run-time/test-output.exe';
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
-left = utils.spawn.sync(
-  'node', [ path.basename(input) ],
-  { cwd: path.dirname(input) }
-);
+left = utils.spawn.sync('node', [path.basename(input)], {
+  cwd: path.dirname(input),
+});
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 // это директории. под
 // виндой они case-insensitive
@@ -48,37 +43,32 @@ left.some(function (leftValue, index) {
   if (leftValue.slice(1, 3) === ':\\') {
     assert.strictEqual(rightValue.slice(1, 12), ':\\snapshot\\');
     nonSnapshot = rightValue.length - 12;
-    assert.strictEqual(leftValue.slice(-nonSnapshot),
-      rightValue.slice(-nonSnapshot));
-  } else
-  if (leftValue.slice(0, 1) === '/') {
+    assert.strictEqual(
+      leftValue.slice(-nonSnapshot),
+      rightValue.slice(-nonSnapshot)
+    );
+  } else if (leftValue.slice(0, 1) === '/') {
     assert.strictEqual(rightValue.slice(0, 10), '/snapshot/');
     nonSnapshot = rightValue.length - 10;
-    assert.strictEqual(leftValue.slice(-nonSnapshot),
-      rightValue.slice(-nonSnapshot));
-  } else
-  if (leftValue === '') {
+    assert.strictEqual(
+      leftValue.slice(-nonSnapshot),
+      rightValue.slice(-nonSnapshot)
+    );
+  } else if (leftValue === '') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'empty') {
+  } else if (leftValue === 'empty') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'string') {
+  } else if (leftValue === 'string') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'object') {
+  } else if (leftValue === 'object') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'function') {
+  } else if (leftValue === 'function') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'true') {
+  } else if (leftValue === 'true') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'false') {
+  } else if (leftValue === 'false') {
     assert.strictEqual(leftValue, rightValue);
-  } else
-  if (leftValue === 'null') {
+  } else if (leftValue === 'null') {
     assert.strictEqual(leftValue, rightValue);
   } else {
     console.log(leftValue, rightValue);

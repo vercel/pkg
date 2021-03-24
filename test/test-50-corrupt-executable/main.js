@@ -17,10 +17,7 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
 const damage = fs.readFileSync(output);
 const boundary = 4096;
@@ -32,14 +29,16 @@ damage[damage.length - 3 * boundary + 10] = 0x2;
 damage[damage.length - 4 * boundary + 10] = 0x2;
 fs.writeFileSync(output, damage);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output),
-    stdio: 'pipe', expect: 1 }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+  stdio: 'pipe',
+  expect: 1,
+});
 
 assert.strictEqual(right.stdout, '');
-assert((right.stderr.indexOf('Invalid') >= 0) ||
-       (right.stderr.indexOf('ILLEGAL') >= 0) ||
-       (right.stderr.indexOf('SyntaxError') >= 0));
+assert(
+  right.stderr.indexOf('Invalid') >= 0 ||
+    right.stderr.indexOf('ILLEGAL') >= 0 ||
+    right.stderr.indexOf('SyntaxError') >= 0
+);
 utils.vacuum.sync(output);

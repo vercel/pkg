@@ -18,15 +18,21 @@ const output = './run-time/test-output.exe';
 
 utils.mkdirp.sync(path.dirname(output));
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, inputs.warmup // fetch this particular node version
-], { stdio: [ 'inherit', 'inherit', 'pipe' ] });
+utils.pkg.sync(
+  [
+    '--target',
+    target,
+    '--output',
+    output,
+    inputs.warmup, // fetch this particular node version
+  ],
+  { stdio: ['inherit', 'inherit', 'pipe'] }
+);
 
-let right = utils.pkg.sync([
-  '--target', target,
-  '--output', output, inputs.index
-], { stdio: 'pipe' });
+let right = utils.pkg.sync(
+  ['--target', target, '--output', output, inputs.index],
+  { stdio: 'pipe' }
+);
 
 assert(right.stdout.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.stdout.indexOf('Warning') >= 0);

@@ -18,20 +18,22 @@ console.log('*************************************');
 console.log('');
 
 if (process.env.CI) {
-  if (target === 'node0' ||
-      target === 'node4' ||
-      target === 'node6' ||
-      target === 'node7' ||
-      target === 'node9' ||
-      target === 'node11' ||
-      target === 'node13') {
+  if (
+    target === 'node0' ||
+    target === 'node4' ||
+    target === 'node6' ||
+    target === 'node7' ||
+    target === 'node9' ||
+    target === 'node11' ||
+    target === 'node13'
+  ) {
     console.log(target + ' is skipped in CI!');
     console.log('');
     process.exit();
   }
 }
 
-function joinAndForward (d) {
+function joinAndForward(d) {
   let r = path.join(__dirname, d);
   if (process.platform === 'win32') r = r.replace(/\\/g, '/');
   return r;
@@ -56,10 +58,10 @@ const files = globby.sync(list);
 files.sort().some(function (file) {
   file = path.resolve(file);
   try {
-    utils.spawn.sync(
-      'node', [ path.basename(file), target ],
-      { cwd: path.dirname(file), stdio: 'inherit' }
-    );
+    utils.spawn.sync('node', [path.basename(file), target], {
+      cwd: path.dirname(file),
+      stdio: 'inherit',
+    });
   } catch (error) {
     console.log();
     console.log(`> ${chalk.red('Error!')} ${error.message}`);

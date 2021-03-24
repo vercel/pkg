@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/ProcessContainerFork.js'
-    ]
-  }
+    scripts: ['lib/ProcessContainerFork.js'],
+  },
 };

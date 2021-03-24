@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/drivers/node-mongodb-native/*.js'
-    ]
-  }
+    scripts: ['lib/drivers/node-mongodb-native/*.js'],
+  },
 };

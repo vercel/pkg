@@ -5,7 +5,7 @@
 var o = {
   p: process.platform,
   a: process.arch,
-  m: parseInt(process.versions.modules, 10)
+  m: parseInt(process.versions.modules, 10),
 };
 
 if (module.parent) {

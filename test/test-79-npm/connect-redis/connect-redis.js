@@ -1,11 +1,10 @@
 'use strict';
 
-function Store () {
+function Store() {
   this.emit = function () {};
 }
 
-function MemoryStore () {
-}
+function MemoryStore() {}
 
 var session = { Store: Store, MemoryStore: MemoryStore };
 var RedisStore = require('connect-redis')(session);

@@ -10,15 +10,10 @@ assert(__dirname === process.cwd());
 
 const input = './package.json';
 
-const newcomers = [
-  'palookaville-linux',
-  'palookaville-macos'
-];
+const newcomers = ['palookaville-linux', 'palookaville-macos'];
 
 const before = utils.filesBefore(newcomers);
 
-utils.pkg.sync([
-  input
-], { stdio: 'inherit' });
+utils.pkg.sync([input], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);

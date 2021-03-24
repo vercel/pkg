@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    deployFilesFrom: [ 'google-closure-compiler' ]
+    deployFilesFrom: ['google-closure-compiler'],
   };
 };
