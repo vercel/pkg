@@ -2,7 +2,7 @@
 
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
-[![Build Status](https://travis-ci.org/vercel/pkg.svg?branch=master)](https://travis-ci.org/vercel/pkg)
+[![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/vercel/pkg/badge.svg?branch=master)](https://coveralls.io/github/vercel/pkg?branch=master)
 [![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
 [![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
