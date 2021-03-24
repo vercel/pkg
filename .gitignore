@@ -16,3 +16,6 @@ examples/express/express-example
 
 # Example dependencies
 examples/express/node_modules
+
+# Editors
+.vscode/
