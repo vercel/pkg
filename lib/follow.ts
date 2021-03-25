@@ -1,4 +1,6 @@
-import { core, sync } from 'resolve';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { core, sync, SyncOpts } from 'resolve';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
@@ -14,18 +16,31 @@ export const natives = core;
 
 const PROOF = 'a-proof-that-main-is-captured.js';
 
-function parentDirectoriesContain(parent, directory) {
+function parentDirectoriesContain(parent: string, directory: string) {
   let currentParent = parent;
 
   while (true) {
-    if (currentParent === directory) return true;
+    if (currentParent === directory) {
+      return true;
+    }
+
     const newParent = path.dirname(currentParent);
-    if (newParent === currentParent) return false;
+
+    if (newParent === currentParent) {
+      return false;
+    }
+
     currentParent = newParent;
   }
 }
 
-export function follow(x, opts) {
+interface FollowOptions
+  extends Pick<SyncOpts, 'basedir' | 'extensions' | 'packageFilter'> {
+  ignoreFile?: string;
+  readFile?: (file: string) => void;
+}
+
+export function follow(x: string, opts: FollowOptions) {
   // TODO async version
   return new Promise((resolve) => {
     resolve(
@@ -36,8 +51,10 @@ export function follow(x, opts) {
           if (
             opts.ignoreFile &&
             path.join(path.dirname(opts.ignoreFile), PROOF) === file
-          )
+          ) {
             return true;
+          }
+
           let stat;
 
           try {
@@ -54,28 +71,40 @@ export function follow(x, opts) {
           if (
             opts.ignoreFile &&
             parentDirectoriesContain(opts.ignoreFile, directory)
-          )
+          ) {
             return false;
+          }
+
           let stat;
 
           try {
             stat = fs.statSync(directory);
           } catch (e) {
-            if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR'))
+            if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
               return false;
+            }
+
             throw e;
           }
 
           return stat.isDirectory();
         },
         readFileSync: (file) => {
-          if (opts.ignoreFile && opts.ignoreFile === file)
+          if (opts.ignoreFile && opts.ignoreFile === file) {
             return Buffer.from(`{"main":"${PROOF}"}`);
-          if (opts.readFile) opts.readFile(file);
+          }
+
+          if (opts.readFile) {
+            opts.readFile(file);
+          }
+
           return fs.readFileSync(file);
         },
         packageFilter: (config, base) => {
-          if (opts.packageFilter) opts.packageFilter(config, base);
+          if (opts.packageFilter) {
+            opts.packageFilter(config, base);
+          }
+
           return config;
         },
       })

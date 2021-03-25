@@ -3,17 +3,23 @@ import {
   STORE_LINKS,
   retrieveDenominator,
   substituteDenominator,
-} from '../prelude/common';
+} from './common';
+import { FileRecords } from './types';
 
 const win32 = process.platform === 'win32';
 
-function hasParent(file, records) {
+function hasParent(file: string, records: FileRecords) {
   const dirname = path.dirname(file);
-  if (dirname === file) return false; // root directory
+
+  // root directory
+  if (dirname === file) {
+    return false;
+  }
+
   return Boolean(records[dirname]);
 }
 
-function purgeTopDirectories(records) {
+function purgeTopDirectories(records: FileRecords) {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     let found = false;
@@ -47,8 +53,12 @@ function purgeTopDirectories(records) {
   }
 }
 
-function denominate(records, entrypoint, denominator) {
-  const newRecords = {};
+function denominate(
+  records: FileRecords,
+  entrypoint: string,
+  denominator: number
+) {
+  const newRecords: FileRecords = {};
 
   for (const file in records) {
     if (records[file]) {
@@ -70,7 +80,7 @@ function denominate(records, entrypoint, denominator) {
   };
 }
 
-export default function refiner(records, entrypoint) {
+export default function refiner(records: FileRecords, entrypoint: string) {
   purgeTopDirectories(records);
   const denominator = retrieveDenominator(Object.keys(records));
   return denominate(records, entrypoint, denominator);

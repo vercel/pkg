@@ -10,26 +10,24 @@ import {
   STORE_STAT,
   isDotJS,
   isDotJSON,
-} from '../prelude/common';
+} from './common';
 
 import { log, wasReported } from './log';
 import { version } from '../package.json';
+import { FileRecord, FileRecords } from './types';
 
 const bootstrapText = fs
   .readFileSync(require.resolve('../prelude/bootstrap.js'), 'utf8')
   .replace('%VERSION%', version);
 
-const commonText = fs.readFileSync(
-  require.resolve('../prelude/common.js'),
-  'utf8'
-);
+const commonText = fs.readFileSync(require.resolve('./common'), 'utf8');
 
-function itemsToText(items) {
+function itemsToText<T extends unknown>(items: T[]) {
   const len = items.length;
   return len.toString() + (len % 10 === 1 ? ' item' : ' items');
 }
 
-function hasAnyStore(record) {
+function hasAnyStore(record: FileRecord) {
   // discarded records like native addons
   for (const store of [STORE_BLOB, STORE_CONTENT, STORE_LINKS, STORE_STAT]) {
     if (record[store]) return true;
@@ -37,16 +35,29 @@ function hasAnyStore(record) {
   return false;
 }
 
-export default function packer({ records, entrypoint, bytecode }) {
+interface PackerOptions {
+  records: FileRecords;
+  entrypoint: string;
+  bytecode: string;
+}
+
+export default function packer({
+  records,
+  entrypoint,
+  bytecode,
+}: PackerOptions) {
   const stripes = [];
 
   for (const snap in records) {
     if (records[snap]) {
       const record = records[snap];
       const { file } = record;
-      if (!hasAnyStore(record)) continue;
-      assert(record[STORE_STAT], 'packer: no STORE_STAT');
 
+      if (!hasAnyStore(record)) {
+        continue;
+      }
+
+      assert(record[STORE_STAT], 'packer: no STORE_STAT');
       assert(
         record[STORE_BLOB] || record[STORE_CONTENT] || record[STORE_LINKS]
       );
@@ -74,7 +85,10 @@ export default function packer({ records, entrypoint, bytecode }) {
         STORE_STAT,
       ]) {
         const value = record[store];
-        if (!value) continue;
+
+        if (!value) {
+          continue;
+        }
 
         if (store === STORE_BLOB || store === STORE_CONTENT) {
           if (record.body === undefined) {
@@ -113,7 +127,11 @@ export default function packer({ records, entrypoint, bytecode }) {
             delete value.nlink;
             delete value.rdev;
             delete value.uid;
-            if (!value.isFile()) value.size = 0;
+
+            if (!value.isFile()) {
+              value.size = 0;
+            }
+
             // portable
             const newStat = { ...value };
             newStat.isFileValue = value.isFile();
