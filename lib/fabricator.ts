@@ -1,4 +1,6 @@
 import { spawn } from 'child_process';
+import { ChildProcessByStdio } from 'node:child_process';
+import { Readable, Writable } from 'node:stream';
 import { log } from './log';
 
 const script = `
@@ -39,9 +41,24 @@ const script = `
   process.stdin.resume();
 `;
 
-const children = {};
+const children: Record<
+  string,
+  ChildProcessByStdio<Writable, Readable, null>
+> = {};
 
-export function fabricate(bakes, fabricator, snap, body, cb) {
+interface FabricatorConfiguration {
+  binaryPath: string;
+  nodeRange: string;
+  arch: string;
+}
+
+export function fabricate(
+  bakes: string[],
+  fabricator: FabricatorConfiguration,
+  snap: string,
+  body: Buffer,
+  cb: (error?: Error, buffer?: Buffer) => void
+) {
   const activeBakes = bakes.filter((bake) => {
     // list of bakes that don't influence the bytecode
     const bake2 = bake.replace(/_/g, '-');
@@ -71,7 +88,7 @@ export function fabricate(bakes, fabricator, snap, body, cb) {
 
   let stdout = Buffer.alloc(0);
 
-  function onError(error) {
+  function onError(error: Error) {
     // eslint-disable-next-line no-use-before-define
     removeListeners();
     kill();
@@ -82,7 +99,7 @@ export function fabricate(bakes, fabricator, snap, body, cb) {
     );
   }
 
-  function onClose(code) {
+  function onClose(code: number) {
     // eslint-disable-next-line no-use-before-define
     removeListeners();
     kill();
@@ -99,7 +116,7 @@ export function fabricate(bakes, fabricator, snap, body, cb) {
     return cb(new Error(`${cmd} closed unexpectedly`));
   }
 
-  function onData(data) {
+  function onData(data: Buffer) {
     stdout = Buffer.concat([stdout, data]);
     if (stdout.length >= 4) {
       const sizeOfBlob = stdout.readInt32LE(0);
@@ -138,7 +155,13 @@ export function fabricate(bakes, fabricator, snap, body, cb) {
   child.stdin.write(b);
 }
 
-export function fabricateTwice(bakes, fabricator, snap, body, cb) {
+export function fabricateTwice(
+  bakes: string[],
+  fabricator: FabricatorConfiguration,
+  snap: string,
+  body: Buffer,
+  cb: (error?: Error, buffer?: Buffer) => void
+) {
   fabricate(bakes, fabricator, snap, body, (error, buffer) => {
     // node0 can not produce second time, even if first time produced fine,
     // probably because of 'filename' cache. also, there are wierd cases
