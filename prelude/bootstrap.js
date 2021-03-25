@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable global-require */
 /* eslint-disable curly */
 /* eslint-disable new-cap */
 /* eslint-disable no-buffer-constructor */
@@ -18,16 +20,17 @@
 var common = {};
 REQUIRE_COMMON(common);
 
-var STORE_BLOB = common.STORE_BLOB;
-var STORE_CONTENT = common.STORE_CONTENT;
-var STORE_LINKS = common.STORE_LINKS;
-var STORE_STAT = common.STORE_STAT;
-
-var isRootPath = common.isRootPath;
-var normalizePath = common.normalizePath;
-var insideSnapshot = common.insideSnapshot;
-var stripSnapshot = common.stripSnapshot;
-var removeUplevels = common.removeUplevels;
+const {
+  STORE_BLOB,
+  STORE_CONTENT,
+  STORE_LINKS,
+  STORE_STAT,
+  isRootPath,
+  normalizePath,
+  insideSnapshot,
+  stripSnapshot,
+  removeUplevels,
+} = common;
 
 var FLAG_ENABLE_PROJECT = false;
 var NODE_VERSION_MAJOR = process.version.match(/^v(\d+)/)[1] | 0;
@@ -66,7 +69,7 @@ if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv[1] = DEFAULT_ENTRYPOINT;
 }
 
-ENTRYPOINT = process.argv[1];
+[, ENTRYPOINT] = process.argv;
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
@@ -74,6 +77,7 @@ delete process.env.PKG_EXECPATH;
 // /////////////////////////////////////////////////////////////////
 
 var EXECSTAT = require('fs').statSync(EXECPATH);
+
 EXECSTAT.atimeMs = EXECSTAT.atime.getTime();
 EXECSTAT.mtimeMs = EXECSTAT.mtime.getTime();
 EXECSTAT.ctimeMs = EXECSTAT.ctime.getTime();
@@ -89,17 +93,15 @@ function insideMountpoint(f) {
   if (!insideSnapshot(f)) return null;
   var file = normalizePath(f);
   var found = mountpoints
-    .map(function (mountpoint) {
-      var interior = mountpoint.interior;
-      var exterior = mountpoint.exterior;
+    .map((mountpoint) => {
+      var { interior } = mountpoint;
+      var { exterior } = mountpoint;
       if (interior === file) return exterior;
       var left = interior + require('path').sep;
       if (file.slice(0, left.length) !== left) return null;
       return exterior + file.slice(left.length - 1);
     })
-    .filter(function (result) {
-      return result;
-    });
+    .filter((result) => result);
   if (found.length >= 2) throw new Error('UNEXPECTED-00');
   if (found.length === 0) return null;
   return found[0];
@@ -107,15 +109,9 @@ function insideMountpoint(f) {
 
 function readdirMountpoints(path) {
   return mountpoints
-    .map(function (mountpoint) {
-      return mountpoint.interior;
-    })
-    .filter(function (interior) {
-      return require('path').dirname(interior) === path;
-    })
-    .map(function (interior) {
-      return require('path').basename(interior);
-    });
+    .map((mountpoint) => mountpoint.interior)
+    .filter((interior) => require('path').dirname(interior) === path)
+    .map((interior) => require('path').basename(interior));
 }
 
 function translate(f) {
@@ -136,7 +132,7 @@ function translateNth(args_, index, f) {
 
 function createMountpoint(interior, exterior) {
   // TODO validate
-  mountpoints.push({ interior: interior, exterior: exterior });
+  mountpoints.push({ interior, exterior });
 }
 
 /*
@@ -193,8 +189,8 @@ function projectToFilesystem(f) {
   }
 
   var results = [];
-  uplevels.forEach(function (uplevel) {
-    relatives.forEach(function (relative) {
+  uplevels.forEach((uplevel) => {
+    relatives.forEach((relative) => {
       results.push(require('path').join(xpdn, uplevel, relative));
     });
   });
@@ -238,14 +234,14 @@ function dezalgo(cb) {
   if (!cb) return cb;
 
   var sync = true;
-  asap(function () {
+  asap(() => {
     sync = false;
   });
 
   return function zalgoSafe() {
     var args = arguments;
     if (sync) {
-      asap(function () {
+      asap(() => {
         cb.apply(undefined, args);
       });
     } else {
@@ -267,7 +263,7 @@ if (typeof PAYLOAD_POSITION !== 'number' || typeof PAYLOAD_SIZE !== 'number') {
   throw new Error('MUST HAVE PAYLOAD');
 }
 
-var readPayload = function (buffer, offset, length, position, callback) {
+function readPayload(buffer, offset, length, position, callback) {
   require('fs').read(
     EXECPATH_FD,
     buffer,
@@ -276,9 +272,9 @@ var readPayload = function (buffer, offset, length, position, callback) {
     PAYLOAD_POSITION + position,
     callback
   );
-};
+}
 
-var readPayloadSync = function (buffer, offset, length, position) {
+function readPayloadSync(buffer, offset, length, position) {
   return require('fs').readSync(
     EXECPATH_FD,
     buffer,
@@ -286,7 +282,7 @@ var readPayloadSync = function (buffer, offset, length, position) {
     length,
     PAYLOAD_POSITION + position
   );
-};
+}
 
 function payloadCopyUni(
   source,
@@ -298,7 +294,7 @@ function payloadCopyUni(
 ) {
   var cb2 = cb || rethrow;
   if (sourceStart >= source[1]) return cb2(null, 0);
-  if (sourceEnd >= source[1]) sourceEnd = source[1];
+  if (sourceEnd >= source[1]) [, sourceEnd] = source;
   var payloadPos = source[0] + sourceStart;
   var targetPos = targetStart;
   var targetEnd = targetStart + sourceEnd - sourceStart;
@@ -323,7 +319,7 @@ function payloadCopyMany(source, target, targetStart, sourceStart, cb) {
     targetPos,
     targetEnd - targetPos,
     payloadPos,
-    function (error, chunkSize) {
+    (error, chunkSize) => {
       if (error) return cb(error);
       sourceStart += chunkSize;
       targetPos += chunkSize;
@@ -356,7 +352,7 @@ function payloadCopyManySync(source, target, targetStart, sourceStart) {
 
 function payloadFile(pointer, cb) {
   var target = Buffer.alloc(pointer[1]);
-  payloadCopyMany(pointer, target, 0, 0, function (error) {
+  payloadCopyMany(pointer, target, 0, 0, (error) => {
     if (error) return cb(error);
     cb(null, target);
   });
@@ -372,7 +368,7 @@ function payloadFileSync(pointer) {
 // SETUP PROCESS ///////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 
-(function () {
+(() => {
   process.pkg = {};
   process.versions.pkg = '%VERSION%';
   process.pkg.mount = createMountpoint;
@@ -383,11 +379,11 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 // PATH.RESOLVE REPLACEMENT ////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   var path = require('path');
 
   process.pkg.path = {};
-  process.pkg.path.resolve = function () {
+  process.pkg.path.resolve = function resolve() {
     var args = cloneArgs(arguments);
     args.unshift(path.dirname(ENTRYPOINT));
     return path.resolve.apply(path, args); // eslint-disable-line prefer-spread
@@ -397,7 +393,7 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 // PATCH FS ////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   var fs = require('fs');
   var ancestor = {};
   ancestor.openSync = fs.openSync;
@@ -436,7 +432,7 @@ function payloadFileSync(pointer) {
 
   function assertEncoding(encoding) {
     if (encoding && !Buffer.isEncoding(encoding)) {
-      throw new Error('Unknown encoding: ' + encoding);
+      throw new Error(`Unknown encoding: ${encoding}`);
     }
   }
 
@@ -448,12 +444,9 @@ function payloadFileSync(pointer) {
   function error_ENOENT(fileOrDirectory, path) {
     // eslint-disable-line camelcase
     var error = new Error(
-      fileOrDirectory +
-        " '" +
-        stripSnapshot(path) +
-        "' " +
-        'was not included into executable at compilation stage. ' +
-        'Please recompile adding it as asset or script.'
+      `${fileOrDirectory} '${stripSnapshot(path)}' ` +
+        `was not included into executable at compilation stage. ` +
+        `Please recompile adding it as asset or script.`
     );
     error.errno = -ENOENT;
     error.code = 'ENOENT';
@@ -474,7 +467,7 @@ function payloadFileSync(pointer) {
 
   function error_ENOTDIR(path) {
     // eslint-disable-line camelcase
-    var error = new Error("ENOTDIR: not a directory, scandir '" + path + "'");
+    var error = new Error(`ENOTDIR: not a directory, scandir '${path}'`);
     error.errno = -ENOTDIR;
     error.code = 'ENOTDIR';
     error.path = path;
@@ -492,10 +485,10 @@ function payloadFileSync(pointer) {
     // console.log("openFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return cb2(error_ENOENT('File or directory', path));
-    var dock = { path: path, entity: entity, position: 0 };
+    var dock = { path, entity, position: 0 };
     var nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
     if (cb) {
-      ancestor.open.call(fs, nullDevice, 'r', function (error, fd) {
+      ancestor.open.call(fs, nullDevice, 'r', (error, fd) => {
         if (error) return cb(error);
         docks[fd] = dock;
         cb(null, fd);
@@ -507,7 +500,7 @@ function payloadFileSync(pointer) {
     }
   }
 
-  fs.openSync = function (path) {
+  fs.openSync = function openSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.openSync.apply(fs, arguments);
     }
@@ -518,7 +511,7 @@ function payloadFileSync(pointer) {
     return openFromSnapshot(path);
   };
 
-  fs.open = function (path) {
+  fs.open = function open(path) {
     if (!insideSnapshot(path)) {
       return ancestor.open.apply(fs, arguments);
     }
@@ -556,7 +549,7 @@ function payloadFileSync(pointer) {
         offset,
         p,
         p + length,
-        function (error, bytesRead, buffer2) {
+        (error, bytesRead, buffer2) => {
           if (error) return cb(error);
           dock.position = p + bytesRead;
           cb(null, bytesRead, buffer2);
@@ -580,17 +573,13 @@ function payloadFileSync(pointer) {
     if (offset < 0 && NODE_VERSION_MAJOR >= 14)
       return cb2(
         new Error(
-          'The value of "offset" is out of range. It must be >= 0. Received ' +
-            offset
+          `The value of "offset" is out of range. It must be >= 0. Received ${offset}`
         )
       );
     if (offset < 0 && NODE_VERSION_MAJOR >= 10)
       return cb2(
         new Error(
-          'The value of "offset" is out of range. It must be >= 0 && <= ' +
-            buffer.length.toString() +
-            '. Received ' +
-            offset
+          `The value of "offset" is out of range. It must be >= 0 && <= ${buffer.length.toString()}. Received ${offset}`
         )
       );
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
@@ -600,26 +589,24 @@ function payloadFileSync(pointer) {
     if (offset + length > buffer.length && NODE_VERSION_MAJOR >= 14)
       return cb2(
         new Error(
-          'The value of "length" is out of range. It must be <= ' +
-            (buffer.length - offset).toString() +
-            '. Received ' +
-            length.toString()
+          `The value of "length" is out of range. It must be <= ${(
+            buffer.length - offset
+          ).toString()}. Received ${length.toString()}`
         )
       );
     if (offset + length > buffer.length && NODE_VERSION_MAJOR >= 10)
       return cb2(
         new Error(
-          'The value of "length" is out of range. It must be >= 0 && <= ' +
-            (buffer.length - offset).toString() +
-            '. Received ' +
-            length.toString()
+          `The value of "length" is out of range. It must be >= 0 && <= ${(
+            buffer.length - offset
+          ).toString()}. Received ${length.toString()}`
         )
       );
     if (offset + length > buffer.length)
       return cb2(new Error('Length extends beyond buffer'));
 
     var dock = docks[fd];
-    var entity = dock.entity;
+    var { entity } = dock;
     var entityLinks = entity[STORE_LINKS];
     if (entityLinks) return cb2(error_EISDIR(dock.path));
     var entityContent = entity[STORE_CONTENT];
@@ -636,7 +623,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-15'));
   }
 
-  fs.readSync = function (fd, buffer, offset, length, position) {
+  fs.readSync = function readSync(fd, buffer, offset, length, position) {
     if (!docks[fd]) {
       return ancestor.readSync.apply(fs, arguments);
     }
@@ -644,7 +631,7 @@ function payloadFileSync(pointer) {
     return readFromSnapshot(fd, buffer, offset, length, position);
   };
 
-  fs.read = function (fd, buffer, offset, length, position) {
+  fs.read = function read(fd, buffer, offset, length, position) {
     if (!docks[fd]) {
       return ancestor.read.apply(fs, arguments);
     }
@@ -662,7 +649,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('Cannot write to packaged file'));
   }
 
-  fs.writeSync = function (fd) {
+  fs.writeSync = function writeSync(fd) {
     if (!docks[fd]) {
       return ancestor.writeSync.apply(fs, arguments);
     }
@@ -670,7 +657,7 @@ function payloadFileSync(pointer) {
     return writeToSnapshot();
   };
 
-  fs.write = function (fd) {
+  fs.write = function write(fd) {
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
@@ -692,7 +679,7 @@ function payloadFileSync(pointer) {
     }
   }
 
-  fs.closeSync = function (fd) {
+  fs.closeSync = function closeSync(fd) {
     if (!docks[fd]) {
       return ancestor.closeSync.apply(fs, arguments);
     }
@@ -700,7 +687,7 @@ function payloadFileSync(pointer) {
     return closeFromSnapshot(fd);
   };
 
-  fs.close = function (fd) {
+  fs.close = function close(fd) {
     if (!docks[fd]) {
       return ancestor.close.apply(fs, arguments);
     }
@@ -716,13 +703,14 @@ function payloadFileSync(pointer) {
   function readFileOptions(options, hasCallback) {
     if (!options || (hasCallback && typeof options === 'function')) {
       return { encoding: null, flag: 'r' };
-    } else if (typeof options === 'string') {
-      return { encoding: options, flag: 'r' };
-    } else if (typeof options === 'object') {
-      return options;
-    } else {
-      return null;
     }
+    if (typeof options === 'string') {
+      return { encoding: options, flag: 'r' };
+    }
+    if (typeof options === 'object') {
+      return options;
+    }
+    return null;
   }
 
   function readFileFromSnapshotSub(entityContent, cb) {
@@ -761,7 +749,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-20'));
   }
 
-  fs.readFileSync = function (path, options_) {
+  fs.readFileSync = function readFileSync(path, options_) {
     if (path === 'dirty-hack-for-testing-purposes') {
       return path;
     }
@@ -779,7 +767,7 @@ function payloadFileSync(pointer) {
       return ancestor.readFileSync.apply(fs, arguments);
     }
 
-    var encoding = options.encoding;
+    var { encoding } = options;
     assertEncoding(encoding);
 
     var buffer = readFileFromSnapshot(path);
@@ -787,7 +775,7 @@ function payloadFileSync(pointer) {
     return buffer;
   };
 
-  fs.readFile = function (path, options_) {
+  fs.readFile = function readFile(path, options_) {
     if (!insideSnapshot(path)) {
       return ancestor.readFile.apply(fs, arguments);
     }
@@ -801,11 +789,11 @@ function payloadFileSync(pointer) {
       return ancestor.readFile.apply(fs, arguments);
     }
 
-    var encoding = options.encoding;
+    var { encoding } = options;
     assertEncoding(encoding);
 
     var callback = dezalgo(maybeCallback(arguments));
-    readFileFromSnapshot(path, function (error, buffer) {
+    readFileFromSnapshot(path, (error, buffer) => {
       if (error) return callback(error);
       if (encoding) buffer = buffer.toString(encoding);
       callback(null, buffer);
@@ -826,13 +814,14 @@ function payloadFileSync(pointer) {
   function readdirOptions(options, hasCallback) {
     if (!options || (hasCallback && typeof options === 'function')) {
       return { encoding: null };
-    } else if (typeof options === 'string') {
-      return { encoding: options };
-    } else if (typeof options === 'object') {
-      return options;
-    } else {
-      return null;
     }
+    if (typeof options === 'string') {
+      return { encoding: options };
+    }
+    if (typeof options === 'object') {
+      return options;
+    }
+    return null;
   }
 
   function Dirent(name, type) {
@@ -840,20 +829,24 @@ function payloadFileSync(pointer) {
     this.type = type;
   }
 
-  Dirent.prototype.isDirectory = function () {
+  Dirent.prototype.isDirectory = function isDirectory() {
     return this.type === 2;
   };
 
-  Dirent.prototype.isFile = function () {
+  Dirent.prototype.isFile = function isFile() {
     return this.type === 1;
   };
 
-  Dirent.prototype.isBlockDevice = Dirent.prototype.isCharacterDevice = Dirent.prototype.isSymbolicLink = Dirent.prototype.isFIFO = Dirent.prototype.isSocket = function () {
+  Dirent.prototype.isSocket = function isSocket() {
     return false;
   };
+  Dirent.prototype.isFIFO = Dirent.prototype.isSocket;
+  Dirent.prototype.isSymbolicLink = Dirent.prototype.isSocket;
+  Dirent.prototype.isCharacterDevice = Dirent.prototype.isSocket;
+  Dirent.prototype.isBlockDevice = Dirent.prototype.isSocket;
 
   function getFileTypes(path_, entries) {
-    return entries.map(function (entry) {
+    return entries.map((entry) => {
       var path = require('path').join(path_, entry);
       var entity = VIRTUAL_FILESYSTEM[path];
       if (entity[STORE_BLOB] || entity[STORE_CONTENT])
@@ -865,7 +858,7 @@ function payloadFileSync(pointer) {
 
   function readdirRoot(path, cb) {
     if (cb) {
-      ancestor.readdir(path, function (error, entries) {
+      ancestor.readdir(path, (error, entries) => {
         if (error) return cb(error);
         entries.push('snapshot');
         cb(null, entries);
@@ -879,7 +872,7 @@ function payloadFileSync(pointer) {
 
   function readdirFromSnapshotSub(entityLinks, path, cb) {
     if (cb) {
-      payloadFile(entityLinks, function (error, buffer) {
+      payloadFile(entityLinks, (error, buffer) => {
         if (error) return cb(error);
         cb(null, JSON.parse(buffer).concat(readdirMountpoints(path)));
       });
@@ -905,7 +898,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-25'));
   }
 
-  fs.readdirSync = function (path, options_) {
+  fs.readdirSync = function readdirSync(path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -926,7 +919,7 @@ function payloadFileSync(pointer) {
     return entries;
   };
 
-  fs.readdir = function (path, options_) {
+  fs.readdir = function readdir(path, options_) {
     var isRoot = isRootPath(path);
 
     if (!insideSnapshot(path) && !isRoot) {
@@ -943,7 +936,7 @@ function payloadFileSync(pointer) {
     }
 
     var callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path, isRoot, function (error, entries) {
+    readdirFromSnapshot(path, isRoot, (error, entries) => {
       if (error) return callback(error);
       if (options.withFileTypes) entries = getFileTypes(path, entries);
       callback(null, entries);
@@ -960,7 +953,7 @@ function payloadFileSync(pointer) {
     return path;
   }
 
-  fs.realpathSync = function (path) {
+  fs.realpathSync = function realpathSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.realpathSync.apply(fs, arguments);
     }
@@ -971,7 +964,7 @@ function payloadFileSync(pointer) {
     return realpathFromSnapshot(path);
   };
 
-  fs.realpath = function (path) {
+  fs.realpath = function realpath(path) {
     if (!insideSnapshot(path)) {
       return ancestor.realpath.apply(fs, arguments);
     }
@@ -1007,26 +1000,26 @@ function payloadFileSync(pointer) {
     s.ctimeMs = EXECSTAT.ctimeMs;
     s.birthtimeMs = EXECSTAT.birthtimeMs;
 
-    var isFileValue = s.isFileValue;
-    var isDirectoryValue = s.isDirectoryValue;
-    var isSocketValue = s.isSocketValue;
+    var { isFileValue } = s;
+    var { isDirectoryValue } = s;
+    var { isSocketValue } = s;
     delete s.isFileValue;
     delete s.isDirectoryValue;
     delete s.isSocketValue;
 
-    s.isFile = function () {
+    s.isFile = function isFile() {
       return isFileValue;
     };
-    s.isDirectory = function () {
+    s.isDirectory = function isDirectory() {
       return isDirectoryValue;
     };
-    s.isSocket = function () {
+    s.isSocket = function isSocket() {
       return isSocketValue;
     };
-    s.isSymbolicLink = function () {
+    s.isSymbolicLink = function isSymbolicLink() {
       return false;
     };
-    s.isFIFO = function () {
+    s.isFIFO = function isFIFO() {
       return false;
     };
 
@@ -1046,7 +1039,7 @@ function payloadFileSync(pointer) {
 
   function statFromSnapshotSub(entityStat, cb) {
     if (cb) {
-      payloadFile(entityStat, function (error, buffer) {
+      payloadFile(entityStat, (error, buffer) => {
         if (error) return cb(error);
         cb(null, restore(JSON.parse(buffer)));
       });
@@ -1067,7 +1060,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-35'));
   }
 
-  fs.statSync = function (path) {
+  fs.statSync = function statSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.statSync.apply(fs, arguments);
     }
@@ -1078,7 +1071,7 @@ function payloadFileSync(pointer) {
     return statFromSnapshot(path);
   };
 
-  fs.stat = function (path) {
+  fs.stat = function stat(path) {
     if (!insideSnapshot(path)) {
       return ancestor.stat.apply(fs, arguments);
     }
@@ -1094,7 +1087,7 @@ function payloadFileSync(pointer) {
   // lstat /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  fs.lstatSync = function (path) {
+  fs.lstatSync = function lstatSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.lstatSync.apply(fs, arguments);
     }
@@ -1105,7 +1098,7 @@ function payloadFileSync(pointer) {
     return statFromSnapshot(path);
   };
 
-  fs.lstat = function (path) {
+  fs.lstat = function lstat(path) {
     if (!insideSnapshot(path)) {
       return ancestor.lstat.apply(fs, arguments);
     }
@@ -1123,13 +1116,13 @@ function payloadFileSync(pointer) {
 
   function fstatFromSnapshot(fd, cb) {
     var cb2 = cb || rethrow;
-    var entity = docks[fd].entity;
+    var { entity } = docks[fd];
     var entityStat = entity[STORE_STAT];
     if (entityStat) return statFromSnapshotSub(entityStat, cb);
     return cb2(new Error('UNEXPECTED-40'));
   }
 
-  fs.fstatSync = function (fd) {
+  fs.fstatSync = function fstatSync(fd) {
     if (!docks[fd]) {
       return ancestor.fstatSync.apply(fs, arguments);
     }
@@ -1137,7 +1130,7 @@ function payloadFileSync(pointer) {
     return fstatFromSnapshot(fd);
   };
 
-  fs.fstat = function (fd) {
+  fs.fstat = function fstat(fd) {
     if (!docks[fd]) {
       return ancestor.fstat.apply(fs, arguments);
     }
@@ -1164,7 +1157,7 @@ function payloadFileSync(pointer) {
     return true;
   }
 
-  fs.existsSync = function (path) {
+  fs.existsSync = function existsSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.existsSync.apply(fs, arguments);
     }
@@ -1175,7 +1168,7 @@ function payloadFileSync(pointer) {
     return existsFromSnapshot(path);
   };
 
-  fs.exists = function (path) {
+  fs.exists = function exists(path) {
     if (!insideSnapshot(path)) {
       return ancestor.exists.apply(fs, arguments);
     }
@@ -1200,7 +1193,7 @@ function payloadFileSync(pointer) {
     return cb2(null, undefined);
   }
 
-  fs.accessSync = function (path) {
+  fs.accessSync = function accessSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.accessSync.apply(fs, arguments);
     }
@@ -1211,7 +1204,7 @@ function payloadFileSync(pointer) {
     return accessFromSnapshot(path);
   };
 
-  fs.access = function (path) {
+  fs.access = function access(path) {
     if (!insideSnapshot(path)) {
       return ancestor.access.apply(fs, arguments);
     }
@@ -1260,7 +1253,7 @@ function payloadFileSync(pointer) {
     return process.binding('fs').internalModuleStat(makeLong(path));
   }
 
-  fs.internalModuleStat = function (long) {
+  fs.internalModuleStat = function internalModuleStat(long) {
     // from node comments:
     // Used to speed up module loading. Returns 0 if the path refers to
     // a file, 1 when it's a directory or < 0 on error (usually -ENOENT).
@@ -1290,7 +1283,7 @@ function payloadFileSync(pointer) {
     return -ENOENT;
   };
 
-  fs.internalModuleReadFile = fs.internalModuleReadJSON = function (long) {
+  fs.internalModuleReadJSON = function internalModuleReadJSON(long) {
     // from node comments:
     // Used to speed up module loading. Returns the contents of the file as
     // a string or undefined when the file cannot be opened. The speedup
@@ -1325,12 +1318,14 @@ function payloadFileSync(pointer) {
       ? [payloadFileSync(entityContent).toString(), true]
       : payloadFileSync(entityContent).toString();
   };
+
+  fs.internalModuleReadFile = fs.internalModuleReadJSON;
 })();
 
 // /////////////////////////////////////////////////////////////////
 // PATCH MODULE ////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   var Module = require('module');
   var ancestor = {};
   ancestor.require = Module.prototype.require;
@@ -1338,7 +1333,7 @@ function payloadFileSync(pointer) {
   ancestor._resolveFilename = Module._resolveFilename;
   ancestor.runMain = Module.runMain;
 
-  Module.prototype.require = function (path) {
+  Module.prototype.require = function require(path) {
     try {
       return ancestor.require.apply(this, arguments);
     } catch (error) {
@@ -1365,14 +1360,15 @@ function payloadFileSync(pointer) {
     }
   };
 
-  var im, makeRequireFunction;
+  var im;
+  var makeRequireFunction;
 
   if (NODE_VERSION_MAJOR === 0) {
-    makeRequireFunction = function (self) {
+    makeRequireFunction = (self) => {
       function rqfn(path) {
         return self.require(path);
       }
-      rqfn.resolve = function (request) {
+      rqfn.resolve = function resolve(request) {
         return Module._resolveFilename(request, self);
       };
       rqfn.main = process.mainModule;
@@ -1383,9 +1379,7 @@ function payloadFileSync(pointer) {
   } else if (NODE_VERSION_MAJOR <= 9) {
     im = require('internal/module');
     if (NODE_VERSION_MAJOR <= 7) {
-      makeRequireFunction = function (m) {
-        return im.makeRequireFunction.call(m);
-      };
+      makeRequireFunction = (m) => im.makeRequireFunction.call(m);
     } else {
       makeRequireFunction = im.makeRequireFunction;
     }
@@ -1395,7 +1389,7 @@ function payloadFileSync(pointer) {
     // TODO esm modules along with cjs
   }
 
-  Module.prototype._compile = function (content, filename_) {
+  Module.prototype._compile = function _compile(content, filename_) {
     if (!insideSnapshot(filename_)) {
       return ancestor._compile.apply(this, arguments);
     }
@@ -1418,14 +1412,14 @@ function payloadFileSync(pointer) {
 
     if (entityBlob) {
       var options = {
-        filename: filename,
+        filename,
         lineOffset: 0,
         displayErrors: true,
         cachedData: payloadFileSync(entityBlob),
         sourceless: !entityContent,
       };
 
-      var Script = require('vm').Script;
+      var { Script } = require('vm');
       var code = entityContent
         ? require('module').wrap(payloadFileSync(entityContent))
         : undefined;
@@ -1449,7 +1443,7 @@ function payloadFileSync(pointer) {
     throw new Error('UNEXPECTED-55');
   };
 
-  Module._resolveFilename = function () {
+  Module._resolveFilename = function _resolveFilename() {
     var filename;
     var flagWasOn = false;
 
@@ -1490,7 +1484,7 @@ function payloadFileSync(pointer) {
     return filename;
   };
 
-  Module.runMain = function () {
+  Module.runMain = function runMain() {
     Module._load(ENTRYPOINT, null, true);
     process._tickCallback();
   };
@@ -1499,7 +1493,7 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 // PATCH CHILD_PROCESS /////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   var childProcess = require('child_process');
   var ancestor = {};
   ancestor.spawn = childProcess.spawn;
@@ -1523,14 +1517,14 @@ function payloadFileSync(pointer) {
   }
 
   function startsWith2(args, index, name, impostor) {
-    var qsName = '"' + name + ' ';
+    var qsName = `"${name} `;
     if (args[index].slice(0, qsName.length) === qsName) {
-      args[index] = '"' + impostor + ' ' + args[index].slice(qsName.length);
+      args[index] = `"${impostor} ${args[index].slice(qsName.length)}`;
       return true;
     }
-    var sName = name + ' ';
+    var sName = `${name} `;
     if (args[index].slice(0, sName.length) === sName) {
-      args[index] = impostor + ' ' + args[index].slice(sName.length);
+      args[index] = `${impostor} ${args[index].slice(sName.length)}`;
       return true;
     }
     if (args[index] === name) {
@@ -1541,8 +1535,8 @@ function payloadFileSync(pointer) {
   }
 
   function startsWith(args, index, name) {
-    var qName = '"' + name + '"';
-    var qEXECPATH = '"' + EXECPATH + '"';
+    var qName = `"${name}"`;
+    var qEXECPATH = `"${EXECPATH}"`;
     var jsName = JSON.stringify(name);
     var jsEXECPATH = JSON.stringify(EXECPATH);
     return (
@@ -1575,9 +1569,7 @@ function payloadFileSync(pointer) {
     ) {
       args[0] = EXECPATH;
       if (NODE_VERSION_MAJOR === 0) {
-        args[1] = args[1].filter(function (a) {
-          return a.slice(0, 13) !== '--debug-port=';
-        });
+        args[1] = args[1].filter((a) => a.slice(0, 13) !== '--debug-port=');
       }
     } else {
       for (var i = 1; i < args[1].length; i += 1) {
@@ -1589,42 +1581,42 @@ function payloadFileSync(pointer) {
     }
   }
 
-  childProcess.spawn = function () {
+  childProcess.spawn = function spawn() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
-  childProcess.spawnSync = function () {
+  childProcess.spawnSync = function spawnSync() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawnSync.apply(childProcess, args);
   };
 
-  childProcess.execFile = function () {
+  childProcess.execFile = function execFile() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFile.apply(childProcess, args);
   };
 
-  childProcess.execFileSync = function () {
+  childProcess.execFileSync = function execFileSync() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFileSync.apply(childProcess, args);
   };
 
-  childProcess.exec = function () {
+  childProcess.exec = function exec() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.exec.apply(childProcess, args);
   };
 
-  childProcess.execSync = function () {
+  childProcess.execSync = function execSync() {
     var args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyLong(args, 0);
@@ -1635,21 +1627,21 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 // PROMISIFY ///////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   var util = require('util');
-  var promisify = util.promisify;
+  var { promisify } = util;
   if (promisify) {
-    var custom = promisify.custom;
-    var customPromisifyArgs = require('internal/util').customPromisifyArgs;
+    var { custom } = promisify;
+    var { customPromisifyArgs } = require('internal/util');
 
     // /////////////////////////////////////////////////////////////
     // FS //////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
     Object.defineProperty(require('fs').exists, custom, {
-      value: function (path) {
-        return new Promise(function (resolve) {
-          require('fs').exists(path, function (exists) {
+      value(path) {
+        return new Promise((resolve) => {
+          require('fs').exists(path, (exists) => {
             resolve(exists);
           });
         });
@@ -1668,25 +1660,21 @@ function payloadFileSync(pointer) {
     // CHILD_PROCESS ///////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
-    var customPromiseExecFunction = function (o) {
-      return function () {
-        var args = Array.from(arguments);
-        return new Promise(function (resolve, reject) {
-          o.apply(
-            undefined,
-            args.concat(function (error, stdout, stderr) {
-              if (error !== null) {
-                error.stdout = stdout;
-                error.stderr = stderr;
-                reject(error);
-              } else {
-                resolve({ stdout: stdout, stderr: stderr });
-              }
-            })
-          );
-        });
-      };
-    };
+    var customPromiseExecFunction = (o) => (...args) =>
+      new Promise((resolve, reject) => {
+        o.apply(
+          undefined,
+          args.concat((error, stdout, stderr) => {
+            if (error !== null) {
+              error.stdout = stdout;
+              error.stderr = stderr;
+              reject(error);
+            } else {
+              resolve({ stdout, stderr });
+            }
+          })
+        );
+      });
 
     Object.defineProperty(require('child_process').exec, custom, {
       value: customPromiseExecFunction(require('child_process').exec),
@@ -1701,7 +1689,7 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 // PATCH PROCESS ///////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-(function () {
+(() => {
   const fs = require('fs');
   var ancestor = {};
   ancestor.dlopen = process.dlopen;
@@ -1711,7 +1699,7 @@ function payloadFileSync(pointer) {
     return f;
   }
 
-  process.dlopen = function () {
+  process.dlopen = function dlopen() {
     const args = cloneArgs(arguments);
     const modulePath = revertMakingLong(args[1]);
     const moduleDirname = require('path').dirname(modulePath);
@@ -1735,7 +1723,7 @@ function payloadFileSync(pointer) {
     }
 
     const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
-    const tryImporting = function (previousErrorMessage) {
+    const tryImporting = function tryImporting(previousErrorMessage) {
       try {
         const res = ancestor.dlopen.apply(process, args);
         return res;

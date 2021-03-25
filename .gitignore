@@ -19,3 +19,4 @@ examples/express/node_modules
 
 # Editors
 .vscode/
+yarn-error.log

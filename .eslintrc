@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "wrap-iife": "off",
+    "no-bitwise": "off",
+    "no-continue": "off",
+    "class-methods-use-this": "off",
+    "no-await-in-loop": "off",
+    "no-constant-condition": "off",
+    "no-param-reassign": "off",
+    "consistent-return": "off",
+    "no-restricted-syntax": "off",
+    "import/prefer-default-export": "off",
+    "camelcase": "off"
+  },
+  "overrides": [{
+    "files": ["prelude/**/*"],
+    "rules": {
+      "strict": "off"
+    }
+  }]
+}
