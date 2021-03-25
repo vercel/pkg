@@ -10,7 +10,7 @@ updates:
       - 'prod-dependencies'
     allowed_updates:
       - match:
-          update_type: "security"
+          update_type: 'security'
 
   - package-ecosystem: 'npm'
     directory: '/'
@@ -24,7 +24,7 @@ updates:
       - 'automerge'
     allowed_updates:
       - match:
-          update_type: "security"
+          update_type: 'security'
 
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -32,4 +32,4 @@ updates:
       interval: 'weekly'
     allowed_updates:
       - match:
-          update_type: "security"
+          update_type: 'security'
