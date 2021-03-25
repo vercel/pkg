@@ -4,7 +4,7 @@
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
-  "repository": "leafac/pkg",
+  "repository": "vercel/pkg",
   "publishConfig": {
     "access": "public"
   },
