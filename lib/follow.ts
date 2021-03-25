@@ -42,7 +42,7 @@ interface FollowOptions
 
 export function follow(x: string, opts: FollowOptions) {
   // TODO async version
-  return new Promise((resolve) => {
+  return new Promise<string>((resolve) => {
     resolve(
       sync(x, {
         basedir: opts.basedir,

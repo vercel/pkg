@@ -22,30 +22,54 @@ import {
 import { follow, natives } from './follow';
 import { log, wasReported } from './log';
 import * as detector from './detector';
+import {
+  ConfigDictionary,
+  FileRecord,
+  FileRecords,
+  Patches,
+  PackageJson,
+} from './types';
 
 const win32 = process.platform === 'win32';
 
-function unlikelyJavascript(file) {
+function unlikelyJavascript(file: string) {
   return ['.css', '.html', '.json'].includes(path.extname(file));
 }
 
-function isPublic(config) {
-  if (config.private) return false;
-  let { license, licenses } = config;
+function isPublic(config: PackageJson) {
+  if (config.private) {
+    return false;
+  }
+
+  const { licenses } = config;
+  let { license } = config;
+
   if (licenses) {
     license = licenses;
   }
+
   if (license) {
-    license = license.type || license;
+    license = typeof license === 'string' ? license : license.type;
   }
+
   if (Array.isArray(license)) {
     license = license.map((c) => String(c.type || c)).join(',');
   }
-  if (!license) return false;
-  if (/^\(/.test(license)) license = license.slice(1);
-  if (/\)$/.test(license)) license = license.slice(0, -1);
+
+  if (!license) {
+    return false;
+  }
+
+  if (/^\(/.test(license)) {
+    license = license.slice(1);
+  }
+
+  if (/\)$/.test(license)) {
+    license = license.slice(0, -1);
+  }
+
   license = license.toLowerCase();
-  licenses = Array.prototype.concat(
+  const allLicenses = Array.prototype.concat(
     license.split(' or '),
     license.split(' and '),
     license.split('/'),
@@ -77,52 +101,117 @@ function isPublic(config) {
     'lgpl-2.1+',
     'cc0-1.0',
   ];
-  for (const c of licenses) {
+
+  for (const c of allLicenses) {
     result = foss.indexOf(c) >= 0;
-    if (result) break;
+
+    if (result) {
+      break;
+    }
   }
+
   return result;
 }
 
-function upon(p, base) {
+function upon(p: any, base: string) {
   if (typeof p !== 'string') {
     throw wasReported('Config items must be strings. See examples');
   }
+
   let negate = false;
+
   if (p[0] === '!') {
     p = p.slice(1);
     negate = true;
   }
+
   p = path.join(base, p);
+
   if (win32) {
     p = p.replace(/\\/g, '/');
   }
+
   if (negate) {
     p = `!${p}`;
   }
+
   return p;
 }
 
-function collect(ps) {
+function collect(ps: string[]) {
   return globby.sync(ps, { dot: true });
 }
 
-function expandFiles(efs, base) {
+function expandFiles(efs: string | string[], base: string) {
   if (!Array.isArray(efs)) {
     efs = [efs];
   }
+
   efs = collect(efs.map((p) => upon(p, base)));
+
   return efs;
 }
 
+interface Marker {
+  hasDictionary?: boolean;
+  activated?: boolean;
+  toplevel?: boolean;
+  public?: boolean;
+  hasDeployFiles?: boolean;
+  config?: PackageJson;
+  configPath: string;
+  base: string;
+}
+
+interface Task {
+  file: string;
+  data?: unknown;
+  reason?: string;
+  marker?: Marker;
+  store: number;
+}
+
+interface Derivative {
+  alias: string;
+  mayExclude?: boolean;
+  mustExclude?: boolean;
+  aliasType: number;
+  fromDependencies?: boolean;
+}
+
+interface WalkerParams {
+  publicToplevel?: boolean;
+  publicPackages?: string[];
+}
+
 class Walker {
-  appendRecord(task) {
-    const { file } = task;
-    if (this.records[file]) return;
+  private params: WalkerParams;
+
+  private patches: Patches;
+
+  private tasks: Task[];
+
+  private records: FileRecords;
+
+  private dictionary: ConfigDictionary;
+
+  constructor() {
+    this.tasks = [];
+    this.records = {};
+    this.dictionary = {};
+    this.patches = {};
+    this.params = {};
+  }
+
+  appendRecord({ file }: Task) {
+    if (this.records[file]) {
+      return;
+    }
+
     this.records[file] = { file };
   }
 
-  append(task) {
+  append(task: Task) {
     task.file = normalizePath(task.file);
     this.appendRecord(task);
     this.tasks.push(task);
@@ -133,6 +222,7 @@ class Walker {
       [STORE_LINKS]: 'Directory',
       [STORE_STAT]: 'Stat info of',
     }[task.store];
+
     if (task.reason) {
       log.debug(`${what}  %1 is added to queue. It was required from %2`, [
         `%1: ${task.file}`,
@@ -143,19 +233,21 @@ class Walker {
     }
   }
 
-  async appendFilesFromConfig(marker) {
+  async appendFilesFromConfig(marker: Marker) {
     const { config, configPath, base } = marker;
-    const pkgConfig = config.pkg;
+    const pkgConfig = config?.pkg;
 
     if (pkgConfig) {
       let { scripts } = pkgConfig;
 
       if (scripts) {
         scripts = expandFiles(scripts, base);
+
         for (const script of scripts) {
           const stat = await fs.stat(script);
+
           if (stat.isFile()) {
-            if (!isDotJS(script) && !isDotJSON(script) & !isDotNODE(script)) {
+            if (!isDotJS(script) && !isDotJSON(script) && !isDotNODE(script)) {
               log.warn("Non-javascript file is specified in 'scripts'.", [
                 'Pkg will probably fail to parse. Specify *.js in glob.',
                 script,
@@ -176,8 +268,10 @@ class Walker {
 
       if (assets) {
         assets = expandFiles(assets, base);
+
         for (const asset of assets) {
           const stat = await fs.stat(asset);
+
           if (stat.isFile()) {
             this.append({
               file: asset,
@@ -188,13 +282,15 @@ class Walker {
           }
         }
       }
-    } else {
+    } else if (config) {
       let { files } = config;
 
       if (files) {
         files = expandFiles(files, base);
+
         for (const file of files) {
           const stat = await fs.stat(file);
+
           if (stat.isFile()) {
             // 1) remove sources of top-level(!) package 'files' i.e. ship as BLOB
             // 2) non-source (non-js) files of top-level package are shipped as CONTENT
@@ -220,15 +316,26 @@ class Walker {
     }
   }
 
-  async stepActivate(marker, derivatives) {
-    if (!marker) assert(false);
-    if (marker.activated) return;
+  async stepActivate(marker: Marker, derivatives: Derivative[]) {
+    if (!marker) {
+      assert(false);
+    }
+
+    if (marker.activated) {
+      return;
+    }
+
     const { config, base } = marker;
-    if (!config) assert(false);
+
+    if (!config) {
+      assert(false);
+    }
 
     const { name } = config;
+
     if (name) {
       const d = this.dictionary[name];
+
       if (d) {
         if (
           typeof config.dependencies === 'object' &&
@@ -237,12 +344,14 @@ class Walker {
           Object.assign(config.dependencies, d.dependencies);
           delete d.dependencies;
         }
+
         Object.assign(config, d);
         marker.hasDictionary = true;
       }
     }
 
     const { dependencies } = config;
+
     if (typeof dependencies === 'object') {
       for (const dependency in dependencies) {
         // it may be `undefined` - overridden
@@ -264,8 +373,10 @@ class Walker {
     }
 
     const pkgConfig = config.pkg;
+
     if (pkgConfig) {
       const { patches } = pkgConfig;
+
       if (patches) {
         for (const key in patches) {
           if (patches[key]) {
@@ -276,8 +387,10 @@ class Walker {
       }
 
       const { deployFiles } = pkgConfig;
+
       if (deployFiles) {
         marker.hasDeployFiles = true;
+
         for (const deployFile of deployFiles) {
           const type = deployFile[2] || 'file';
           log.warn(`Cannot include ${type} %1 into executable.`, [
@@ -298,13 +411,15 @@ class Walker {
 
     await this.appendFilesFromConfig(marker);
     marker.public = isPublic(config);
+
     if (!marker.public && marker.toplevel) {
       marker.public = this.params.publicToplevel;
     }
+
     if (!marker.public && !marker.toplevel && this.params.publicPackages) {
       marker.public =
         this.params.publicPackages[0] === '*' ||
-        this.params.publicPackages.indexOf(name) !== -1;
+        (!!name && this.params.publicPackages.indexOf(name) !== -1);
     }
 
     marker.activated = true;
@@ -312,7 +427,7 @@ class Walker {
     delete marker.config;
   }
 
-  async stepRead(record) {
+  async stepRead(record: FileRecord) {
     let body;
 
     try {
@@ -325,17 +440,24 @@ class Walker {
     record.body = body;
   }
 
-  hasPatch(record) {
+  hasPatch(record: FileRecord) {
     const patch = this.patches[record.file];
-    if (!patch) return;
+
+    if (!patch) {
+      return;
+    }
+
     return true;
   }
 
-  stepPatch(record) {
+  stepPatch(record: FileRecord) {
     const patch = this.patches[record.file];
-    if (!patch) return;
 
-    let body = record.body.toString('utf8');
+    if (!patch) {
+      return;
+    }
+
+    let body = (record.body || '').toString('utf8');
 
     for (let i = 0; i < patch.length; i += 2) {
       if (typeof patch[i] === 'object') {
@@ -358,12 +480,13 @@ class Walker {
     record.body = body;
   }
 
-  stepStrip(record) {
-    let body = record.body.toString('utf8');
+  stepStrip(record: FileRecord) {
+    let body = (record.body || '').toString('utf8');
 
     if (/^\ufeff/.test(body)) {
       body = body.replace(/^\ufeff/, '');
     }
+
     if (/^#!/.test(body)) {
       body = body.replace(/^#![^\n]*\n/, '\n');
     }
@@ -371,22 +494,36 @@ class Walker {
     record.body = body;
   }
 
-  stepDetect(record, marker, derivatives) {
-    const { body } = record;
+  stepDetect(record: FileRecord, marker: Marker, derivatives: Derivative[]) {
+    let { body = '' } = record;
+
+    if (body instanceof Buffer) {
+      body = body.toString();
+    }
 
     try {
       detector.detect(body, (node, trying) => {
         const { toplevel } = marker;
-        let d = detector.visitor_SUCCESSFUL(node);
+        let d = (detector.visitor_SUCCESSFUL(node) as unknown) as Derivative;
+
         if (d) {
-          if (d.mustExclude) return false;
+          if (d.mustExclude) {
+            return false;
+          }
+
           d.mayExclude = d.mayExclude || trying;
           derivatives.push(d);
+
           return false;
         }
-        d = detector.visitor_NONLITERAL(node);
+
+        d = (detector.visitor_NONLITERAL(node) as unknown) as Derivative;
+
         if (d) {
-          if (d.mustExclude) return false;
+          if (typeof d === 'object' && d.mustExclude) {
+            return false;
+          }
+
           const debug = !toplevel || d.mayExclude || trying;
           const level = debug ? 'debug' : 'warn';
           log[level](`Cannot resolve '${d.alias}'`, [
@@ -398,7 +535,9 @@ class Walker {
           ]);
           return false;
         }
-        d = detector.visitor_MALFORMED(node);
+
+        d = (detector.visitor_MALFORMED(node) as unknown) as Derivative;
+
         if (d) {
           // there is no 'mustExclude'
           const debug = !toplevel || trying;
@@ -406,7 +545,9 @@ class Walker {
           log[level](`Malformed requirement for '${d.alias}'`, [record.file]);
           return false;
         }
-        d = detector.visitor_USESCWD(node);
+
+        d = (detector.visitor_USESCWD(node) as unknown) as Derivative;
+
         if (d) {
           // there is no 'mustExclude'
           const level = 'debug'; // there is no 'mayExclude'
@@ -415,8 +556,10 @@ class Walker {
             "It resolves relatively to 'process.cwd' by default, however",
             "you may want to use 'path.dirname(require.main.filename)'",
           ]);
+
           return false;
         }
+
         return true; // can i go inside?
       });
     } catch (error) {
@@ -425,8 +568,11 @@ class Walker {
     }
   }
 
-  async stepDerivatives_ALIAS_AS_RELATIVE(record, marker, derivative) {
-    // eslint-disable-line camelcase
+  async stepDerivatives_ALIAS_AS_RELATIVE(
+    record: FileRecord,
+    marker: Marker,
+    derivative: Derivative
+  ) {
     const file = path.join(path.dirname(record.file), derivative.alias);
 
     let stat;
@@ -453,21 +599,25 @@ class Walker {
     }
   }
 
-  async stepDerivatives_ALIAS_AS_RESOLVABLE(record, marker, derivative) {
+  async stepDerivatives_ALIAS_AS_RESOLVABLE(
+    record: FileRecord,
+    marker: Marker,
+    derivative: Derivative
+  ) {
     // eslint-disable-line camelcase
-    const newPackages = [];
+    const newPackages: { packageJson: string; marker?: Marker }[] = [];
 
-    const catchReadFile = (file) => {
+    const catchReadFile = (file: string) => {
       assert(isPackageJson(file), `walker: ${file} must be package.json`);
       newPackages.push({ packageJson: file });
     };
 
-    const catchPackageFilter = (config, base) => {
+    const catchPackageFilter = (config: PackageJson, base: string) => {
       const newPackage = newPackages[newPackages.length - 1];
       newPackage.marker = { config, configPath: newPackage.packageJson, base };
     };
 
-    let newFile;
+    let newFile = '';
     let failure;
 
     try {
@@ -488,12 +638,13 @@ class Walker {
     if (failure) {
       const { toplevel } = marker;
       const mainNotFound =
-        newPackages.length > 0 && !newPackages[0].marker.config.main;
+        newPackages.length > 0 && !newPackages[0].marker?.config?.main;
       const debug =
         !toplevel ||
         derivative.mayExclude ||
         (mainNotFound && derivative.fromDependencies);
       const level = debug ? 'debug' : 'warn';
+
       if (mainNotFound) {
         const message = "Entry 'main' not found in %1";
         log[level](message, [
@@ -503,6 +654,7 @@ class Walker {
       } else {
         log[level](failure.message, [`%1: ${record.file}`]);
       }
+
       return;
     }
 
@@ -544,7 +696,11 @@ class Walker {
     });
   }
 
-  async stepDerivatives(record, marker, derivatives) {
+  async stepDerivatives(
+    record: FileRecord,
+    marker: Marker,
+    derivatives: Derivative[]
+  ) {
     for (const derivative of derivatives) {
       if (natives[derivative.alias]) continue;
 
@@ -566,7 +722,7 @@ class Walker {
     }
   }
 
-  async step_STORE_ANY(record, marker, store) {
+  async step_STORE_ANY(record: FileRecord, marker: Marker, store: number) {
     // eslint-disable-line camelcase
     if (record[store] !== undefined) return;
     record[store] = false; // default is discard
@@ -576,9 +732,10 @@ class Walker {
       store: STORE_STAT,
     });
 
-    const derivatives1 = [];
+    const derivatives1: Derivative[] = [];
     await this.stepActivate(marker, derivatives1);
     await this.stepDerivatives(record, marker, derivatives1);
+
     if (store === STORE_BLOB) {
       if (unlikelyJavascript(record.file) || isDotNODE(record.file)) {
         this.append({
@@ -608,7 +765,7 @@ class Walker {
       }
 
       if (store === STORE_BLOB) {
-        const derivatives2 = [];
+        const derivatives2: Derivative[] = [];
         this.stepDetect(record, marker, derivatives2);
         await this.stepDerivatives(record, marker, derivatives2);
       }
@@ -617,8 +774,7 @@ class Walker {
     record[store] = true;
   }
 
-  step_STORE_LINKS(record, data) {
-    // eslint-disable-line camelcase
+  step_STORE_LINKS(record: FileRecord, data: unknown) {
     if (record[STORE_LINKS]) {
       record[STORE_LINKS].push(data);
       return;
@@ -632,8 +788,7 @@ class Walker {
     });
   }
 
-  async step_STORE_STAT(record) {
-    // eslint-disable-line camelcase
+  async step_STORE_STAT(record: FileRecord) {
     if (record[STORE_STAT]) return;
 
     try {
@@ -653,11 +808,13 @@ class Walker {
     }
   }
 
-  async step(task) {
+  async step(task: Task) {
     const { file, store, data } = task;
     const record = this.records[file];
+
     if (store === STORE_BLOB || store === STORE_CONTENT) {
-      await this.step_STORE_ANY(record, task.marker, store);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await this.step_STORE_ANY(record, task.marker!, store);
     } else if (store === STORE_LINKS) {
       this.step_STORE_LINKS(record, data);
     } else if (store === STORE_STAT) {
@@ -667,22 +824,24 @@ class Walker {
     }
   }
 
-  async readDictionary(marker) {
+  async readDictionary(marker: Marker) {
     const dd = path.join(__dirname, '../dictionary');
     const files = await fs.readdir(dd);
 
     for (const file of files) {
       if (/\.js$/.test(file)) {
         const name = file.slice(0, -3);
-        // eslint-disable-next-line import/no-dynamic-require, global-require
+        // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
         const config = require(path.join(dd, file));
         this.dictionary[name] = config;
       }
     }
 
-    const pkgConfig = marker.config.pkg;
+    const pkgConfig = marker.config?.pkg;
+
     if (pkgConfig) {
       const { dictionary } = pkgConfig;
+
       if (dictionary) {
         for (const name in dictionary) {
           if (dictionary[name]) {
@@ -693,11 +852,12 @@ class Walker {
     }
   }
 
-  async start(marker, entrypoint, addition, params) {
-    this.tasks = [];
-    this.records = {};
-    this.dictionary = {};
-    this.patches = {};
+  async start(
+    marker: Marker,
+    entrypoint: string,
+    addition: string,
+    params: WalkerParams
+  ) {
     this.params = params;
 
     await this.readDictionary(marker);
@@ -731,7 +891,7 @@ class Walker {
   }
 }
 
-export default async function walker(...args) {
+export default async function walker(...args: Parameters<Walker['start']>) {
   const w = new Walker();
   return w.start(...args);
 }
