@@ -53,7 +53,7 @@ exports.isRootPath = isRootPath;
 var normalizePath;
 
 if (win32) {
-  normalizePath = function (f) {
+  normalizePath = (f) => {
     var file = f;
     if (Buffer.isBuffer(file)) file = file.toString();
     if (hasURL && file instanceof URL) file = file.pathname.replace(/^\//, '');
@@ -63,7 +63,7 @@ if (win32) {
     return file;
   };
 } else {
-  normalizePath = function (f) {
+  normalizePath = (f) => {
     var file = f;
     if (Buffer.isBuffer(file)) file = file.toString();
     if (hasURL && file instanceof URL) file = file.pathname;
@@ -75,19 +75,19 @@ if (win32) {
 
 exports.normalizePath = normalizePath;
 
-exports.isPackageJson = function (file) {
+exports.isPackageJson = function isPackageJson(file) {
   return path.basename(file) === 'package.json';
 };
 
-exports.isDotJS = function (file) {
+exports.isDotJS = function isDotJS(file) {
   return path.extname(file) === '.js';
 };
 
-exports.isDotJSON = function (file) {
+exports.isDotJSON = function isDotJSON(file) {
   return path.extname(file) === '.json';
 };
 
-exports.isDotNODE = function (file) {
+exports.isDotNODE = function isDotNODE(file) {
   return path.extname(file) === '.node';
 };
 
@@ -98,7 +98,7 @@ function replaceSlashes(file, slash) {
     }
   } else if (/^\//.test(file)) {
     if (slash === '\\') {
-      return 'C:' + file.replace(/\//g, '\\');
+      return `C:${file.replace(/\//g, '\\')}`;
     }
   }
   return file;
@@ -108,12 +108,15 @@ function injectSnapshot(file) {
   if (/^.:\\/.test(file)) {
     // C:\path\to
     if (file.length === 3) file = file.slice(0, -1); // C:\
-    return file[0] + ':\\snapshot' + file.slice(2);
-  } else if (/^\//.test(file)) {
+    return `${file[0]}:\\snapshot${file.slice(2)}`;
+  }
+
+  if (/^\//.test(file)) {
     // /home/user/project
     if (file.length === 1) file = file.slice(0, -1); // /
-    return '/snapshot' + file;
+    return `/snapshot${file}`;
   }
+
   return file;
 }
 
@@ -128,10 +131,10 @@ function longestCommonLength(s1, s2) {
 }
 
 function withoutNodeModules(file) {
-  return file.split(path.sep + 'node_modules' + path.sep)[0];
+  return file.split(`${path.sep}node_modules${path.sep}`)[0];
 }
 
-exports.retrieveDenominator = function (files) {
+exports.retrieveDenominator = function retrieveDenominator(files) {
   assert(files.length > 0);
 
   var s1 = withoutNodeModules(files[0]) + path.sep;
@@ -144,12 +147,12 @@ exports.retrieveDenominator = function (files) {
   return s1.lastIndexOf(path.sep);
 };
 
-exports.substituteDenominator = function (f, denominator) {
+exports.substituteDenominator = function substituteDenominator(f, denominator) {
   var rootLength = win32 ? 2 : 0;
   return f.slice(0, rootLength) + f.slice(denominator);
 };
 
-exports.snapshotify = function (file, slash) {
+exports.snapshotify = function snapshotify(file, slash) {
   assert.strictEqual(file, normalizePath(file));
   return injectSnapshot(replaceSlashes(file, slash));
 };
@@ -182,19 +185,19 @@ if (win32) {
   };
 }
 
-exports.stripSnapshot = function (f) {
+exports.stripSnapshot = function stripSnapshot(f) {
   var file = normalizePath(f);
   if (/^.:\\snapshot$/.test(file)) {
-    return file[0] + ':\\**\\';
+    return `${file[0]}:\\**\\`;
   }
   if (/^.:\\snapshot\\/.test(file)) {
-    return file[0] + ':\\**' + file.slice(11);
+    return `${file[0]}:\\**${file.slice(11)}`;
   }
   if (/^\/snapshot$/.test(file)) {
     return '/**/';
   }
   if (/^\/snapshot\//.test(file)) {
-    return '/**' + file.slice(9);
+    return `/**${file.slice(9)}`;
   }
   return f; // not inside
 };
