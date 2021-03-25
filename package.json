@@ -39,7 +39,7 @@
     "escodegen": "^1.14.1",
     "fs-extra": "^8.1.0",
     "globby": "^11.0.0",
-    "into-stream": "^5.1.1",
+    "into-stream": "^6.0.0",
     "minimist": "^1.2.5",
     "multistream": "^2.1.1",
     "pkg-fetch": "^2.6.9",
