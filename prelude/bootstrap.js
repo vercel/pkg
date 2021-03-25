@@ -1224,6 +1224,24 @@ function payloadFileSync(pointer) {
   };
 
   // ///////////////////////////////////////////////////////////////
+  // promises ////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////
+
+  if (fs.promises !== undefined) {
+    var util = require('util');
+    fs.promises.open = util.promisify(fs.open);
+    fs.promises.read = util.promisify(fs.read);
+    fs.promises.write = util.promisify(fs.write);
+    fs.promises.readFile = util.promisify(fs.readFile);
+    fs.promises.readdir = util.promisify(fs.readdir);
+    fs.promises.realpath = util.promisify(fs.realpath);
+    fs.promises.stat = util.promisify(fs.stat);
+    fs.promises.lstat = util.promisify(fs.lstat);
+    fs.promises.fstat = util.promisify(fs.fstat);
+    fs.promises.access = util.promisify(fs.access);
+  }
+
+  // ///////////////////////////////////////////////////////////////
   // INTERNAL //////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
@@ -1688,9 +1706,14 @@ function payloadFileSync(pointer) {
   var ancestor = {};
   ancestor.dlopen = process.dlopen;
 
+  function revertMakingLong(f) {
+    if (/^\\\\\?\\/.test(f)) return f.slice(4);
+    return f;
+  }
+
   process.dlopen = function () {
     const args = cloneArgs(arguments);
-    const modulePath = args[1];
+    const modulePath = revertMakingLong(args[1]);
     const moduleDirname = require('path').dirname(modulePath);
     if (insideSnapshot(modulePath)) {
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
