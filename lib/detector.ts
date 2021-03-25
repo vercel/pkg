@@ -2,6 +2,7 @@
 /* eslint-disable prefer-const */
 
 import { generate } from 'escodegen';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as babelTypes from '@babel/types';
 import * as babel from '@babel/parser';
 

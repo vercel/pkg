@@ -12,5 +12,5 @@
     "incremental": true,
     "resolveJsonModule": true
   },
-  "include": ["lib/**/*"]
+  "include": ["lib/**/*", "typings/**/*"]
 }
