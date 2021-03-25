@@ -2,9 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'src/view/**/*',
-      'src/js/view/**/*'
-    ]
-  }
+    assets: ['src/view/**/*', 'src/js/view/**/*'],
+  },
 };

@@ -29,6 +29,9 @@
       ]
     ]
   },
+  "prettier": {
+    "singleQuote": true
+  },
   "dependencies": {
     "@babel/parser": "^7.9.4",
     "@babel/runtime": "^7.9.2",
@@ -55,9 +58,13 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
     "eslint-config-klopov": "^1.0.2",
+    "eslint-config-prettier": "8.1.0",
     "json-stable-stringify": "^1.0.1",
+    "lint-staged": ">=10",
     "mkdirp": "^1.0.3",
-    "rimraf": "^3.0.1"
+    "prettier": "2.2.1",
+    "rimraf": "^3.0.1",
+    "simple-git-hooks": ">=2.0.3"
   },
   "peerDependencies": {
     "node-notifier": ">=6.0.0"
@@ -76,10 +83,14 @@
     "test:no-npm": "node test/test.js host no-npm"
   },
   "eslintConfig": {
-    "extends": "klopov",
+    "extends": [
+      "klopov",
+      "prettier"
+    ],
     "parser": "babel-eslint",
     "rules": {
-      "wrap-iife": "off"
+      "wrap-iife": "off",
+      "camelcase": "off"
     }
   },
   "greenkeeper": {
@@ -87,5 +98,11 @@
     "ignore": [
       "pkg-fetch"
     ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,css,md,json}": "prettier --write"
   }
 }

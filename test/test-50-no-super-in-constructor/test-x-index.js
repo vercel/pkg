@@ -4,7 +4,7 @@ var events = require('events');
 var util = require('util');
 
 class UpnpService {
-  constructor () {
+  constructor() {
     console.log('ok');
     events.EventEmitter.call(this);
   }

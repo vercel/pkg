@@ -7,18 +7,18 @@ exports.STORE_BLOB = 0;
 exports.STORE_CONTENT = 1;
 exports.STORE_LINKS = 2;
 exports.STORE_STAT = 3;
-exports.ALIAS_AS_RELATIVE = 0;   // require("./file.js") // file or directory
+exports.ALIAS_AS_RELATIVE = 0; // require("./file.js") // file or directory
 exports.ALIAS_AS_RESOLVABLE = 1; // require("package")
 
 var win32 = process.platform === 'win32';
 var hasURL = typeof URL !== 'undefined';
 
-function uppercaseDriveLetter (f) {
+function uppercaseDriveLetter(f) {
   if (f.slice(1, 3) !== ':\\') return f;
   return f[0].toUpperCase() + f.slice(1);
 }
 
-function removeTrailingSlashes (f) {
+function removeTrailingSlashes(f) {
   if (f === '/') {
     return f; // dont remove from "/"
   }
@@ -31,8 +31,7 @@ function removeTrailingSlashes (f) {
     if (char === '\\') {
       f = f.slice(0, -1);
       last -= 1;
-    } else
-    if (char === '/') {
+    } else if (char === '/') {
       f = f.slice(0, -1);
       last -= 1;
     } else {
@@ -42,7 +41,7 @@ function removeTrailingSlashes (f) {
   return f;
 }
 
-function isRootPath (p) {
+function isRootPath(p) {
   if (Buffer.isBuffer(p)) p = p.toString();
   if (hasURL && p instanceof URL) p = p.pathname;
   if (p === '.') p = path.resolve(p);
@@ -58,7 +57,7 @@ if (win32) {
     var file = f;
     if (Buffer.isBuffer(file)) file = file.toString();
     if (hasURL && file instanceof URL) file = file.pathname.replace(/^\//, '');
-    if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
+    if (!/^.:$/.test(file)) file = path.normalize(file); // 'c:' -> 'c:.'
     file = uppercaseDriveLetter(file);
     file = removeTrailingSlashes(file);
     return file;
@@ -68,7 +67,7 @@ if (win32) {
     var file = f;
     if (Buffer.isBuffer(file)) file = file.toString();
     if (hasURL && file instanceof URL) file = file.pathname;
-    if (!(/^.:$/.test(file))) file = path.normalize(file); // 'c:' -> 'c:.'
+    if (!/^.:$/.test(file)) file = path.normalize(file); // 'c:' -> 'c:.'
     file = removeTrailingSlashes(file);
     return file;
   };
@@ -92,13 +91,12 @@ exports.isDotNODE = function (file) {
   return path.extname(file) === '.node';
 };
 
-function replaceSlashes (file, slash) {
+function replaceSlashes(file, slash) {
   if (/^.:\\/.test(file)) {
     if (slash === '/') {
       return file.slice(2).replace(/\\/g, '/');
     }
-  } else
-  if (/^\//.test(file)) {
+  } else if (/^\//.test(file)) {
     if (slash === '\\') {
       return 'C:' + file.replace(/\//g, '\\');
     }
@@ -106,13 +104,12 @@ function replaceSlashes (file, slash) {
   return file;
 }
 
-function injectSnapshot (file) {
+function injectSnapshot(file) {
   if (/^.:\\/.test(file)) {
     // C:\path\to
     if (file.length === 3) file = file.slice(0, -1); // C:\
     return file[0] + ':\\snapshot' + file.slice(2);
-  } else
-  if (/^\//.test(file)) {
+  } else if (/^\//.test(file)) {
     // /home/user/project
     if (file.length === 1) file = file.slice(0, -1); // /
     return '/snapshot' + file;
@@ -120,7 +117,7 @@ function injectSnapshot (file) {
   return file;
 }
 
-function longestCommonLength (s1, s2) {
+function longestCommonLength(s1, s2) {
   var length = Math.min(s1.length, s2.length);
   for (var i = 0; i < length; i += 1) {
     if (s1.charCodeAt(i) !== s2.charCodeAt(i)) {
@@ -130,7 +127,7 @@ function longestCommonLength (s1, s2) {
   return length;
 }
 
-function withoutNodeModules (file) {
+function withoutNodeModules(file) {
   return file.split(path.sep + 'node_modules' + path.sep)[0];
 }
 
@@ -158,27 +155,29 @@ exports.snapshotify = function (file, slash) {
 };
 
 if (win32) {
-  exports.insideSnapshot = function insideSnapshot (f) {
+  exports.insideSnapshot = function insideSnapshot(f) {
     if (Buffer.isBuffer(f)) f = f.toString();
     if (hasURL && f instanceof URL) f = f.pathname.replace(/^\//, '');
     if (typeof f !== 'string') return false;
     var slice112 = f.slice(1, 12);
-    if (slice112 === ':\\snapshot\\' ||
-        slice112 === ':/snapshot\\' ||
-        slice112 === ':\\snapshot/' ||
-        slice112 === ':/snapshot/' ||
-        slice112 === ':\\snapshot' ||
-        slice112 === ':/snapshot') return true;
+    if (
+      slice112 === ':\\snapshot\\' ||
+      slice112 === ':/snapshot\\' ||
+      slice112 === ':\\snapshot/' ||
+      slice112 === ':/snapshot/' ||
+      slice112 === ':\\snapshot' ||
+      slice112 === ':/snapshot'
+    )
+      return true;
     return false;
   };
 } else {
-  exports.insideSnapshot = function insideSnapshot (f) {
+  exports.insideSnapshot = function insideSnapshot(f) {
     if (Buffer.isBuffer(f)) f = f.toString();
     if (hasURL && f instanceof URL) f = f.pathname;
     if (typeof f !== 'string') return false;
     var slice010 = f.slice(0, 10);
-    if (slice010 === '/snapshot/' ||
-        slice010 === '/snapshot') return true;
+    if (slice010 === '/snapshot/' || slice010 === '/snapshot') return true;
     return false;
   };
 }
@@ -201,12 +200,11 @@ exports.stripSnapshot = function (f) {
 };
 
 if (win32) {
-  exports.removeUplevels = function removeUplevels (f) {
+  exports.removeUplevels = function removeUplevels(f) {
     while (true) {
       if (f.slice(0, 3) === '..\\') {
         f = f.slice(3);
-      } else
-      if (f === '..') {
+      } else if (f === '..') {
         f = '.';
       } else {
         break;
@@ -215,12 +213,11 @@ if (win32) {
     return f;
   };
 } else {
-  exports.removeUplevels = function removeUplevels (f) {
+  exports.removeUplevels = function removeUplevels(f) {
     while (true) {
       if (f.slice(0, 3) === '../') {
         f = f.slice(3);
-      } else
-      if (f === '..') {
+      } else if (f === '..') {
         f = '.';
       } else {
         break;

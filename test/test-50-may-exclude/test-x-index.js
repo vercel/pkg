@@ -4,7 +4,7 @@
 
 var error1;
 
-function func1 () {
+function func1() {
   require.resolve('not-exists-1', 'may-exclude');
 }
 
@@ -18,7 +18,7 @@ try {
 
 var error2;
 
-function func2 () {
+function func2() {
   require.resolve('not-exists-2', 'may-exclude');
 }
 
@@ -50,19 +50,19 @@ try {
   error4 = e;
 }
 
-console.log([
-
-  error1.message.split('\n')[0],
-  error1.code,
-  JSON.stringify(Object.assign(error1, { requireStack: undefined })),
-  error2.message.split('\n')[0],
-  error2.code,
-  JSON.stringify(Object.assign(error2, { requireStack: undefined })),
-  error3.message.split('\n')[0],
-  error3.code,
-  JSON.stringify(Object.assign(error3, { requireStack: undefined })),
-  error4.message.split('\n')[0],
-  error4.code,
-  JSON.stringify(Object.assign(error4, { requireStack: undefined }))
-
-].join('\n'));
+console.log(
+  [
+    error1.message.split('\n')[0],
+    error1.code,
+    JSON.stringify(Object.assign(error1, { requireStack: undefined })),
+    error2.message.split('\n')[0],
+    error2.code,
+    JSON.stringify(Object.assign(error2, { requireStack: undefined })),
+    error3.message.split('\n')[0],
+    error3.code,
+    JSON.stringify(Object.assign(error3, { requireStack: undefined })),
+    error4.message.split('\n')[0],
+    error4.code,
+    JSON.stringify(Object.assign(error4, { requireStack: undefined })),
+  ].join('\n')
+);

@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'bin/*.txt'
-    ]
-  }
+    assets: ['bin/*.txt'],
+  },
 };

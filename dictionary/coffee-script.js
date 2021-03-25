@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/coffee-script/*.js'
-    ]
-  }
+    scripts: ['lib/coffee-script/*.js'],
+  },
 };

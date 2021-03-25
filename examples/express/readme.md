@@ -4,12 +4,12 @@
 
 ## Instructions
 
-  1. Run `npm install`
-  2. Run `pkg .`
+1. Run `npm install`
+2. Run `pkg .`
 
-  That's it!
+That's it!
 
 ## Post Success Notes
 
-  * Upon success, `pkg` will create an executable named "express-example". This file can be found at the root of the example project directory.
-  * To see the app in action, run the executable then navigate to http://localhost:8080/ in your browser.
+- Upon success, `pkg` will create an executable named "express-example". This file can be found at the root of the example project directory.
+- To see the app in action, run the executable then navigate to http://localhost:8080/ in your browser.

@@ -16,19 +16,15 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--public',
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--public', '--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output),
-    stdio: 'pipe', expect: 1 }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+  stdio: 'pipe',
+  expect: 1,
+});
 
-if (!(/^(node|v)?0/.test(target))) {
+if (!/^(node|v)?0/.test(target)) {
   assert(right.stderr.indexOf('x.parse is not a function') >= 0);
 }
 

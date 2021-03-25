@@ -19,11 +19,13 @@ const hostVersion = process.version.match(/^v(\d+)/)[1];
 const host = 'node' + hostVersion;
 const target = process.argv[2] || host;
 const windows = process.platform === 'win32';
-const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5, 10: 5, 12: 6, 14: 6 }[hostVersion];
+const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5, 10: 5, 12: 6, 14: 6 }[
+  hostVersion
+];
 assert(npm !== undefined);
 
-function applyMetaToRight (right, meta) {
-  right = (meta.take === 'stderr' ? right.stderr : right.stdout);
+function applyMetaToRight(right, meta) {
+  right = meta.take === 'stderr' ? right.stderr : right.stdout;
   if (meta.take === 'last-line') right = right.split('\n').slice(-2).join('\n');
   if (right.slice(-2) === '\r\n') right = right.slice(0, -2);
   if (right.slice(-1) === '\n') right = right.slice(0, -1);
@@ -38,39 +40,43 @@ table = JSON.parse(table);
 let changes = checklist.split('const changes = ')[1].split(';')[0];
 changes = JSON.parse(changes);
 
-function save () {
+function save() {
   const t = utils.stringify(table, undefined, 2);
   let c = utils.stringify(changes, undefined, 2);
   if (c === '[]') c = '[\n]';
-  fs.writeFileSync('checklist.js',
+  fs.writeFileSync(
+    'checklist.js',
     '/* eslint-disable no-unused-vars */\n' +
-    '/* eslint-disable quotes */\n' +
-    '\n' +
-    '\'use strict\';\n' +
-    '\n' +
-    'const table = ' + t + ';\n' +
-    'const changes = ' + c + ';\n'
+      '/* eslint-disable quotes */\n' +
+      '\n' +
+      "'use strict';\n" +
+      '\n' +
+      'const table = ' +
+      t +
+      ';\n' +
+      'const changes = ' +
+      c +
+      ';\n'
   );
 }
 
-function stamp2string (s) {
+function stamp2string(s) {
   // platform, arch, modules
   return s.p + '/' + s.a + '/m' + s.m.toString();
 }
 
-function update (p, r, v, note) {
+function update(p, r, v, note) {
   if (!table[p]) table[p] = {};
   const row = table[p];
   const ss = stamp2string(stamp);
   const o = row[ss];
-  const rv = r + (v ? (',' + v) : '');
-  const rn = r + (note ? (',' + note) : '');
-  row[ss] = rv + (note ? (',' + note) : '');
+  const rv = r + (v ? ',' + v : '');
+  const rn = r + (note ? ',' + note : '');
+  row[ss] = rv + (note ? ',' + note : '');
   const o2 = o ? o.split(',')[0] : undefined;
-  if ((!o) && (r !== 'ok')) {
+  if (!o && r !== 'ok') {
     changes.push(p + ',' + ss + ': new ' + rn);
-  } else
-  if ((o2 !== undefined) && (o2 !== r)) {
+  } else if (o2 !== undefined && o2 !== r) {
     changes.push(p + ',' + ss + ': ' + o + ' -> ' + rn);
   }
   save();
@@ -80,21 +86,13 @@ if (!UPM) {
   console.log('Cleaning cache...');
 
   if (windows) {
-    utils.vacuum.sync(path.join(
-      process.env.APPDATA, 'npm-cache'
-    ));
-    utils.mkdirp.sync(path.join(
-      process.env.APPDATA, 'npm-cache'
-    ));
+    utils.vacuum.sync(path.join(process.env.APPDATA, 'npm-cache'));
+    utils.mkdirp.sync(path.join(process.env.APPDATA, 'npm-cache'));
   } else {
     if (npm >= 5) {
-      utils.exec.sync(
-        'npm cache clean --force'
-      );
+      utils.exec.sync('npm cache clean --force');
     } else {
-      utils.exec.sync(
-        'npm cache clean'
-      );
+      utils.exec.sync('npm cache clean');
     }
   }
 
@@ -108,30 +106,27 @@ if (!UPM) {
   const lucky = path.basename(input).slice(0, -3);
   const output = path.resolve('_isolator', lucky + '.exe');
 
-  utils.pkg.sync([
-    '--target', target,
-    '--output', output, input
-  ]);
+  utils.pkg.sync(['--target', target, '--output', output, input]);
 
-  stamp = utils.spawn.sync(
-    output
-  );
+  stamp = utils.spawn.sync(output);
 
   stamp = JSON.parse(stamp);
   utils.vacuum.sync(output);
   console.log('Stamp is ' + JSON.stringify(stamp));
   utils.pause(2);
-}());
+})();
 
-const inputs = globby.sync([
-  './*/*.js',
-  '!./*/*.config.js',
-  '!./*/*.meta.js',
-  '!./*/gulpfile.js',
-  '!./*/*fixture*'
-]).map(function (result) {
-  return path.resolve(result);
-});
+const inputs = globby
+  .sync([
+    './*/*.js',
+    '!./*/*.config.js',
+    '!./*/*.meta.js',
+    '!./*/gulpfile.js',
+    '!./*/*fixture*',
+  ])
+  .map(function (result) {
+    return path.resolve(result);
+  });
 
 let times = {};
 const ci = process.env.CI;
@@ -145,9 +140,7 @@ if (ci) {
     return foldyName;
   });
 
-  times = JSON.parse(utils.exec.sync(
-    'node times.js ' + foldyNames.join()
-  ));
+  times = JSON.parse(utils.exec.sync('node times.js ' + foldyNames.join()));
 }
 
 inputs.some(function (input) {
@@ -176,7 +169,7 @@ inputs.some(function (input) {
     const latestTime = times[foldyName];
     if (latestTime) {
       const diff = Date.now() - latestTime;
-      const days = diff / 1000 / 60 / 60 / 24 | 0;
+      const days = (diff / 1000 / 60 / 60 / 24) | 0;
       if (days >= 360) {
         // no need to pollute changes with this
         // update(wordy, 'nop', '', 'abandoned');
@@ -219,11 +212,11 @@ inputs.some(function (input) {
 
   if (!UPM) {
     const build = meta.build;
-    const packages = [ packy ].concat(meta.packages || []);
+    const packages = [packy].concat(meta.packages || []);
     console.log('Installing ' + packages + '...');
     let successful = false;
     let counter = 10;
-    while ((!successful) && (counter > 0)) {
+    while (!successful && counter > 0) {
       successful = true;
       let command = 'npm install ' + packages.join(' ');
       if (npm >= 5) command += ' --no-save';
@@ -242,9 +235,12 @@ inputs.some(function (input) {
     let packyVersion;
 
     try {
-      packyVersion = JSON.parse(fs.readFileSync(
-        path.join(foldy, 'node_modules', packy.split('@')[0], 'package.json'), 'utf8'
-      )).version;
+      packyVersion = JSON.parse(
+        fs.readFileSync(
+          path.join(foldy, 'node_modules', packy.split('@')[0], 'package.json'),
+          'utf8'
+        )
+      ).version;
     } catch (___) {
       update(wordy, 'bad-npm-i', '', note);
       console.log(wordy + ' failed to install here!');
@@ -266,21 +262,20 @@ inputs.some(function (input) {
   console.log('Running non-compiled ' + wordy + '...');
 
   try {
-    right = utils.spawn.sync(
-      'node', [ input ],
-      { cwd: path.dirname(input),
-        stdio: 'pipe' }
-    );
+    right = utils.spawn.sync('node', [input], {
+      cwd: path.dirname(input),
+      stdio: 'pipe',
+    });
   } catch (___) {
     right = {
       stdout: '',
-      stderr: ___.toString()
+      stderr: ___.toString(),
     };
   }
 
   right = applyMetaToRight(right, meta);
 
-  console.log('Result is \'' + right + '\'');
+  console.log("Result is '" + right + "'");
 
   if (right !== 'ok') {
     update(wordy, 'bad-test', version, note);
@@ -294,25 +289,21 @@ inputs.some(function (input) {
       input = config;
     }
 
-    utils.pkg.sync([
-      '--target', target,
-      '--output', output, input
-    ]);
+    utils.pkg.sync(['--target', target, '--output', output, input]);
 
     console.log('Copying addons...');
 
     const deployFiles = [];
 
-    if (!meta.deployFiles &&
-        !meta.deployFilesFrom) {
-      globby.sync(
-        path.join(foldy, 'node_modules', '**', '*.node')
-      ).some(function (deployFrom) {
-        deployFiles.push([
-          deployFrom,
-          path.join(path.dirname(output), path.basename(deployFrom))
-        ]);
-      });
+    if (!meta.deployFiles && !meta.deployFilesFrom) {
+      globby
+        .sync(path.join(foldy, 'node_modules', '**', '*.node'))
+        .some(function (deployFrom) {
+          deployFiles.push([
+            deployFrom,
+            path.join(path.dirname(output), path.basename(deployFrom)),
+          ]);
+        });
     }
 
     const deployFilesRelative = [];
@@ -329,7 +320,7 @@ inputs.some(function (input) {
         dict.pkg.deployFiles.some(function (deployFile) {
           const deployFrom = 'node_modules/' + dictName + '/' + deployFile[0];
           const deployTo = deployFile[1];
-          deployFilesRelative.push([ deployFrom, deployTo ]);
+          deployFilesRelative.push([deployFrom, deployTo]);
         });
       });
     }
@@ -356,20 +347,20 @@ inputs.some(function (input) {
       if (fs.existsSync(deployFrom)) {
         const statFrom = fs.statSync(deployFrom);
         if (statFrom.isFile()) {
-          deployFiles.push([ deployFrom, deployTo ]);
+          deployFiles.push([deployFrom, deployTo]);
         } else {
-          globby.sync(
-            path.join(deployFrom, '**', '*')
-          ).some(function (deployFrom2) {
-            const r = path.relative(deployFrom, deployFrom2);
-            const deployTo2 = path.join(deployTo, r);
-            if (fs.existsSync(deployFrom2)) {
-              const statFrom2 = fs.statSync(deployFrom2);
-              if (statFrom2.isFile()) {
-                deployFiles.push([ deployFrom2, deployTo2 ]);
+          globby
+            .sync(path.join(deployFrom, '**', '*'))
+            .some(function (deployFrom2) {
+              const r = path.relative(deployFrom, deployFrom2);
+              const deployTo2 = path.join(deployTo, r);
+              if (fs.existsSync(deployFrom2)) {
+                const statFrom2 = fs.statSync(deployFrom2);
+                if (statFrom2.isFile()) {
+                  deployFiles.push([deployFrom2, deployTo2]);
+                }
               }
-            }
-          });
+            });
         }
       }
     });
@@ -379,29 +370,26 @@ inputs.some(function (input) {
       const deployTo = deployFile[1];
       const statFrom = fs.statSync(deployFrom);
       utils.mkdirp.sync(path.dirname(deployTo));
-      fs.writeFileSync(deployTo,
-        fs.readFileSync(deployFrom));
-      fs.chmodSync(deployTo,
-        statFrom.mode.toString(8).slice(-3));
+      fs.writeFileSync(deployTo, fs.readFileSync(deployFrom));
+      fs.chmodSync(deployTo, statFrom.mode.toString(8).slice(-3));
     });
 
     console.log('Running compiled ' + wordy + '...');
 
     try {
-      right = utils.spawn.sync(
-        './' + path.basename(output), [],
-        { cwd: path.dirname(output),
-          stdio: 'pipe' }
-      );
+      right = utils.spawn.sync('./' + path.basename(output), [], {
+        cwd: path.dirname(output),
+        stdio: 'pipe',
+      });
     } catch (___) {
       right = {
         stdout: '',
-        stderr: ___.toString()
+        stderr: ___.toString(),
       };
     }
 
     right = applyMetaToRight(right, meta);
-    console.log('Result is \'' + right + '\'');
+    console.log("Result is '" + right + "'");
 
     if (right !== 'ok') {
       update(wordy, 'error', version, note);
@@ -410,9 +398,7 @@ inputs.some(function (input) {
     }
   }
 
-  const rubbishes = globby.sync(
-    path.join(path.dirname(output), '**', '*')
-  );
+  const rubbishes = globby.sync(path.join(path.dirname(output), '**', '*'));
 
   rubbishes.some(function (rubbish) {
     utils.vacuum.sync(rubbish);
@@ -424,8 +410,4 @@ inputs.some(function (input) {
   }
 });
 
-console.log(
-  '\nChanges:\n' +
-  changes.join('\n') +
-  '\n'
-);
+console.log('\nChanges:\n' + changes.join('\n') + '\n');

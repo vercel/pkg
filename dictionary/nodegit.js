@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'dist/**/*.js'
-    ]
-  }
+    scripts: ['dist/**/*.js'],
+  },
 };

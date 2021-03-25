@@ -9,10 +9,9 @@ if (process.send) {
   return;
 }
 
-var child = spawn(
-  process.execPath, [ process.argv[1], 'argvx', '--argvy' ],
-  { stdio: [ 'inherit', 'inherit', 'inherit', 'ipc' ] }
-);
+var child = spawn(process.execPath, [process.argv[1], 'argvx', '--argvy'], {
+  stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+});
 
 child.on('message', function (value) {
   console.log(value.toString());

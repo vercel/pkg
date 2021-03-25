@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'lib/routes.json'
-    ]
-  }
+    assets: ['lib/routes.json'],
+  },
 };

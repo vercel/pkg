@@ -16,19 +16,21 @@ const output = './test-output.exe';
 
 if (/^(node|v)?0/.test(target)) return;
 
-for (const pub of [ 'swordsman', 'crusader', '*' ]) {
+for (const pub of ['swordsman', 'crusader', '*']) {
   let right;
 
   utils.pkg.sync([
     '--public-packages=' + pub,
-    '--target', target,
-    '--output', output, input
+    '--target',
+    target,
+    '--output',
+    output,
+    input,
   ]);
 
-  right = utils.spawn.sync(
-    './' + path.basename(output), [],
-    { cwd: path.dirname(output) }
-  );
+  right = utils.spawn.sync('./' + path.basename(output), [], {
+    cwd: path.dirname(output),
+  });
 
   if (pub === 'swordsman') {
     assert.strictEqual(right, '');

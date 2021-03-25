@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/reload-server.js'
-    ]
-  }
+    scripts: ['lib/reload-server.js'],
+  },
 };

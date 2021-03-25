@@ -1,6 +1,6 @@
 'use strict';
 
-function EventEmitter () {
+function EventEmitter() {
   this.listeners = [];
 }
 EventEmitter.prototype.on = function (name, listener) {

@@ -17,15 +17,11 @@ let left, right;
 
 left = require('../../package.json').version;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 assert.strictEqual(left[0], '4');
 assert.strictEqual(right[0], '4');

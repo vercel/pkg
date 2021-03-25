@@ -13,13 +13,11 @@ const input = './test-x-index.js';
 const newcomers = [
   'test-x-index-linux',
   'test-x-index-macos',
-  'test-x-index-win.exe'
+  'test-x-index-win.exe',
 ];
 
 const before = utils.filesBefore(newcomers);
 
-utils.pkg.sync([
-  input
-], { stdio: 'inherit' });
+utils.pkg.sync([input], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);

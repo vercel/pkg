@@ -16,14 +16,9 @@ const output = './АБРАКАДАБРА/test-output.exe'; // cyrillic
 let right;
 utils.mkdirp.sync(path.dirname(output));
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  output, [], {}
-);
+right = utils.spawn.sync(output, [], {});
 
 assert.strictEqual(right, '42\n42\n');
 utils.vacuum.sync(path.dirname(output));

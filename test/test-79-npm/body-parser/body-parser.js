@@ -1,7 +1,7 @@
 'use strict';
 
 var parser = require('body-parser');
-var req = { headers: { } };
+var req = { headers: {} };
 var res = {};
 
 var middleware = parser.json();

@@ -14,15 +14,17 @@ var updateNotifier = require('update-notifier');
 var pjson = { name: 'pkg', version: '3.0.0' };
 var notifier;
 
-function runNotifier () {
+function runNotifier() {
   notifier = updateNotifier({
     pkg: pjson,
-    updateCheckInterval: 0
+    updateCheckInterval: 0,
   });
   setTimeout(function () {
-    if (spawnWasCalled &&
-        notifier.update &&
-        notifier.update.current === '3.0.0') {
+    if (
+      spawnWasCalled &&
+      notifier.update &&
+      notifier.update.current === '3.0.0'
+    ) {
       console.log('ok');
       process.exit(0);
     } else {

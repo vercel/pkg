@@ -17,19 +17,13 @@ if (process.arch === 'arm') return;
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
-left = utils.spawn.sync(
-  'node', [ 'test-x-index.js' ]
-);
+left = utils.spawn.sync('node', ['test-x-index.js']);
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, '.'
-]);
+utils.pkg.sync(['--target', target, '--output', output, '.']);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 left = left.split('\n');
 right = right.split('\n');

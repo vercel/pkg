@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/nconf/stores/*.js'
-    ]
-  }
+    scripts: ['lib/nconf/stores/*.js'],
+  },
 };

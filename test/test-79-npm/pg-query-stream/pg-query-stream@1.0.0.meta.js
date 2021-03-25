@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    packages: [ 'pg' ]
+    packages: ['pg'],
   };
 };

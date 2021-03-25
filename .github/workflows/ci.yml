@@ -8,7 +8,6 @@ on:
 
 jobs:
   test:
-
     strategy:
       fail-fast: false # prevent test to stop if one fails
       matrix:
