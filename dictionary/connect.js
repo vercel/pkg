@@ -2,11 +2,9 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/middleware/*.js'
-    ],
+    scripts: ['lib/middleware/*.js'],
     assets: [
-      'lib/public/**/*' // for connect@2.3
-    ]
-  }
+      'lib/public/**/*', // for connect@2.3
+    ],
+  },
 };

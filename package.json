@@ -5,9 +5,6 @@
   "main": "lib-es5/index.js",
   "license": "MIT",
   "repository": "vercel/pkg",
-  "publishConfig": {
-    "access": "public"
-  },
   "bin": {
     "pkg": "lib-es5/bin.js"
   },
@@ -32,6 +29,9 @@
       ]
     ]
   },
+  "prettier": {
+    "singleQuote": true
+  },
   "dependencies": {
     "@babel/parser": "^7.9.4",
     "@babel/runtime": "^7.9.2",
@@ -43,6 +43,7 @@
     "minimist": "^1.2.5",
     "multistream": "^2.1.1",
     "pkg-fetch": "^2.6.9",
+    "prebuild-install": "6.0.1",
     "progress": "^2.0.3",
     "resolve": "^1.15.1",
     "stream-meter": "^1.0.4"
@@ -57,22 +58,39 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
     "eslint-config-klopov": "^1.0.2",
+    "eslint-config-prettier": "8.1.0",
     "json-stable-stringify": "^1.0.1",
+    "lint-staged": ">=10",
     "mkdirp": "^1.0.3",
-    "rimraf": "^3.0.1"
+    "prettier": "2.2.1",
+    "rimraf": "^3.0.1",
+    "simple-git-hooks": ">=2.0.3"
+  },
+  "peerDependencies": {
+    "node-notifier": ">=6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "node-notifier": {
+      "optional": true
+    }
   },
   "scripts": {
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint-klopov . || true",
     "prepare": "npm run babel",
-    "test": "eslint-klopov . && npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm",
+    "prepublishOnly": "eslint-klopov . && npm run test:no-npm",
+    "test": "npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm",
     "test:no-npm": "node test/test.js host no-npm"
   },
   "eslintConfig": {
-    "extends": "klopov",
+    "extends": [
+      "klopov",
+      "prettier"
+    ],
     "parser": "babel-eslint",
     "rules": {
-      "wrap-iife": "off"
+      "wrap-iife": "off",
+      "camelcase": "off"
     }
   },
   "greenkeeper": {
@@ -80,5 +98,11 @@
     "ignore": [
       "pkg-fetch"
     ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,css,md,json}": "prettier --write"
   }
 }

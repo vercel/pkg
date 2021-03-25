@@ -5,11 +5,9 @@ module.exports = {
     patches: {
       'lib/native.js': [
         'path.join(__dirname, "..")',
-        'path.dirname(process.execPath)'
-      ]
+        'path.dirname(process.execPath)',
+      ],
     },
-    deployFiles: [
-      [ 'prebuilds', 'prebuilds', 'directory' ]
-    ]
-  }
+    deployFiles: [['prebuilds', 'prebuilds', 'directory']],
+  },
 };

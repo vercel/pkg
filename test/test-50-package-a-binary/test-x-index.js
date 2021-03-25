@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 
-function sha256 (s) {
+function sha256(s) {
   return crypto.createHash('sha256').update(s).digest('hex');
 }
 

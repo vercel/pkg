@@ -1,9 +1,6 @@
 {
   "bin": "express-load.js",
   "pkg": {
-    "scripts": [
-      "controllers/*.js",
-      "routes/*.js"
-    ]
+    "scripts": ["controllers/*.js", "routes/*.js"]
   }
 }

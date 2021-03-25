@@ -11,7 +11,7 @@ var parser = new Parser({
   },
   returnFatalError: function (error) {
     console.log(error);
-  }
+  },
 });
 
 if (Array.isArray(parser.bufferCache)) {

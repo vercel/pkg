@@ -2,7 +2,7 @@
 
 var Promise = require('any-promise');
 
-function p () {
+function p() {
   return new Promise((resolve) => {
     resolve('ok');
   });

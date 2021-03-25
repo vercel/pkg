@@ -16,22 +16,18 @@ const output = './run-time/test-output.exe';
 let right;
 utils.mkdirp.sync(path.dirname(output));
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 assert(
-  right.split('*****')[0].indexOf('was not included into executable at compilation stage') >= 0
+  right
+    .split('*****')[0]
+    .indexOf('was not included into executable at compilation stage') >= 0
 );
 
-assert(
-  right.split('*****')[1].indexOf('you want to compile the package') >= 0
-);
+assert(right.split('*****')[1].indexOf('you want to compile the package') >= 0);
 
 utils.vacuum.sync(path.dirname(output));

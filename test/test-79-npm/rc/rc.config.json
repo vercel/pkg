@@ -1,8 +1,6 @@
 {
   "bin": "rc.js",
   "pkg": {
-    "assets": [
-      ".fixture.for.rc"
-    ]
+    "assets": [".fixture.for.rc"]
   }
 }

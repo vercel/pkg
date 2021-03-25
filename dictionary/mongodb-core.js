@@ -7,16 +7,16 @@ module.exports = {
         'return err;',
         'if (err.message.indexOf("SyntaxError") >= 0) {' +
           'err.message = "Pkg: Try to specify your ' +
-          'javascript file in \'assets\' in config. " + err.message;' +
-        '};\n' +
-        'return err;',
+          "javascript file in 'assets' in config. \" + err.message;" +
+          '};\n' +
+          'return err;',
         'if (Error.captureStackTrace) {',
         'if (this.message.indexOf("SyntaxError") >= 0) {' +
           'this.message = "Pkg: Try to specify your ' +
-          'javascript file in \'assets\' in config. " + this.message;' +
-        '};\n' +
-        'if (Error.captureStackTrace) {'
-      ]
-    }
-  }
+          "javascript file in 'assets' in config. \" + this.message;" +
+          '};\n' +
+          'if (Error.captureStackTrace) {',
+      ],
+    },
+  },
 };

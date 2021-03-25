@@ -10,10 +10,10 @@ var child;
 assert(!process.send);
 
 try {
-  child = cp.fork(path.join(
-    process.cwd(),
-    'test-cpfork-b-child.js'
-  ), [ 'argvx', '--argvy' ]);
+  child = cp.fork(path.join(process.cwd(), 'test-cpfork-b-child.js'), [
+    'argvx',
+    '--argvy',
+  ]);
 } catch (e) {
   console.log(e.message);
 }

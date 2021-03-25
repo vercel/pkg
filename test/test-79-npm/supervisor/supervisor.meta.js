@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    take: 'stderr'
+    take: 'stderr',
   };
 };

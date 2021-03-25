@@ -9,10 +9,10 @@ var child;
 assert(!process.send);
 
 try {
-  child = cp.fork(
-    require.resolve('./test-cpfork-a-child.js'),
-    [ 'argx', '--argvy' ]
-  );
+  child = cp.fork(require.resolve('./test-cpfork-a-child.js'), [
+    'argx',
+    '--argvy',
+  ]);
 } catch (e) {
   console.log(e.message);
 }

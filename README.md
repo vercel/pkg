@@ -2,7 +2,7 @@
 
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
-[![Build Status](https://travis-ci.org/vercel/pkg.svg?branch=master)](https://travis-ci.org/vercel/pkg)
+[![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/vercel/pkg/badge.svg?branch=master)](https://coveralls.io/github/vercel/pkg?branch=master)
 [![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
 [![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
@@ -11,15 +11,15 @@ This command line interface enables you to package your Node.js project into an 
 
 ## Use Cases
 
-* Make a commercial version of your application without sources
-* Make a demo/evaluation/trial version of your app without sources
-* Instantly make executables for other platforms (cross-compilation)
-* Make some kind of self-extracting archive or installer
-* No need to install Node.js and npm to run the packaged application
-* No need to download hundreds of files via `npm install` to deploy
-your application. Deploy it as a single file
-* Put your assets inside the executable to make it even more portable
-* Test your app against new Node.js version without installing it
+- Make a commercial version of your application without sources
+- Make a demo/evaluation/trial version of your app without sources
+- Instantly make executables for other platforms (cross-compilation)
+- Make some kind of self-extracting archive or installer
+- No need to install Node.js and npm to run the packaged application
+- No need to download hundreds of files via `npm install` to deploy
+  your application. Deploy it as a single file
+- Put your assets inside the executable to make it even more portable
+- Test your app against new Node.js version without installing it
 
 ## Usage
 
@@ -31,12 +31,12 @@ After installing it, run `pkg --help` without arguments to see list of options.
 
 The entrypoint of your project is a mandatory CLI argument. It may be:
 
-* Path to entry file. Suppose it is `/path/app.js`, then
-packaged app will work the same way as `node /path/app.js`
-* Path to `package.json`. `Pkg` will follow `bin` property of
-the specified `package.json` and use it as entry file.
-* Path to directory. `Pkg` will look for `package.json` in
-the specified directory. See above.
+- Path to entry file. Suppose it is `/path/app.js`, then
+  packaged app will work the same way as `node /path/app.js`
+- Path to `package.json`. `Pkg` will follow `bin` property of
+  the specified `package.json` and use it as entry file.
+- Path to directory. `Pkg` will look for `package.json` in
+  the specified directory. See above.
 
 ### Targets
 
@@ -45,9 +45,9 @@ time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
 dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
 
-* **nodeRange** node${n} or latest
-* **platform** freebsd, linux, alpine, macos, win
-* **arch** x64, x86, armv6, armv7
+- **nodeRange** node${n} or latest
+- **platform** freebsd, linux, alpine, macos, win
+- **arch** x64, x86, armv6, armv7
 
 You may omit any element (and specify just `node6` for example).
 The omitted elements will be taken from current platform or
@@ -65,23 +65,29 @@ don't need to specify anything manually. However your code
 may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
 example views, css, images etc).
+
 ```js
-  require('./build/' + cmd + '.js')
-  path.join(__dirname, 'views/' + viewName)
+require('./build/' + cmd + '.js');
+path.join(__dirname, 'views/' + viewName);
 ```
+
 Such cases are not handled by `pkg`. So you must specify the
 files - scripts and assets - manually in `pkg` property of
 your `package.json` file.
+
 ```json
   "pkg": {
     "scripts": "build/**/*.js",
     "assets": "views/**/*"
   }
 ```
+
 You may also specify arrays of globs:
+
 ```
     "assets": [ "assets/**/*", "images/**/*" ]
 ```
+
 Just be sure to call `pkg package.json` or `pkg .` to make use
 of `scripts` and `assets` entries.
 
@@ -113,6 +119,7 @@ Node.js application can be called with runtime options
 `node --v8-options`. You can "bake" these runtime options into
 packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
+
 ```sh
 pkg app.js --options expose-gc
 pkg app.js --options max_old_space_size=4096
@@ -141,6 +148,25 @@ option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
+### Environment
+
+| Var            | Description                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| PKG_CACHE_PATH | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache`   |
+| PKG_IGNORE_TAG | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
+| MAKE_JOB_COUNT | Allow configuring number of processes used for compiling                                  |
+
+Examples
+
+```bash
+# 1 - Using export
+export PKG_CACHE_PATH=/my/cache
+pkg app.js
+
+# 2 - Passing it before the script
+PKG_CACHE_PATH=/my/cache pkg app.js
+```
+
 ## Usage of packaged app
 
 Command line call to packaged app `./app a b` is equivalent
@@ -159,17 +185,17 @@ then `__filename` value will be likely `/snapshot/path/app.js`
 at run time. `__dirname` will be `/snapshot/path` as well. Here is
 the comparison table of path-related values:
 
-value                          | with `node`         | packaged                   | comments
--------------------------------|---------------------|----------------------------|-----------
-__filename                     | /project/app.js     | /snapshot/project/app.js   |
-__dirname                      | /project            | /snapshot/project          |
-process.cwd()                  | /project            | /deploy                    | suppose the app is called ...
-process.execPath               | /usr/bin/nodejs     | /deploy/app-x64            | `app-x64` and run in `/deploy`
-process.argv[0]                | /usr/bin/nodejs     | /deploy/app-x64            |
-process.argv[1]                | /project/app.js     | /snapshot/project/app.js   |
-process.pkg.entrypoint         | undefined           | /snapshot/project/app.js   |
-process.pkg.defaultEntrypoint  | undefined           | /snapshot/project/app.js   |
-require.main.filename          | /project/app.js     | /snapshot/project/app.js   |
+| value                         | with `node`     | packaged                 | comments                       |
+| ----------------------------- | --------------- | ------------------------ | ------------------------------ |
+| \_\_filename                  | /project/app.js | /snapshot/project/app.js |
+| \_\_dirname                   | /project        | /snapshot/project        |
+| process.cwd()                 | /project        | /deploy                  | suppose the app is called ...  |
+| process.execPath              | /usr/bin/nodejs | /deploy/app-x64          | `app-x64` and run in `/deploy` |
+| process.argv[0]               | /usr/bin/nodejs | /deploy/app-x64          |
+| process.argv[1]               | /project/app.js | /snapshot/project/app.js |
+| process.pkg.entrypoint        | undefined       | /snapshot/project/app.js |
+| process.pkg.defaultEntrypoint | undefined       | /snapshot/project/app.js |
+| require.main.filename         | /project/app.js | /snapshot/project/app.js |
 
 Hence, in order to make use of a file collected at packaging
 time (`require` a javascript file or serve an asset) you should
@@ -203,8 +229,9 @@ In some cases (like with the `bindings` package), the module path is generated
 dynamicaly and `pkg` won't be able to detect it. In this case, you should
 add the `.node` file directly in the `assets` field in `package.json`.
 
-The way NodeJS requires native addon is different from a classic JS
-file. It needs to have a file on disk to load it but `pkg` only generate
+The way Node.js requires native addon is different from a classic JS
+file. It needs to have a file on disk to load it, but `pkg` only generates
+
 one file. To circumvent this, `pkg` will create a temporary file on the
 disk. These files will stay on the disk after the process has exited
 and will be used again on the next process launch.
@@ -224,7 +251,7 @@ with `.node` files.
 a promise. For example:
 
 ```js
-await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
+await exec(['app.js', '--target', 'host', '--output', 'app.exe']);
 // do something with app.exe, run, test, upload, deploy, etc
 ```
 
@@ -235,3 +262,22 @@ await exec([ 'app.js', '--target', 'host', '--output', 'app.exe' ])
 This error can be caused by deleting the directory the application is
 run from. Or, generally, deleting `process.cwd()` directory when the
 application is running.
+
+### Error: ERR_INSPECTOR_NOT_AVAILABLE
+
+This error can be caused by using `NODE_OPTIONS` variable to force to
+run `node` with the debug mode enabled. Debugging options are disallowed
+, as **pkg** executables are usually used for production environments.
+If you do need to use inspector, you can [build a debuggable Node.js](https://github.com/vercel/pkg/issues/93#issuecomment-301210543) yourself.
+
+### Error: require(...).internalModuleStat is not a function
+
+This error can be caused by using `NODE_OPTIONS` variable with some
+bootstrap or `node` options causing conflicts with **pkg**. Some
+IDEs, such as **VS Code**, may add this env variable automatically.
+
+You could check on **Unix systems** (Linux/macOS) in `bash`:
+
+```bash
+$ printenv | grep NODE
+```

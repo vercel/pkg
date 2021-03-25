@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/appenders/*.js'
-    ]
-  }
+    scripts: ['lib/appenders/*.js'],
+  },
 };

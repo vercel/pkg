@@ -15,14 +15,15 @@ const standard = 'stdout';
 
 let right;
 
-const inspect = (standard === 'stdout')
-  ? [ 'inherit', 'pipe', 'inherit' ]
-  : [ 'inherit', 'inherit', 'pipe' ];
+const inspect =
+  standard === 'stdout'
+    ? ['inherit', 'pipe', 'inherit']
+    : ['inherit', 'inherit', 'pipe'];
 
-right = utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-], inspect);
+right = utils.pkg.sync(
+  ['--target', target, '--output', output, input],
+  inspect
+);
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 right = right.replace(/\\/g, '/');

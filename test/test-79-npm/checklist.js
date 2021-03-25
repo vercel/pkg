@@ -3,7 +3,5 @@
 
 'use strict';
 
-const table = {
-};
-const changes = [
-];
+const table = {};
+const changes = [];

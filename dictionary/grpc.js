@@ -6,9 +6,6 @@ module.exports = {
       // suppress because hundreds of
       // C++ files go inside executable
     ],
-    assets: [
-      'etc/*.pem',
-      'deps/grpc/etc/*.pem'
-    ]
-  }
+    assets: ['etc/*.pem', 'deps/grpc/etc/*.pem'],
+  },
 };

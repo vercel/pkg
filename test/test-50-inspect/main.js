@@ -13,17 +13,13 @@ const target = process.argv[2] || 'host';
 const input = './test-x-index.js';
 const output = './test-output.exe';
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-utils.spawn.sync(
-  './' + path.basename(output),
-  [ '--inspect' ],
-  { cwd: path.dirname(output),
-    env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' },
-    stdio: 'pipe', expect: 9 }
-);
+utils.spawn.sync('./' + path.basename(output), ['--inspect'], {
+  cwd: path.dirname(output),
+  env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' },
+  stdio: 'pipe',
+  expect: 9,
+});
 
 utils.vacuum.sync(output);

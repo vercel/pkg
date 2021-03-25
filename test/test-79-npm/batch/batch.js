@@ -5,7 +5,7 @@ var batch = new Batch();
 
 batch.concurrency(4);
 
-var ids = [ 4, 7, 12, 25 ];
+var ids = [4, 7, 12, 25];
 
 ids.forEach(function () {
   batch.push(function (done) {

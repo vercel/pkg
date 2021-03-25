@@ -5,9 +5,10 @@
 var exec = require('child_process').exec;
 
 var child = exec(
-  '"' + process.execPath + '" ' + [
-    require.resolve('./test-exec-child.js'), 'argvx', '--argvy'
-  ].join(' '),
+  '"' +
+    process.execPath +
+    '" ' +
+    [require.resolve('./test-exec-child.js'), 'argvx', '--argvy'].join(' '),
   function (error) {
     if (error) return console.error(error);
     console.log('exec done');

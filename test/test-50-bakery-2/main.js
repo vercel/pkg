@@ -16,22 +16,24 @@ const output = './run-time/test-output.exe';
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
-left = utils.spawn.sync(
-  'node', [ '--expose-gc', path.basename(input) ],
-  { cwd: path.dirname(input) }
-);
+left = utils.spawn.sync('node', ['--expose-gc', path.basename(input)], {
+  cwd: path.dirname(input),
+});
 
 utils.pkg.sync([
-  '--target', target,
-  '--options', 'expose-gc',
-  '--output', output, input
+  '--target',
+  target,
+  '--options',
+  'expose-gc',
+  '--output',
+  output,
+  input,
 ]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
-assert.equal(left, 'function\n');
-assert.equal(right, 'function\n');
+assert.strictEqual(left, 'function\n');
+assert.strictEqual(right, 'function\n');
 utils.vacuum.sync(path.dirname(output));

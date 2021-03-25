@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'lib/data/cacert.pem'
-    ]
-  }
+    assets: ['lib/data/cacert.pem'],
+  },
 };

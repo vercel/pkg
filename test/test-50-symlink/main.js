@@ -20,18 +20,14 @@ const symlink = './test-symlink.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
 fs.symlinkSync(output, symlink);
 
-right = utils.spawn.sync(
-  './' + path.basename(symlink), [],
-  { cwd: path.dirname(symlink) }
-);
+right = utils.spawn.sync('./' + path.basename(symlink), [], {
+  cwd: path.dirname(symlink),
+});
 
-assert.equal(right, '42\n');
+assert.strictEqual(right, '42\n');
 utils.vacuum.sync(output);
 utils.vacuum.sync(symlink);

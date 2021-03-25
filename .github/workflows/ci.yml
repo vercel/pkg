@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false # prevent test to stop if one fails
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+        os: [ubuntu-latest] # Skip macos-latest, windows-latest for now
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.pkg-cache/
+          key: ${{  matrix.os }}-${{ matrix.node-version }}
+
+      - name: Install deps
+        run: yarn install
+
+      - name: Lint
+        if: matrix['node-version'] == '14.x' && matrix['os'] == 'ubuntu-latest'
+        run: yarn run lint
+
+      - name: Build
+        run: yarn run babel
+
+      - name: Test
+        run: yarn run test

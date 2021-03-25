@@ -21,15 +21,11 @@ if (/^(node|v)?8/.test(target)) return;
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
-assert.equal(right, '1\n2\n3\n4\n5\n');
+assert.strictEqual(right, '1\n2\n3\n4\n5\n');
 utils.vacuum.sync(output);

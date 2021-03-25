@@ -2,12 +2,10 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/*.js'
-    ],
+    scripts: ['lib/*.js'],
     deployFiles: [
-      [ 'build/Release', 'sharp/build/Release', 'directory' ],
-      [ 'vendor/lib', 'sharp/vendor/lib', 'directory' ]
-    ]
-  }
+      ['build/Release', 'sharp/build/Release', 'directory'],
+      ['vendor/lib', 'sharp/vendor/lib', 'directory'],
+    ],
+  },
 };

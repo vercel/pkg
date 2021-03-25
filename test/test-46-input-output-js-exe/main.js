@@ -9,11 +9,9 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const input = './test-x-index.js';
-const newcomers = [ 'test-output.exe' ];
+const newcomers = ['test-output.exe'];
 const before = utils.filesBefore(newcomers);
 
-utils.pkg.sync([
-  '--output', 'test-output.exe', input
-], { stdio: 'inherit' });
+utils.pkg.sync(['--output', 'test-output.exe', input], { stdio: 'inherit' });
 
 utils.filesAfter(before, newcomers);

@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/helper.js'
-    ]
-  }
+    scripts: ['lib/helper.js'],
+  },
 };
