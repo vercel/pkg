@@ -231,7 +231,6 @@ add the `.node` file directly in the `assets` field in `package.json`.
 
 The way Node.js requires native addon is different from a classic JS
 file. It needs to have a file on disk to load it, but `pkg` only generates
-
 one file. To circumvent this, `pkg` will create a temporary file on the
 disk. These files will stay on the disk after the process has exited
 and will be used again on the next process launch.
