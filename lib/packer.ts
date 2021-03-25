@@ -2,6 +2,7 @@
 
 import assert from 'assert';
 import fs from 'fs-extra';
+import path from 'path';
 
 import {
   STORE_BLOB,
@@ -13,8 +14,9 @@ import {
 } from './common';
 
 import { log, wasReported } from './log';
-import { version } from '../package.json';
 import { FileRecord, FileRecords } from './types';
+
+const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))
 
 const bootstrapText = fs
   .readFileSync(require.resolve('../prelude/bootstrap.js'), 'utf8')

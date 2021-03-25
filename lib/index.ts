@@ -1,6 +1,6 @@
 /* eslint-disable require-atomic-updates */
 
-import { mkdirp, readFile, remove, stat } from 'fs-extra';
+import { mkdirp, readFile, remove, stat, readFileSync } from 'fs-extra';
 import { need, system } from 'pkg-fetch';
 import assert from 'assert';
 import minimist from 'minimist';
@@ -14,9 +14,12 @@ import { plusx } from './chmod';
 import producer from './producer';
 import refine from './refiner';
 import { shutdown } from './fabricator';
-import { version } from '../package.json';
 import walk, { Marker, WalkerParams } from './walker';
 import { Target, NodeTarget } from './types';
+
+const { version } = JSON.parse(
+  readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
+);
 
 function isConfiguration(file: string) {
   return isPackageJson(file) || file.endsWith('.config.json');
