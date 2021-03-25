@@ -1,6 +1,3 @@
-# This is a fork of https://github.com/vercel/pkg that supports native addons (at the cost of not being able to cross-compile). It’s based on https://github.com/kkoomen/pkg; see https://github.com/vercel/pkg/pull/837 for more information
-# Also, add support for fs/promises. See https://github.com/vercel/pkg/issues/455 & https://github.com/vercel/pkg/issues/958
-
 **Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using Vercel, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
 
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
