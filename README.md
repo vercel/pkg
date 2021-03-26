@@ -61,8 +61,9 @@ are taken from current platform/Node.js. By default targets are
 During packaging process `pkg` parses your sources, detects
 calls to `require`, traverses the dependencies of your project
 and includes them into executable. In most cases you
-don't need to specify anything manually. However your code
-may have `require(variable)` calls (so called non-literal
+don't need to specify anything manually.
+
+However your code may have `require(variable)` calls (so called non-literal
 argument to `require`) or use non-javascript files (for
 example views, css, images etc).
 
@@ -78,9 +79,15 @@ your `package.json` file.
 ```json
   "pkg": {
     "scripts": "build/**/*.js",
-    "assets": "views/**/*"
+    "assets": "views/**/*",
+    "targets": [ "node4-linux-armv6" ],
+    "outputPath: "dist"
   }
 ```
+
+The above example will include everything in `assets/` and
+every .js file in `build/`, build only for `node4-linux-armv6`,
+and place the executable inside `dist/`.
 
 You may also specify arrays of globs:
 
@@ -88,8 +95,8 @@ You may also specify arrays of globs:
     "assets": [ "assets/**/*", "images/**/*" ]
 ```
 
-Just be sure to call `pkg package.json` or `pkg .` to make use
-of `scripts` and `assets` entries.
+Just be sure to call `pkg package.json` or `pkg .` to make
+use of `package.json` configuration.
 
 ### Scripts
 
