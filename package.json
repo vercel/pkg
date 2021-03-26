@@ -80,9 +80,8 @@
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint lib prelude || true",
     "prepare": "npm run babel",
-    "prepublishOnly": "eslint . && npm run test:no-npm",
-    "test": "npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm",
-    "test:no-npm": "node test/test.js host no-npm"
+    "prepublishOnly": "npm run lint",
+    "test": "npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
   },
   "greenkeeper": {
     "emails": false,
