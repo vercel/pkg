@@ -42,7 +42,7 @@
     "into-stream": "^5.1.1",
     "minimist": "^1.2.5",
     "multistream": "^2.1.1",
-    "pkg-fetch": "^2.6.9",
+    "pkg-fetch": "2.6.9",
     "prebuild-install": "6.0.1",
     "progress": "^2.0.3",
     "resolve": "^1.15.1",
