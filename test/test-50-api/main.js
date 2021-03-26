@@ -17,22 +17,19 @@ let right;
 utils.mkdirp.sync(path.dirname(output));
 
 // calling twice
-require('../../').exec([
-  '--target', target,
-  '--output', output, input
-]).then(function () {
-  return require('../../').exec([
-    '--target', target,
-    '--output', output, input
-  ]).then(function () {
-    right = utils.spawn.sync(
-      output, [], {}
-    );
+require('../../')
+  .exec(['--target', target, '--output', output, input])
+  .then(function () {
+    return require('../../')
+      .exec(['--target', target, '--output', output, input])
+      .then(function () {
+        right = utils.spawn.sync(output, [], {});
 
-    assert.equal(right, '42\n');
-    utils.vacuum.sync(output);
+        assert.strictEqual(right, '42\n');
+        utils.vacuum.sync(output);
+      });
+  })
+  .catch(function (error) {
+    console.error(error);
+    process.exit(2);
   });
-}).catch(function (error) {
-  console.error(error);
-  process.exit(2);
-});

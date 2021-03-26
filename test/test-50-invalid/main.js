@@ -13,14 +13,15 @@ const standard = 'stdout';
 
 let right;
 
-const inspect = (standard === 'stdout')
-  ? [ 'inherit', 'pipe', 'inherit' ]
-  : [ 'inherit', 'inherit', 'pipe' ];
+const inspect =
+  standard === 'stdout'
+    ? ['inherit', 'pipe', 'inherit']
+    : ['inherit', 'inherit', 'pipe'];
 
-right = utils.pkg.sync([
-  '--target', target,
-  '--output', 'no-output', '12345'
-], { stdio: inspect, expect: 2 });
+right = utils.pkg.sync(['--target', target, '--output', 'no-output', '12345'], {
+  stdio: inspect,
+  expect: 2,
+});
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
 assert(right.indexOf('Error!') >= 0);

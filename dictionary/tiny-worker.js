@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'lib/noop.js'
-    ]
-  }
+    assets: ['lib/noop.js'],
+  },
 };

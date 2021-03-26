@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/mongodb/**/*.js'
-    ]
-  }
+    scripts: ['lib/mongodb/**/*.js'],
+  },
 };

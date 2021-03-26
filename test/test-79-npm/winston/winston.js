@@ -10,5 +10,5 @@ process.stdout.write = function (m) {
 var winston = require('winston');
 var Logger = winston.Logger;
 var Console = winston.transports.Console;
-new Logger({ transports: [ new Console() ] }); // eslint-disable-line no-new
+new Logger({ transports: [new Console()] }); // eslint-disable-line no-new
 winston.log('info', 'ok');

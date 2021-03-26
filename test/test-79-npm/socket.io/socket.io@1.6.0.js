@@ -8,13 +8,15 @@ io.listen(3000);
 setTimeout(function () {
   http.get('http://127.0.0.1:3000/socket.io/socket.io.js', function (res) {
     var chunks = '';
-    res.on('data', function (chunk) {
-      chunks += chunk.toString();
-    }).on('end', function () {
-      if (chunks.indexOf('__webpack_require__') >= 0) {
-        console.log('ok');
-      }
-      io.close();
-    });
+    res
+      .on('data', function (chunk) {
+        chunks += chunk.toString();
+      })
+      .on('end', function () {
+        if (chunks.indexOf('__webpack_require__') >= 0) {
+          console.log('ok');
+        }
+        io.close();
+      });
   });
 }, 100);

@@ -8,8 +8,12 @@ module.exports = [
   typeof module.filename,
   module.filename ? module.filename : 'empty',
   typeof module.parent,
-  module.parent ? (typeof module.parent.filename) : 'empty',
-  module.parent ? (module.parent.filename ? module.parent.filename : 'empty') : 'empty',
+  module.parent ? typeof module.parent.filename : 'empty',
+  module.parent
+    ? module.parent.filename
+      ? module.parent.filename
+      : 'empty'
+    : 'empty',
   typeof module.require,
   typeof global,
   // в nodejs они разные // (module.require === require).toString(),
@@ -22,5 +26,5 @@ module.exports = [
   typeof global,
   typeof global.setTimeout,
   global.module ? (global.module === module).toString() : 'true',
-  global.require ? (global.require === require).toString() : 'true'
+  global.require ? (global.require === require).toString() : 'true',
 ];

@@ -7,12 +7,14 @@ const path = require('path');
 const assert = require('assert');
 
 let configs = fs.readdirSync('../../dictionary');
-configs = configs.filter(function (config) {
-  return config !== '.eslintrc.json';
-}).map(function (config) {
-  assert.equal(config.slice(-3), '.js');
-  return config.slice(0, -3);
-});
+configs = configs
+  .filter(function (config) {
+    return config !== '.eslintrc.json';
+  })
+  .map(function (config) {
+    assert.strictEqual(config.slice(-3), '.js');
+    return config.slice(0, -3);
+  });
 
 let tests = fs.readdirSync('../test-79-npm');
 tests = tests.filter(function (test) {

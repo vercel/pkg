@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: [
-      'lib/arrayParser.js'
-    ]
-  }
+    scripts: ['lib/arrayParser.js'],
+  },
 };

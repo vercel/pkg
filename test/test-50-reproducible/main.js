@@ -21,19 +21,25 @@ const output2 = './test-output-2.exe';
 utils.pkg.sync([
   '--public',
   '--no-bytecode',
-  '--target', target,
-  '--output', output1, input
+  '--target',
+  target,
+  '--output',
+  output1,
+  input,
 ]);
 
 utils.pkg.sync([
   '--public',
   '--no-bytecode',
-  '--target', target,
-  '--output', output2, input
+  '--target',
+  target,
+  '--output',
+  output2,
+  input,
 ]);
 
 const content1 = fs.readFileSync(output1);
 const content2 = fs.readFileSync(output2);
-assert.equal(Buffer.compare(content1, content2), 0);
+assert.strictEqual(Buffer.compare(content1, content2), 0);
 utils.vacuum.sync(output1);
 utils.vacuum.sync(output2);

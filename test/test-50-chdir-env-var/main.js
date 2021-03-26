@@ -15,18 +15,16 @@ const output = './run-time/test-output.exe';
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-], { env: {
-  CHDIR: 'source',
-  PATH: process.env.PATH
-} });
+utils.pkg.sync(['--target', target, '--output', output, input], {
+  env: {
+    CHDIR: 'source',
+    PATH: process.env.PATH,
+  },
+});
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname('source/' + output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname('source/' + output),
+});
 
-assert.equal(right, 'ok\n');
+assert.strictEqual(right, 'ok\n');
 utils.vacuum.sync(path.dirname('source/' + output));

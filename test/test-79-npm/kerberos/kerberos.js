@@ -1,13 +1,15 @@
 'use strict';
 
-function isModuleNotFoundError (error) {
-  return ((error.code === 'MODULE_NOT_FOUND') &&
-          (error.message.indexOf('build/Release/kerberos') >= 0));
+function isModuleNotFoundError(error) {
+  return (
+    error.code === 'MODULE_NOT_FOUND' &&
+    error.message.indexOf('build/Release/kerberos') >= 0
+  );
 }
 
 var kerberos;
 
-function hideTryBlockFromBundleDetectorIgnoreFlag () {
+function hideTryBlockFromBundleDetectorIgnoreFlag() {
   kerberos = require('kerberos');
 }
 
@@ -22,7 +24,7 @@ try {
 
 var sspi;
 
-function hideTryBlockFromBundleDetectorIgnoreFlag2 () {
+function hideTryBlockFromBundleDetectorIgnoreFlag2() {
   sspi = require('kerberos/lib/sspi');
 }
 

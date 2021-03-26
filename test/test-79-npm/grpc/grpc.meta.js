@@ -5,6 +5,6 @@ const home = require('../home.js');
 module.exports = function (stamp) {
   return {
     allow: home(stamp),
-    note: 'seems not compatible with freebsd network headers'
+    note: 'seems not compatible with freebsd network headers',
   };
 };

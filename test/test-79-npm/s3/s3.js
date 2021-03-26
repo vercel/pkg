@@ -5,14 +5,14 @@ var s3 = require('s3');
 var client = s3.createClient({
   s3Options: {
     accessKeyId: 'ABRACADABRABRACADABR',
-    secretAccessKey: 'TdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTd'
-  }
+    secretAccessKey: 'TdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTdTd',
+  },
 });
 
 var ee = client.listObjects({
   s3Params: {
-    Bucket: 'enclosejs'
-  }
+    Bucket: 'enclosejs',
+  },
 });
 
 ee.on('error', function (error) {

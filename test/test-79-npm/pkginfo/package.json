@@ -1,1 +1,4 @@
-{ "private": true, "fixture": "fixture-text" }
+{
+  "private": true,
+  "fixture": "fixture-text"
+}

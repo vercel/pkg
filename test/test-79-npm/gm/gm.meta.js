@@ -2,6 +2,6 @@
 
 module.exports = function () {
   return {
-    note: 'requires GraphicsMagick/ImageMagick installed'
+    note: 'requires GraphicsMagick/ImageMagick installed',
   };
 };

@@ -16,6 +16,4 @@ process.pkg.mount(
 
 require('./plugins-D-ext/test-y-require-D.js'.slice());
 
-console.log(
-  fs.readdirSync(__dirname).join('\n')
-);
+console.log(fs.readdirSync(__dirname).join('\n'));

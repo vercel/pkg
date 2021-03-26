@@ -1,5 +1,3 @@
 'use strict';
 
-console.log(
-  process.versions.pkg
-);
+console.log(process.versions.pkg);

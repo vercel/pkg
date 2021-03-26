@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'data/*'
-    ]
-  }
+    assets: ['data/*'],
+  },
 };

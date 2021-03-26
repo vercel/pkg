@@ -2,6 +2,6 @@
 
 module.exports = function (stamp) {
   return {
-    allow: stamp.m >= 46
+    allow: stamp.m >= 46,
   };
 };

@@ -9,7 +9,7 @@ var e = extender.define({
       ret += str;
     }
     return ret;
-  }
+  },
 });
 
 var v = e('hello').multiply(2).value();

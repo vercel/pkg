@@ -4,8 +4,6 @@
     "jade": "*"
   },
   "pkg": {
-    "assets": [
-      "views/*.jade"
-    ]
+    "assets": ["views/*.jade"]
   }
 }

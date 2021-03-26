@@ -15,19 +15,13 @@ const output = './run-time/test-output.exe';
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
-left = utils.spawn.sync(
-  'node', [ 'sub/test-x-index.js' ]
-);
+left = utils.spawn.sync('node', ['sub/test-x-index.js']);
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, '.'
-]);
+utils.pkg.sync(['--target', target, '--output', output, '.']);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
-assert.equal(left, right);
+assert.strictEqual(left, right);
 utils.vacuum.sync(path.dirname(output));
