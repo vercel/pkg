@@ -45,6 +45,8 @@
     "pkg-fetch": "2.6.9",
     "prebuild-install": "6.0.1",
     "progress": "^2.0.3",
+    "resolve": "^1.20.0",
+    "stream-meter": "^1.0.4",
     "tslib": "2.1.0"
   },
   "devDependencies": {
@@ -65,7 +67,6 @@
     "@types/stream-meter": "0.0.22",
     "@typescript-eslint/eslint-plugin": "4.19.0",
     "@typescript-eslint/parser": "4.19.0",
-    "babel-eslint": "10.1.0",
     "eslint": "7.22.0",
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-config-prettier": "8.1.0",
@@ -93,9 +94,8 @@
     "start": "tsc --watch",
     "lint": "eslint lib prelude || true",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run test:no-npm",
-    "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm",
-    "test:no-npm": "node test/test.js host no-npm"
+    "prepublishOnly": "npm run lint",
+    "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
   },
   "greenkeeper": {
     "emails": false,
