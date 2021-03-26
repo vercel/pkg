@@ -1661,7 +1661,8 @@ function payloadFileSync(pointer) {
     // /////////////////////////////////////////////////////////////
 
     var customPromiseExecFunction = (o) => (...args) => {
-      let resolve, reject;
+      let resolve;
+      let reject;
       const p = new Promise((res, rej) => {
         resolve = res;
         reject  = rej;
