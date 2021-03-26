@@ -1,6 +1,6 @@
 /* eslint-disable require-atomic-updates */
 
-import { exists, mkdirp, readFile, remove, stat } from 'fs-extra';
+import { mkdirp, readFile, remove, stat } from 'fs-extra';
 import { need, system } from 'pkg-fetch';
 import assert from 'assert';
 import minimist from 'minimist';
@@ -15,10 +15,20 @@ import producer from './producer';
 import refine from './refiner';
 import { shutdown } from './fabricator';
 import { version } from '../package.json';
-import walk from './walker';
+import walk, { Marker, WalkerParams } from './walker';
+import { Target, NodeTarget } from './types';
 
-function isConfiguration(file) {
+function isConfiguration(file: string) {
   return isPackageJson(file) || file.endsWith('.config.json');
+}
+
+async function exists(file: string) {
+  try {
+    await stat(file);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 // http://www.openwall.com/lists/musl/2012/12/08/4
@@ -32,103 +42,146 @@ const {
   toFancyArch,
   toFancyPlatform,
 } = system;
-const hostNodeRange = `node${process.version.match(/^v(\d+)/)[1]}`;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const hostNodeRange = `node${process.version.match(/^v(\d+)/)![1]}`;
 
-function parseTargets(items) {
+function parseTargets(items: string[]): NodeTarget[] {
   // [ 'node6-macos-x64', 'node6-linux-x64' ]
   const targets = [];
+
   for (const item of items) {
     const target = {
       nodeRange: hostNodeRange,
       platform: hostPlatform,
       arch: hostArch,
     };
+
     if (item !== 'host') {
       for (const token of item.split('-')) {
-        if (!token) continue;
+        if (!token) {
+          continue;
+        }
+
         if (isValidNodeRange(token)) {
           target.nodeRange = token;
           continue;
         }
+
         const p = toFancyPlatform(token);
+
         if (knownPlatforms.indexOf(p) >= 0) {
           target.platform = p;
           continue;
         }
         const a = toFancyArch(token);
+
         if (knownArchs.indexOf(a) >= 0) {
           target.arch = a;
           continue;
         }
+
         throw wasReported(`Unknown token '${token}' in '${item}'`);
       }
     }
+
     targets.push(target);
   }
+
   return targets;
 }
 
-function stringifyTarget(target) {
+function stringifyTarget(target: NodeTarget) {
   const { nodeRange, platform, arch } = target;
   return `${nodeRange}-${platform}-${arch}`;
 }
 
-function differentParts(targets) {
-  const nodeRanges = {};
-  const platforms = {};
-  const archs = {};
+interface DifferentResult {
+  nodeRange?: boolean;
+  platform?: boolean;
+  arch?: boolean;
+}
+
+function differentParts(targets: NodeTarget[]): DifferentResult {
+  const nodeRanges: Record<string, boolean> = {};
+  const platforms: Record<string, boolean> = {};
+  const archs: Record<string, boolean> = {};
+
   for (const target of targets) {
     nodeRanges[target.nodeRange] = true;
     platforms[target.platform] = true;
     archs[target.arch] = true;
   }
-  const result = {};
+
+  const result: DifferentResult = {};
+
   if (Object.keys(nodeRanges).length > 1) {
     result.nodeRange = true;
   }
+
   if (Object.keys(platforms).length > 1) {
     result.platform = true;
   }
+
   if (Object.keys(archs).length > 1) {
     result.arch = true;
   }
+
   return result;
 }
 
-function stringifyTargetForOutput(output, target, different) {
+function stringifyTargetForOutput(
+  output: string,
+  target: NodeTarget,
+  different: DifferentResult
+) {
   const a = [output];
-  if (different.nodeRange) a.push(target.nodeRange);
-  if (different.platform) a.push(target.platform);
-  if (different.arch) a.push(target.arch);
+
+  if (different.nodeRange) {
+    a.push(target.nodeRange);
+  }
+
+  if (different.platform) {
+    a.push(target.platform);
+  }
+
+  if (different.arch) {
+    a.push(target.arch);
+  }
+
   return a.join('-');
 }
 
-function fabricatorForTarget(target) {
+function fabricatorForTarget(target: NodeTarget) {
   const { nodeRange, arch } = target;
   return { nodeRange, platform: hostPlatform, arch };
 }
 
-const dryRunResults = {};
+const dryRunResults: Record<string, boolean> = {};
 
-async function needWithDryRun(target) {
+async function needWithDryRun(target: NodeTarget) {
   const target2 = { dryRun: true, ...target };
   const result = await need(target2);
   assert(['exists', 'fetched', 'built'].indexOf(result) >= 0);
   dryRunResults[result] = true;
 }
 
-const targetsCache = {};
+const targetsCache: Record<string, string> = {};
 
-async function needViaCache(target) {
+async function needViaCache(target: NodeTarget) {
   const s = stringifyTarget(target);
   let c = targetsCache[s];
-  if (c) return c;
+
+  if (c) {
+    return c;
+  }
+
   c = await need(target);
   targetsCache[s] = c;
+
   return c;
 }
 
-export async function exec(argv2) {
+export async function exec(argv2: string[]) {
   // eslint-disable-line complexity
   const argv = minimist(argv2, {
     boolean: [
@@ -191,6 +244,7 @@ export async function exec(argv2) {
       'Pass --help to see usage information',
     ]);
   }
+
   if (argv._.length > 1) {
     throw wasReported('Not more than one entry file/directory is expected');
   }
@@ -202,8 +256,10 @@ export async function exec(argv2) {
   if (!(await exists(input))) {
     throw wasReported('Input file does not exist', [input]);
   }
+
   if ((await stat(input)).isDirectory()) {
     input = path.join(input, 'package.json');
+
     if (!(await exists(input))) {
       throw wasReported('Input file does not exist', [input]);
     }
@@ -215,7 +271,7 @@ export async function exec(argv2) {
   let inputJsonName;
 
   if (isConfiguration(input)) {
-    inputJson = JSON.parse(await readFile(input));
+    inputJson = JSON.parse(await readFile(input, 'utf-8'));
     inputJsonName = inputJson.name;
 
     if (inputJsonName) {
@@ -271,11 +327,14 @@ export async function exec(argv2) {
 
   if (config) {
     config = path.resolve(config);
+
     if (!(await exists(config))) {
       throw wasReported('Config file does not exist', [config]);
     }
+
     // eslint-disable-next-line import/no-dynamic-require, global-require
     configJson = require(config); // may be either json or js
+
     if (
       !configJson.name &&
       !configJson.files &&
@@ -299,26 +358,31 @@ export async function exec(argv2) {
 
   if (!output) {
     let name;
+
     if (inputJson) {
       name = inputJsonName;
+
       if (!name) {
         throw wasReported("Property 'name' does not exist in", [argv._[0]]);
       }
     } else if (configJson) {
       name = configJson.name;
     }
+
     if (!name) {
       name = path.basename(inputFin);
     }
+
     if (!outputPath) {
       if (inputJson && inputJson.pkg) {
         outputPath = inputJson.pkg.outputPath;
-      } else
-      if (configJson && configJson.pkg) {
+      } else if (configJson && configJson.pkg) {
         outputPath = configJson.pkg.outputPath;
       }
+
       outputPath = outputPath || '';
     }
+
     autoOutput = true;
     const ext = path.extname(name);
     output = name.slice(0, -ext.length || undefined);
@@ -335,15 +399,19 @@ export async function exec(argv2) {
     throw wasReported(`Something is wrong near ${JSON.stringify(sTargets)}`);
   }
 
-  let targets = parseTargets(sTargets.split(',').filter((t) => t));
+  let targets = (parseTargets(
+    sTargets.split(',').filter((t) => t)
+  ) as unknown) as Array<NodeTarget & Partial<Target>>;
 
   if (!targets.length) {
     let jsonTargets;
+
     if (inputJson && inputJson.pkg) {
       jsonTargets = inputJson.pkg.targets;
     } else if (configJson && configJson.pkg) {
       jsonTargets = configJson.pkg.targets;
     }
+
     if (jsonTargets) {
       targets = parseTargets(jsonTargets);
     }
@@ -356,9 +424,10 @@ export async function exec(argv2) {
     } else {
       targets = parseTargets(['linux', 'macos', 'win']);
     }
+
     log.info(
       'Targets not specified. Assuming:',
-      `${targets.map(stringifyTarget).join(', ')}`
+      `${targets.map((t) => stringifyTarget(t)).join(', ')}`
     );
   }
 
@@ -370,19 +439,23 @@ export async function exec(argv2) {
 
   for (const target of targets) {
     let file;
+
     if (targets.length === 1) {
       file = output;
     } else {
       file = stringifyTargetForOutput(output, target, different);
     }
-    if (target.platform === 'win' && path.extname(file) !== '.exe')
+
+    if (target.platform === 'win' && path.extname(file) !== '.exe') {
       file += '.exe';
+    }
+
     target.output = file;
   }
 
   // bakes
 
-  const bakes = (argv.options || '')
+  const bakes = ((argv.options || '') as string)
     .split(',')
     .filter((bake) => bake)
     .map((bake) => `--${bake}`);
@@ -408,8 +481,9 @@ export async function exec(argv2) {
     target.forceBuild = forceBuild;
     await needWithDryRun(target);
     const f = fabricatorForTarget(target);
-    target.fabricator = f;
-    f.forceBuild = forceBuild;
+    target.fabricator = f as Target;
+    (f as any).forceBuild = forceBuild;
+
     if (bytecode) {
       await needWithDryRun(f);
     }
@@ -422,8 +496,10 @@ export async function exec(argv2) {
   for (const target of targets) {
     target.binaryPath = await needViaCache(target);
     const f = target.fabricator;
-    if (bytecode) {
-      f.binaryPath = await needViaCache(f);
+
+    if (f && bytecode) {
+      f.binaryPath = await needViaCache(f as NodeTarget);
+
       if (f.platform !== 'win') {
         await plusx(f.binaryPath);
       }
@@ -432,7 +508,7 @@ export async function exec(argv2) {
 
   // marker
 
-  let marker;
+  let marker: Marker;
 
   if (configJson) {
     marker = {
@@ -452,13 +528,16 @@ export async function exec(argv2) {
 
   // public
 
-  const params = {};
+  const params: WalkerParams = {};
+
   if (argv.public) {
     params.publicToplevel = true;
   }
+
   if (argv['public-packages']) {
     params.publicPackages = argv['public-packages'].split(',');
-    if (params.publicPackages.indexOf('*') !== -1) {
+
+    if (params.publicPackages?.indexOf('*') !== -1) {
       params.publicPackages = ['*'];
     }
   }
@@ -482,7 +561,7 @@ export async function exec(argv2) {
   log.debug('Targets:', JSON.stringify(targets, null, 2));
 
   for (const target of targets) {
-    if (await exists(target.output)) {
+    if (target.output && (await exists(target.output))) {
       if ((await stat(target.output)).isFile()) {
         await remove(target.output);
       } else {
@@ -490,13 +569,14 @@ export async function exec(argv2) {
           target.output,
         ]);
       }
-    } else {
+    } else if (target.output) {
       await mkdirp(path.dirname(target.output));
     }
 
     const slash = target.platform === 'win' ? '\\' : '/';
-    await producer({ backpack, bakes, slash, target });
-    if (target.platform !== 'win') {
+    await producer({ backpack, bakes, slash, target: target as Target });
+
+    if (target.platform !== 'win' && target.output) {
       await plusx(target.output);
     }
   }

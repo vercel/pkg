@@ -152,7 +152,7 @@ function expandFiles(efs: string | string[], base: string) {
   return efs;
 }
 
-interface Marker {
+export interface Marker {
   hasDictionary?: boolean;
   activated?: boolean;
   toplevel?: boolean;
@@ -179,7 +179,7 @@ interface Derivative {
   fromDependencies?: boolean;
 }
 
-interface WalkerParams {
+export interface WalkerParams {
   publicToplevel?: boolean;
   publicPackages?: string[];
 }
@@ -855,7 +855,7 @@ class Walker {
   async start(
     marker: Marker,
     entrypoint: string,
-    addition: string,
+    addition: string | undefined,
     params: WalkerParams
   ) {
     this.params = params;

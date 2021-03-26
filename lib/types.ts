@@ -27,7 +27,6 @@ export type ConfigDictionary = Record<
   }
 >;
 
-
 export interface PkgOptions {
   scripts?: string[];
   log?: (
@@ -49,4 +48,23 @@ export interface PackageJson {
   dependencies?: Record<string, string>;
   files?: string[];
   pkg?: PkgOptions;
+}
+
+export const platform = {
+  macos: 'darwin',
+  win: 'win32',
+  linux: 'linux',
+};
+
+export interface NodeTarget {
+  nodeRange: string;
+  arch: string;
+  platform: keyof typeof platform;
+  forceBuild?: boolean;
+}
+
+export interface Target extends NodeTarget {
+  binaryPath: string;
+  output: string;
+  fabricator: Target;
 }

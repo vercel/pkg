@@ -1,7 +1,7 @@
-import { spawn } from 'child_process';
-import { ChildProcessByStdio } from 'node:child_process';
-import { Readable, Writable } from 'node:stream';
+import { spawn, ChildProcessByStdio } from 'child_process';
+import { Readable, Writable } from 'stream';
 import { log } from './log';
+import { Target } from './types';
 
 const script = `
   var vm = require('vm');
@@ -46,15 +46,9 @@ const children: Record<
   ChildProcessByStdio<Writable, Readable, null>
 > = {};
 
-interface FabricatorConfiguration {
-  binaryPath: string;
-  nodeRange: string;
-  arch: string;
-}
-
 export function fabricate(
   bakes: string[],
-  fabricator: FabricatorConfiguration,
+  fabricator: Target,
   snap: string,
   body: Buffer,
   cb: (error?: Error, buffer?: Buffer) => void
@@ -157,7 +151,7 @@ export function fabricate(
 
 export function fabricateTwice(
   bakes: string[],
-  fabricator: FabricatorConfiguration,
+  fabricator: Target,
   snap: string,
   body: Buffer,
   cb: (error?: Error, buffer?: Buffer) => void

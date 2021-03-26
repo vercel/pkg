@@ -41,12 +41,20 @@ interface PackerOptions {
   bytecode: string;
 }
 
+export interface Stripe {
+  snap: string;
+  skip?: boolean;
+  store: number;
+  file?: string;
+  buffer?: Buffer;
+}
+
 export default function packer({
   records,
   entrypoint,
   bytecode,
 }: PackerOptions) {
-  const stripes = [];
+  const stripes: Stripe[] = [];
 
   for (const snap in records) {
     if (records[snap]) {

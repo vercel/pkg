@@ -1,37 +1,83 @@
-import Multistream from 'multistream';
+import multistream from 'multistream';
 import assert from 'assert';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import intoStream from 'into-stream';
 import path from 'path';
 import streamMeter from 'stream-meter';
-import {
-  STORE_BLOB,
-  STORE_CONTENT,
-  isDotNODE,
-  snapshotify,
-} from './common';
+import { Readable } from 'stream';
+
+import { STORE_BLOB, STORE_CONTENT, isDotNODE, snapshotify } from './common';
 import { log, wasReported } from './log';
 import { fabricateTwice } from './fabricator';
+import { platform, Target } from './types';
+import { Stripe } from './packer';
 
-function discoverPlaceholder(binaryBuffer, searchString, padder) {
+interface NotFound {
+  notFound: true;
+}
+
+interface Placeholder {
+  position: number;
+  size: number;
+  padder: string;
+}
+
+type PlaceholderTypes =
+  | 'BAKERY'
+  | 'PAYLOAD_POSITION'
+  | 'PAYLOAD_SIZE'
+  | 'PRELUDE_POSITION'
+  | 'PRELUDE_SIZE';
+type PlaceholderMap = Record<PlaceholderTypes, Placeholder | NotFound>;
+
+function discoverPlaceholder(
+  binaryBuffer: Buffer,
+  searchString: string,
+  padder: string
+): Placeholder | NotFound {
   const placeholder = Buffer.from(searchString);
   const position = binaryBuffer.indexOf(placeholder);
-  if (position === -1) return { notFound: true };
+
+  if (position === -1) {
+    return { notFound: true };
+  }
+
   return { position, size: placeholder.length, padder };
 }
 
-function injectPlaceholder(fd, placeholder, value, cb) {
-  const { notFound, position, size, padder } = placeholder;
-  if (notFound) assert(false, 'Placeholder for not found');
-  if (typeof value === 'number') value = value.toString();
-  if (typeof value === 'string') value = Buffer.from(value);
-  const padding = Buffer.from(padder.repeat(size - value.length));
-  value = Buffer.concat([value, padding]);
-  fs.write(fd, value, 0, value.length, position, cb);
+function injectPlaceholder(
+  fd: number,
+  placeholder: Placeholder | NotFound,
+  value: string | number | Buffer,
+  cb: (
+    err: NodeJS.ErrnoException | null,
+    written: number,
+    buffer: Buffer
+  ) => void
+) {
+  if ('notFound' in placeholder) {
+    assert(false, 'Placeholder for not found');
+  }
+
+  const { position, size, padder } = placeholder;
+  let stringValue: Buffer = Buffer.from('');
+
+  if (typeof value === 'number') {
+    stringValue = Buffer.from(value.toString());
+  } else if (typeof value === 'string') {
+    stringValue = Buffer.from(value);
+  } else {
+    stringValue = value;
+  }
+
+  const padding = Buffer.from(padder.repeat(size - stringValue.length));
+
+  stringValue = Buffer.concat([stringValue, padding]);
+  fs.write(fd, stringValue, 0, stringValue.length, position, cb);
 }
 
-function discoverPlaceholders(binaryBuffer) {
+function discoverPlaceholders(binaryBuffer: Buffer) {
   return {
     BAKERY: discoverPlaceholder(
       binaryBuffer,
@@ -53,27 +99,44 @@ function discoverPlaceholders(binaryBuffer) {
   };
 }
 
-function injectPlaceholders(fd, placeholders, values, cb) {
+function injectPlaceholders(
+  fd: number,
+  placeholders: PlaceholderMap,
+  values: Record<PlaceholderTypes, number | string | Buffer>,
+  cb: (error?: Error | null) => void
+) {
   injectPlaceholder(fd, placeholders.BAKERY, values.BAKERY, (error) => {
-    if (error) return cb(error);
+    if (error) {
+      return cb(error);
+    }
+
     injectPlaceholder(
       fd,
       placeholders.PAYLOAD_POSITION,
       values.PAYLOAD_POSITION,
       (error2) => {
-        if (error2) return cb(error2);
+        if (error2) {
+          return cb(error2);
+        }
+
         injectPlaceholder(
           fd,
           placeholders.PAYLOAD_SIZE,
           values.PAYLOAD_SIZE,
           (error3) => {
-            if (error3) return cb(error3);
+            if (error3) {
+              return cb(error3);
+            }
+
             injectPlaceholder(
               fd,
               placeholders.PRELUDE_POSITION,
               values.PRELUDE_POSITION,
               (error4) => {
-                if (error4) return cb(error4);
+                if (error4) {
+                  return cb(error4);
+                }
+
                 injectPlaceholder(
                   fd,
                   placeholders.PRELUDE_SIZE,
@@ -89,49 +152,50 @@ function injectPlaceholders(fd, placeholders, values, cb) {
   });
 }
 
-function makeBakeryValueFromBakes(bakes) {
+function makeBakeryValueFromBakes(bakes: string[]) {
   const parts = [];
+
   if (bakes.length) {
     for (let i = 0; i < bakes.length; i += 1) {
       parts.push(Buffer.from(bakes[i]));
       parts.push(Buffer.alloc(1));
     }
+
     parts.push(Buffer.alloc(1));
   }
+
   return Buffer.concat(parts);
 }
 
-function replaceDollarWise(s, sf, st) {
+function replaceDollarWise(s: string, sf: string, st: string) {
   return s.replace(sf, () => st);
 }
 
-function makePreludeBufferFromPrelude(prelude) {
+function makePreludeBufferFromPrelude(prelude: string) {
   return Buffer.from(
     `(function(process, require, console, EXECPATH_FD, PAYLOAD_POSITION, PAYLOAD_SIZE) { ${prelude}\n})` // dont remove \n
   );
 }
 
-function findPackageJson(nodeFile) {
+function findPackageJson(nodeFile: string) {
   let dir = nodeFile;
+
   while (dir !== '/') {
     dir = path.dirname(dir);
+
     if (fs.existsSync(path.join(dir, 'package.json'))) {
       break;
     }
   }
+
   if (dir === '/') {
     throw new Error(`package.json not found for "${nodeFile}"`);
   }
+
   return dir;
 }
 
-const platform = {
-  macos: 'darwin',
-  win: 'win32',
-  linux: 'linux',
-};
-
-function nativePrebuildInstall(target, nodeFile) {
+function nativePrebuildInstall(target: Target, nodeFile: string) {
   const prebuild = path.join(
     __dirname,
     '../node_modules/.bin/prebuild-install'
@@ -139,9 +203,11 @@ function nativePrebuildInstall(target, nodeFile) {
   const dir = findPackageJson(nodeFile);
   // parse the target node version from the binaryPath
   const nodeVersion = path.basename(target.binaryPath).split('-')[1];
+
   if (!/^v[0-9]+\.[0-9]+\.[0-9]+$/.test(nodeVersion)) {
     throw new Error(`Couldn't find node version, instead got: ${nodeVersion}`);
   }
+
   // prebuild-install will overwrite the target .node file. Instead, we're
   // going to:
   //  * Take a backup
@@ -149,12 +215,15 @@ function nativePrebuildInstall(target, nodeFile) {
   //  * move the prebuild to a new name with a platform/version extension
   //  * put the backed up file back
   const nativeFile = `${nodeFile}.${target.platform}.${nodeVersion}`;
+
   if (fs.existsSync(nativeFile)) {
     return nativeFile;
   }
+
   if (!fs.existsSync(`${nodeFile}.bak`)) {
     fs.copyFileSync(nodeFile, `${nodeFile}.bak`);
   }
+
   execSync(
     `${prebuild} -t ${nodeVersion} --platform ${
       platform[target.platform]
@@ -163,11 +232,24 @@ function nativePrebuildInstall(target, nodeFile) {
   );
   fs.copyFileSync(nodeFile, nativeFile);
   fs.copyFileSync(`${nodeFile}.bak`, nodeFile);
+
   return nativeFile;
 }
 
-export default function producer({ backpack, bakes, slash, target }) {
-  return new Promise((resolve, reject) => {
+interface ProducerOptions {
+  backpack: { entrypoint: string; stripes: Stripe[]; prelude: string };
+  bakes: string[];
+  slash: string;
+  target: Target;
+}
+
+export default function producer({
+  backpack,
+  bakes,
+  slash,
+  target,
+}: ProducerOptions) {
+  return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
       throw wasReported(
         'Your node.js does not have Buffer.alloc. Please upgrade!'
@@ -179,22 +261,26 @@ export default function producer({ backpack, bakes, slash, target }) {
     entrypoint = snapshotify(entrypoint, slash);
     stripes = stripes.slice();
 
-    const vfs = {};
+    const vfs: Record<string, Record<string, [number, number]>> = {};
+
     for (const stripe of stripes) {
       let { snap } = stripe;
       snap = snapshotify(snap, slash);
-      if (!vfs[snap]) vfs[snap] = {};
+
+      if (!vfs[snap]) {
+        vfs[snap] = {};
+      }
     }
 
-    let meter;
+    let meter: streamMeter.StreamMeter;
     let count = 0;
 
-    function pipeToNewMeter(s) {
+    function pipeToNewMeter(s: Readable) {
       meter = streamMeter();
       return s.pipe(meter);
     }
 
-    function next(s) {
+    function next(s: Readable) {
       count += 1;
       return pipeToNewMeter(s);
     }
@@ -203,21 +289,21 @@ export default function producer({ backpack, bakes, slash, target }) {
     const placeholders = discoverPlaceholders(binaryBuffer);
 
     let track = 0;
-    let prevStripe;
+    let prevStripe: Stripe;
 
-    let payloadPosition;
-    let payloadSize;
-    let preludePosition;
-    let preludeSize;
+    let payloadPosition: number;
+    let payloadSize: number;
+    let preludePosition: number;
+    let preludeSize: number;
 
-    new Multistream((cb) => {
+    multistream((cb) => {
       if (count === 0) {
-        return cb(undefined, next(intoStream(binaryBuffer)));
+        return cb(null, next(intoStream(binaryBuffer)));
       }
 
       if (count === 1) {
         payloadPosition = meter.bytes;
-        return cb(undefined, next(intoStream(Buffer.alloc(0))));
+        return cb(null, next(intoStream(Buffer.alloc(0))));
       }
 
       if (count === 2) {
@@ -233,7 +319,7 @@ export default function producer({ backpack, bakes, slash, target }) {
           // clone to prevent 'skip' propagate
           // to other targets, since same stripe
           // is used for several targets
-          const stripe = { ...stripes.shift() };
+          const stripe = { ...(stripes.shift() as Stripe) };
           prevStripe = stripe;
 
           if (stripe.buffer) {
@@ -248,15 +334,18 @@ export default function producer({ backpack, bakes, slash, target }) {
                   if (error) {
                     log.warn(error.message);
                     stripe.skip = true;
-                    return cb(undefined, intoStream(Buffer.alloc(0)));
+                    return cb(null, intoStream(Buffer.alloc(0)));
                   }
 
-                  cb(undefined, pipeToNewMeter(intoStream(buffer)));
+                  cb(
+                    null,
+                    pipeToNewMeter(intoStream(buffer || Buffer.from('')))
+                  );
                 }
               );
             }
 
-            return cb(undefined, pipeToNewMeter(intoStream(stripe.buffer)));
+            return cb(null, pipeToNewMeter(intoStream(stripe.buffer)));
           }
 
           if (stripe.file) {
@@ -265,17 +354,20 @@ export default function producer({ backpack, bakes, slash, target }) {
                 wasReported(
                   'Trying to take executable into executable',
                   stripe.file
-                )
+                ),
+                null
               );
             }
 
             assert.strictEqual(stripe.store, STORE_CONTENT); // others must be buffers from walker
+
             if (isDotNODE(stripe.file)) {
               try {
                 const platformFile = nativePrebuildInstall(target, stripe.file);
+
                 if (fs.existsSync(platformFile)) {
                   return cb(
-                    undefined,
+                    null,
                     pipeToNewMeter(fs.createReadStream(platformFile))
                   );
                 }
@@ -283,10 +375,8 @@ export default function producer({ backpack, bakes, slash, target }) {
                 log.debug(`prebuild-install failed[${stripe.file}]:`, err);
               }
             }
-            return cb(
-              undefined,
-              pipeToNewMeter(fs.createReadStream(stripe.file))
-            );
+
+            return cb(null, pipeToNewMeter(fs.createReadStream(stripe.file)));
           }
 
           assert(false, 'producer: bad stripe');
@@ -294,7 +384,7 @@ export default function producer({ backpack, bakes, slash, target }) {
           payloadSize = track;
           preludePosition = payloadPosition + payloadSize;
           return cb(
-            undefined,
+            null,
             next(
               intoStream(
                 makePreludeBufferFromPrelude(
@@ -313,7 +403,7 @@ export default function producer({ backpack, bakes, slash, target }) {
           );
         }
       } else {
-        return cb();
+        return cb(null, null);
       }
     })
       .on('error', (error) => {
