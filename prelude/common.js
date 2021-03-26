@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var fs = require('fs');
 var path = require('path');
 
 exports.STORE_BLOB = 0;
@@ -153,7 +154,6 @@ exports.substituteDenominator = function substituteDenominator(f, denominator) {
 };
 
 exports.snapshotify = function snapshotify(file, slash) {
-  assert.strictEqual(file, normalizePath(file));
   return injectSnapshot(replaceSlashes(file, slash));
 };
 
@@ -170,8 +170,9 @@ if (win32) {
       slice112 === ':/snapshot/' ||
       slice112 === ':\\snapshot' ||
       slice112 === ':/snapshot'
-    )
+    ) {
       return true;
+    }
     return false;
   };
 } else {
@@ -229,3 +230,12 @@ if (win32) {
     return f;
   };
 }
+
+function toNormalizedRealPath(requestPath) {
+  const file = normalizePath(requestPath);
+  if (fs.existsSync(file)) {
+    return fs.realpathSync(file);
+  }
+  return file;
+}
+exports.toNormalizedRealPath = toNormalizedRealPath;
