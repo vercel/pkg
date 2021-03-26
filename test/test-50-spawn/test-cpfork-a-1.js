@@ -9,9 +9,7 @@ var child;
 assert(!process.send);
 
 try {
-  child = cp.fork(
-    require.resolve('./test-cpfork-a-child.js')
-  );
+  child = cp.fork(require.resolve('./test-cpfork-a-child.js'));
 } catch (e) {
   console.log(e.message);
 }

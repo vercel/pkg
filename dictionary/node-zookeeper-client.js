@@ -2,8 +2,6 @@
 
 module.exports = {
   pkg: {
-    assets: [
-      'lib/jute/specification.json'
-    ]
-  }
+    assets: ['lib/jute/specification.json'],
+  },
 };

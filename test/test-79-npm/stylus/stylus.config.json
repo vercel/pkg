@@ -1,8 +1,6 @@
 {
   "bin": "stylus.js",
   "pkg": {
-    "assets": [
-      "external.css"
-    ]
+    "assets": ["external.css"]
   }
 }

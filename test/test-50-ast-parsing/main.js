@@ -21,23 +21,23 @@ if (/^(node|v)?4/.test(target)) return;
 
 let left, right;
 
-left = fs.readFileSync(
-  data, 'utf8'
-).split('\n').filter(function (line) {
-  return line.indexOf('/***/ ') >= 0;
-}).map(function (line) {
-  return line.split('/***/ ')[1];
-}).join('\n') + '\n';
+left =
+  fs
+    .readFileSync(data, 'utf8')
+    .split('\n')
+    .filter(function (line) {
+      return line.indexOf('/***/ ') >= 0;
+    })
+    .map(function (line) {
+      return line.split('/***/ ')[1];
+    })
+    .join('\n') + '\n';
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
-assert.equal(left, right);
+assert.strictEqual(left, right);
 utils.vacuum.sync(output);

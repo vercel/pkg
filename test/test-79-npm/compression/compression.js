@@ -1,7 +1,7 @@
 'use strict';
 
 var compression = require('compression');
-var req = { headers: { } };
+var req = { headers: {} };
 var res = {};
 
 var middleware = compression();

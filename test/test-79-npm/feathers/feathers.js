@@ -13,14 +13,16 @@ var server = app.listen(1337, function () {
   setTimeout(function () {
     http.get('http://127.0.0.1:' + port.toString() + '/', function (res) {
       var chunks = '';
-      res.on('data', function (chunk) {
-        chunks += chunk.toString();
-      }).on('end', function () {
-        if (chunks === 'Hello there!') {
-          console.log('ok');
-        }
-        server.close();
-      });
+      res
+        .on('data', function (chunk) {
+          chunks += chunk.toString();
+        })
+        .on('end', function () {
+          if (chunks === 'Hello there!') {
+            console.log('ok');
+          }
+          server.close();
+        });
     });
   }, 100);
 });

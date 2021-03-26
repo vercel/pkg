@@ -8,19 +8,19 @@ const dontBuild = require('pkg-fetch/lib-es5/upload.js').dontBuild;
 const knownPlatforms = fetch.system.knownPlatforms;
 const items = [];
 
-function nodeRangeToNodeVersion (nodeRange) {
+function nodeRangeToNodeVersion(nodeRange) {
   assert(/^node/.test(nodeRange));
   return 'v' + nodeRange.slice(4);
 }
 
-
 for (const platform of knownPlatforms) {
-  const nodeRanges = [ 'node8', 'node10', 'node12' ];
-  if (platform === 'linux' || platform === 'alpine') nodeRanges.unshift('node6');
+  const nodeRanges = ['node8', 'node10', 'node12'];
+  if (platform === 'linux' || platform === 'alpine')
+    nodeRanges.unshift('node6');
   if (platform === 'linux') nodeRanges.unshift('node4');
   for (const nodeRange of nodeRanges) {
     const nodeVersion = nodeRangeToNodeVersion(nodeRange);
-    const archs = [ 'x64' ];
+    const archs = ['x64'];
     if (platform === 'win') archs.unshift('x86');
     if (platform === 'linux') archs.push('armv7');
     // linux-armv7 is needed in multi-arch tests,

@@ -7,9 +7,9 @@ if (process.platform === 'win32') return;
 var exec = require('child_process').exec;
 
 var child = exec(
-  process.execPath + ' ' + [
-    require.resolve('./test-exec-child.js'), 'argvx', '--argvy'
-  ].join(' ')
+  process.execPath +
+    ' ' +
+    [require.resolve('./test-exec-child.js'), 'argvx', '--argvy'].join(' ')
   // leave without callback for coverage
 );
 

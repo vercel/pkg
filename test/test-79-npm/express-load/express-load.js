@@ -11,7 +11,6 @@ var opts = {};
 
 load('controllers', opts).then('routes').into(app);
 
-if (app.controllers.fixture &&
-    app.routes.fixture) {
+if (app.controllers.fixture && app.routes.fixture) {
   console.log('ok');
 }

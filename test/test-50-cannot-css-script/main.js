@@ -14,16 +14,14 @@ const standard = 'stdout';
 
 let right;
 
-const inspect = (standard === 'stdout')
-  ? [ 'inherit', 'pipe', 'inherit' ]
-  : [ 'inherit', 'inherit', 'pipe' ];
+const inspect =
+  standard === 'stdout'
+    ? ['inherit', 'pipe', 'inherit']
+    : ['inherit', 'inherit', 'pipe'];
 
-right = utils.pkg.sync([
-  '--target', target,
-  '--output', output, '.'
-], inspect);
+right = utils.pkg.sync(['--target', target, '--output', output, '.'], inspect);
 
 assert(right.indexOf('\x1B\x5B') < 0, 'colors detected');
-assert(right.indexOf('Non-javascript file is specified in \'scripts\'') >= 0);
+assert(right.indexOf("Non-javascript file is specified in 'scripts'") >= 0);
 assert(right.indexOf('animate.css') >= 0);
 utils.vacuum.sync(output);

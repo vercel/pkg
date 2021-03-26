@@ -18,15 +18,9 @@ if (windows) return;
 
 let right;
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { expect: null }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], { expect: null });
 
-assert.equal(right, 'ok\n');
+assert.strictEqual(right, 'ok\n');
 utils.vacuum.sync(output);

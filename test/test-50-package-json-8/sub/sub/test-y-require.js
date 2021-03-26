@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 
-function main () {
+function main() {
   require('../test-z-require.js');
 }
 

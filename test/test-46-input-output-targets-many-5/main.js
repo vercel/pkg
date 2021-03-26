@@ -13,14 +13,17 @@ const input = './test-x-index.js';
 const newcomers = [
   'test-output.exe-linux',
   'test-output.exe-macos',
-  'test-output.exe-win.exe'
+  'test-output.exe-win.exe',
 ];
 
 const before = utils.filesBefore(newcomers);
 
 utils.pkg.sync([
-  '--target', 'linux,macos,win',
-  '--output', 'test-output.exe', input
+  '--target',
+  'linux,macos,win',
+  '--output',
+  'test-output.exe',
+  input,
 ]);
 
 utils.filesAfter(before, newcomers);

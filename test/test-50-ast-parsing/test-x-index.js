@@ -4,20 +4,17 @@ const fs = require('fs');
 const detector = require('../../lib-es5/detector.js');
 const body = fs.readFileSync('./test-y-data.txt', 'utf8');
 
-detector.detect(
-  body,
-  function (node, trying) {
-    let p;
-    p = detector.visitor_SUCCESSFUL(node, true);
-    if (p) {
-      if (trying) {
-        console.log('try { ' + p + '; } catch (_) {}');
-      } else {
-        console.log(p + ';');
-      }
-      return false;
+detector.detect(body, function (node, trying) {
+  let p;
+  p = detector.visitor_SUCCESSFUL(node, true);
+  if (p) {
+    if (trying) {
+      console.log('try { ' + p + '; } catch (_) {}');
+    } else {
+      console.log(p + ';');
     }
-    // TODO maybe NONLITERAL and USESCWD?
-    return true;
+    return false;
   }
-);
+  // TODO maybe NONLITERAL and USESCWD?
+  return true;
+});

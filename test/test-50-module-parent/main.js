@@ -16,27 +16,22 @@ const output = './run-time/test-output.exe';
 let left, right;
 utils.mkdirp.sync(path.dirname(output));
 
-left = utils.spawn.sync(
-  'node', [ path.basename(input) ],
-  { cwd: path.dirname(input) }
-);
+left = utils.spawn.sync('node', [path.basename(input)], {
+  cwd: path.dirname(input),
+});
 
-utils.pkg.sync([
-  '--target', target,
-  '--output', output, input
-]);
+utils.pkg.sync(['--target', target, '--output', output, input]);
 
-right = utils.spawn.sync(
-  './' + path.basename(output), [],
-  { cwd: path.dirname(output) }
-);
+right = utils.spawn.sync('./' + path.basename(output), [], {
+  cwd: path.dirname(output),
+});
 
 left = left.split('\n');
 right = right.split('\n');
 // right may have less lines, premature exit,
 // less trusted, so using left.length here
 for (let i = 0; i < left.length; i += 1) {
-  assert.equal(left[i], right[i]);
+  assert.strictEqual(left[i], right[i]);
 }
 
 utils.vacuum.sync(path.dirname(output));

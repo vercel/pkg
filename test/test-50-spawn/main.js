@@ -13,31 +13,38 @@ assert(__dirname === process.cwd());
 const host = 'node' + process.version.match(/^v(\d+)/)[1];
 const target = process.argv[2] || host;
 
-function rnd () {
+function rnd() {
   return Math.random().toString().slice(-6);
 }
 
-const pairs = fs.readdirSync('.').filter(function (f) {
-  return (/\.js$/.test(f)) &&
-         (f !== 'main.js') &&
-         (!(/-child\.js$/.test(f)));
-}).map(function (f) {
-  return ({
-    input: f, output: './test-output-' + rnd() + '.exe'
+const pairs = fs
+  .readdirSync('.')
+  .filter(function (f) {
+    return /\.js$/.test(f) && f !== 'main.js' && !/-child\.js$/.test(f);
+  })
+  .map(function (f) {
+    return {
+      input: f,
+      output: './test-output-' + rnd() + '.exe',
+    };
   });
-});
 
 assert(pairs.length > 6);
 
-function stripTraceOpt (lines) {
-  return lines.split('\n').filter(function (line) {
-    return (line.indexOf('[disabled optimization') < 0) &&
-           (line.indexOf('[marking') < 0) &&
-           (line.indexOf('[compiling method') < 0) &&
-           (line.indexOf('[optimizing') < 0) &&
-           (line.indexOf('[completed optimizing') < 0) &&
-           (line.indexOf('einfo:') < 0);
-  }).join('\n');
+function stripTraceOpt(lines) {
+  return lines
+    .split('\n')
+    .filter(function (line) {
+      return (
+        line.indexOf('[disabled optimization') < 0 &&
+        line.indexOf('[marking') < 0 &&
+        line.indexOf('[compiling method') < 0 &&
+        line.indexOf('[optimizing') < 0 &&
+        line.indexOf('[completed optimizing') < 0 &&
+        line.indexOf('einfo:') < 0
+      );
+    })
+    .join('\n');
 }
 
 pairs.some(function (pair) {
@@ -47,20 +54,15 @@ pairs.some(function (pair) {
   let left, right;
   utils.mkdirp.sync(path.dirname(output));
 
-  left = utils.spawn.sync(
-    'node', [ path.basename(input) ],
-    { cwd: path.dirname(input) }
-  );
+  left = utils.spawn.sync('node', [path.basename(input)], {
+    cwd: path.dirname(input),
+  });
 
-  utils.pkg.sync([
-    '--target', target,
-    '--output', output, input
-  ]);
+  utils.pkg.sync(['--target', target, '--output', output, input]);
 
-  right = utils.spawn.sync(
-    './' + path.basename(output), [],
-    { cwd: path.dirname(output) }
-  );
+  right = utils.spawn.sync('./' + path.basename(output), [], {
+    cwd: path.dirname(output),
+  });
 
   right = stripTraceOpt(right);
   left = stripTraceOpt(left);

@@ -1,0 +1,20 @@
+name: 'Close stale issues'
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'This issue is stale because it has been open 90 days with no activity. Remove the stale label or comment or this will be closed in 5 days. To ignore this issue entirely you can add the no-stale label'
+          close-issue-message: 'This issue is now closed due to inactivity, you can of course reopen or reference this issue if you see fit.'
+          stale-pr-message: 'This pull-request is stale because it has been open 90 days with no activity. Remove the stale label or comment or this will be closed in 5 days. To ignore this pull-request entirely you can add the no-stale label'
+          close-pr-message: 'This pull-request is now closed due to inactivity, you can of course reopen or reference this pull-request if you see fit.'
+          days-before-stale: 90
+          days-before-close: 5
+          exempt-issue-labels: 'no-stale,enhancement'
+          exempt-pr-labels: 'no-stale'
