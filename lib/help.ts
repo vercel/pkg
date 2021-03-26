@@ -30,6 +30,5 @@ export default function help() {
     ${chalk.cyan('$ pkg -t node4-linux,node6-linux,node6-win index.js')}
   ${chalk.gray('–')} Bakes '--expose-gc' into executable
     ${chalk.cyan('$ pkg --options expose-gc index.js')}
-
 `);
 }

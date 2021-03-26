@@ -1,11 +1,14 @@
 {
   "extends": [
     "airbnb-base",
+    "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
-  "parser": "@babel/eslint-parser",
-  "parserOptions": {
-    "sourceType": "module"
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   },
   "rules": {
     "wrap-iife": "off",
@@ -18,12 +21,25 @@
     "consistent-return": "off",
     "no-restricted-syntax": "off",
     "import/prefer-default-export": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ]
   },
-  "overrides": [{
-    "files": ["prelude/**/*"],
-    "rules": {
-      "strict": "off"
+  "overrides": [
+    {
+      "files": ["prelude/**/*"],
+      "rules": {
+        "strict": "off"
+      }
     }
-  }]
+  ]
 }

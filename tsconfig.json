@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "lib-es5",
+    "importHelpers": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "resolveJsonModule": true
+  },
+  "include": ["lib/**/*"]
+}

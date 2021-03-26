@@ -33,10 +33,10 @@ jobs:
 
       - name: Lint
         if: matrix['node-version'] == '14.x' && matrix['os'] == 'ubuntu-latest'
-        run: yarn run lint
+        run: yarn lint
 
       - name: Build
-        run: yarn run babel
+        run: yarn build
 
       - name: Test
-        run: yarn run test
+        run: yarn test
