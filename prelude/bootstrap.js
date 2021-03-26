@@ -1660,21 +1660,29 @@ function payloadFileSync(pointer) {
     // CHILD_PROCESS ///////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////
 
-    var customPromiseExecFunction = (o) => (...args) =>
-      new Promise((resolve, reject) => {
-        o.apply(
-          undefined,
-          args.concat((error, stdout, stderr) => {
-            if (error !== null) {
-              error.stdout = stdout;
-              error.stderr = stderr;
-              reject(error);
-            } else {
-              resolve({ stdout, stderr });
-            }
-          })
-        );
+    var customPromiseExecFunction = (o) => (...args) => {
+      let resolve;
+      let reject;
+      const p = new Promise((res, rej) => {
+        resolve = res;
+        reject  = rej;
       });
+
+      p.child = o.apply(
+        undefined,
+        args.concat((error, stdout, stderr) => {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          } else {
+            resolve({ stdout, stderr });
+          }
+        })
+      );
+
+      return p;
+    };
 
     Object.defineProperty(require('child_process').exec, custom, {
       value: customPromiseExecFunction(require('child_process').exec),
