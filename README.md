@@ -145,17 +145,17 @@ into executable), it may be useful to look through the log.
 
 ### Bytecode (reproducibility)
 
-By default your source code is precompiled to v8 bytecode before being written
-to the output file. To disable this feature pass `--no-bytecode` to `pkg`.
+By default, your source code is precompiled to v8 bytecode before being written
+to the output file. To disable this feature, pass `--no-bytecode` to `pkg`.
 
 > Why would you want to do this?
 
-Well, let's say you need a reproducible build
-process, wherein your executable hashes (IE. md5, sha1, sha256, etc.) are the
+If you need a reproducible build
+process where your executable hashes (e.g. md5, sha1, sha256, etc.) are the
 same value between builds. Because compiling bytecode is not deterministic
 (see [here](https://ui.adsabs.harvard.edu/abs/2019arXiv191003478C/abstract) or
 [here](https://medium.com/dailyjs/understanding-v8s-bytecode-317d46c94775)) it
-results in executables that have differing hashed values. Disabling bytecode
+results in executables with differing hashed values. Disabling bytecode
 compilation allows a given input to always have the same output.
 
 > Why would you NOT want to do this?
