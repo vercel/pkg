@@ -143,6 +143,30 @@ Pass `--debug` to `pkg` to get a log of packaging process.
 If you have issues with some particular file (seems not packaged
 into executable), it may be useful to look through the log.
 
+### Bytecode (reproducibility)
+
+By default your source code is precompiled to v8 bytecode before being written
+to the output file. To disable this feature pass `--no-bytecode` to `pkg`.
+
+> Why would you want to do this?
+
+Well, let's say you need a reproducible build
+process, wherein your executable hashes (IE. md5, sha1, sha256, etc.) are the
+same value between builds. Because compiling bytecode is not deterministic
+(see [here](https://ui.adsabs.harvard.edu/abs/2019arXiv191003478C/abstract) or
+[here](https://medium.com/dailyjs/understanding-v8s-bytecode-317d46c94775)) it
+results in executables that have differing hashed values. Disabling bytecode
+compilation allows a given input to always have the same output.
+
+> Why would you NOT want to do this?
+
+While compiling to bytecode does not make your source code 100% secure, it does
+add a small layer of security/privacy/obscurity to your source code. Turning
+off bytecode compilation causes the raw source code to be written directly to
+the executable file. If you're on \*nix machine and would like an example, run
+`pkg` with the `--no-bytecode` flag, and use the GNU strings tool on the
+output. You then should be able to grep your source code.
+
 ### Build
 
 `pkg` has so called "base binaries" - they are actually same
