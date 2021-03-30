@@ -29,7 +29,7 @@ left =
       return line.indexOf('/***/ ') >= 0;
     })
     .map(function (line) {
-      return line.split('/***/ ')[1];
+      return line.split('/***/ ')[1].replace(/['`]/g, '"');
     })
     .join('\n') + '\n';
 
