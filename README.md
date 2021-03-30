@@ -81,7 +81,7 @@ your `package.json` file.
     "scripts": "build/**/*.js",
     "assets": "views/**/*",
     "targets": [ "node4-linux-armv6" ],
-    "outputPath: "dist"
+    "outputPath": "dist"
   }
 ```
 
