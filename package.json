@@ -35,17 +35,17 @@
   "dependencies": {
     "@babel/parser": "7.13.12",
     "@babel/runtime": "7.13.10",
-    "chalk": "^3.0.0",
-    "escodegen": "^1.14.1",
-    "fs-extra": "^8.1.0",
-    "globby": "^11.0.0",
-    "into-stream": "^5.1.1",
+    "chalk": "^4.1.0",
+    "escodegen": "^2.0.0",
+    "fs-extra": "^9.1.0",
+    "globby": "^11.0.3",
+    "into-stream": "^6.0.0",
     "minimist": "^1.2.5",
-    "multistream": "^2.1.1",
+    "multistream": "^4.1.0",
     "pkg-fetch": "2.6.9",
     "prebuild-install": "6.0.1",
     "progress": "^2.0.3",
-    "resolve": "^1.15.1",
+    "resolve": "^1.20.0",
     "stream-meter": "^1.0.4"
   },
   "devDependencies": {
@@ -63,13 +63,13 @@
     "eslint-plugin-import": "2.22.1",
     "json-stable-stringify": "^1.0.1",
     "lint-staged": ">=10",
-    "mkdirp": "^1.0.3",
+    "mkdirp": "^1.0.4",
     "prettier": "2.2.1",
-    "rimraf": "^3.0.1",
-    "simple-git-hooks": ">=2.0.3"
+    "simple-git-hooks": ">=2.2.0",
+    "rimraf": "^3.0.2"
   },
   "peerDependencies": {
-    "node-notifier": ">=6.0.0"
+    "node-notifier": ">=9.0.1"
   },
   "peerDependenciesMeta": {
     "node-notifier": {
@@ -77,8 +77,9 @@
     }
   },
   "scripts": {
-    "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "lint": "eslint lib prelude || true",
+    "lint:fix": "eslint lib prelude test || true",
+    "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
     "prepare": "npm run babel",
     "prepublishOnly": "npm run lint",
     "test": "npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
