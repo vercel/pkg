@@ -43,33 +43,25 @@ function removeTrailingSlashes(f: string) {
   return f;
 }
 
-export function isRootPath(p: any) {
-  if (Buffer.isBuffer(p)) {
-    p = p.toString();
+const isUrl = (p: unknown): p is URL => hasURL && p instanceof URL;
+
+export function isRootPath(p: string | URL | Buffer) {
+  let file = Buffer.isBuffer(p) ? p.toString() : isUrl(p) ? p.pathname : p;
+
+  if (file === '.') {
+    file = path.resolve(file);
   }
 
-  if (hasURL && p instanceof URL) {
-    p = p.pathname;
-  }
-
-  if (p === '.') {
-    p = path.resolve(p);
-  }
-
-  return path.dirname(p) === p;
+  return path.dirname(file) === p;
 }
 
-export function normalizePath(f: any) {
+export function normalizePath(f: string | URL | Buffer) {
   if (win32) {
-    let file = f;
-
-    if (Buffer.isBuffer(file)) {
-      file = file.toString();
-    }
-
-    if (hasURL && file instanceof URL) {
-      file = file.pathname.replace(/^\//, '');
-    }
+    let file = Buffer.isBuffer(f)
+      ? f.toString()
+      : isUrl(f)
+      ? f.pathname.replace(/^\//, '')
+      : f;
 
     if (!/^.:$/.test(file)) {
       file = path.normalize(file);
@@ -80,15 +72,7 @@ export function normalizePath(f: any) {
     return removeTrailingSlashes(file);
   }
 
-  let file = f;
-
-  if (Buffer.isBuffer(file)) {
-    file = file.toString();
-  }
-
-  if (hasURL && file instanceof URL) {
-    file = file.pathname;
-  }
+  let file = Buffer.isBuffer(f) ? f.toString() : isUrl(f) ? f.pathname : f;
 
   if (!/^.:$/.test(file)) {
     file = path.normalize(file);

@@ -113,7 +113,7 @@ function isPublic(config: PackageJson) {
   return result;
 }
 
-function upon(p: any, base: string) {
+function upon(p: string, base: string) {
   if (typeof p !== 'string') {
     throw wasReported('Config items must be strings. See examples');
   }

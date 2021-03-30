@@ -485,7 +485,7 @@ export async function exec(argv2: string[]) {
     await needWithDryRun(target);
     const f = fabricatorForTarget(target);
     target.fabricator = f as Target;
-    (f as any).forceBuild = forceBuild;
+    (f as NodeTarget).forceBuild = forceBuild;
 
     if (bytecode) {
       await needWithDryRun(f);

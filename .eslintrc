@@ -14,6 +14,7 @@
     "wrap-iife": "off",
     "no-bitwise": "off",
     "no-continue": "off",
+    "no-nested-ternary": "off",
     "class-methods-use-this": "off",
     "no-await-in-loop": "off",
     "no-constant-condition": "off",
