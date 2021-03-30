@@ -29,7 +29,7 @@ left =
       return line.indexOf('/***/ ') >= 0;
     })
     .map(function (line) {
-      return line.split('/***/ ')[1];
+      return line.split('/***/ ')[1].replace(/['`]/g, '"');
     })
     .join('\n') + '\n';
 
@@ -39,5 +39,5 @@ right = utils.spawn.sync('./' + path.basename(output), [], {
   cwd: path.dirname(output),
 });
 
-assert.strictEqual(left, right);
+assert.deepStrictEqual(left.split(/(\r|\n)+/), right.split(/(\r|\n)+/));
 utils.vacuum.sync(output);
