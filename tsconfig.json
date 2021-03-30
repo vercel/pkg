@@ -7,7 +7,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "lib-es5",
-    "importHelpers": true,
     "strict": true,
     "esModuleInterop": true,
     "incremental": true,
