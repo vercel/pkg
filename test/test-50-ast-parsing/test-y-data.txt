@@ -7,12 +7,16 @@ function hellee(a, b, c) {
 
         require.resolve();
   /***/ require.resolve("barbos1");
+  /***/ require.resolve(`barbos1`);
+  /***/ require.resolve(`barbos1`, `must-exclude1`);
   /***/ require.resolve("barbos1", "must-exclude1");
   /***/ require.resolve("barbos1", "may-exclude1");
   /***/ require.resolve("barbos1", "unknown1");
 
         require();
   /***/ require("barbos2");
+  /***/ require(`barbos2`);
+  /***/ require(`barbos2`, `must-exclude2`);
   /***/ require("barbos2", "must-exclude2");
   /***/ require("barbos2", "may-exclude2");
   /***/ require("barbos2", "unknown2");
@@ -20,6 +24,7 @@ function hellee(a, b, c) {
         path.join();
         path.join(__dirname);
   /***/ path.join(__dirname, "file");
+  /***/ path.join(__dirname, `file`);
 
   // TODO path.join(__dirname + "/file");
 
@@ -33,12 +38,16 @@ function helleeTry(a, b, c) {
 
         try { require.resolve(); } catch (_) {}
   /***/ try { require.resolve("barbos1"); } catch (_) {}
+  /***/ try { require.resolve(`barbos1`); } catch (_) {}
+  /***/ try { require.resolve(`barbos1`, `must-exclude1`); } catch (_) {}
   /***/ try { require.resolve("barbos1", "must-exclude1"); } catch (_) {}
   /***/ try { require.resolve("barbos1", "may-exclude1"); } catch (_) {}
   /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
 
         try { require(); } catch (_) {}
   /***/ try { require("barbos2"); } catch (_) {}
+  /***/ try { require(`barbos2`); } catch (_) {}
+  /***/ try { require(`barbos2`, `must-exclude2`); } catch (_) {}
   /***/ try { require("barbos2", "must-exclude2"); } catch (_) {}
   /***/ try { require("barbos2", "may-exclude2"); } catch (_) {}
   /***/ try { require("barbos2", "unknown2"); } catch (_) {}
@@ -65,12 +74,16 @@ function helluu(a, b, c) {
 
             require.resolve();
       /***/ require.resolve("barbos1");
+      /***/ require.resolve(`barbos1`);
+      /***/ require.resolve(`barbos1`, `must-exclude1`);
       /***/ require.resolve("barbos1", "must-exclude1");
       /***/ require.resolve("barbos1", "may-exclude1");
       /***/ require.resolve("barbos1", "unknown1");
 
             require();
       /***/ require("barbos2");
+      /***/ require(`barbos2`);
+      /***/ require(`barbos2`, `must-exclude2`);
       /***/ require("barbos2", "must-exclude2");
       /***/ require("barbos2", "may-exclude2");
       /***/ require("barbos2", "unknown2");
@@ -78,6 +91,7 @@ function helluu(a, b, c) {
             path.join();
             path.join(__dirname);
       /***/ path.join(__dirname, "file");
+      /***/ path.join(__dirname, `file`);
 
       // TODO path.join(__dirname + "/file");
 
@@ -100,12 +114,16 @@ function helluuTry(a, b, c) {
 
             try { require.resolve(); } catch (_) {}
       /***/ try { require.resolve("barbos1"); } catch (_) {}
+      /***/ try { require.resolve(`barbos1`); } catch (_) {}
+      /***/ try { require.resolve(`barbos1`, `must-exclude1`); } catch (_) {}
       /***/ try { require.resolve("barbos1", "must-exclude1"); } catch (_) {}
       /***/ try { require.resolve("barbos1", "may-exclude1"); } catch (_) {}
       /***/ try { require.resolve("barbos1", "unknown1"); } catch (_) {}
 
             try { require(); } catch (_) {}
       /***/ try { require("barbos2"); } catch (_) {}
+      /***/ try { require(`barbos2`); } catch (_) {}
+      /***/ try { require(`barbos2`, `must-exclude2`); } catch (_) {}
       /***/ try { require("barbos2", "must-exclude2"); } catch (_) {}
       /***/ try { require("barbos2", "may-exclude2"); } catch (_) {}
       /***/ try { require("barbos2", "unknown2"); } catch (_) {}
@@ -113,6 +131,7 @@ function helluuTry(a, b, c) {
             try { path.join(); } catch (_) {}
             try { path.join(__dirname); } catch (_) {}
       /***/ try { path.join(__dirname, "file"); } catch (_) {}
+      /***/ try { path.join(__dirname, `file`); } catch (_) {}
 
       // TODO path.join(__dirname + "/file");
 
