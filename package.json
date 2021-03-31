@@ -77,9 +77,9 @@
     }
   },
   "scripts": {
-    "lint": "eslint lib prelude || true",
-    "lint:fix": "eslint lib prelude test || true",
     "babel": "node test/rimraf-es5.js && babel lib --out-dir lib-es5",
+    "lint": "eslint lib prelude test || true",
+    "lint:fix": "eslint lib prelude test --fix",
     "prepare": "npm run babel",
     "prepublishOnly": "npm run lint",
     "test": "npm run babel && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
