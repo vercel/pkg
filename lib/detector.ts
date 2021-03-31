@@ -9,6 +9,7 @@ import * as babel from '@babel/parser';
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
 
 function isLiteral(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any
 ): node is babelTypes.StringLiteral | babelTypes.TemplateLiteral {
   // TODO: this function is a lie and can probably be better

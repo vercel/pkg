@@ -33,6 +33,33 @@ import {
   SymLinks,
 } from './types';
 
+export interface Marker {
+  hasDictionary?: boolean;
+  activated?: boolean;
+  toplevel?: boolean;
+  public?: boolean;
+  hasDeployFiles?: boolean;
+  config?: PackageJson;
+  configPath: string;
+  base: string;
+}
+
+interface Task {
+  file: string;
+  data?: unknown;
+  reason?: string;
+  marker?: Marker;
+  store: number;
+}
+
+interface Derivative {
+  alias: string;
+  mayExclude?: boolean;
+  mustExclude?: boolean;
+  aliasType: number;
+  fromDependencies?: boolean;
+}
+
 // Note: as a developer, you can set the PKG_STRICT_VER variable.
 //       this will turn on some assertion in the walker code below
 //       to assert that each file content/state that we appending
@@ -164,31 +191,123 @@ function expandFiles(efs: string | string[], base: string) {
   return efs;
 }
 
-export interface Marker {
-  hasDictionary?: boolean;
-  activated?: boolean;
-  toplevel?: boolean;
-  public?: boolean;
-  hasDeployFiles?: boolean;
-  config?: PackageJson;
-  configPath: string;
-  base: string;
+async function stepRead(record: FileRecord) {
+  if (strictVerify) {
+    assert(record.file === toNormalizedRealPath(record.file));
+  }
+
+  let body;
+
+  try {
+    body = await fs.readFile(record.file);
+  } catch (error) {
+    log.error(`Cannot read file, ${error.code}`, record.file);
+    throw wasReported(error);
+  }
+
+  record.body = body;
 }
 
-interface Task {
-  file: string;
-  data?: unknown;
-  reason?: string;
-  marker?: Marker;
-  store: number;
+function stepStrip(record: FileRecord) {
+  let body = (record.body || '').toString('utf8');
+
+  if (/^\ufeff/.test(body)) {
+    body = body.replace(/^\ufeff/, '');
+  }
+
+  if (/^#!/.test(body)) {
+    body = body.replace(/^#![^\n]*\n/, '\n');
+  }
+
+  record.body = body;
 }
 
-interface Derivative {
-  alias: string;
-  mayExclude?: boolean;
-  mustExclude?: boolean;
-  aliasType: number;
-  fromDependencies?: boolean;
+function stepDetect(
+  record: FileRecord,
+  marker: Marker,
+  derivatives: Derivative[]
+) {
+  let { body = '' } = record;
+
+  if (body instanceof Buffer) {
+    body = body.toString();
+  }
+
+  try {
+    detector.detect(body, (node, trying) => {
+      const { toplevel } = marker;
+      let d = (detector.visitor_SUCCESSFUL(node) as unknown) as Derivative;
+
+      if (d) {
+        if (d.mustExclude) {
+          return false;
+        }
+
+        d.mayExclude = d.mayExclude || trying;
+        derivatives.push(d);
+
+        return false;
+      }
+
+      d = (detector.visitor_NONLITERAL(node) as unknown) as Derivative;
+
+      if (d) {
+        if (typeof d === 'object' && d.mustExclude) {
+          return false;
+        }
+
+        const debug = !toplevel || d.mayExclude || trying;
+        const level = debug ? 'debug' : 'warn';
+        log[level](`Cannot resolve '${d.alias}'`, [
+          record.file,
+          'Dynamic require may fail at run time, because the requested file',
+          'is unknown at compilation time and not included into executable.',
+          "Use a string literal as an argument for 'require', or leave it",
+          "as is and specify the resolved file name in 'scripts' option.",
+        ]);
+        return false;
+      }
+
+      d = (detector.visitor_MALFORMED(node) as unknown) as Derivative;
+
+      if (d) {
+        // there is no 'mustExclude'
+        const debug = !toplevel || trying;
+        const level = debug ? 'debug' : 'warn'; // there is no 'mayExclude'
+        log[level](`Malformed requirement for '${d.alias}'`, [record.file]);
+        return false;
+      }
+
+      d = (detector.visitor_USESCWD(node) as unknown) as Derivative;
+
+      if (d) {
+        // there is no 'mustExclude'
+        const level = 'debug'; // there is no 'mayExclude'
+        log[level](`Path.resolve(${d.alias}) is ambiguous`, [
+          record.file,
+          "It resolves relatively to 'process.cwd' by default, however",
+          "you may want to use 'path.dirname(require.main.filename)'",
+        ]);
+
+        return false;
+      }
+
+      return true; // can i go inside?
+    });
+  } catch (error) {
+    log.error(error.message, record.file);
+    throw wasReported(error);
+  }
+}
+
+function findCommonJunctionPoint(file: string, realFile: string) {
+  // find common denominator => where the link changes
+  while (toNormalizedRealPath(path.dirname(file)) === path.dirname(realFile)) {
+    file = path.dirname(file);
+    realFile = path.dirname(realFile);
+  }
+
+  return { file, realFile };
 }
 
 export interface WalkerParams {
@@ -262,20 +381,8 @@ class Walker {
     }
   }
 
-  findCommonJunctionPoint(file: string, realFile: string) {
-    // find common denominator => where the link changes
-    while (
-      toNormalizedRealPath(path.dirname(file)) === path.dirname(realFile)
-    ) {
-      file = path.dirname(file);
-      realFile = path.dirname(realFile);
-    }
-
-    return { file, realFile };
-  }
-
   appendSymlink(file: string, realFile: string) {
-    const a = this.findCommonJunctionPoint(file, realFile);
+    const a = findCommonJunctionPoint(file, realFile);
     file = a.file;
     realFile = a.realFile;
 
@@ -548,23 +655,6 @@ class Walker {
     delete marker.config;
   }
 
-  async stepRead(record: FileRecord) {
-    if (strictVerify) {
-      assert(record.file === toNormalizedRealPath(record.file));
-    }
-
-    let body;
-
-    try {
-      body = await fs.readFile(record.file);
-    } catch (error) {
-      log.error(`Cannot read file, ${error.code}`, record.file);
-      throw wasReported(error);
-    }
-
-    record.body = body;
-  }
-
   hasPatch(record: FileRecord) {
     const patch = this.patches[record.file];
 
@@ -603,94 +693,6 @@ class Walker {
     }
 
     record.body = body;
-  }
-
-  stepStrip(record: FileRecord) {
-    let body = (record.body || '').toString('utf8');
-
-    if (/^\ufeff/.test(body)) {
-      body = body.replace(/^\ufeff/, '');
-    }
-
-    if (/^#!/.test(body)) {
-      body = body.replace(/^#![^\n]*\n/, '\n');
-    }
-
-    record.body = body;
-  }
-
-  stepDetect(record: FileRecord, marker: Marker, derivatives: Derivative[]) {
-    let { body = '' } = record;
-
-    if (body instanceof Buffer) {
-      body = body.toString();
-    }
-
-    try {
-      detector.detect(body, (node, trying) => {
-        const { toplevel } = marker;
-        let d = (detector.visitor_SUCCESSFUL(node) as unknown) as Derivative;
-
-        if (d) {
-          if (d.mustExclude) {
-            return false;
-          }
-
-          d.mayExclude = d.mayExclude || trying;
-          derivatives.push(d);
-
-          return false;
-        }
-
-        d = (detector.visitor_NONLITERAL(node) as unknown) as Derivative;
-
-        if (d) {
-          if (typeof d === 'object' && d.mustExclude) {
-            return false;
-          }
-
-          const debug = !toplevel || d.mayExclude || trying;
-          const level = debug ? 'debug' : 'warn';
-          log[level](`Cannot resolve '${d.alias}'`, [
-            record.file,
-            'Dynamic require may fail at run time, because the requested file',
-            'is unknown at compilation time and not included into executable.',
-            "Use a string literal as an argument for 'require', or leave it",
-            "as is and specify the resolved file name in 'scripts' option.",
-          ]);
-          return false;
-        }
-
-        d = (detector.visitor_MALFORMED(node) as unknown) as Derivative;
-
-        if (d) {
-          // there is no 'mustExclude'
-          const debug = !toplevel || trying;
-          const level = debug ? 'debug' : 'warn'; // there is no 'mayExclude'
-          log[level](`Malformed requirement for '${d.alias}'`, [record.file]);
-          return false;
-        }
-
-        d = (detector.visitor_USESCWD(node) as unknown) as Derivative;
-
-        if (d) {
-          // there is no 'mustExclude'
-          const level = 'debug'; // there is no 'mayExclude'
-          log[level](`Path.resolve(${d.alias}) is ambiguous`, [
-            record.file,
-            "It resolves relatively to 'process.cwd' by default, however",
-            "you may want to use 'path.dirname(require.main.filename)'",
-          ]);
-
-          return false;
-        }
-
-        return true; // can i go inside?
-      });
-    } catch (error) {
-      log.error(error.message, record.file);
-      throw wasReported(error);
-    }
   }
 
   async stepDerivatives_ALIAS_AS_RELATIVE(
@@ -900,16 +902,17 @@ class Walker {
 
     if (store === STORE_BLOB || this.hasPatch(record)) {
       if (!record.body) {
-        await this.stepRead(record);
+        await stepRead(record);
         this.stepPatch(record);
+
         if (store === STORE_BLOB) {
-          this.stepStrip(record);
+          stepStrip(record);
         }
       }
 
       if (store === STORE_BLOB) {
         const derivatives2: Derivative[] = [];
-        this.stepDetect(record, marker, derivatives2);
+        stepDetect(record, marker, derivatives2);
         await this.stepDerivatives(record, marker, derivatives2);
       }
     }
@@ -986,6 +989,7 @@ class Walker {
     switch (store) {
       case STORE_BLOB:
       case STORE_CONTENT:
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await this.step_STORE_ANY(record, task.marker!, store);
         break;
       case STORE_LINKS:
