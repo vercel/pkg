@@ -28,10 +28,10 @@ If binaries are not in cache it will check in it's github releases to fetch the 
 
 Patches are needed to patch Node.js executable with a proxy around fs. This proxy adds the ability to look into something called a snapshot file system, which is where your project is stored. Also, it doesn’t store your source JavaScript directly. It runs your JavaScript through the V8 compiler and produces a V8 snapshot, which has two nice consequences:
 
-1. Your code will start marginally faster, because all the work of parsing the JavaScript source and so forth is already done; and 
-2. Your code doesn’t live in the clear in the binary, which may be advantageous if you want to hide it.
+1. Your code will start faster, because all the work of parsing the JavaScript source and so forth is already done
+2. Code is protected as it doesn’t live in the clear in the binary
 
-Pkg traverses the source code for your application and its dependencies looking for things like require()s to prune code that isn’t used. This is good if you want to optimize for small binaries with little effort. But often this process goes wrong, specially when something like TypeScript produces JavaScript that throws off pkg’s heuristics. In that case you have to intervene and list the files that should be included by hand in `pakckage.json` `pkg` settings (assets/scripts).
+Pkg traverses the source code for your application and its dependencies looking for things like require()s to prune code that isn’t used. This allows to optimize binaries size this process could go wrong, specially when something like TypeScript produces JavaScript that throws off pkg’s heuristics. In that case you have to intervene and list the files that should be included by hand in `pakckage.json` `pkg` settings (assets/scripts).
 
 ## Project structure
 
@@ -57,7 +57,7 @@ module.exports = {
     assets: [
       'lib/public/**/*', 
     ],
-    patches: { // monkey patch the code to fix some require errors
+    patches: {
       'lib/bunyan.js': ["mv = require('mv' + '');", "mv = require('mv');"],
       'graceful-fs.js': [
         { do: 'prepend' },
@@ -107,7 +107,7 @@ stepPatch(record) {
   }
 ```
 
-- `deployFiles`: List of files like node native addons and else that needs to be placed on pkg root folder
+- `deployFiles`: List of files like node native addons and else that needs to be placed on application root folder. For each one of this files a warning will be shown in log output that remember user to deploy them with the application
 
 ### examples
 
