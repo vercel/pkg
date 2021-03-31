@@ -14,8 +14,12 @@
 /* global REQUIRE_COMMON */
 /* global VIRTUAL_FILESYSTEM */
 /* global DEFAULT_ENTRYPOINT */
+/* global SYMLINKS */
 
 'use strict';
+
+const { normalize } = require('path');
+const assert = require('assert');
 
 var common = {};
 REQUIRE_COMMON(common);
@@ -161,6 +165,33 @@ console.log(translateNth(["", "r+"], 0, "d:\\snapshot\\countly\\plugins-ext"));
 console.log(translateNth(["", "rw"], 0, "d:\\snapshot\\countly\\plugins-ext\\"));
 console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 */
+
+const win32 = process.platform === 'win32';
+const slash = win32 ? '\\' : '/';
+function realpathFromSnapshot(path_) {
+  path_ = normalize(path_);
+  let count = 0;
+  let needToSubstitute = true;
+  while (needToSubstitute) {
+    needToSubstitute = false;
+    for (const [k, v] of Object.entries(SYMLINKS)) {
+      if (path_.startsWith(k + slash) || path_ === k) {
+        path_ = path_.replace(k, v);
+        needToSubstitute = true;
+        break;
+      }
+    }
+    count += 1;
+  }
+  assert(count === 1 || count === 2);
+  return path_;
+}
+
+function normalizePathAndFollowLink(path_) {
+  path_ = normalizePath(path_);
+  var path = realpathFromSnapshot(path_);
+  return path;
+}
 
 // /////////////////////////////////////////////////////////////////
 // PROJECT /////////////////////////////////////////////////////////
@@ -487,8 +518,7 @@ function payloadFileSync(pointer) {
 
   function openFromSnapshot(path_, cb) {
     var cb2 = cb || rethrow;
-    var path = normalizePath(path_);
-    // console.log("openFromSnapshot", path);
+    var path = normalizePathAndFollowLink(path_);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return cb2(error_ENOENT('File or directory', path));
     var dock = { path, entity, position: 0 };
@@ -730,7 +760,6 @@ function payloadFileSync(pointer) {
   function readFileFromSnapshot(path_, cb) {
     var cb2 = cb || rethrow;
     var path = normalizePath(path_);
-    // console.log("readFileFromSnapshot", path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return cb2(error_ENOENT('File', path));
     var entityLinks = entity[STORE_LINKS];
@@ -843,13 +872,14 @@ function payloadFileSync(pointer) {
     return this.type === 1;
   };
 
-  Dirent.prototype.isSocket = function isSocket() {
-    return false;
-  };
-  Dirent.prototype.isFIFO = Dirent.prototype.isSocket;
-  Dirent.prototype.isSymbolicLink = Dirent.prototype.isSocket;
-  Dirent.prototype.isCharacterDevice = Dirent.prototype.isSocket;
-  Dirent.prototype.isBlockDevice = Dirent.prototype.isSocket;
+  const noop = () => false;
+  Dirent.prototype.isBlockDevice = noop;
+  Dirent.prototype.isCharacterDevice = noop;
+  Dirent.prototype.isSocket = noop;
+  Dirent.prototype.isFIFO = noop;
+
+  Dirent.prototype.isSymbolicLink = (fileOrFolderName) =>
+    Boolean(SYMLINKS[fileOrFolderName]);
 
   function getFileTypes(path_, entries) {
     return entries.map((entry) => {
@@ -891,8 +921,9 @@ function payloadFileSync(pointer) {
   function readdirFromSnapshot(path_, isRoot, cb) {
     var cb2 = cb || rethrow;
     if (isRoot) return readdirRoot(path_, cb);
-    var path = normalizePath(path_);
-    // console.log("readdirFromSnapshot", path);
+
+    var path = normalizePathAndFollowLink(path_);
+
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return cb2(error_ENOENT('Directory', path));
     var entityBlob = entity[STORE_BLOB];
@@ -953,12 +984,6 @@ function payloadFileSync(pointer) {
   // realpath //////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function realpathFromSnapshot(path_) {
-    var path = normalizePath(path_);
-    // console.log("realpathFromSnapshot", path);
-    return path;
-  }
-
   fs.realpathSync = function realpathSync(path) {
     if (!insideSnapshot(path)) {
       return ancestor.realpathSync.apply(fs, arguments);
@@ -1006,12 +1031,15 @@ function payloadFileSync(pointer) {
     s.ctimeMs = EXECSTAT.ctimeMs;
     s.birthtimeMs = EXECSTAT.birthtimeMs;
 
-    var { isFileValue } = s;
-    var { isDirectoryValue } = s;
-    var { isSocketValue } = s;
+    const { isFileValue } = s;
+    const { isDirectoryValue } = s;
+    const { isSocketValue } = s;
+    const { isSymbolicLinkValue } = s;
+
     delete s.isFileValue;
     delete s.isDirectoryValue;
     delete s.isSocketValue;
+    delete s.isSymbolicLinkValue;
 
     s.isFile = function isFile() {
       return isFileValue;
@@ -1023,7 +1051,7 @@ function payloadFileSync(pointer) {
       return isSocketValue;
     };
     s.isSymbolicLink = function isSymbolicLink() {
-      return false;
+      return isSymbolicLinkValue;
     };
     s.isFIFO = function isFIFO() {
       return false;
@@ -1057,8 +1085,7 @@ function payloadFileSync(pointer) {
 
   function statFromSnapshot(path_, cb) {
     var cb2 = cb || rethrow;
-    var path = normalizePath(path_);
-    // console.log("statFromSnapshot", path);
+    var path = normalizePathAndFollowLink(path_);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForStat(path, cb);
     var entityStat = entity[STORE_STAT];
@@ -1156,8 +1183,7 @@ function payloadFileSync(pointer) {
   }
 
   function existsFromSnapshot(path_) {
-    var path = normalizePath(path_);
-    // console.log("existsFromSnapshot", path);
+    var path = normalizePathAndFollowLink(path_);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForExists(path);
     return true;
@@ -1192,8 +1218,7 @@ function payloadFileSync(pointer) {
 
   function accessFromSnapshot(path_, cb) {
     var cb2 = cb || rethrow;
-    var path = normalizePath(path_);
-    // console.log("accessFromSnapshot", path);
+    var path = normalizePathAndFollowLink(path_);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return cb2(error_ENOENT('File or directory', path));
     return cb2(null, undefined);
@@ -1271,8 +1296,7 @@ function payloadFileSync(pointer) {
         .internalModuleStat(makeLong(translate(path)));
     }
 
-    path = normalizePath(path);
-    // console.log("internalModuleStat", path);
+    path = normalizePathAndFollowLink(path);
     var entity = VIRTUAL_FILESYSTEM[path];
     if (!entity) return findNativeAddonForInternalModuleStat(path);
     var entityBlob = entity[STORE_BLOB];
@@ -1292,14 +1316,14 @@ function payloadFileSync(pointer) {
     // For newer node versions (after https://github.com/nodejs/node/pull/33229 ):
     // Returns an array [string, boolean].
     //
-    var returnArray =
+    const returnArray =
       (NODE_VERSION_MAJOR === 12 && NODE_VERSION_MINOR >= 19) ||
       (NODE_VERSION_MAJOR === 14 && NODE_VERSION_MINOR >= 5) ||
       NODE_VERSION_MAJOR >= 15;
 
-    var path = revertMakingLong(long);
-    var bindingFs = process.binding('fs');
-    var readFile = (
+    const path = revertMakingLong(long);
+    const bindingFs = process.binding('fs');
+    const readFile = (
       bindingFs.internalModuleReadFile || bindingFs.internalModuleReadJSON
     ).bind(bindingFs);
     if (!insideSnapshot(path)) {
@@ -1309,11 +1333,10 @@ function payloadFileSync(pointer) {
       return readFile(makeLong(translate(path)));
     }
 
-    path = normalizePath(path);
-    // console.log("internalModuleReadFile", path);
-    var entity = VIRTUAL_FILESYSTEM[path];
+    const path2 = normalizePathAndFollowLink(path);
+    const entity = VIRTUAL_FILESYSTEM[path2];
     if (!entity) return returnArray ? [undefined, false] : undefined;
-    var entityContent = entity[STORE_CONTENT];
+    const entityContent = entity[STORE_CONTENT];
     if (!entityContent) return returnArray ? [undefined, false] : undefined;
     return returnArray
       ? [payloadFileSync(entityContent).toString(), true]
@@ -1399,8 +1422,7 @@ function payloadFileSync(pointer) {
       return ancestor._compile.apply(this, arguments);
     }
 
-    var filename = normalizePath(filename_);
-    // console.log("_compile", filename);
+    var filename = normalizePathAndFollowLink(filename_);
     var entity = VIRTUAL_FILESYSTEM[filename];
 
     if (!entity) {
@@ -1666,7 +1688,7 @@ function payloadFileSync(pointer) {
       let reject;
       const p = new Promise((res, rej) => {
         resolve = res;
-        reject  = rej;
+        reject = rej;
       });
 
       p.child = o.apply(

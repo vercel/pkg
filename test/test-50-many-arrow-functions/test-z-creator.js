@@ -1,5 +1,6 @@
 'use strict';
 
+// eslint-disable no-useless-concat
 let s =
   'function EventEmitter () {\n' +
   '  this.listeners = [];\n' +
@@ -15,11 +16,11 @@ let s =
   'const ee = new EventEmitter();\n';
 
 for (let i = 0; i < 140; i += 1) {
-  s += "ee.on('message', (data) => {\n" + '  console.log(data);\n' + '});\n';
+  s += "ee.on('message', (data) => {\n  console.log(data);\n});\n";
 }
 
 s += "ee.emit('message', 'hooray');\n";
 
-s = "'use strict';\n" + '\n' + s;
+s = "'use strict';\n\n" + s;
 
 require('fs').writeFileSync('test-x-index.js', s);

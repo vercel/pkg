@@ -25,7 +25,8 @@ if (process.env.CI) {
     target === 'node7' ||
     target === 'node9' ||
     target === 'node11' ||
-    target === 'node13'
+    target === 'node13' ||
+    target === 'node15'
   ) {
     console.log(target + ' is skipped in CI!');
     console.log('');
