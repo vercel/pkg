@@ -3,7 +3,6 @@
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/vercel/pkg/badge.svg?branch=master)](https://coveralls.io/github/vercel/pkg?branch=master)
 [![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
 [![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
 
@@ -311,3 +310,26 @@ You could check on **Unix systems** (Linux/macOS) in `bash`:
 ```bash
 $ printenv | grep NODE
 ```
+
+## Advanced
+
+### exploring virtual file system embedded in debug mode
+
+When you are using the `--debug` flag when building your executable,
+`pkg` add the ability to display the content of the virtual file system
+and the symlink table on the console, when the application starts,
+providing that the environement variable DEBUG_PKG is set.
+This feature can be useful to inspect if symlinks are correctly handled,
+and check that all the required files for your application are properly
+incorporated to the final executable.
+
+    $ pkg --debug app.js -o output
+    $ DEBUG_PKG output
+
+or
+
+    C:\> pkg --debug app.js -o output.exe
+    C:\> set DEBUG_PKG=1
+    C:\> output.exe
+
+Note: make sure not to use --debug flag in production.

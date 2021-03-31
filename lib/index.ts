@@ -15,7 +15,7 @@ import producer from './producer';
 import refine from './refiner';
 import { shutdown } from './fabricator';
 import walk, { Marker, WalkerParams } from './walker';
-import { Target, NodeTarget } from './types';
+import { Target, NodeTarget, SymLinks } from './types';
 
 const { version } = JSON.parse(
   readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
@@ -549,17 +549,21 @@ export async function exec(argv2: string[]) {
 
   let records;
   let entrypoint = inputFin;
+  let symLinks: SymLinks;
   const addition = isConfiguration(input) ? input : undefined;
 
   const walkResult = await walk(marker, entrypoint, addition, params);
   entrypoint = walkResult.entrypoint;
-  records = walkResult.records;
 
-  const refineResult = refine(records, entrypoint);
+  records = walkResult.records;
+  symLinks = walkResult.symLinks;
+
+  const refineResult = refine(records, entrypoint, symLinks);
   entrypoint = refineResult.entrypoint;
   records = refineResult.records;
+  symLinks = refineResult.symLinks;
 
-  const backpack = packer({ records, entrypoint, bytecode });
+  const backpack = packer({ records, entrypoint, bytecode, symLinks });
 
   log.debug('Targets:', JSON.stringify(targets, null, 2));
 
@@ -576,8 +580,13 @@ export async function exec(argv2: string[]) {
       await mkdirp(path.dirname(target.output));
     }
 
-    const slash = target.platform === 'win' ? '\\' : '/';
-    await producer({ backpack, bakes, slash, target: target as Target });
+    await producer({
+      backpack,
+      bakes,
+      slash: target.platform === 'win' ? '\\' : '/',
+      target: target as Target,
+      symLinks,
+    });
 
     if (target.platform !== 'win' && target.output) {
       await plusx(target.output);

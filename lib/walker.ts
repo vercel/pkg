@@ -4,6 +4,7 @@ import assert from 'assert';
 import fs from 'fs-extra';
 import globby from 'globby';
 import path from 'path';
+import chalk from 'chalk';
 
 import {
   ALIAS_AS_RELATIVE,
@@ -17,6 +18,7 @@ import {
   isDotNODE,
   isPackageJson,
   normalizePath,
+  toNormalizedRealPath,
 } from './common';
 
 import { follow, natives } from './follow';
@@ -28,7 +30,17 @@ import {
   FileRecords,
   Patches,
   PackageJson,
+  SymLinks,
 } from './types';
+
+// Note: as a developer, you can set the PKG_STRICT_VER variable.
+//       this will turn on some assertion in the walker code below
+//       to assert that each file content/state that we appending
+//       to the virtual file system applies to  a real file,
+//       not a symlink.
+//       By default assertion are disabled as they can have a
+//       performance hit.
+const strictVerify = Boolean(process.env.PKG_STRICT_VER);
 
 const win32 = process.platform === 'win32';
 
@@ -187,6 +199,8 @@ export interface WalkerParams {
 class Walker {
   private params: WalkerParams;
 
+  private symLinks: SymLinks;
+
   private patches: Patches;
 
   private tasks: Task[];
@@ -201,18 +215,34 @@ class Walker {
     this.dictionary = {};
     this.patches = {};
     this.params = {};
+    this.symLinks = {};
   }
 
-  appendRecord({ file }: Task) {
+  appendRecord({ file, store }: Task) {
     if (this.records[file]) {
       return;
+    }
+
+    if (
+      store === STORE_BLOB ||
+      store === STORE_CONTENT ||
+      store === STORE_LINKS
+    ) {
+      // make sure we have a real file
+      if (strictVerify) {
+        assert(file === toNormalizedRealPath(file));
+      }
     }
 
     this.records[file] = { file };
   }
 
-  append(task: Task) {
-    task.file = normalizePath(task.file);
+  private append(task: Task) {
+    if (strictVerify) {
+      assert(typeof task.file === 'string');
+      assert(task.file === normalizePath(task.file));
+    }
+
     this.appendRecord(task);
     this.tasks.push(task);
 
@@ -224,13 +254,103 @@ class Walker {
     }[task.store];
 
     if (task.reason) {
-      log.debug(`${what}  %1 is added to queue. It was required from %2`, [
-        `%1: ${task.file}`,
-        `%2: ${task.reason}`,
-      ]);
+      log.debug(
+        `${what} ${task.file} is added to queue. It was required from ${task.reason}`
+      );
     } else {
-      log.debug(`${what} %1 is added to queue`, [`%1: ${task.file}`]);
+      log.debug(`${what} ${task.file} is added to queue.`);
     }
+  }
+
+  findCommonJunctionPoint(file: string, realFile: string) {
+    // find common denominator => where the link changes
+    while (
+      toNormalizedRealPath(path.dirname(file)) === path.dirname(realFile)
+    ) {
+      file = path.dirname(file);
+      realFile = path.dirname(realFile);
+    }
+
+    return { file, realFile };
+  }
+
+  appendSymlink(file: string, realFile: string) {
+    const a = this.findCommonJunctionPoint(file, realFile);
+    file = a.file;
+    realFile = a.realFile;
+
+    if (!this.symLinks[file]) {
+      const dn = path.dirname(file);
+      this.appendFileInFolder({
+        file: dn,
+        store: STORE_LINKS,
+        data: path.basename(file),
+      });
+
+      log.debug(`adding symlink ${file}  => ${path.relative(file, realFile)}`);
+      this.symLinks[file] = realFile;
+
+      this.appendStat({
+        file: realFile,
+        store: STORE_STAT,
+      });
+      this.appendStat({
+        file: dn,
+        store: STORE_STAT,
+      });
+      this.appendStat({
+        file,
+        store: STORE_STAT,
+      });
+    }
+  }
+
+  appendStat(task: Task) {
+    assert(task.store === STORE_STAT);
+    this.append(task);
+  }
+
+  appendFileInFolder(task: Task) {
+    if (strictVerify) {
+      assert(task.store === STORE_LINKS);
+      assert(typeof task.file === 'string');
+    }
+    const realFile = toNormalizedRealPath(task.file);
+    if (realFile === task.file) {
+      this.append(task);
+      return;
+    }
+    this.append({ ...task, file: realFile });
+    this.appendStat({
+      file: task.file,
+      store: STORE_STAT,
+    });
+    this.appendStat({
+      file: path.dirname(task.file),
+      store: STORE_STAT,
+    });
+  }
+
+  appendBlobOrContent(task: Task) {
+    if (strictVerify) {
+      assert(task.file === normalizePath(task.file));
+    }
+
+    assert(task.store === STORE_BLOB || task.store === STORE_CONTENT);
+    assert(typeof task.file === 'string');
+    const realFile = toNormalizedRealPath(task.file);
+
+    if (realFile === task.file) {
+      this.append(task);
+      return;
+    }
+
+    this.append({ ...task, file: realFile });
+    this.appendSymlink(task.file, realFile);
+    this.appendStat({
+      file: task.file,
+      store: STORE_STAT,
+    });
   }
 
   async appendFilesFromConfig(marker: Marker) {
@@ -254,8 +374,8 @@ class Walker {
               ]);
             }
 
-            this.append({
-              file: script,
+            this.appendBlobOrContent({
+              file: normalizePath(script),
               marker,
               store: STORE_BLOB,
               reason: configPath,
@@ -273,8 +393,8 @@ class Walker {
           const stat = await fs.stat(asset);
 
           if (stat.isFile()) {
-            this.append({
-              file: asset,
+            this.appendBlobOrContent({
+              file: normalizePath(asset),
               marker,
               store: STORE_CONTENT,
               reason: configPath,
@@ -288,7 +408,8 @@ class Walker {
       if (files) {
         files = expandFiles(files, base);
 
-        for (const file of files) {
+        for (let file of files) {
+          file = normalizePath(file);
           const stat = await fs.stat(file);
 
           if (stat.isFile()) {
@@ -296,14 +417,14 @@ class Walker {
             // 2) non-source (non-js) files of top-level package are shipped as CONTENT
             // 3) parsing some js 'files' of non-top-level packages fails, hence all CONTENT
             if (marker.toplevel) {
-              this.append({
+              this.appendBlobOrContent({
                 file,
                 marker,
                 store: isDotJS(file) ? STORE_BLOB : STORE_CONTENT,
                 reason: configPath,
               });
             } else {
-              this.append({
+              this.appendBlobOrContent({
                 file,
                 marker,
                 store: STORE_CONTENT,
@@ -428,6 +549,10 @@ class Walker {
   }
 
   async stepRead(record: FileRecord) {
+    if (strictVerify) {
+      assert(record.file === toNormalizedRealPath(record.file));
+    }
+
     let body;
 
     try {
@@ -573,7 +698,9 @@ class Walker {
     marker: Marker,
     derivative: Derivative
   ) {
-    const file = path.join(path.dirname(record.file), derivative.alias);
+    const file = normalizePath(
+      path.join(path.dirname(record.file), derivative.alias)
+    );
 
     let stat;
 
@@ -590,7 +717,7 @@ class Walker {
     }
 
     if (stat && stat.isFile()) {
-      this.append({
+      this.appendBlobOrContent({
         file,
         marker,
         store: STORE_CONTENT,
@@ -620,9 +747,10 @@ class Walker {
     let newFile = '';
     let failure;
 
+    const basedir = path.dirname(record.file);
     try {
       newFile = await follow(derivative.alias, {
-        basedir: path.dirname(record.file),
+        basedir,
         // default is extensions: ['.js'], but
         // it is not enough because 'typos.json'
         // is not taken in require('./typos')
@@ -652,7 +780,7 @@ class Walker {
           `%2: ${record.file}`,
         ]);
       } else {
-        log[level](failure.message, [`%1: ${record.file}`]);
+        log[level](`${chalk.yellow(failure.message)}  in ${record.file}`);
       }
 
       return;
@@ -669,6 +797,9 @@ class Walker {
           extensions: ['.js', '.json', '.node'],
           ignoreFile: newPackage.packageJson,
         });
+        if (strictVerify) {
+          assert(newFile2 === normalizePath(newFile2));
+        }
       } catch (_) {
         // not setting is enough
       }
@@ -680,7 +811,13 @@ class Walker {
     }
 
     if (newPackageForNewRecords) {
-      this.append({
+      if (strictVerify) {
+        assert(
+          newPackageForNewRecords.packageJson ===
+            normalizePath(newPackageForNewRecords.packageJson)
+        );
+      }
+      this.appendBlobOrContent({
         file: newPackageForNewRecords.packageJson,
         marker: newPackageForNewRecords.marker,
         store: STORE_CONTENT,
@@ -688,7 +825,7 @@ class Walker {
       });
     }
 
-    this.append({
+    this.appendBlobOrContent({
       file: newFile,
       marker: newPackageForNewRecords ? newPackageForNewRecords.marker : marker,
       store: STORE_BLOB,
@@ -704,30 +841,36 @@ class Walker {
     for (const derivative of derivatives) {
       if (natives[derivative.alias]) continue;
 
-      if (derivative.aliasType === ALIAS_AS_RELATIVE) {
-        await this.stepDerivatives_ALIAS_AS_RELATIVE(
-          record,
-          marker,
-          derivative
-        );
-      } else if (derivative.aliasType === ALIAS_AS_RESOLVABLE) {
-        await this.stepDerivatives_ALIAS_AS_RESOLVABLE(
-          record,
-          marker,
-          derivative
-        );
-      } else {
-        assert(false, `walker: unknown aliasType ${derivative.aliasType}`);
+      switch (derivative.aliasType) {
+        case ALIAS_AS_RELATIVE:
+          await this.stepDerivatives_ALIAS_AS_RELATIVE(
+            record,
+            marker,
+            derivative
+          );
+          break;
+        case ALIAS_AS_RESOLVABLE:
+          await this.stepDerivatives_ALIAS_AS_RESOLVABLE(
+            record,
+            marker,
+            derivative
+          );
+          break;
+        default:
+          assert(false, `walker: unknown aliasType ${derivative.aliasType}`);
       }
     }
   }
 
   async step_STORE_ANY(record: FileRecord, marker: Marker, store: number) {
     // eslint-disable-line camelcase
+    if (strictVerify) {
+      assert(record.file === toNormalizedRealPath(record.file));
+    }
     if (record[store] !== undefined) return;
     record[store] = false; // default is discard
 
-    this.append({
+    this.appendStat({
       file: record.file,
       store: STORE_STAT,
     });
@@ -738,7 +881,7 @@ class Walker {
 
     if (store === STORE_BLOB) {
       if (unlikelyJavascript(record.file) || isDotNODE(record.file)) {
-        this.append({
+        this.appendBlobOrContent({
           file: record.file,
           marker,
           store: STORE_CONTENT,
@@ -747,7 +890,7 @@ class Walker {
       }
 
       if (marker.public || marker.hasDictionary) {
-        this.append({
+        this.appendBlobOrContent({
           file: record.file,
           marker,
           store: STORE_CONTENT,
@@ -775,6 +918,13 @@ class Walker {
   }
 
   step_STORE_LINKS(record: FileRecord, data: unknown) {
+    if (strictVerify) {
+      assert(
+        record.file === toNormalizedRealPath(record.file),
+        ' expecting real file !!!'
+      );
+    }
+
     if (record[STORE_LINKS]) {
       record[STORE_LINKS].push(data);
       return;
@@ -782,7 +932,10 @@ class Walker {
 
     record[STORE_LINKS] = [data];
 
-    this.append({
+    if (record[STORE_STAT]) {
+      return;
+    }
+    this.appendStat({
       file: record.file,
       store: STORE_STAT,
     });
@@ -791,8 +944,26 @@ class Walker {
   async step_STORE_STAT(record: FileRecord) {
     if (record[STORE_STAT]) return;
 
+    const realPath = toNormalizedRealPath(record.file);
+    if (realPath !== record.file) {
+      this.appendStat({
+        file: realPath,
+        store: STORE_STAT,
+      });
+    }
+
     try {
-      record[STORE_STAT] = await fs.stat(record.file);
+      const valueStat = await fs.stat(record.file);
+
+      const value = {
+        mode: valueStat.mode,
+        size: valueStat.isFile() ? valueStat.size : 0,
+        isFileValue: valueStat.isFile(),
+        isDirectoryValue: valueStat.isDirectory(),
+        isSocketValue: valueStat.isSocket(),
+        isSymbolicLinkValue: valueStat.isSymbolicLink(),
+      };
+      record[STORE_STAT] = value;
     } catch (error) {
       log.error(`Cannot stat, ${error.code}`, record.file);
       throw wasReported(error);
@@ -800,7 +971,7 @@ class Walker {
 
     if (path.dirname(record.file) !== record.file) {
       // root directory
-      this.append({
+      this.appendFileInFolder({
         file: path.dirname(record.file),
         store: STORE_LINKS,
         data: path.basename(record.file),
@@ -812,15 +983,19 @@ class Walker {
     const { file, store, data } = task;
     const record = this.records[file];
 
-    if (store === STORE_BLOB || store === STORE_CONTENT) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await this.step_STORE_ANY(record, task.marker!, store);
-    } else if (store === STORE_LINKS) {
-      this.step_STORE_LINKS(record, data);
-    } else if (store === STORE_STAT) {
-      await this.step_STORE_STAT(record);
-    } else {
-      assert(false, `walker: unknown store ${store}`);
+    switch (store) {
+      case STORE_BLOB:
+      case STORE_CONTENT:
+        await this.step_STORE_ANY(record, task.marker!, store);
+        break;
+      case STORE_LINKS:
+        this.step_STORE_LINKS(record, data);
+        break;
+      case STORE_STAT:
+        await this.step_STORE_STAT(record);
+        break;
+      default:
+        assert(false, `walker: unknown store ${store}`);
     }
   }
 
@@ -859,17 +1034,21 @@ class Walker {
     params: WalkerParams
   ) {
     this.params = params;
+    this.symLinks = {};
 
     await this.readDictionary(marker);
 
-    this.append({
+    entrypoint = normalizePath(entrypoint);
+
+    this.appendBlobOrContent({
       file: entrypoint,
       marker,
       store: STORE_BLOB,
     });
 
     if (addition) {
-      this.append({
+      addition = normalizePath(addition);
+      this.appendBlobOrContent({
         file: addition,
         marker,
         store: STORE_CONTENT,
@@ -885,6 +1064,7 @@ class Walker {
     }
 
     return {
+      symLinks: this.symLinks,
       records: this.records,
       entrypoint: normalizePath(entrypoint),
     };

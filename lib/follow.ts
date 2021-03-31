@@ -4,6 +4,7 @@ import { core, sync, SyncOpts } from 'resolve';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
+import { toNormalizedRealPath } from './common';
 
 Object.keys(core).forEach((key) => {
   // 'resolve' hardcodes the list to host's one, but i need
@@ -106,6 +107,13 @@ export function follow(x: string, opts: FollowOptions) {
           }
 
           return config;
+        },
+
+        /** function to synchronously resolve a potential symlink to its real path */
+        // realpathSync?: (file: string) => string;
+        realpathSync: (file) => {
+          const file2 = toNormalizedRealPath(file);
+          return file2;
         },
       })
     );

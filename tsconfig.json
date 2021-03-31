@@ -10,6 +10,7 @@
     "strict": true,
     "esModuleInterop": true,
     "incremental": true,
+    "downlevelIteration": true,
     "resolveJsonModule": true
   },
   "include": ["lib/**/*", "typings/**/*"]

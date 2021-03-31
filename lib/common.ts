@@ -1,4 +1,5 @@
 import assert from 'assert';
+import fs from 'fs';
 import path from 'path';
 
 export const STORE_BLOB = 0;
@@ -174,7 +175,6 @@ export function substituteDenominator(f: string, denominator: number) {
 }
 
 export function snapshotify(file: string, slash: string) {
-  assert.strictEqual(file, normalizePath(file));
   return injectSnapshot(replaceSlashes(file, slash));
 }
 
@@ -183,9 +183,11 @@ export function insideSnapshot(f: Buffer | string | URL) {
     if (Buffer.isBuffer(f)) {
       f = f.toString();
     }
+
     if (hasURL && f instanceof URL) {
       f = f.pathname.replace(/^\//, '');
     }
+    
     if (typeof f !== 'string') {
       return false;
     }
@@ -267,4 +269,14 @@ export function removeUplevels(f: string) {
   }
 
   return f;
+}
+
+export function toNormalizedRealPath(requestPath: string) {
+  const file = normalizePath(requestPath);
+
+  if (fs.existsSync(file)) {
+    return fs.realpathSync(file);
+  }
+
+  return file;
 }

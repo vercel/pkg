@@ -71,3 +71,5 @@ export interface Target extends NodeTarget {
   output: string;
   fabricator: Target;
 }
+
+export type SymLinks = Record<string, string>;

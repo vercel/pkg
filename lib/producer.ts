@@ -10,7 +10,7 @@ import { Readable } from 'stream';
 import { STORE_BLOB, STORE_CONTENT, isDotNODE, snapshotify } from './common';
 import { log, wasReported } from './log';
 import { fabricateTwice } from './fabricator';
-import { platform, Target } from './types';
+import { platform, SymLinks, Target } from './types';
 import { Stripe } from './packer';
 
 interface NotFound {
@@ -241,6 +241,7 @@ interface ProducerOptions {
   bakes: string[];
   slash: string;
   target: Target;
+  symLinks: SymLinks;
 }
 
 export default function producer({
@@ -248,6 +249,7 @@ export default function producer({
   bakes,
   slash,
   target,
+  symLinks,
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -270,6 +272,14 @@ export default function producer({
       if (!vfs[snap]) {
         vfs[snap] = {};
       }
+    }
+
+    const snapshotSymLinks: SymLinks = {};
+
+    for (const [key, value] of Object.entries(symLinks)) {
+      const k = snapshotify(key, slash);
+      const v = snapshotify(value, slash);
+      snapshotSymLinks[k] = v;
     }
 
     let meter: streamMeter.StreamMeter;
@@ -390,12 +400,16 @@ export default function producer({
                 makePreludeBufferFromPrelude(
                   replaceDollarWise(
                     replaceDollarWise(
-                      prelude,
-                      '%VIRTUAL_FILESYSTEM%',
-                      JSON.stringify(vfs)
+                      replaceDollarWise(
+                        prelude,
+                        '%VIRTUAL_FILESYSTEM%',
+                        JSON.stringify(vfs)
+                      ),
+                      '%DEFAULT_ENTRYPOINT%',
+                      JSON.stringify(entrypoint)
                     ),
-                    '%DEFAULT_ENTRYPOINT%',
-                    JSON.stringify(entrypoint)
+                    '%SYMLINKS%',
+                    JSON.stringify(snapshotSymLinks)
                   )
                 )
               )

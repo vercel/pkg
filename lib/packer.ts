@@ -14,7 +14,7 @@ import {
 } from './common';
 
 import { log, wasReported } from './log';
-import { FileRecord, FileRecords } from './types';
+import { FileRecord, FileRecords, SymLinks } from './types';
 
 const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))
 
@@ -23,6 +23,11 @@ const bootstrapText = fs
   .replace('%VERSION%', version);
 
 const commonText = fs.readFileSync(require.resolve('./common'), 'utf8');
+
+const diagnosticText = fs.readFileSync(
+  require.resolve('../prelude/diagnostic.js'),
+  'utf8'
+);
 
 function itemsToText<T extends unknown>(items: T[]) {
   const len = items.length;
@@ -41,6 +46,7 @@ interface PackerOptions {
   records: FileRecords;
   entrypoint: string;
   bytecode: string;
+  symLinks: SymLinks;
 }
 
 export interface Stripe {
@@ -69,12 +75,14 @@ export default function packer({
 
       assert(record[STORE_STAT], 'packer: no STORE_STAT');
       assert(
-        record[STORE_BLOB] || record[STORE_CONTENT] || record[STORE_LINKS]
+        record[STORE_BLOB] ||
+          record[STORE_CONTENT] ||
+          record[STORE_LINKS] ||
+          record[STORE_STAT]
       );
 
       if (record[STORE_BLOB] && !bytecode) {
         delete record[STORE_BLOB];
-
         if (!record[STORE_CONTENT]) {
           // TODO make a test for it?
           throw wasReported(
@@ -87,7 +95,6 @@ export default function packer({
           );
         }
       }
-
       for (const store of [
         STORE_BLOB,
         STORE_CONTENT,
@@ -112,72 +119,54 @@ export default function packer({
           }
         } else if (store === STORE_LINKS) {
           if (Array.isArray(value)) {
-            const buffer = Buffer.from(JSON.stringify(value));
+            const dedupedValue = [...new Set(value)];
+            log.debug('files & folders deduped = ', dedupedValue);
+            const buffer = Buffer.from(JSON.stringify(dedupedValue));
             stripes.push({ snap, store, buffer });
           } else {
             assert(false, 'packer: bad STORE_LINKS');
           }
         } else if (store === STORE_STAT) {
           if (typeof value === 'object') {
-            // reproducible
-            delete value.atime;
-            delete value.atimeMs;
-            delete value.mtime;
-            delete value.mtimeMs;
-            delete value.ctime;
-            delete value.ctimeMs;
-            delete value.birthtime;
-            delete value.birthtimeMs;
-            // non-date
-            delete value.blksize;
-            delete value.blocks;
-            delete value.dev;
-            delete value.gid;
-            delete value.ino;
-            delete value.nlink;
-            delete value.rdev;
-            delete value.uid;
-
-            if (!value.isFile()) {
-              value.size = 0;
-            }
-
-            // portable
             const newStat = { ...value };
-            newStat.isFileValue = value.isFile();
-            newStat.isDirectoryValue = value.isDirectory();
-            newStat.isSocketValue = value.isSocket();
             const buffer = Buffer.from(JSON.stringify(newStat));
             stripes.push({ snap, store, buffer });
           } else {
-            assert(false, 'packer: bad STORE_STAT');
+            assert(false, 'packer: unknown store');
           }
-        } else {
-          assert(false, 'packer: unknown store');
         }
-      }
 
-      if (record[STORE_CONTENT]) {
-        const disclosed = isDotJS(file) || isDotJSON(file);
-        log.debug(
-          disclosed
-            ? 'The file was included as DISCLOSED code (with sources)'
-            : 'The file was included as asset content',
-          file
-        );
-      } else if (record[STORE_BLOB]) {
-        log.debug('The file was included as bytecode (no sources)', file);
-      } else if (record[STORE_LINKS]) {
-        const value = record[STORE_LINKS];
-        log.debug(
-          `The directory files list was included (${itemsToText(value)})`,
-          file
-        );
+        if (record[STORE_CONTENT]) {
+          const disclosed = isDotJS(file) || isDotJSON(file);
+          log.debug(
+            disclosed
+              ? 'The file was included as DISCLOSED code (with sources)'
+              : 'The file was included as asset content',
+            file
+          );
+        } else if (record[STORE_BLOB]) {
+          log.debug('The file was included as bytecode (no sources)', file);
+        } else if (record[STORE_LINKS]) {
+          const link = record[STORE_LINKS];
+          log.debug(
+            `The directory files list was included (${itemsToText(link)})`,
+            file
+          );
+        }
       }
     }
   }
-
-  const prelude = `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT) { ${bootstrapText}\n})(function (exports) {\n${commonText}\n},\n${'%VIRTUAL_FILESYSTEM%'}\n,\n${'%DEFAULT_ENTRYPOINT%'}\n);`;
+  const prelude =
+    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS) { 
+        ${bootstrapText}${
+      log.debugMode ? diagnosticText : ''
+    }\n})(function (exports) {\n${commonText}\n},\n` +
+    `%VIRTUAL_FILESYSTEM%` +
+    `\n,\n` +
+    `%DEFAULT_ENTRYPOINT%` +
+    `\n,\n` +
+    `%SYMLINKS%` +
+    `\n);`;
 
   return { prelude, entrypoint, stripes };
 }
