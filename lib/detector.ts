@@ -15,8 +15,9 @@ function isLiteral(
   // TODO: this function is a lie and can probably be better
   // I was using babelTypes.isStringLiteral but that broke a bunch of tests
   return (
-    node?.type === 'Literal' ||
-    (node.type === 'TemplateLiteral' && node.expressions.length === 0)
+    node &&
+    (node.type === 'Literal' ||
+      (node.type === 'TemplateLiteral' && node.expressions.length === 0))
   );
 }
 

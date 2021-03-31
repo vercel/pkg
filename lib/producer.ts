@@ -1,4 +1,4 @@
-import multistream from 'multistream';
+import Multistream from 'multistream';
 import assert from 'assert';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -306,7 +306,7 @@ export default function producer({
     let preludePosition: number;
     let preludeSize: number;
 
-    multistream((cb) => {
+    new Multistream((cb) => {
       if (count === 0) {
         return cb(null, next(intoStream(binaryBuffer)));
       }
