@@ -35,7 +35,7 @@ Pkg traverses the source code for your application and its dependencies looking 
 
 ## Project structure
 
-```
+```bash
 pkg
 ├── dictionary
 ├── examples
