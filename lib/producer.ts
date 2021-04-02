@@ -1,3 +1,4 @@
+import { createBrotliCompress, createGzip } from 'zlib';
 import Multistream from 'multistream';
 import assert from 'assert';
 import { execSync } from 'child_process';
@@ -12,6 +13,7 @@ import { log, wasReported } from './log';
 import { fabricateTwice } from './fabricator';
 import { platform, SymLinks, Target } from './types';
 import { Stripe } from './packer';
+import { CompressType } from './compress_type';
 
 interface NotFound {
   notFound: true;
@@ -225,8 +227,7 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
   }
 
   execSync(
-    `${prebuild} -t ${nodeVersion} --platform ${
-      platform[target.platform]
+    `${prebuild} -t ${nodeVersion} --platform ${platform[target.platform]
     } --arch ${target.arch}`,
     { cwd: dir }
   );
@@ -242,14 +243,34 @@ interface ProducerOptions {
   slash: string;
   target: Target;
   symLinks: SymLinks;
+  doCompress: CompressType;
 }
 
+const fileDictionary: { [key: string]: string } = {};
+let counter = 0;
+function replace(k: string) {
+  let existingKey = fileDictionary[k];
+  if (!existingKey) {
+    const newkey = counter;
+    counter += 1;
+    existingKey = newkey.toString(36);
+    fileDictionary[k] = existingKey;
+  }
+  return existingKey;
+}
+const separator = '$';
+
+function makeKey(filename: string, slash: string): string {
+  const a = filename.split(slash).map(replace).join(separator);
+  return a;
+}
 export default function producer({
   backpack,
   bakes,
   slash,
   target,
   symLinks,
+  doCompress
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -268,10 +289,8 @@ export default function producer({
     for (const stripe of stripes) {
       let { snap } = stripe;
       snap = snapshotify(snap, slash);
-
-      if (!vfs[snap]) {
-        vfs[snap] = {};
-      }
+      const vfsKey = makeKey(snap, slash);
+      if (!vfs[vfsKey]) vfs[vfsKey] = {};
     }
 
     const snapshotSymLinks: SymLinks = {};
@@ -279,7 +298,8 @@ export default function producer({
     for (const [key, value] of Object.entries(symLinks)) {
       const k = snapshotify(key, slash);
       const v = snapshotify(value, slash);
-      snapshotSymLinks[k] = v;
+      const vfsKey = makeKey(k, slash);
+      snapshotSymLinks[vfsKey] = makeKey(v, slash);
     }
 
     let meter: streamMeter.StreamMeter;
@@ -288,6 +308,15 @@ export default function producer({
     function pipeToNewMeter(s: Readable) {
       meter = streamMeter();
       return s.pipe(meter);
+    }
+    function pipeMayCompressToNewMeter(s: Readable): streamMeter.StreamMeter {
+      if (doCompress === CompressType.GZip) {
+        return pipeToNewMeter(s.pipe(createGzip()));
+      }
+      if (doCompress === CompressType.Brotli) {
+        return pipeToNewMeter(s.pipe(createBrotliCompress()));
+      }
+      return pipeToNewMeter(s);
     }
 
     function next(s: Readable) {
@@ -321,7 +350,8 @@ export default function producer({
           const { store } = prevStripe;
           let { snap } = prevStripe;
           snap = snapshotify(snap, slash);
-          vfs[snap][store] = [track, meter.bytes];
+          const vfsKey = makeKey(snap, slash);
+          vfs[vfsKey][store] = [track, meter.bytes];
           track += meter.bytes;
         }
 
@@ -347,15 +377,14 @@ export default function producer({
                     return cb(null, intoStream(Buffer.alloc(0)));
                   }
 
-                  cb(
-                    null,
-                    pipeToNewMeter(intoStream(buffer || Buffer.from('')))
-                  );
+                  cb(null, pipeMayCompressToNewMeter(intoStream(buffer || Buffer.from(''))));
                 }
               );
             }
-
-            return cb(null, pipeToNewMeter(intoStream(stripe.buffer)));
+            return cb(
+              null,
+              pipeMayCompressToNewMeter(intoStream(stripe.buffer))
+            );
           }
 
           if (stripe.file) {
@@ -378,15 +407,17 @@ export default function producer({
                 if (fs.existsSync(platformFile)) {
                   return cb(
                     null,
-                    pipeToNewMeter(fs.createReadStream(platformFile))
+                    pipeMayCompressToNewMeter(fs.createReadStream(platformFile))
                   );
                 }
               } catch (err) {
                 log.debug(`prebuild-install failed[${stripe.file}]:`, err);
               }
             }
-
-            return cb(null, pipeToNewMeter(fs.createReadStream(stripe.file)));
+            return cb(
+              null,
+              pipeMayCompressToNewMeter(fs.createReadStream(stripe.file))
+            );
           }
 
           assert(false, 'producer: bad stripe');
@@ -401,15 +432,23 @@ export default function producer({
                   replaceDollarWise(
                     replaceDollarWise(
                       replaceDollarWise(
-                        prelude,
-                        '%VIRTUAL_FILESYSTEM%',
-                        JSON.stringify(vfs)
+                        replaceDollarWise(
+                          replaceDollarWise(
+                            prelude,
+                            '%VIRTUAL_FILESYSTEM%',
+                            JSON.stringify(vfs)
+                          ),
+                          '%DEFAULT_ENTRYPOINT%',
+                          JSON.stringify(entrypoint)
+                        ),
+                        '%SYMLINKS%',
+                        JSON.stringify(snapshotSymLinks)
                       ),
-                      '%DEFAULT_ENTRYPOINT%',
-                      JSON.stringify(entrypoint)
+                      '%DICT%',
+                      JSON.stringify(fileDictionary)
                     ),
-                    '%SYMLINKS%',
-                    JSON.stringify(snapshotSymLinks)
+                    '%DOCOMPRESS%',
+                    JSON.stringify(doCompress)
                   )
                 )
               )

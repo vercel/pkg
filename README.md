@@ -192,6 +192,16 @@ option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
 
+### Compression
+
+Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the exectable.
+
+This option can reduce the size of the embedded file system by up to 60%.
+
+The startup time of the application might be reduced slightly.
+
+`-C` can be used as a shortcut for `--compress `.
+
 ### Environment
 
 | Var            | Description                                                                               |

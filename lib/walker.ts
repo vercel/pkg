@@ -497,6 +497,7 @@ class Walker {
         assets = expandFiles(assets, base);
 
         for (const asset of assets) {
+          log.debug(' Adding asset : .... ', asset);
           const stat = await fs.stat(asset);
 
           if (stat.isFile()) {

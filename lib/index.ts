@@ -1,6 +1,6 @@
 /* eslint-disable require-atomic-updates */
 
-import { mkdirp, readFile, remove, stat, readFileSync } from 'fs-extra';
+import { existsSync, mkdirp, readFile, remove, stat, readFileSync } from 'fs-extra';
 import { need, system } from 'pkg-fetch';
 import assert from 'assert';
 import minimist from 'minimist';
@@ -16,6 +16,7 @@ import refine from './refiner';
 import { shutdown } from './fabricator';
 import walk, { Marker, WalkerParams } from './walker';
 import { Target, NodeTarget, SymLinks } from './types';
+import { CompressType } from './compress_type';
 
 const { version } = JSON.parse(
   readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
@@ -23,15 +24,6 @@ const { version } = JSON.parse(
 
 function isConfiguration(file: string) {
   return isPackageJson(file) || file.endsWith('.config.json');
-}
-
-async function exists(file: string) {
-  try {
-    await stat(file);
-    return true;
-  } catch (error) {
-    return false;
-  }
 }
 
 // http://www.openwall.com/lists/musl/2012/12/08/4
@@ -245,6 +237,8 @@ export async function exec(argv2: string[]) {
       't',
       'target',
       'targets',
+      'C',
+      'compress',
     ],
     default: { bytecode: true },
   });
@@ -272,7 +266,31 @@ export async function exec(argv2: string[]) {
 
   const forceBuild = argv.b || argv.build;
 
-  // _
+  // doCompress
+  const algo = argv.C || argv.compress || 'None';
+
+
+  let doCompress: CompressType = CompressType.None;
+  switch (algo.toLowerCase()) {
+    case 'brotli':
+    case 'br':
+      doCompress = CompressType.Brotli;
+      break;
+    case 'gzip':
+    case 'gz':
+      doCompress = CompressType.GZip;
+      break;
+    case 'none':
+      break;
+    default:
+      // eslint-disable-next-line no-console
+      throw wasReported(`Invalid compression algorithm ${algo} ( should be None, Brotli or Gzip)`);
+
+  }
+  if (doCompress !== CompressType.None) {
+    // eslint-disable-next-line no-console
+    console.log('compression: ', CompressType[doCompress]);
+  }
 
   if (!argv._.length) {
     throw wasReported('Entry file/directory is expected', [
@@ -288,14 +306,13 @@ export async function exec(argv2: string[]) {
 
   let input = path.resolve(argv._[0]);
 
-  if (!(await exists(input))) {
+  if (!existsSync(input)) {
     throw wasReported('Input file does not exist', [input]);
   }
 
   if ((await stat(input)).isDirectory()) {
     input = path.join(input, 'package.json');
-
-    if (!(await exists(input))) {
+    if (!existsSync(input)) {
       throw wasReported('Input file does not exist', [input]);
     }
   }
@@ -330,10 +347,10 @@ export async function exec(argv2: string[]) {
         }
       }
       inputBin = path.resolve(path.dirname(input), bin);
-      if (!(await exists(inputBin))) {
+      if (!existsSync(inputBin)) {
         throw wasReported(
           'Bin file does not exist (taken from package.json ' +
-            "'bin' property)",
+          "'bin' property)",
           [inputBin]
         );
       }
@@ -362,8 +379,7 @@ export async function exec(argv2: string[]) {
 
   if (config) {
     config = path.resolve(config);
-
-    if (!(await exists(config))) {
+    if (!existsSync(config)) {
       throw wasReported('Config file does not exist', [config]);
     }
 
@@ -603,7 +619,7 @@ export async function exec(argv2: string[]) {
   log.debug('Targets:', JSON.stringify(targets, null, 2));
 
   for (const target of targets) {
-    if (target.output && (await exists(target.output))) {
+    if (target.output && existsSync(target.output)) {
       if ((await stat(target.output)).isFile()) {
         await remove(target.output);
       } else {
@@ -615,14 +631,8 @@ export async function exec(argv2: string[]) {
       await mkdirp(path.dirname(target.output));
     }
 
-    await producer({
-      backpack,
-      bakes,
-      slash: target.platform === 'win' ? '\\' : '/',
-      target: target as Target,
-      symLinks,
-    });
-
+    const slash = target.platform === 'win' ? '\\' : '/';
+    await producer({ backpack, bakes, slash, target: target as Target, symLinks, doCompress });
     if (target.platform !== 'win' && target.output) {
       await plusx(target.output);
     }
