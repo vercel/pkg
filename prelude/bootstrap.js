@@ -453,6 +453,8 @@ function payloadFileSync(pointer) {
   ancestor.exists = fs.exists;
   ancestor.accessSync = fs.accessSync;
   ancestor.access = fs.access;
+  ancestor.mkdirSync = fs.mkdirSync;
+  ancestor.mkdir = fs.mkdir;
 
   var windows = process.platform === 'win32';
 
@@ -1239,6 +1241,40 @@ function payloadFileSync(pointer) {
 
     var callback = dezalgo(maybeCallback(arguments));
     accessFromSnapshot(path, callback);
+  };
+
+  // ///////////////////////////////////////////////////////////////
+  // mkdir /////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////
+
+  function mkdirInSnapshot(path_, cb) {
+    var cb2 = cb || rethrow;
+    return cb2(
+      new Error('Cannot mkdir in a snapshot. Try mountpoints instead.')
+    );
+  }
+
+  fs.mkdirSync = function mkdirSync(path) {
+    if (!insideSnapshot(path)) {
+      return ancestor.mkdirSync.apply(fs, arguments);
+    }
+    if (insideMountpoint(path)) {
+      return ancestor.mkdirSync.apply(fs, translateNth(arguments, 0, path));
+    }
+
+    return mkdirInSnapshot(path);
+  };
+
+  fs.mkdir = function mkdir(path) {
+    if (!insideSnapshot(path)) {
+      return ancestor.mkdir.apply(fs, arguments);
+    }
+    if (insideMountpoint(path)) {
+      return ancestor.mkdir.apply(fs, translateNth(arguments, 0, path));
+    }
+
+    var callback = dezalgo(maybeCallback(arguments));
+    mkdirInSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
