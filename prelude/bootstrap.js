@@ -94,12 +94,15 @@ EXECSTAT.birthtimeMs = EXECSTAT.birthtime.getTime();
 var mountpoints = [];
 
 function insideMountpoint(f) {
+  var util = require('util');
   if (!insideSnapshot(f)) return null;
   var file = normalizePath(f);
   var found = mountpoints
     .map((mountpoint) => {
       var { interior } = mountpoint;
       var { exterior } = mountpoint;
+      if (util.isRegExp(interior) && interior.test(file))
+        return file.replace(interior, exterior);
       if (interior === file) return exterior;
       var left = interior + require('path').sep;
       if (file.slice(0, left.length) !== left) return null;
