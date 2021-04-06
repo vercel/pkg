@@ -1247,7 +1247,7 @@ function payloadFileSync(pointer) {
   // mkdir /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function mkdirInSnapshot(path_, cb) {
+  function mkdirFailInSnapshot(path_, cb) {
     var cb2 = cb || rethrow;
     return cb2(
       new Error('Cannot mkdir in a snapshot. Try mountpoints instead.')
@@ -1262,7 +1262,7 @@ function payloadFileSync(pointer) {
       return ancestor.mkdirSync.apply(fs, translateNth(arguments, 0, path));
     }
 
-    return mkdirInSnapshot(path);
+    return mkdirFailInSnapshot(path);
   };
 
   fs.mkdir = function mkdir(path) {
@@ -1274,7 +1274,7 @@ function payloadFileSync(pointer) {
     }
 
     var callback = dezalgo(maybeCallback(arguments));
-    mkdirInSnapshot(path, callback);
+    mkdirFailInSnapshot(path, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
