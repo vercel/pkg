@@ -29,6 +29,6 @@ right = utils.spawn.sync('./' + path.basename(output), [], {
   cwd: path.dirname(output),
 });
 
-assert.strictEqual(right, 'I am D\n' + 'test-x-index.js\n');
+assert.strictEqual(right, 'I am D\ntest-x-index.js\n');
 
 utils.vacuum.sync(path.dirname(output));

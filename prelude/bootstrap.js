@@ -120,18 +120,12 @@ function insideMountpoint(f) {
 function readdirMountpoints(path) {
   return mountpoints
     .filter(({ interior }) => {
-      if (isRegExp(interior)) {
-        return interior.test(path);
-      } else {
-        return require('path').dirname(interior) === path;
-      }
+      if (isRegExp(interior)) return interior.test(path);
+      return require('path').dirname(interior) === path;
     })
     .map(({ interior, exterior }) => {
-      if (isRegExp(interior)) {
-        return path.replace(interior, exterior);
-      } else {
-        return require('path').basename(interior);
-      }
+      if (isRegExp(interior)) return path.replace(interior, exterior);
+      return require('path').basename(interior);
     });
 }
 
