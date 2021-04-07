@@ -6,9 +6,9 @@ var path = require('path');
 var myDirectory = path.dirname(process.execPath);
 
 process.pkg.mount(
-  new RegExp(path.join('^', __dirname, 'regexp_mountpoint_test/(.*)$')),
-  function (match, group1) {
-    return path.join(myDirectory, 'plugins-D-ext', group1);
+  /^(.*)regexp_mountpoint_test(.*)$/,
+  function (match, group1, group2) {
+    return path.join(myDirectory, 'plugins-D-ext', group2);
   }
 );
 
