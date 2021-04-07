@@ -1,0 +1,16 @@
+{
+  "name": "a",
+  "version": "0.1.0",
+  "description": "proof",
+  "bin": "a.js",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "pkg": "^4.4.0"
+  },
+  "pkg": {
+    "scripts": [
+      "a.js",
+      "b.js"
+    ]
+  }
+}
