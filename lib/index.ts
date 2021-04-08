@@ -50,7 +50,7 @@ const hostNodeRange = `node${process.version.match(/^v(\d+)/)![1]}`;
 
 function parseTargets(items: string[]): NodeTarget[] {
   // [ 'node6-macos-x64', 'node6-linux-x64' ]
-  const targets = [];
+  const targets: NodeTarget[] = [];
 
   for (const item of items) {
     const target = {
@@ -87,7 +87,7 @@ function parseTargets(items: string[]): NodeTarget[] {
       }
     }
 
-    targets.push(target);
+    targets.push(target as NodeTarget);
   }
 
   return targets;
@@ -161,9 +161,19 @@ function fabricatorForTarget(target: NodeTarget) {
 
 const dryRunResults: Record<string, boolean> = {};
 
-async function needWithDryRun(target: NodeTarget) {
-  const target2 = { dryRun: true, ...target };
-  const result = await need(target2);
+async function needWithDryRun({
+  forceBuild,
+  nodeRange,
+  platform,
+  arch,
+}: NodeTarget) {
+  const result = await need({
+    dryRun: true,
+    forceBuild,
+    nodeRange,
+    platform,
+    arch,
+  });
   assert(['exists', 'fetched', 'built'].indexOf(result) >= 0);
   dryRunResults[result] = true;
 }
@@ -178,7 +188,15 @@ async function needViaCache(target: NodeTarget) {
     return c;
   }
 
-  c = await need(target);
+  const { forceBuild, nodeRange, platform, arch } = target;
+
+  c = await need({
+    forceBuild,
+    nodeRange,
+    platform,
+    arch,
+  });
+
   targetsCache[s] = c;
 
   return c;
