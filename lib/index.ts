@@ -500,13 +500,16 @@ export async function exec(argv2: string[]) {
 
   for (const target of targets) {
     target.forceBuild = forceBuild;
+
     await needWithDryRun(target);
-    const f = fabricatorForTarget(target);
-    target.fabricator = f as Target;
-    (f as NodeTarget).forceBuild = forceBuild;
+
+    target.fabricator = fabricatorForTarget(target) as Target;
 
     if (bytecode) {
-      await needWithDryRun(f);
+      await needWithDryRun({
+        ...target.fabricator,
+        forceBuild,
+      });
     }
   }
 
