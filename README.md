@@ -42,13 +42,13 @@ The entrypoint of your project is a mandatory CLI argument. It may be:
 `pkg` can generate executables for several target machines at a
 time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
-dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
+dashes, for example `node12-macos-x64` or `node14-linux-arm64`:
 
 - **nodeRange** node${n} or latest
-- **platform** freebsd, linux, alpine, macos, win
-- **arch** x64, x86, armv6, armv7
+- **platform** linux, win, macos, (freebsd, alpine)
+- **arch** x64, arm64, (armv6, armv7)
 
-You may omit any element (and specify just `node6` for example).
+You may omit any element (and specify just `node14` for example).
 The omitted elements will be taken from current platform or
 system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
@@ -79,13 +79,13 @@ your `package.json` file.
   "pkg": {
     "scripts": "build/**/*.js",
     "assets": "views/**/*",
-    "targets": [ "node4-linux-armv6" ],
+    "targets": [ "node14-linux-arm64" ],
     "outputPath": "dist"
   }
 ```
 
 The above example will include everything in `assets/` and
-every .js file in `build/`, build only for `node4-linux-armv6`,
+every .js file in `build/`, build only for `node14-linux-arm64`,
 and place the executable inside `dist/`.
 
 You may also specify arrays of globs:
