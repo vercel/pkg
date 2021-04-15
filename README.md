@@ -126,7 +126,7 @@ Node.js application can be called with runtime options
 You can "bake" these runtime options into packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
 
-You can specify multiple options by joigning them in a single string, comma (`,`) separated:
+You can specify multiple options by joining them in a single string, comma (`,`) separated:
 
 ```sh
 pkg app.js --options expose-gc
