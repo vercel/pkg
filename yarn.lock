@@ -2029,10 +2029,10 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-pkg-fetch@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.0.1.tgz#d06bcde5932412b0ef670b2c847e452c2ce8aabe"
-  integrity sha512-+zzuCVFMgBjZoDUw6JpFqgJI7bbIEanpsM6mQwGW+Qj65YZwAWxkeioOHvgZwCHm0yTd47BfA06ODUfwlpjScg==
+pkg-fetch@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.0.2.tgz#9c352da90ba39990efc25ba14a46c27d50201ff4"
+  integrity sha512-Nnvr0DortVRmajb289VjmY1g0WW8dAof46eA2+Er1RvZYSuYMfbTh/sL0dP5yJWUnzIXhn5fd1EuO7f6xCRbew==
   dependencies:
     axios "^0.21.1"
     chalk "^4.1.0"
