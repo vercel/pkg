@@ -1,3 +1,5 @@
+import type { log } from './log';
+
 export interface FileRecord {
   file: string;
   body?: Buffer | string;
@@ -32,10 +34,7 @@ export type ConfigDictionary = Record<
 
 export interface PkgOptions {
   scripts?: string[];
-  log?: (
-    logger: (message: string) => void,
-    context: Record<string, string>
-  ) => void;
+  log?: (logger: typeof log, context: Record<string, string>) => void;
   assets?: string[];
   deployFiles?: string[];
   patches?: Patches;

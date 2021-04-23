@@ -87,7 +87,7 @@ function isPublic(config: PackageJson) {
     license = licenses;
   }
 
-  if (license) {
+  if (license && !Array.isArray(license)) {
     license = typeof license === 'string' ? license : license.type;
   }
 

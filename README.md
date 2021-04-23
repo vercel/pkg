@@ -42,13 +42,13 @@ The entrypoint of your project is a mandatory CLI argument. It may be:
 `pkg` can generate executables for several target machines at a
 time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
-dashes, for example `node6-macos-x64` or `node4-linux-armv6`:
+dashes, for example `node12-macos-x64` or `node14-linux-arm64`:
 
 - **nodeRange** node${n} or latest
-- **platform** freebsd, linux, alpine, macos, win
-- **arch** x64, x86, armv6, armv7
+- **platform** linux, win, macos, (freebsd, alpine)
+- **arch** x64, arm64, (armv6, armv7)
 
-You may omit any element (and specify just `node6` for example).
+You may omit any element (and specify just `node14` for example).
 The omitted elements will be taken from current platform or
 system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
@@ -79,13 +79,13 @@ your `package.json` file.
   "pkg": {
     "scripts": "build/**/*.js",
     "assets": "views/**/*",
-    "targets": [ "node4-linux-armv6" ],
+    "targets": [ "node14-linux-arm64" ],
     "outputPath": "dist"
   }
 ```
 
 The above example will include everything in `assets/` and
-every .js file in `build/`, build only for `node4-linux-armv6`,
+every .js file in `build/`, build only for `node14-linux-arm64`,
 and place the executable inside `dist/`.
 
 You may also specify arrays of globs:
@@ -121,14 +121,17 @@ See also
 ### Options
 
 Node.js application can be called with runtime options
-(belonging to Node.js or V8). To list them type `node --help` or
-`node --v8-options`. You can "bake" these runtime options into
-packaged application. The app will always run with the options
+(belonging to Node.js or V8). To list them type `node --help` or `node --v8-options`.
+
+You can "bake" these runtime options into packaged application. The app will always run with the options
 turned on. Just remove `--` from option name.
+
+You can specify multiple options by joining them in a single string, comma (`,`) separated:
 
 ```sh
 pkg app.js --options expose-gc
 pkg app.js --options max_old_space_size=4096
+pkg app.js --options max-old-space-size=1024,tls-min-v1.0,expose-gc
 ```
 
 ### Output
@@ -147,7 +150,7 @@ into executable), it may be useful to look through the log.
 By default, your source code is precompiled to v8 bytecode before being written
 to the output file. To disable this feature, pass `--no-bytecode` to `pkg`.
 
-> Why would you want to do this?
+#### Why would you want to do this?
 
 If you need a reproducible build
 process where your executable hashes (e.g. md5, sha1, sha256, etc.) are the
@@ -157,7 +160,7 @@ same value between builds. Because compiling bytecode is not deterministic
 results in executables with differing hashed values. Disabling bytecode
 compilation allows a given input to always have the same output.
 
-> Why would you NOT want to do this?
+#### Why would you NOT want to do this?
 
 While compiling to bytecode does not make your source code 100% secure, it does
 add a small layer of security/privacy/obscurity to your source code. Turning
@@ -165,6 +168,17 @@ off bytecode compilation causes the raw source code to be written directly to
 the executable file. If you're on \*nix machine and would like an example, run
 `pkg` with the `--no-bytecode` flag, and use the GNU strings tool on the
 output. You then should be able to grep your source code.
+
+#### Other considerations
+
+Specifying `--no-bytecode` will fail if there are any packages in your project that aren't explicitly marked
+as public by the `license` in their `package.json`.
+By default, `pkg` will check the license of each package and make sure that stuff that isn't meant for the public will
+only be included as bytecode.
+
+If you do require building pkg binaries for other architectures and/or depend on a package with a broken
+`license` in its `package.json`, you can override this behaviour by either explicitly whitelisting packages to be public
+using `--public-packages "packageA,packageB"` or setting all packages to public using `--public-packages "*"`
 
 ### Build
 

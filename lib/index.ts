@@ -50,7 +50,7 @@ const hostNodeRange = `node${process.version.match(/^v(\d+)/)![1]}`;
 
 function parseTargets(items: string[]): NodeTarget[] {
   // [ 'node6-macos-x64', 'node6-linux-x64' ]
-  const targets = [];
+  const targets: NodeTarget[] = [];
 
   for (const item of items) {
     const target = {
@@ -87,7 +87,7 @@ function parseTargets(items: string[]): NodeTarget[] {
       }
     }
 
-    targets.push(target);
+    targets.push(target as NodeTarget);
   }
 
   return targets;
@@ -154,16 +154,40 @@ function stringifyTargetForOutput(
   return a.join('-');
 }
 
-function fabricatorForTarget(target: NodeTarget) {
-  const { nodeRange, arch } = target;
-  return { nodeRange, platform: hostPlatform, arch };
+function fabricatorForTarget({ nodeRange, arch }: NodeTarget) {
+  let fabPlatform = hostPlatform;
+
+  if (
+    hostArch !== arch &&
+    (hostPlatform === 'linux' || hostPlatform === 'alpine')
+  ) {
+    // With linuxstatic, it is possible to generate bytecode for different
+    // arch with simple QEMU configuration instead of the entire sysroot.
+    fabPlatform = 'linuxstatic';
+  }
+
+  return {
+    nodeRange,
+    platform: fabPlatform,
+    arch,
+  };
 }
 
 const dryRunResults: Record<string, boolean> = {};
 
-async function needWithDryRun(target: NodeTarget) {
-  const target2 = { dryRun: true, ...target };
-  const result = await need(target2);
+async function needWithDryRun({
+  forceBuild,
+  nodeRange,
+  platform,
+  arch,
+}: NodeTarget) {
+  const result = await need({
+    dryRun: true,
+    forceBuild,
+    nodeRange,
+    platform,
+    arch,
+  });
   assert(['exists', 'fetched', 'built'].indexOf(result) >= 0);
   dryRunResults[result] = true;
 }
@@ -178,7 +202,15 @@ async function needViaCache(target: NodeTarget) {
     return c;
   }
 
-  c = await need(target);
+  const { forceBuild, nodeRange, platform, arch } = target;
+
+  c = await need({
+    forceBuild,
+    nodeRange,
+    platform,
+    arch,
+  });
+
   targetsCache[s] = c;
 
   return c;
@@ -482,13 +514,16 @@ export async function exec(argv2: string[]) {
 
   for (const target of targets) {
     target.forceBuild = forceBuild;
+
     await needWithDryRun(target);
-    const f = fabricatorForTarget(target);
-    target.fabricator = f as Target;
-    (f as NodeTarget).forceBuild = forceBuild;
+
+    target.fabricator = fabricatorForTarget(target) as Target;
 
     if (bytecode) {
-      await needWithDryRun(f);
+      await needWithDryRun({
+        ...target.fabricator,
+        forceBuild,
+      });
     }
   }
 
