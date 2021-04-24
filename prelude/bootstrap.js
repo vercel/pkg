@@ -93,6 +93,10 @@ EXECSTAT.birthtimeMs = EXECSTAT.birthtime.getTime();
 
 var mountpoints = [];
 
+function isRegExp(val) {
+  return require('util').types.isRegExp(val);
+}
+
 function insideMountpoint(f) {
   if (!insideSnapshot(f)) return null;
   var file = normalizePath(f);
@@ -100,6 +104,8 @@ function insideMountpoint(f) {
     .map((mountpoint) => {
       var { interior } = mountpoint;
       var { exterior } = mountpoint;
+      if (isRegExp(interior) && interior.test(file))
+        return file.replace(interior, exterior);
       if (interior === file) return exterior;
       var left = interior + require('path').sep;
       if (file.slice(0, left.length) !== left) return null;
@@ -113,9 +119,14 @@ function insideMountpoint(f) {
 
 function readdirMountpoints(path) {
   return mountpoints
-    .map((mountpoint) => mountpoint.interior)
-    .filter((interior) => require('path').dirname(interior) === path)
-    .map((interior) => require('path').basename(interior));
+    .filter(({ interior }) => {
+      if (isRegExp(interior)) return interior.test(path);
+      return require('path').dirname(interior) === path;
+    })
+    .map(({ interior, exterior }) => {
+      if (isRegExp(interior)) return path.replace(interior, exterior);
+      return require('path').basename(interior);
+    });
 }
 
 function translate(f) {
