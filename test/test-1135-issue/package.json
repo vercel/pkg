@@ -1,0 +1,21 @@
+{
+  "name": "pkg_issue_1135",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "pkg": "npx pkg -t host package.json"
+  },
+  "pkg": {
+    "scripts": "index.js",
+    "outputPath": "dist",
+    "assets": "./node_modules/canvas/build/Release/*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.7.0"
+  }
+}

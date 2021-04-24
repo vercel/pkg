@@ -1768,6 +1768,8 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 (() => {
   const fs = require('fs');
+  const path = require('path');
+
   var ancestor = {};
   ancestor.dlopen = process.dlopen;
 
@@ -1779,28 +1781,11 @@ function payloadFileSync(pointer) {
   process.dlopen = function dlopen() {
     const args = cloneArgs(arguments);
     const modulePath = revertMakingLong(args[1]);
-    const moduleDirname = require('path').dirname(modulePath);
-    if (insideSnapshot(modulePath)) {
-      // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
-      // we need to write the file somewhere on disk first and then load it
-      const moduleContent = fs.readFileSync(modulePath);
-      const moduleBaseName = require('path').basename(modulePath);
-      const hash = require('crypto')
-        .createHash('sha256')
-        .update(moduleContent)
-        .digest('hex');
-      const tmpModulePath = `${require('os').tmpdir()}/${hash}_${moduleBaseName}`;
-      try {
-        fs.statSync(tmpModulePath);
-      } catch (e) {
-        // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
-      }
-      args[1] = tmpModulePath;
-    }
-
+    const moduleBaseName = path.basename(modulePath);
+    const moduleFolder = path.dirname(modulePath);
     const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
-    const tryImporting = function tryImporting(previousErrorMessage) {
+
+    function tryImporting(_tmpFolder, previousErrorMessage) {
       try {
         const res = ancestor.dlopen.apply(process, args);
         return res;
@@ -1810,24 +1795,79 @@ function payloadFileSync(pointer) {
           throw e;
         }
         if (e.message.match(unknownModuleErrorRegex)) {
+          // this case triggers on linux, the error message give us a clue on what dynamic linking library
+          // is missing.
           // some modules are packaged with dynamic linking and needs to open other files that should be in
           // the same directory, in this case, we write this file in the same /tmp directory and try to
           // import the module again
+
           const moduleName = e.message.match(unknownModuleErrorRegex)[1];
-          const importModulePath = `${moduleDirname}/${moduleName}`;
-          const moduleContent = fs.readFileSync(importModulePath);
-          const moduleBaseName = require('path').basename(importModulePath);
-          const tmpModulePath = `${require('os').tmpdir()}/${moduleBaseName}`;
-          try {
-            fs.statSync(tmpModulePath);
-          } catch (err) {
-            fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o444 });
+          const importModulePath = path.join(moduleFolder, moduleName);
+
+          if (!fs.existsSync(importModulePath)) {
+            throw new Error(
+              `INTERNAL ERROR this file doesn't exist in the virtual file system :${importModulePath}`
+            );
           }
-          return tryImporting(e.message);
+          const moduleContent1 = fs.readFileSync(importModulePath);
+          const tmpModulePath1 = path.join(_tmpFolder, moduleName);
+
+          try {
+            fs.statSync(tmpModulePath1);
+          } catch (err) {
+            fs.writeFileSync(tmpModulePath1, moduleContent1, { mode: 0o555 });
+          }
+          return tryImporting(_tmpFolder, e.message);
         }
-        throw e;
+
+        // this case triggers on windows mainly.
+        // we copy all stuff that exists in the folder of the .node module
+        // into the tempory folders...
+        const files = fs.readdirSync(moduleFolder);
+        for (const file of files) {
+          if (file === moduleBaseName) {
+            // ignore the current module
+            continue;
+          }
+          const filenameSrc = path.join(moduleFolder, file);
+
+          if (fs.statSync(filenameSrc).isDirectory()) {
+            continue;
+          }
+          const filenameDst = path.join(_tmpFolder, file);
+          const content = fs.readFileSync(filenameSrc);
+
+          fs.writeFileSync(filenameDst, content, { mode: 0o555 });
+        }
+        return tryImporting(_tmpFolder, e.message);
       }
-    };
-    tryImporting();
+    }
+    if (insideSnapshot(modulePath)) {
+      const moduleContent = fs.readFileSync(modulePath);
+
+      // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
+      // we need to write the file somewhere on disk first and then load it
+      const hash = require('crypto')
+        .createHash('sha256')
+        .update(moduleContent)
+        .digest('hex');
+
+      const tmpFolder = path.join(require('os').tmpdir(), hash);
+      if (!fs.existsSync(tmpFolder)) {
+        fs.mkdirSync(tmpFolder);
+      }
+      const tmpModulePath = path.join(tmpFolder, moduleBaseName);
+
+      try {
+        fs.statSync(tmpModulePath);
+      } catch (e) {
+        // Most likely this means the module is not on disk yet
+        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o755 });
+      }
+      args[1] = tmpModulePath;
+      tryImporting(tmpFolder);
+    } else {
+      return ancestor.dlopen.apply(process, args);
+    }
   };
 })();
