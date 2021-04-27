@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false # prevent test to stop if one fails
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [10.x, 12.x, 14.x, 16.x]
         os: [ubuntu-latest, windows-latest] # Skip macos-latest
 
     runs-on: ${{ matrix.os }}
@@ -32,7 +32,7 @@ jobs:
         run: yarn install
 
       - name: Lint
-        if: matrix['node-version'] == '14.x' && matrix['os'] == 'ubuntu-latest'
+        if: matrix['node-version'] == '16.x' && matrix['os'] == 'ubuntu-latest'
         run: yarn lint
 
       - name: Build
