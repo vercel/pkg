@@ -19,7 +19,7 @@ const hostVersion = process.version.match(/^v(\d+)/)[1];
 const host = 'node' + hostVersion;
 const target = process.argv[2] || host;
 const windows = process.platform === 'win32';
-const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5, 10: 5, 12: 6, 14: 6 }[
+const npm = { 0: 2, 4: 2, 6: 3, 7: 4, 8: 5, 9: 5, 10: 5, 12: 6, 14: 6, 16: 7 }[
   hostVersion
 ];
 assert(npm !== undefined);
