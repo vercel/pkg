@@ -14,7 +14,7 @@ function nodeRangeToNodeVersion(nodeRange) {
 }
 
 for (const platform of knownPlatforms) {
-  const nodeRanges = ['node8', 'node10', 'node12', 'node14'];
+  const nodeRanges = ['node8', 'node10', 'node12', 'node14', 'node16'];
   for (const nodeRange of nodeRanges) {
     const nodeVersion = nodeRangeToNodeVersion(nodeRange);
     const archs = ['x64'];
