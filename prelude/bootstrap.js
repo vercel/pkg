@@ -1952,6 +1952,7 @@ function payloadFileSync(pointer) {
     execFileSync: childProcess.execFileSync,
     exec: childProcess.exec,
     execSync: childProcess.execSync,
+    fork: childProcess.fork,
   };
 
   function setOptsEnv(args) {
@@ -1963,6 +1964,16 @@ function payloadFileSync(pointer) {
     }
     const opts = args[pos];
     if (!opts.env) opts.env = _extend({}, process.env);
+    if (Array.isArray(opts.execArgv)) {
+      // fork: The patched Node.js binary prevents us from passing execArgv on
+      // the cli. Instead we'll pass those options through the environment.
+      // https://nodejs.org/docs/latest/api/cli.html#cli_node_options_options
+      opts.env.NODE_OPTIONS =
+        typeof opts.env.NODE_OPTIONS === 'string'
+          ? `${opts.env.NODE_OPTIONS} ${opts.execArgv.join(' ')}`
+          : opts.execArgv.join(' ');
+      delete opts.execArgv;
+    }
     if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
@@ -2069,6 +2080,12 @@ function payloadFileSync(pointer) {
     setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.execSync.apply(childProcess, args);
+  };
+
+  childProcess.fork = function fork() {
+    var args = cloneArgs(arguments);
+    setOptsEnv(args);
+    return ancestor.fork.apply(childProcess, args);
   };
 })();
 
