@@ -28,7 +28,10 @@ const {
   gunzipSync,
   brotliDecompressSync,
   brotliDecompress,
+  createBrotliDecompress,
+  createGunzip,
 } = require('zlib');
+const { createHash } = require('crypto');
 
 const common = {};
 REQUIRE_COMMON(common);
@@ -510,6 +513,7 @@ function payloadFileSync(pointer) {
   ancestor.access = fs.access;
   ancestor.mkdirSync = fs.mkdirSync;
   ancestor.mkdir = fs.mkdir;
+  ancestor.createReadStream = fs.createReadStream;
 
   const windows = process.platform === 'win32';
 
@@ -567,10 +571,51 @@ function payloadFileSync(pointer) {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  function removeTemporaryFolderAndContent(folder) {
+    if (NODE_VERSION_MAJOR <= 14) {
+      if (NODE_VERSION_MAJOR <= 10) {
+        // folder must be empty
+        for (const f of fs.readdirSync(folder)) {
+          fs.unlinkSync(path.join(folder, f));
+        }
+        fs.rmdirSync(folder);
+      } else {
+        fs.rmdirSync(folder, { recursive: true });
+      }
+    } else {
+      fs.rmSync(folder, { recursive: true });
+    }
+  }
+  const temporaryFiles = {};
+  const os = require('os');
+  const tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
+  process.on('beforeExit', () => {
+    removeTemporaryFolderAndContent(tmpFolder);
+  });
+  function deflateSync(snapshotFilename) {
+    const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
+    // content is already unziped !
+    const hash = createHash('sha256').update(content).digest('hex');
+    const fName = path.join(tmpFolder, hash);
+    fs.writeFileSync(fName, content);
+    return fName;
+  }
+
+  function uncompressExternallyAndOpen(snapshotFilename) {
+    if (temporaryFiles[snapshotFilename]) {
+      return fs.openSync(temporaryFiles[snapshotFilename].tmpFile);
+    }
+    const tmpFile = deflateSync(snapshotFilename);
+    temporaryFiles[snapshotFilename] = {
+      tmpFile,
+    };
+    const fd = fs.openSync(snapshotFilename, 'r');
+    return fd;
+  }
+
   function openFromSnapshot(f, cb) {
     const cb2 = cb || rethrow;
     const entity = findVirtualFileSystemEntry(f);
-
     if (!entity) return cb2(error_ENOENT('File or directory', f));
     const dock = { path: f, entity, position: 0 };
     const nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
@@ -587,12 +632,36 @@ function payloadFileSync(pointer) {
     }
   }
 
+  let bypassCompressCheckWhenCallbyCreateReadStream = false;
+
+  fs.createReadStream = function createReadStream(f) {
+    if (!insideSnapshot(f)) {
+      return ancestor.createReadStream.apply(fs, arguments);
+    }
+    if (insideMountpoint(f)) {
+      return ancestor.createReadStream.apply(fs, translateNth(arguments, 0, f));
+    }
+    bypassCompressCheckWhenCallbyCreateReadStream = true;
+    const stream = ancestor.createReadStream.apply(fs, arguments);
+    bypassCompressCheckWhenCallbyCreateReadStream = false;
+
+    if (DOCOMPRESS === GZIP) {
+      return stream.pipe(createGunzip());
+    }
+    if (DOCOMPRESS === BROTLI) {
+      return stream.pipe(createBrotliDecompress());
+    }
+    return stream;
+  };
   fs.openSync = function openSync(f) {
     if (!insideSnapshot(f)) {
       return ancestor.openSync.apply(fs, arguments);
     }
     if (insideMountpoint(f)) {
       return ancestor.openSync.apply(fs, translateNth(arguments, 0, f));
+    }
+    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
+      return uncompressExternallyAndOpen(f);
     }
     return openFromSnapshot(f);
   };
@@ -604,8 +673,11 @@ function payloadFileSync(pointer) {
     if (insideMountpoint(f)) {
       return ancestor.open.apply(fs, translateNth(arguments, 0, f));
     }
-
     const callback = dezalgo(maybeCallback(arguments));
+    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
+      const fd = uncompressExternallyAndOpen(f);
+      return callback(null, fd);
+    }
     openFromSnapshot(f, callback);
   };
 
@@ -1897,10 +1969,7 @@ function payloadFileSync(pointer) {
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
-      const hash = require('crypto')
-        .createHash('sha256')
-        .update(moduleContent)
-        .digest('hex');
+      const hash = createHash('sha256').update(moduleContent).digest('hex');
 
       const tmpFolder = path.join(require('os').tmpdir(), hash);
       if (!fs.existsSync(tmpFolder)) {
