@@ -23,7 +23,7 @@ fs.writeFileSync(
   fs.readFileSync('./plugins-D-ext/test-y-require-D.js')
 );
 
-utils.pkg.sync(['--target', target, '--output', output, input]);
+utils.pkg.sync(['--debug', '--target', target, '--output', output, input]);
 
 right = utils.spawn.sync('./' + path.basename(output), [], {
   cwd: path.dirname(output),
