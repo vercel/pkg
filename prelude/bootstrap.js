@@ -600,16 +600,18 @@ function payloadFileSync(pointer) {
     fs.writeFileSync(fName, content);
     return fName;
   }
-
-  function uncompressExternallyAndOpen(snapshotFilename) {
-    if (temporaryFiles[snapshotFilename]) {
-      return fs.openSync(temporaryFiles[snapshotFilename].tmpFile);
+  function uncompressExternally(snapshotFilename) {
+    let t = temporaryFiles[snapshotFilename];
+    if (!t) {
+      const tmpFile = deflateSync(snapshotFilename);
+      t = { tmpFile };
+      temporaryFiles[snapshotFilename] = t;
     }
-    const tmpFile = deflateSync(snapshotFilename);
-    temporaryFiles[snapshotFilename] = {
-      tmpFile,
-    };
-    const fd = fs.openSync(snapshotFilename, 'r');
+    return t.tmpFile;
+  }
+  function uncompressExternallyAndOpen(snapshotFilename) {
+    const externalFile = uncompressExternally(snapshotFilename);
+    const fd = fs.openSync(externalFile, 'r');
     return fd;
   }
 
@@ -1416,18 +1418,70 @@ function payloadFileSync(pointer) {
   // promises ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  const ancestor_promises = {};
   if (fs.promises !== undefined) {
     var util = require('util');
-    fs.promises.open = util.promisify(fs.open);
-    fs.promises.read = util.promisify(fs.read);
-    fs.promises.write = util.promisify(fs.write);
-    fs.promises.readFile = util.promisify(fs.readFile);
+    ancestor_promises.open = fs.promises.open;
+    ancestor_promises.read = fs.promises.read;
+    ancestor_promises.write = fs.promises.write;
+    ancestor_promises.readFile = fs.promises.readFile;
+    ancestor_promises.readdir = fs.promises.readdir;
+    ancestor_promises.realpath = fs.promises.realpath;
+    ancestor_promises.stat = fs.promises.stat;
+    ancestor_promises.lstat = fs.promises.lstat;
+    ancestor_promises.fstat = fs.promises.fstat;
+    ancestor_promises.access = fs.promises.access;
+
+    fs.promises.open = async function open(f) {
+      if (!insideSnapshot(f)) {
+        return ancestor_promises.open.apply(this, arguments);
+      }
+      if (insideMountpoint(f)) {
+        return ancestor_promises.open.apply(
+          this,
+          translateNth(arguments, 0, f)
+        );
+      }
+      const externalFile = uncompressExternally(f);
+      arguments[0] = externalFile;
+      const fd = await ancestor_promises.open.apply(this, arguments);
+      if (typeof fd === 'object') {
+        fd._pkg = { externalFile, file: f };
+      }
+      return fd;
+    };
+    fs.promises.readFile = async function readFile(f) {
+      if (!insideSnapshot(f)) {
+        return ancestor_promises.readFile.apply(this, arguments);
+      }
+      if (insideMountpoint(f)) {
+        return ancestor_promises.readFile.apply(
+          this,
+          translateNth(arguments, 0, f)
+        );
+      }
+      const externalFile = uncompressExternally(f);
+      arguments[0] = externalFile;
+      return ancestor_promises.readFile.apply(this, arguments);
+    };
+    fs.promises.write = async function write(fd) {
+      if (fd._pkg) {
+        throw new Error(
+          `[PKG] Cannot write into Snapshot file : ${fd._pkg.file}`
+        );
+      }
+      return ancestor_promises.write.apply(this, arguments);
+    };
     fs.promises.readdir = util.promisify(fs.readdir);
+
+    /*
+    fs.promises.read = util.promisify(fs.read);
     fs.promises.realpath = util.promisify(fs.realpath);
     fs.promises.stat = util.promisify(fs.stat);
     fs.promises.lstat = util.promisify(fs.lstat);
     fs.promises.fstat = util.promisify(fs.fstat);
     fs.promises.access = util.promisify(fs.access);
+  */
   }
 
   // ///////////////////////////////////////////////////////////////

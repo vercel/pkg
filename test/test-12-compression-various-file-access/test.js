@@ -41,12 +41,5 @@ async function withReadStream() {
 (async () => {
   await withReadFileSync();
   await withReadStream();
-  await withReadStream();
-  /*
-	fs.promises is not supported ... yet
-	*/
-  if (false) {
-    await withPromises();
-  }
   await withDirectAccess();
 })();
