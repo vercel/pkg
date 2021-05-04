@@ -198,7 +198,7 @@ function findPackageJson(nodeFile: string) {
 }
 
 function nativePrebuildInstall(target: Target, nodeFile: string) {
-  const prebuild = path.join(
+  const prebuildInstall = path.join(
     __dirname,
     '../node_modules/.bin/prebuild-install'
   );
@@ -227,9 +227,12 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
     fs.copyFileSync(nodeFile, `${nodeFile}.bak`);
   }
 
-  execSync(
-    `${prebuild} -t ${nodeVersion} --platform ${platform[target.platform]
-    } --arch ${target.arch}`,
+  execSync([
+      prebuildInstall,
+      `--target ${nodeVersion}`,
+      `--platform ${platform[target.platform]}`,
+      `--arch ${target.arch}`
+    ].join(' '),
     { cwd: dir }
   );
   fs.copyFileSync(nodeFile, nativeFile);
