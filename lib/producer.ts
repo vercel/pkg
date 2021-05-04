@@ -1,7 +1,7 @@
 import Multistream from 'multistream';
 import assert from 'assert';
-import { execSync } from 'child_process';
-import fs from 'fs';
+import { execFileSync } from 'child_process';
+import fs from 'fs-extra';
 import intoStream from 'into-stream';
 import path from 'path';
 import streamMeter from 'stream-meter';
@@ -196,7 +196,7 @@ function findPackageJson(nodeFile: string) {
 }
 
 function nativePrebuildInstall(target: Target, nodeFile: string) {
-  const prebuild = path.join(
+  const prebuildInstall = path.join(
     __dirname,
     '../node_modules/.bin/prebuild-install'
   );
@@ -208,30 +208,36 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
     throw new Error(`Couldn't find node version, instead got: ${nodeVersion}`);
   }
 
-  // prebuild-install will overwrite the target .node file. Instead, we're
-  // going to:
-  //  * Take a backup
-  //  * run prebuild
-  //  * move the prebuild to a new name with a platform/version extension
-  //  * put the backed up file back
   const nativeFile = `${nodeFile}.${target.platform}.${nodeVersion}`;
 
   if (fs.existsSync(nativeFile)) {
     return nativeFile;
   }
 
+  // prebuild-install will overwrite the target .node file, so take a backup
   if (!fs.existsSync(`${nodeFile}.bak`)) {
     fs.copyFileSync(nodeFile, `${nodeFile}.bak`);
   }
 
-  execSync(
-    `${prebuild} -t ${nodeVersion} --platform ${
-      platform[target.platform]
-    } --arch ${target.arch}`,
+  // run prebuild
+  execFileSync(
+    prebuildInstall,
+    [
+      '--target',
+      nodeVersion,
+      '--platform',
+      platform[target.platform],
+      '--arch',
+      target.arch,
+    ],
     { cwd: dir }
   );
+
+  // move the prebuild to a new name with a platform/version extension
   fs.copyFileSync(nodeFile, nativeFile);
-  fs.copyFileSync(`${nodeFile}.bak`, nodeFile);
+
+  // put the backed up file back
+  fs.moveSync(`${nodeFile}.bak`, nodeFile, { overwrite: true });
 
   return nativeFile;
 }
