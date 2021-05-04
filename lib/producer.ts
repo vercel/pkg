@@ -216,6 +216,7 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
   //  * run prebuild
   //  * move the prebuild to a new name with a platform/version extension
   //  * put the backed up file back
+  //  * remove the backup
   const nativeFile = `${nodeFile}.${target.platform}.${nodeVersion}`;
 
   if (fs.existsSync(nativeFile)) {
@@ -233,6 +234,8 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
   );
   fs.copyFileSync(nodeFile, nativeFile);
   fs.copyFileSync(`${nodeFile}.bak`, nodeFile);
+
+  fs.rmSync(`${nodeFile}.bak`);
 
   return nativeFile;
 }
