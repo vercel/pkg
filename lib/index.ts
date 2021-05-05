@@ -1,5 +1,6 @@
 /* eslint-disable require-atomic-updates */
 
+import assert from 'assert';
 import { execSync } from 'child_process';
 import {
   existsSync,
@@ -9,10 +10,10 @@ import {
   stat,
   readFileSync,
   writeFileSync,
+  copyFileSync,
 } from 'fs-extra';
-import { need, system } from 'pkg-fetch';
-import assert from 'assert';
 import minimist from 'minimist';
+import { need, system } from 'pkg-fetch';
 import path from 'path';
 
 import { log, wasReported } from './log';
@@ -563,6 +564,16 @@ export async function exec(argv2: string[]) {
 
     if (f && bytecode) {
       f.binaryPath = await needViaCache(f as NodeTarget);
+
+      if (f.platform === 'macos') {
+        // ad-hoc sign the base binary temporarily to generate bytecode
+        // due to the new mandatory signing requirement
+        const signedBinaryPath = `${f.binaryPath}-signed`;
+        await remove(signedBinaryPath);
+        copyFileSync(f.binaryPath, signedBinaryPath);
+        execSync(`codesign --sign - ${signedBinaryPath}`);
+        f.binaryPath = signedBinaryPath;
+      }
 
       if (f.platform !== 'win') {
         await plusx(f.binaryPath);
