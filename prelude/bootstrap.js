@@ -495,7 +495,9 @@ function payloadFileSync(pointer) {
   ancestor.readdirSync = fs.readdirSync;
   ancestor.readdir = fs.readdir;
   ancestor.realpathSync = fs.realpathSync;
+  ancestor.realpathSync.native = fs.realpathSync;
   ancestor.realpath = fs.realpath;
+  ancestor.realpath.native = fs.realpath;
   ancestor.statSync = fs.statSync;
   ancestor.stat = fs.stat;
   ancestor.lstatSync = fs.lstatSync;
@@ -1059,6 +1061,9 @@ function payloadFileSync(pointer) {
     const callback = dezalgo(maybeCallback(arguments));
     callback(null, realpathFromSnapshot(f));
   };
+
+  fs.realpathSync.native = fs.realpathSync;
+  fs.realpath.native = fs.realpath;
 
   // ///////////////////////////////////////////////////////////////
   // stat //////////////////////////////////////////////////////////
