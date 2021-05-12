@@ -672,6 +672,14 @@ export async function exec(argv2: string[]) {
           // sign executable ad-hoc to workaround the new mandatory signing requirement
           // users can always replace the signature if necessary
           execSync(`codesign --sign - ${target.output}`);
+        } else if (target.arch === 'arm64') {
+          log.warn('Unable to sign the macOS executable on non-macOS host', [
+            'Due to the mandatory code signing requirement, before the',
+            'executable is distributed to end users, it must be signed with',
+            'the "codesign" utility of macOS, otherwise, it will be immediately',
+            'killed by kernel on launch. An ad-hoc signature is sufficient.',
+            'To do that, "codesign --sign - <executable>" on a Mac.',
+          ]);
         }
       }
 
