@@ -47,7 +47,7 @@ assert(
 
 /* eslint-disable no-unused-vars */
 const input = 'package.json';
-const target = 'host';
+const target = process.argv[2] || 'host';
 const ext = process.platform === 'win32' ? '.exe' : '';
 const outputRef = 'test-output-empty' + ext;
 const outputNone = 'test-output-None' + ext;

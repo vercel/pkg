@@ -28,7 +28,10 @@ const {
   gunzipSync,
   brotliDecompressSync,
   brotliDecompress,
+  createBrotliDecompress,
+  createGunzip,
 } = require('zlib');
+const { createHash } = require('crypto');
 
 const common = {};
 REQUIRE_COMMON(common);
@@ -510,6 +513,7 @@ function payloadFileSync(pointer) {
   ancestor.access = fs.access;
   ancestor.mkdirSync = fs.mkdirSync;
   ancestor.mkdir = fs.mkdir;
+  ancestor.createReadStream = fs.createReadStream;
 
   const windows = process.platform === 'win32';
 
@@ -567,10 +571,53 @@ function payloadFileSync(pointer) {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  function removeTemporaryFolderAndContent(folder) {
+    if (NODE_VERSION_MAJOR <= 14) {
+      if (NODE_VERSION_MAJOR <= 10) {
+        // folder must be empty
+        for (const f of fs.readdirSync(folder)) {
+          fs.unlinkSync(path.join(folder, f));
+        }
+        fs.rmdirSync(folder);
+      } else {
+        fs.rmdirSync(folder, { recursive: true });
+      }
+    } else {
+      fs.rmSync(folder, { recursive: true });
+    }
+  }
+  const temporaryFiles = {};
+  const os = require('os');
+  const tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
+  process.on('beforeExit', () => {
+    removeTemporaryFolderAndContent(tmpFolder);
+  });
+  function deflateSync(snapshotFilename) {
+    const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
+    // content is already unziped !
+    const hash = createHash('sha256').update(content).digest('hex');
+    const fName = path.join(tmpFolder, hash);
+    fs.writeFileSync(fName, content);
+    return fName;
+  }
+  function uncompressExternally(snapshotFilename) {
+    let t = temporaryFiles[snapshotFilename];
+    if (!t) {
+      const tmpFile = deflateSync(snapshotFilename);
+      t = { tmpFile };
+      temporaryFiles[snapshotFilename] = t;
+    }
+    return t.tmpFile;
+  }
+  function uncompressExternallyAndOpen(snapshotFilename) {
+    const externalFile = uncompressExternally(snapshotFilename);
+    const fd = fs.openSync(externalFile, 'r');
+    return fd;
+  }
+
   function openFromSnapshot(f, cb) {
     const cb2 = cb || rethrow;
     const entity = findVirtualFileSystemEntry(f);
-
     if (!entity) return cb2(error_ENOENT('File or directory', f));
     const dock = { path: f, entity, position: 0 };
     const nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
@@ -587,12 +634,36 @@ function payloadFileSync(pointer) {
     }
   }
 
+  let bypassCompressCheckWhenCallbyCreateReadStream = false;
+
+  fs.createReadStream = function createReadStream(f) {
+    if (!insideSnapshot(f)) {
+      return ancestor.createReadStream.apply(fs, arguments);
+    }
+    if (insideMountpoint(f)) {
+      return ancestor.createReadStream.apply(fs, translateNth(arguments, 0, f));
+    }
+    bypassCompressCheckWhenCallbyCreateReadStream = true;
+    const stream = ancestor.createReadStream.apply(fs, arguments);
+    bypassCompressCheckWhenCallbyCreateReadStream = false;
+
+    if (DOCOMPRESS === GZIP) {
+      return stream.pipe(createGunzip());
+    }
+    if (DOCOMPRESS === BROTLI) {
+      return stream.pipe(createBrotliDecompress());
+    }
+    return stream;
+  };
   fs.openSync = function openSync(f) {
     if (!insideSnapshot(f)) {
       return ancestor.openSync.apply(fs, arguments);
     }
     if (insideMountpoint(f)) {
       return ancestor.openSync.apply(fs, translateNth(arguments, 0, f));
+    }
+    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
+      return uncompressExternallyAndOpen(f);
     }
     return openFromSnapshot(f);
   };
@@ -604,8 +675,11 @@ function payloadFileSync(pointer) {
     if (insideMountpoint(f)) {
       return ancestor.open.apply(fs, translateNth(arguments, 0, f));
     }
-
     const callback = dezalgo(maybeCallback(arguments));
+    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
+      const fd = uncompressExternallyAndOpen(f);
+      return callback(null, fd);
+    }
     openFromSnapshot(f, callback);
   };
 
@@ -1344,18 +1418,70 @@ function payloadFileSync(pointer) {
   // promises ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
+  const ancestor_promises = {};
   if (fs.promises !== undefined) {
     var util = require('util');
-    fs.promises.open = util.promisify(fs.open);
-    fs.promises.read = util.promisify(fs.read);
-    fs.promises.write = util.promisify(fs.write);
-    fs.promises.readFile = util.promisify(fs.readFile);
+    ancestor_promises.open = fs.promises.open;
+    ancestor_promises.read = fs.promises.read;
+    ancestor_promises.write = fs.promises.write;
+    ancestor_promises.readFile = fs.promises.readFile;
+    ancestor_promises.readdir = fs.promises.readdir;
+    ancestor_promises.realpath = fs.promises.realpath;
+    ancestor_promises.stat = fs.promises.stat;
+    ancestor_promises.lstat = fs.promises.lstat;
+    ancestor_promises.fstat = fs.promises.fstat;
+    ancestor_promises.access = fs.promises.access;
+
+    fs.promises.open = async function open(f) {
+      if (!insideSnapshot(f)) {
+        return ancestor_promises.open.apply(this, arguments);
+      }
+      if (insideMountpoint(f)) {
+        return ancestor_promises.open.apply(
+          this,
+          translateNth(arguments, 0, f)
+        );
+      }
+      const externalFile = uncompressExternally(f);
+      arguments[0] = externalFile;
+      const fd = await ancestor_promises.open.apply(this, arguments);
+      if (typeof fd === 'object') {
+        fd._pkg = { externalFile, file: f };
+      }
+      return fd;
+    };
+    fs.promises.readFile = async function readFile(f) {
+      if (!insideSnapshot(f)) {
+        return ancestor_promises.readFile.apply(this, arguments);
+      }
+      if (insideMountpoint(f)) {
+        return ancestor_promises.readFile.apply(
+          this,
+          translateNth(arguments, 0, f)
+        );
+      }
+      const externalFile = uncompressExternally(f);
+      arguments[0] = externalFile;
+      return ancestor_promises.readFile.apply(this, arguments);
+    };
+    fs.promises.write = async function write(fd) {
+      if (fd._pkg) {
+        throw new Error(
+          `[PKG] Cannot write into Snapshot file : ${fd._pkg.file}`
+        );
+      }
+      return ancestor_promises.write.apply(this, arguments);
+    };
     fs.promises.readdir = util.promisify(fs.readdir);
+
+    /*
+    fs.promises.read = util.promisify(fs.read);
     fs.promises.realpath = util.promisify(fs.realpath);
     fs.promises.stat = util.promisify(fs.stat);
     fs.promises.lstat = util.promisify(fs.lstat);
     fs.promises.fstat = util.promisify(fs.fstat);
     fs.promises.access = util.promisify(fs.access);
+  */
   }
 
   // ///////////////////////////////////////////////////////////////
@@ -1897,10 +2023,7 @@ function payloadFileSync(pointer) {
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
-      const hash = require('crypto')
-        .createHash('sha256')
-        .update(moduleContent)
-        .digest('hex');
+      const hash = createHash('sha256').update(moduleContent).digest('hex');
 
       const tmpFolder = path.join(require('os').tmpdir(), hash);
       if (!fs.existsSync(tmpFolder)) {

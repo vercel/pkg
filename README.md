@@ -348,7 +348,7 @@ and check that all the required files for your application are properly
 incorporated to the final executable.
 
     $ pkg --debug app.js -o output
-    $ DEBUG_PKG output
+    $ DEBUG_PKG=1 output
 
 or
 
