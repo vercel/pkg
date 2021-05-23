@@ -572,6 +572,7 @@ function payloadFileSync(pointer) {
   // ///////////////////////////////////////////////////////////////
 
   function removeTemporaryFolderAndContent(folder) {
+    if (!folder) return;
     if (NODE_VERSION_MAJOR <= 14) {
       if (NODE_VERSION_MAJOR <= 10) {
         // folder must be empty
@@ -588,11 +589,12 @@ function payloadFileSync(pointer) {
   }
   const temporaryFiles = {};
   const os = require('os');
-  const tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
+  let tmpFolder = '';
   process.on('beforeExit', () => {
     removeTemporaryFolderAndContent(tmpFolder);
   });
   function deflateSync(snapshotFilename) {
+    if (!tmpFolder) tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
     const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
     // content is already unziped !
     const hash = createHash('sha256').update(content).digest('hex');
