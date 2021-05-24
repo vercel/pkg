@@ -2037,10 +2037,10 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-pkg-fetch@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.1.0.tgz#4a3a6b26d6953b506625b2ba4a3e75c6af9ded0e"
-  integrity sha512-bUOo92TO95Ctcdx48Y9CnS4DF4TluTJ1/+6vfm+k+ILg1tFRGYhkFcWFRa7pofWClVMQcNHENNW1KmdzoFIPpw==
+pkg-fetch@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.1.1.tgz#8f94115d926e71359ed96c211fe022b7a2452f8d"
+  integrity sha512-3GfpNwbwoTxge2TrVp6Oyz/FZJOoxF1r0+1YikOhnBXa2Di/VOJKtUObFHap76BFnyFo1fwh5vARWFR9TzLKUg==
   dependencies:
     chalk "^4.1.0"
     fs-extra "^9.1.0"
