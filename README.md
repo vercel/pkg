@@ -313,6 +313,9 @@ to `--target` option. You should specify the same Node.js version
 as your system-wide Node.js to make compiled executable compatible
 with `.node` files.
 
+Note that fully static Node binaries are not capable of loading native
+bindings, so you may not use Node bindings with `linuxstatic`.
+
 ## API
 
 `const { exec } = require('pkg')`
