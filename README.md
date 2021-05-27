@@ -64,6 +64,12 @@ note that by default `pkg` has to run the executable of the
 - Windows: possible to build `x64` on `arm64` with `x64 emulation` but not opposite.
 - or, disable bytecode generation with `--no-bytecode --public-packages "*" --public`.
 
+`macos-arm64` is experimental. Be careful about the [mandatory code signing requirement](https://developer.apple.com/documentation/macos-release-notes/macos-big-sur-11_0_1-universal-apps-release-notes).
+The final executable has to be signed (ad-hoc signature is sufficient) with `codesign`
+utility of macOS, or the end-user has no way to permit it to run at all. `pkg` ad-hoc
+signs the final executable if you run `pkg` on macOS. Preferably, you should replace
+this signature with your own trusted Apple Developer ID.
+
 ### Config
 
 During packaging process `pkg` parses your sources, detects
