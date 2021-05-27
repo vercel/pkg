@@ -192,6 +192,8 @@ option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
 [BUILDING.md](https://github.com/nodejs/node/blob/HEAD/BUILDING.md)
 
+See [pkg-fetch](https://github.com/vercel/pkg-fetch) for more info.
+
 ### Compression
 
 Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the exectable.
