@@ -188,7 +188,7 @@ application. If you prefer to compile base binaries from
 source instead of downloading them, you may pass `--build`
 option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
-[BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
+[BUILDING.md](https://github.com/nodejs/node/blob/HEAD/BUILDING.md)
 
 ### Compression
 
