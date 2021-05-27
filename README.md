@@ -55,6 +55,15 @@ There is also an alias `host`, that means that all 3 elements
 are taken from current platform/Node.js. By default targets are
 `linux,macos,win` for current Node.js version and arch.
 
+If you want to generate executable for different architectures,
+note that by default `pkg` has to run the executable of the
+**target** arch to generate bytecodes:
+
+- Linux: configure binfmt with [QEMU](https://wiki.debian.org/QemuUserEmulation).
+- macOS: possible to build `x64` on `arm64` with `Rosetta 2` but not opposite.
+- Windows: possible to build `x64` on `arm64` with `x64 emulation` but not opposite.
+- or, disable bytecode generation with `--no-bytecode --public-packages "*" --public`.
+
 ### Config
 
 During packaging process `pkg` parses your sources, detects
