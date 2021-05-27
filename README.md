@@ -3,8 +3,6 @@
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
-[![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
-[![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
