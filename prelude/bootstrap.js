@@ -187,15 +187,28 @@ console.log(translateNth(["", "r+"], 0, "d:\\snapshot\\countly\\plugins-ext"));
 console.log(translateNth(["", "rw"], 0, "d:\\snapshot\\countly\\plugins-ext\\"));
 console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 */
+const dictRev = {};
 const separator = '$';
+let maxKey = Object.keys(DICT).reduce((p, c) => {
+  const cc = parseInt(c, 36);
+  return cc > p ? cc : p;
+}, 0);
 function replace(k) {
-  return DICT[k];
+  let v = DICT[k];
+  // we have found a part of a missing file => let record for latter use
+  if (v === undefined) {
+    maxKey += 1;
+    v = maxKey.toString(36);
+    DICT[k] = v;
+    dictRev[v] = k;
+  }
+  return v;
 }
+
 function makeKey(filename, slash) {
   const a = filename.split(slash).map(replace).join(separator);
   return a || filename;
 }
-const dictRev = {};
 Object.entries(DICT).forEach(([k, v]) => {
   dictRev[v] = k;
 });
@@ -1326,8 +1339,7 @@ function payloadFileSync(pointer) {
   }
 
   function existsFromSnapshot(path_) {
-    const fShort = normalizePathAndFollowLink(path_);
-    const entity = VIRTUAL_FILESYSTEM[fShort];
+    const entity = findVirtualFileSystemEntry(path_);
     if (!entity) return findNativeAddonForExists(path_);
     return true;
   }

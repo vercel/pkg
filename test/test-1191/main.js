@@ -32,7 +32,6 @@ const logRef = utils.spawn.sync('node', [path.join(__dirname, input)], {
   cwd: __dirname,
   expect: 0,
 });
-
 if (logRef.replace(/\r|\n/g, '') !== '42') {
   console.log(`expecting 42 but got ${logRef}`);
   process.exit(1);
