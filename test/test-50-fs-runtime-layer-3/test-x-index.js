@@ -12,7 +12,7 @@ test01();
 function test01() {
   fs.open(theFile, 'w+', function (error, fd) {
     console.log(error === null);
-    var buffer = Buffer.from('FOO');
+    var buffer = new Buffer('FOO');
     fs.write(fd, buffer, 0, buffer.length, null, function (error2) {
       console.log(error2 === null);
       if (error2) console.log(error2.message);
@@ -31,7 +31,7 @@ function test01() {
 
 function test02() {
   var fd = fs.openSync(theFile, 'w+');
-  var buffer = Buffer.from('QUX BARABAZ');
+  var buffer = new Buffer('QUX BARABAZ');
   var bytesWritten;
   try {
     bytesWritten = fs.writeSync(fd, buffer, 0, buffer.length);

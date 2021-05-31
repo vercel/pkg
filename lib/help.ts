@@ -19,7 +19,6 @@ export default function help() {
     --public             speed up and disclose the sources of top-level project
     --public-packages    force specified packages to be considered public
     --no-bytecode        skip bytecode generation and include source files as plain js
-    -C, --compress       [default=None] compression algorithm = Brotli or GZip
 
   ${chalk.dim('Examples:')}
 
@@ -37,11 +36,5 @@ export default function help() {
     ${chalk.cyan('$ pkg --public-packages "packageA,packageB" index.js')}
   ${chalk.gray('–')} Consider all packages to be public
     ${chalk.cyan('$ pkg --public-packages "*" index.js')}
-  ${chalk.gray('–')} Bakes '--expose-gc' into executable
-    ${chalk.cyan('$ pkg --options expose-gc index.js')}
-  ${chalk.gray(
-    '–'
-  )} reduce size of the data packed inside the executable with GZip
-    ${chalk.cyan('$ pkg --compress GZip index.js')}
 `);
 }

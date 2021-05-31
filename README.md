@@ -209,16 +209,6 @@ requirements to compile original Node.js:
 
 See [pkg-fetch](https://github.com/vercel/pkg-fetch) for more info.
 
-### Compression
-
-Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the exectable.
-
-This option can reduce the size of the embedded file system by up to 60%.
-
-The startup time of the application might be reduced slightly.
-
-`-C` can be used as a shortcut for `--compress `.
-
 ### Environment
 
 | Var            | Description                                                                               |
@@ -368,7 +358,7 @@ and check that all the required files for your application are properly
 incorporated to the final executable.
 
     $ pkg --debug app.js -o output
-    $ DEBUG_PKG=1 output
+    $ DEBUG_PKG output
 
 or
 
