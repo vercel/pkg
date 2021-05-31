@@ -1,5 +1,4 @@
 {
-  // note you must disable the base rule as it can report incorrect errors
   "extends": ["airbnb-base", "prettier"],
   "rules": {
     "no-bitwise": "off",
@@ -11,10 +10,8 @@
     "consistent-return": "off",
     "no-restricted-syntax": "off",
     "import/prefer-default-export": "off",
-    "camelcase": "off",
-    "no-shadow": "off",
-    "@typescript-eslint/no-shadow": ["error"]
-    },
+    "camelcase": "off"
+  },
   "overrides": [
     {
       "files": ["*.ts"],

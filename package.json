@@ -72,7 +72,6 @@
     "lint": "eslint lib prelude test",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint",
     "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
   },
   "greenkeeper": {
