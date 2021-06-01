@@ -11,6 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bonjour": "*"
+    "bonjour": "3.5.0"
   }
 }

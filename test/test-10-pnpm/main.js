@@ -10,6 +10,10 @@ const utils = require('../utils.js');
 // ignore this test if nodejs <= 10 , as recent version of PNPM do not support nodejs=10
 const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
 if (MAJOR_VERSION < 12) {
+  console.log(
+    'skiping test as it requires nodejs >= 12 and got',
+    MAJOR_VERSION
+  );
   return;
 }
 

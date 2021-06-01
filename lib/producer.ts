@@ -253,31 +253,67 @@ interface ProducerOptions {
   doCompress: CompressType;
 }
 
+/**
+ * instead of creating a vfs dicionnary with actual path as key
+ * we use a compression mechanism that can reduce significantly
+ * the memory footprint of the vfs in the code.
+ *
+ * without vfs compression:
+ *
+ * vfs = {
+ *   "/folder1/folder2/file1.js": {};
+ *   "/folder1/folder2/folder3/file2.js": {};
+ *   "/folder1/folder2/folder3/file3.js": {};
+ * }
+ *
+ * with compression :
+ *
+ * fileDictionary = {
+ *    "folder1": "1",
+ *    "folder2": "2",
+ *    "file1": "3",
+ *    "folder3": "4",
+ *    "file2": "5",
+ *    "file3": "6",
+ * }
+ * vfs = {
+ *   "/1/2/3": {};
+ *   "/1/2/4/5": {};
+ *   "/1/2/4/6": {};
+ * }
+ *
+ * note: the key is computed in base36 for further compression.
+ */
 const fileDictionary: { [key: string]: string } = {};
 let counter = 0;
-function replace(k: string) {
-  let existingKey = fileDictionary[k];
+function getOrCreateHash(fileOrFolderName: string) {
+  let existingKey = fileDictionary[fileOrFolderName];
   if (!existingKey) {
     const newkey = counter;
     counter += 1;
     existingKey = newkey.toString(36);
-    fileDictionary[k] = existingKey;
+    fileDictionary[fileOrFolderName] = existingKey;
   }
   return existingKey;
 }
-const separator = '$';
+const separator = '/';
 
-function makeKey(filename: string, slash: string): string {
-  const a = filename.split(slash).map(replace).join(separator);
-  return a;
+function makeKey(
+  doCompression: CompressType,
+  fullpath: string,
+  slash: string
+): string {
+  if (doCompression === CompressType.None) return fullpath;
+  return fullpath.split(slash).map(getOrCreateHash).join(separator);
 }
+
 export default function producer({
   backpack,
   bakes,
   slash,
   target,
   symLinks,
-  doCompress
+  doCompress,
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -296,7 +332,7 @@ export default function producer({
     for (const stripe of stripes) {
       let { snap } = stripe;
       snap = snapshotify(snap, slash);
-      const vfsKey = makeKey(snap, slash);
+      const vfsKey = makeKey(doCompress, snap, slash);
       if (!vfs[vfsKey]) vfs[vfsKey] = {};
     }
 
@@ -305,8 +341,8 @@ export default function producer({
     for (const [key, value] of Object.entries(symLinks)) {
       const k = snapshotify(key, slash);
       const v = snapshotify(value, slash);
-      const vfsKey = makeKey(k, slash);
-      snapshotSymLinks[vfsKey] = makeKey(v, slash);
+      const vfsKey = makeKey(doCompress, k, slash);
+      snapshotSymLinks[vfsKey] = makeKey(doCompress, v, slash);
     }
 
     let meter: streamMeter.StreamMeter;
@@ -357,7 +393,7 @@ export default function producer({
           const { store } = prevStripe;
           let { snap } = prevStripe;
           snap = snapshotify(snap, slash);
-          const vfsKey = makeKey(snap, slash);
+          const vfsKey = makeKey(doCompress, snap, slash);
           vfs[vfsKey][store] = [track, meter.bytes];
           track += meter.bytes;
         }
@@ -384,7 +420,12 @@ export default function producer({
                     return cb(null, intoStream(Buffer.alloc(0)));
                   }
 
-                  cb(null, pipeMayCompressToNewMeter(intoStream(buffer || Buffer.from(''))));
+                  cb(
+                    null,
+                    pipeMayCompressToNewMeter(
+                      intoStream(buffer || Buffer.from(''))
+                    )
+                  );
                 }
               );
             }

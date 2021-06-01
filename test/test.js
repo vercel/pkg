@@ -42,8 +42,11 @@ function joinAndForward(d) {
 
 const list = [];
 
+console.log('FLAVOR = ', flavor);
 if (flavor === 'only-npm') {
   list.push(joinAndForward('test-79-npm/main.js'));
+  list.push(joinAndForward('test-1191/main.js'));
+  list.push(joinAndForward('test-1192/main.js'));
 } else {
   list.push(joinAndForward('**/main.js'));
   if (flavor === 'no-npm') {

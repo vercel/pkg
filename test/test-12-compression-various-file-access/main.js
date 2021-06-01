@@ -68,7 +68,8 @@ async function runTest(input) {
     console.log(' GZIPed:');
     console.log(logGZip);
 
-    process.exit(1);
+    console.log('------------ ERROR');
+    process.exit(1000);
   }
   utils.vacuum.sync(output);
   utils.vacuum.sync('gzip_' + output);
@@ -83,3 +84,4 @@ console.log('  now testing with fs.promises');
 const input2 = 'test_with_new_fs_promises.js';
 runTest(input2);
 console.log('Done');
+process.exit(0);

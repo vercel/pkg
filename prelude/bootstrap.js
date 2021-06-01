@@ -188,8 +188,8 @@ console.log(translateNth(["", "rw"], 0, "d:\\snapshot\\countly\\plugins-ext\\"))
 console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 */
 const dictRev = {};
-const separator = '$';
-let maxKey = Object.keys(DICT).reduce((p, c) => {
+const separator = '/';
+let maxKey = Object.values(DICT).reduce((p, c) => {
   const cc = parseInt(c, 36);
   return cc > p ? cc : p;
 }, 0);
@@ -206,6 +206,9 @@ function replace(k) {
 }
 
 function makeKey(filename, slash) {
+  if (!DOCOMPRESS) {
+    return filename;
+  }
   const a = filename.split(slash).map(replace).join(separator);
   return a || filename;
 }
@@ -214,13 +217,20 @@ Object.entries(DICT).forEach(([k, v]) => {
 });
 
 function toOriginal(fShort) {
+  if (!DOCOMPRESS) {
+    return fShort;
+  }
   return fShort
-    .split('$')
+    .split(separator)
     .map((x) => dictRev[x])
     .join(path.sep);
 }
 
 const symlinksEntries = Object.entries(SYMLINKS);
+
+// separator for substitution depends on platform;
+const sepsep = DOCOMPRESS ? separator : path.sep;
+
 function normalizePathAndFollowLink(f) {
   f = normalizePath(f);
   f = makeKey(f, path.sep);
@@ -228,7 +238,7 @@ function normalizePathAndFollowLink(f) {
   while (needToSubstitute) {
     needToSubstitute = false;
     for (const [k, v] of symlinksEntries) {
-      if (f.startsWith(`${k}${separator}`) || f === k) {
+      if (f.startsWith(`${k}${sepsep}`) || f === k) {
         f = f.replace(k, v);
         needToSubstitute = true;
         break;

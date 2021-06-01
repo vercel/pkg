@@ -3,8 +3,8 @@
 const path = require('path');
 
 let fs_promises;
-// ignore this test if nodejs <= 10 , as recent version of PNPM do not support nodejs=10
 const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
+
 if (MAJOR_VERSION >= 14) {
   // only work with nodeJs >= 14.0
   fs_promises = require('fs/promises');
@@ -26,16 +26,12 @@ async function withPromises() {
 
     if (MAJOR_VERSION >= 14) {
       // eslint-disable-line no-unused-vars
-      const { bytesRead } = await fd.read({
-        buffer,
-        position: 10,
-        encoding: 'ascii',
-      });
+      const { bytesRead } = await fd.read(buffer, 0, buffer.length, 0);
       if (process.env.DEBUG) {
         console.log('bytesRead = ', bytesRead);
       }
     } else {
-      await fd.read(buffer, 0, buffer.length, 10);
+      await fd.read(buffer, 0, buffer.length, 0);
     }
     console.log(buffer.toString());
   } catch (err) {
