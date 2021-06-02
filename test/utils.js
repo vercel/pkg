@@ -5,9 +5,9 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const globby = require('globby');
-const execSync = require('child_process').execSync;
-const spawnSync = require('child_process').spawnSync;
-const existsSync = require('fs').existsSync;
+const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
+const { existsSync } = require('fs');
 const stableStringify = require('json-stable-stringify');
 
 module.exports.mkdirp = mkdirp;

@@ -51,6 +51,8 @@ if (flavor === 'only-npm') {
     list.push('!' + joinAndForward('test-46-multi-arch'));
     list.push('!' + joinAndForward('test-46-multi-arch-2'));
     list.push('!' + joinAndForward('test-79-npm'));
+    list.push('!' + joinAndForward('test-1191'));
+    list.push('!' + joinAndForward('test-1192'));
   }
 }
 

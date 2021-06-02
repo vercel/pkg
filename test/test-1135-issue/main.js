@@ -33,7 +33,6 @@ console.log('node version = ', version);
 const npmlog = utils.exec.sync('npm install');
 console.log('npm log :', npmlog);
 
-// verify that we have the .pnpm folder and a symlinks module in node_modules
 assert(fs.lstatSync(path.join(__dirname, 'node_modules/canvas')).isDirectory());
 assert(
   fs.lstatSync(path.join(__dirname, 'node_modules/canvas/build')).isDirectory()
