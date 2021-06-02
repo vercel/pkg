@@ -1,0 +1,24 @@
+{
+  "name": "pkg-express",
+  "version": "1.0.0",
+  "description": "Illustrates issue between pkg 5.2.X and express (works with with pkg pre 5.2.X).",
+  "repository": "",
+  "main": "src/index.js",
+  "bin": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "npm run make",
+    "start": "node .",
+    "make": "pkg . -o ./dist/pkg-express.exe"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "pkg": "5.2.1"
+  },
+  "pkg": {
+    "assets": "./public/views/*.pug"
+  }
+}
