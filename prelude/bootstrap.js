@@ -628,9 +628,7 @@ function payloadFileSync(pointer) {
         )
       );
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
-    if (offset >= buffer.length && NODE_VERSION_MAJOR >= 6) return cb2(null, 0);
-    if (offset >= buffer.length)
-      return cb2(new Error('Offset is out of bounds'));
+    if (offset >= buffer.length) return cb2(null, 0);
     if (offset + length > buffer.length && NODE_VERSION_MAJOR >= 14)
       return cb2(
         new Error(
@@ -1438,26 +1436,9 @@ function payloadFileSync(pointer) {
   var im;
   var makeRequireFunction;
 
-  if (NODE_VERSION_MAJOR === 0) {
-    makeRequireFunction = (self) => {
-      function rqfn(path) {
-        return self.require(path);
-      }
-      rqfn.resolve = function resolve(request) {
-        return Module._resolveFilename(request, self);
-      };
-      rqfn.main = process.mainModule;
-      rqfn.extensions = Module._extensions;
-      rqfn.cache = Module._cache;
-      return rqfn;
-    };
-  } else if (NODE_VERSION_MAJOR <= 9) {
+  if (NODE_VERSION_MAJOR <= 9) {
     im = require('internal/module');
-    if (NODE_VERSION_MAJOR <= 7) {
-      makeRequireFunction = (m) => im.makeRequireFunction.call(m);
-    } else {
-      makeRequireFunction = im.makeRequireFunction;
-    }
+    makeRequireFunction = im.makeRequireFunction;
   } else {
     im = require('internal/modules/cjs/helpers');
     makeRequireFunction = im.makeRequireFunction;
@@ -1642,9 +1623,6 @@ function payloadFileSync(pointer) {
       args[0] === EXECPATH
     ) {
       args[0] = EXECPATH;
-      if (NODE_VERSION_MAJOR === 0) {
-        args[1] = args[1].filter((a) => a.slice(0, 13) !== '--debug-port=');
-      }
     } else {
       for (var i = 1; i < args[1].length; i += 1) {
         var mbc = args[1][i - 1];
