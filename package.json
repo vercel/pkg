@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "5.1.0",
+  "version": "5.2.1",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "into-stream": "^6.0.0",
     "minimist": "^1.2.5",
     "multistream": "^4.1.0",
-    "pkg-fetch": "3.0.4",
+    "pkg-fetch": "3.1.1",
     "prebuild-install": "6.0.1",
     "progress": "^2.0.3",
     "resolve": "^1.20.0",
@@ -72,7 +72,6 @@
     "lint": "eslint lib prelude test",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint",
     "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
   },
   "greenkeeper": {

@@ -3,8 +3,6 @@
 ![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
 
 [![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
-[![Dependency Status](https://david-dm.org/vercel/pkg/status.svg)](https://david-dm.org/vercel/pkg)
-[![devDependency Status](https://david-dm.org/vercel/pkg/dev-status.svg)](https://david-dm.org/vercel/pkg?type=dev)
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
@@ -44,9 +42,11 @@ time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
 dashes, for example `node12-macos-x64` or `node14-linux-arm64`:
 
-- **nodeRange** node${n} or latest
-- **platform** linux, win, macos, (freebsd, alpine)
+- **nodeRange** (node8), node10, node12, node14, node16 or latest
+- **platform** alpine, linux, linuxstatic, win, macos, (freebsd)
 - **arch** x64, arm64, (armv6, armv7)
+
+(element) is unsupported, but you may try to compile yourself.
 
 You may omit any element (and specify just `node14` for example).
 The omitted elements will be taken from current platform or
@@ -54,6 +54,21 @@ system-wide Node.js installation (its version and arch).
 There is also an alias `host`, that means that all 3 elements
 are taken from current platform/Node.js. By default targets are
 `linux,macos,win` for current Node.js version and arch.
+
+If you want to generate executable for different architectures,
+note that by default `pkg` has to run the executable of the
+**target** arch to generate bytecodes:
+
+- Linux: configure binfmt with [QEMU](https://wiki.debian.org/QemuUserEmulation).
+- macOS: possible to build `x64` on `arm64` with `Rosetta 2` but not opposite.
+- Windows: possible to build `x64` on `arm64` with `x64 emulation` but not opposite.
+- or, disable bytecode generation with `--no-bytecode --public-packages "*" --public`.
+
+`macos-arm64` is experimental. Be careful about the [mandatory code signing requirement](https://developer.apple.com/documentation/macos-release-notes/macos-big-sur-11_0_1-universal-apps-release-notes).
+The final executable has to be signed (ad-hoc signature is sufficient) with `codesign`
+utility of macOS, or the end-user has no way to permit it to run at all. `pkg` ad-hoc
+signs the final executable if you run `pkg` on macOS. Preferably, you should replace
+this signature with your own trusted Apple Developer ID.
 
 ### Config
 
@@ -190,17 +205,9 @@ application. If you prefer to compile base binaries from
 source instead of downloading them, you may pass `--build`
 option to `pkg`. First ensure your computer meets the
 requirements to compile original Node.js:
-[BUILDING.md](https://github.com/nodejs/node/blob/master/BUILDING.md)
+[BUILDING.md](https://github.com/nodejs/node/blob/HEAD/BUILDING.md)
 
-### Compression
-
-Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the exectable.
-
-This option can reduce the size of the embedded file system by up to 60%.
-
-The startup time of the application might be reduced slightly.
-
-`-C` can be used as a shortcut for `--compress `.
+See [pkg-fetch](https://github.com/vercel/pkg-fetch) for more info.
 
 ### Environment
 
@@ -295,6 +302,9 @@ version. Then, when you compile your project with `pkg`, pay attention
 to `--target` option. You should specify the same Node.js version
 as your system-wide Node.js to make compiled executable compatible
 with `.node` files.
+
+Note that fully static Node binaries are not capable of loading native
+bindings, so you may not use Node bindings with `linuxstatic`.
 
 ## API
 

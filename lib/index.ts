@@ -1,9 +1,19 @@
 /* eslint-disable require-atomic-updates */
 
-import { existsSync, mkdirp, readFile, remove, stat, readFileSync } from 'fs-extra';
-import { need, system } from 'pkg-fetch';
 import assert from 'assert';
+import { execSync } from 'child_process';
+import {
+  existsSync,
+  mkdirp,
+  readFile,
+  remove,
+  stat,
+  readFileSync,
+  writeFileSync,
+  copyFileSync,
+} from 'fs-extra';
 import minimist from 'minimist';
+import { need, system } from 'pkg-fetch';
 import path from 'path';
 
 import { log, wasReported } from './log';
@@ -16,7 +26,7 @@ import refine from './refiner';
 import { shutdown } from './fabricator';
 import walk, { Marker, WalkerParams } from './walker';
 import { Target, NodeTarget, SymLinks } from './types';
-import { CompressType } from './compress_type';
+import { patchMachOExecutable } from './mach-o';
 
 const { version } = JSON.parse(
   readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
@@ -237,8 +247,6 @@ export async function exec(argv2: string[]) {
       't',
       'target',
       'targets',
-      'C',
-      'compress',
     ],
     default: { bytecode: true },
   });
@@ -266,31 +274,7 @@ export async function exec(argv2: string[]) {
 
   const forceBuild = argv.b || argv.build;
 
-  // doCompress
-  const algo = argv.C || argv.compress || 'None';
-
-
-  let doCompress: CompressType = CompressType.None;
-  switch (algo.toLowerCase()) {
-    case 'brotli':
-    case 'br':
-      doCompress = CompressType.Brotli;
-      break;
-    case 'gzip':
-    case 'gz':
-      doCompress = CompressType.GZip;
-      break;
-    case 'none':
-      break;
-    default:
-      // eslint-disable-next-line no-console
-      throw wasReported(`Invalid compression algorithm ${algo} ( should be None, Brotli or Gzip)`);
-
-  }
-  if (doCompress !== CompressType.None) {
-    // eslint-disable-next-line no-console
-    console.log('compression: ', CompressType[doCompress]);
-  }
+  // _
 
   if (!argv._.length) {
     throw wasReported('Entry file/directory is expected', [
@@ -350,7 +334,7 @@ export async function exec(argv2: string[]) {
       if (!existsSync(inputBin)) {
         throw wasReported(
           'Bin file does not exist (taken from package.json ' +
-          "'bin' property)",
+            "'bin' property)",
           [inputBin]
         );
       }
@@ -554,6 +538,16 @@ export async function exec(argv2: string[]) {
     if (f && bytecode) {
       f.binaryPath = await needViaCache(f as NodeTarget);
 
+      if (f.platform === 'macos') {
+        // ad-hoc sign the base binary temporarily to generate bytecode
+        // due to the new mandatory signing requirement
+        const signedBinaryPath = `${f.binaryPath}-signed`;
+        await remove(signedBinaryPath);
+        copyFileSync(f.binaryPath, signedBinaryPath);
+        execSync(`codesign --sign - ${signedBinaryPath}`);
+        f.binaryPath = signedBinaryPath;
+      }
+
       if (f.platform !== 'win') {
         await plusx(f.binaryPath);
       }
@@ -631,9 +625,35 @@ export async function exec(argv2: string[]) {
       await mkdirp(path.dirname(target.output));
     }
 
-    const slash = target.platform === 'win' ? '\\' : '/';
-    await producer({ backpack, bakes, slash, target: target as Target, symLinks, doCompress });
+    await producer({
+      backpack,
+      bakes,
+      slash: target.platform === 'win' ? '\\' : '/',
+      target: target as Target,
+      symLinks,
+    });
+
     if (target.platform !== 'win' && target.output) {
+      if (target.platform === 'macos') {
+        // patch executable to allow code signing
+        const buf = patchMachOExecutable(readFileSync(target.output));
+        writeFileSync(target.output, buf);
+
+        if (hostPlatform === 'macos') {
+          // sign executable ad-hoc to workaround the new mandatory signing requirement
+          // users can always replace the signature if necessary
+          execSync(`codesign --sign - ${target.output}`);
+        } else if (target.arch === 'arm64') {
+          log.warn('Unable to sign the macOS executable on non-macOS host', [
+            'Due to the mandatory code signing requirement, before the',
+            'executable is distributed to end users, it must be signed with',
+            'the "codesign" utility of macOS, otherwise, it will be immediately',
+            'killed by kernel on launch. An ad-hoc signature is sufficient.',
+            'To do that, "codesign --sign - <executable>" on a Mac.',
+          ]);
+        }
+      }
+
       await plusx(target.output);
     }
   }

@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
 
 import assert from 'assert';
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'path';
 
 import {
   STORE_BLOB,
@@ -157,7 +157,7 @@ export default function packer({
     }
   }
   const prelude =
-    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS, DICT, DOCOMPRESS) { 
+    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS) { 
         ${bootstrapText}${
       log.debugMode ? diagnosticText : ''
     }\n})(function (exports) {\n${commonText}\n},\n` +
@@ -166,10 +166,6 @@ export default function packer({
     `%DEFAULT_ENTRYPOINT%` +
     `\n,\n` +
     `%SYMLINKS%` +
-    '\n,\n' +
-    '%DICT%' +
-    '\n,\n' +
-    '%DOCOMPRESS%' +
     `\n);`;
 
   return { prelude, entrypoint, stripes };

@@ -1,9 +1,5 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable global-require */
-/* eslint-disable curly */
-/* eslint-disable new-cap */
-/* eslint-disable no-buffer-constructor */
-/* eslint-disable no-multi-spaces */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
@@ -14,21 +10,20 @@
 /* global REQUIRE_COMMON */
 /* global VIRTUAL_FILESYSTEM */
 /* global DEFAULT_ENTRYPOINT */
-/* global DICT */
-/* global DOCOMPRESS */
 /* global SYMLINKS */
 
 'use strict';
 
+const assert = require('assert');
+const childProcess = require('child_process');
+const { createHash } = require('crypto');
 const fs = require('fs');
+const { isRegExp } = require('util').types;
+const Module = require('module');
 const path = require('path');
-const { sep } = require('path');
-const {
-  gunzip,
-  gunzipSync,
-  brotliDecompressSync,
-  brotliDecompress,
-} = require('zlib');
+const { promisify, _extend } = require('util');
+const { Script } = require('vm');
+const { tmpdir } = require('os');
 
 const common = {};
 REQUIRE_COMMON(common);
@@ -76,7 +71,7 @@ if (process.env.PKG_EXECPATH === EXECPATH) {
 
   if (process.argv[1] && process.argv[1] !== '-') {
     // https://github.com/nodejs/node/blob/1a96d83a223ff9f05f7d942fb84440d323f7b596/lib/internal/bootstrap/node.js#L269
-    process.argv[1] = require('path').resolve(process.argv[1]);
+    process.argv[1] = path.resolve(process.argv[1]);
   }
 } else {
   process.argv[1] = DEFAULT_ENTRYPOINT;
@@ -102,13 +97,8 @@ EXECSTAT.birthtimeMs = EXECSTAT.birthtime.getTime();
 
 const mountpoints = [];
 
-function isRegExp(val) {
-  return require('util').types.isRegExp(val);
-}
-
 function insideMountpoint(f) {
   if (!insideSnapshot(f)) return null;
-
   const file = normalizePath(f);
   const found = mountpoints
     .map((mountpoint) => {
@@ -116,25 +106,24 @@ function insideMountpoint(f) {
       if (isRegExp(interior) && interior.test(file))
         return file.replace(interior, exterior);
       if (interior === file) return exterior;
-      const left = interior + sep;
+      const left = interior + path.sep;
       if (file.slice(0, left.length) !== left) return null;
       return exterior + file.slice(left.length - 1);
     })
     .filter((result) => result);
-
   if (found.length >= 2) throw new Error('UNEXPECTED-00');
   if (found.length === 0) return null;
   return found[0];
 }
 
-function readdirMountpoints(filename) {
+function readdirMountpoints(path_) {
   return mountpoints
     .filter(({ interior }) => {
-      if (isRegExp(interior)) return interior.test(filename);
-      return path.dirname(interior) === filename;
+      if (isRegExp(interior)) return interior.test(path_);
+      return path.dirname(interior) === path_;
     })
     .map(({ interior, exterior }) => {
-      if (isRegExp(interior)) return path.replace(interior, exterior);
+      if (isRegExp(interior)) return path_.replace(interior, exterior);
       return path.basename(interior);
     });
 }
@@ -186,51 +175,30 @@ console.log(translateNth(["", "r+"], 0, "d:\\snapshot\\countly\\plugins-ext"));
 console.log(translateNth(["", "rw"], 0, "d:\\snapshot\\countly\\plugins-ext\\"));
 console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\1234"));
 */
-const separator = '$';
-function replace(k) {
-  return DICT[k];
-}
-function makeKey(filename, slash) {
-  const a = filename.split(slash).map(replace).join(separator);
-  return a || filename;
-}
-const dictRev = {};
-Object.entries(DICT).forEach(([k, v]) => {
-  dictRev[v] = k;
-});
 
-function toOriginal(fShort) {
-  return fShort
-    .split('$')
-    .map((x) => dictRev[x])
-    .join(sep);
-}
-
-const symlinksEntries = Object.entries(SYMLINKS);
-function normalizePathAndFollowLink(f) {
-  f = normalizePath(f);
-  f = makeKey(f, sep);
-  let needToSubstitue = true;
-  while (needToSubstitue) {
-    needToSubstitue = false;
-    for (const [k, v] of symlinksEntries) {
-      if (f.startsWith(`${k}${separator}`) || f === k) {
-        f = f.replace(k, v);
-        needToSubstitue = true;
+const win32 = process.platform === 'win32';
+const slash = win32 ? '\\' : '/';
+function realpathFromSnapshot(path_) {
+  let path_normal = path.normalize(path_);
+  let count = 0;
+  let needToSubstitute = true;
+  while (needToSubstitute) {
+    needToSubstitute = false;
+    for (const [k, v] of Object.entries(SYMLINKS)) {
+      if (path_normal.startsWith(k + slash) || path_normal === k) {
+        path_normal = path_normal.replace(k, v);
+        needToSubstitute = true;
         break;
       }
     }
+    count += 1;
   }
-  return f;
-}
-function realpathFromSnapshot(f) {
-  const realPath = toOriginal(normalizePathAndFollowLink(f));
-  return realPath;
+  assert(count === 1 || count === 2);
+  return path_normal;
 }
 
-function findVirtualFileSystemEntry(f) {
-  const fShort = normalizePathAndFollowLink(f);
-  return VIRTUAL_FILESYSTEM[fShort];
+function normalizePathAndFollowLink(path_) {
+  return realpathFromSnapshot(normalizePath(path_));
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -238,7 +206,7 @@ function findVirtualFileSystemEntry(f) {
 // /////////////////////////////////////////////////////////////////
 
 const xpdn = path.dirname(EXECPATH);
-const maxUplevels = xpdn.split(sep).length;
+const maxUplevels = xpdn.split(path.sep).length;
 function projectToFilesystem(f) {
   const relatives = [];
   relatives.push(
@@ -268,22 +236,23 @@ function projectToFilesystem(f) {
 function projectToNearby(f) {
   return path.join(xpdn, path.basename(f));
 }
-function findNativeAddonSyncFreeFromRequire(f) {
-  if (!insideSnapshot(f)) throw new Error(`UNEXPECTED-10 ${f}`);
-  if (f.slice(-5) !== '.node') return null; // leveldown.node.js
+
+function findNativeAddonSyncFreeFromRequire(path_) {
+  if (!insideSnapshot(path_)) throw new Error(`UNEXPECTED-10 ${path_}`);
+  if (path_.slice(-5) !== '.node') return null; // leveldown.node.js
   // check mearby first to prevent .node tampering
-  const projector = projectToNearby(f);
+  const projector = projectToNearby(path_);
   if (fs.existsSync(projector)) return projector;
-  const projectors = projectToFilesystem(f);
+  const projectors = projectToFilesystem(path_);
   for (let i = 0; i < projectors.length; i += 1) {
     if (fs.existsSync(projectors[i])) return projectors[i];
   }
   return null;
 }
 
-function findNativeAddonSyncUnderRequire(f) {
+function findNativeAddonSyncUnderRequire(path_) {
   if (!FLAG_ENABLE_PROJECT) return null;
-  return findNativeAddonSyncFreeFromRequire(f);
+  return findNativeAddonSyncFreeFromRequire(path_);
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -413,39 +382,17 @@ function payloadCopyManySync(source, target, targetStart, sourceStart) {
   }
 }
 
-const GZIP = 1;
-const BROTLI = 2;
 function payloadFile(pointer, cb) {
   const target = Buffer.alloc(pointer[1]);
   payloadCopyMany(pointer, target, 0, 0, (error) => {
     if (error) return cb(error);
-    if (DOCOMPRESS === GZIP) {
-      gunzip(target, (error2, target2) => {
-        if (error2) return cb(error2);
-        cb(null, target2);
-      });
-    } else if (DOCOMPRESS === BROTLI) {
-      brotliDecompress(target, (error2, target2) => {
-        if (error2) return cb(error2);
-        cb(null, target2);
-      });
-    } else {
-      return cb(null, target);
-    }
+    cb(null, target);
   });
 }
 
 function payloadFileSync(pointer) {
   const target = Buffer.alloc(pointer[1]);
   payloadCopyManySync(pointer, target, 0, 0);
-  if (DOCOMPRESS === GZIP) {
-    const target1 = gunzipSync(target);
-    return target1;
-  }
-  if (DOCOMPRESS === BROTLI) {
-    const target1 = brotliDecompressSync(target);
-    return target1;
-  }
   return target;
 }
 
@@ -467,7 +414,7 @@ function payloadFileSync(pointer) {
 
 (() => {
   process.pkg.path = {};
-  process.pkg.path.resolve = () => {
+  process.pkg.path.resolve = function resolve() {
     const args = cloneArgs(arguments);
     args.unshift(path.dirname(ENTRYPOINT));
     return path.resolve.apply(path, args); // eslint-disable-line prefer-spread
@@ -479,35 +426,39 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 
 (() => {
-  const ancestor = {};
-  ancestor.openSync = fs.openSync;
-  ancestor.open = fs.open;
-  ancestor.readSync = fs.readSync;
-  ancestor.read = fs.read;
-  ancestor.writeSync = fs.writeSync;
-  ancestor.write = fs.write;
-  ancestor.closeSync = fs.closeSync;
-  ancestor.close = fs.close;
-  ancestor.readFileSync = fs.readFileSync;
-  ancestor.readFile = fs.readFile;
-  // ancestor.writeFileSync = fs.writeFileSync; // based on openSync/writeSync/closeSync
-  // ancestor.writeFile =     fs.writeFile; // based on open/write/close
-  ancestor.readdirSync = fs.readdirSync;
-  ancestor.readdir = fs.readdir;
-  ancestor.realpathSync = fs.realpathSync;
-  ancestor.realpath = fs.realpath;
-  ancestor.statSync = fs.statSync;
-  ancestor.stat = fs.stat;
-  ancestor.lstatSync = fs.lstatSync;
-  ancestor.lstat = fs.lstat;
-  ancestor.fstatSync = fs.fstatSync;
-  ancestor.fstat = fs.fstat;
-  ancestor.existsSync = fs.existsSync;
-  ancestor.exists = fs.exists;
-  ancestor.accessSync = fs.accessSync;
-  ancestor.access = fs.access;
-  ancestor.mkdirSync = fs.mkdirSync;
-  ancestor.mkdir = fs.mkdir;
+  const ancestor = {
+    openSync: fs.openSync,
+    open: fs.open,
+    readSync: fs.readSync,
+    read: fs.read,
+    writeSync: fs.writeSync,
+    write: fs.write,
+    closeSync: fs.closeSync,
+    close: fs.close,
+    readFileSync: fs.readFileSync,
+    readFile: fs.readFile,
+    // writeFileSync: fs.writeFileSync, // based on openSync/writeSync/closeSync
+    // writeFile:     fs.writeFile, // based on open/write/close
+    readdirSync: fs.readdirSync,
+    readdir: fs.readdir,
+    realpathSync: fs.realpathSync,
+    realpath: fs.realpath,
+    statSync: fs.statSync,
+    stat: fs.stat,
+    lstatSync: fs.lstatSync,
+    lstat: fs.lstat,
+    fstatSync: fs.fstatSync,
+    fstat: fs.fstat,
+    existsSync: fs.existsSync,
+    exists: fs.exists,
+    accessSync: fs.accessSync,
+    access: fs.access,
+    mkdirSync: fs.mkdirSync,
+    mkdir: fs.mkdir,
+  };
+
+  ancestor.realpathSync.native = fs.realpathSync;
+  ancestor.realpath.native = fs.realpath;
 
   const windows = process.platform === 'win32';
 
@@ -523,40 +474,37 @@ function payloadFileSync(pointer) {
   }
 
   function maybeCallback(args) {
-    var cb = args[args.length - 1];
+    const cb = args[args.length - 1];
     return typeof cb === 'function' ? cb : rethrow;
   }
 
-  function error_ENOENT(fileOrDirectory, f) {
-    // eslint-disable-line camelcase
-    var error = new Error(
-      `${fileOrDirectory} '${stripSnapshot(f)}' ` +
+  function error_ENOENT(fileOrDirectory, path_) {
+    const error = new Error(
+      `${fileOrDirectory} '${stripSnapshot(path_)}' ` +
         `was not included into executable at compilation stage. ` +
         `Please recompile adding it as asset or script.`
     );
     error.errno = -ENOENT;
     error.code = 'ENOENT';
-    error.path = f;
+    error.path = path_;
     error.pkg = true;
     return error;
   }
 
-  function error_EISDIR(f) {
-    // eslint-disable-line camelcase
-    var error = new Error('EISDIR: illegal operation on a directory, read');
+  function error_EISDIR(path_) {
+    const error = new Error('EISDIR: illegal operation on a directory, read');
     error.errno = -EISDIR;
     error.code = 'EISDIR';
-    error.path = f;
+    error.path = path_;
     error.pkg = true;
     return error;
   }
 
-  function error_ENOTDIR(f) {
-    // eslint-disable-line camelcase
-    var error = new Error(`ENOTDIR: not a directory, scandir '${f}'`);
+  function error_ENOTDIR(path_) {
+    const error = new Error(`ENOTDIR: not a directory, scandir '${path_}'`);
     error.errno = -ENOTDIR;
     error.code = 'ENOTDIR';
-    error.path = f;
+    error.path = path_;
     error.pkg = true;
     return error;
   }
@@ -565,12 +513,12 @@ function payloadFileSync(pointer) {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function openFromSnapshot(f, cb) {
+  function openFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
-    const entity = findVirtualFileSystemEntry(f);
-
-    if (!entity) return cb2(error_ENOENT('File or directory', f));
-    const dock = { path: f, entity, position: 0 };
+    const path_vfs = normalizePathAndFollowLink(path_);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) return cb2(error_ENOENT('File or directory', path_vfs));
+    const dock = { path: path_vfs, entity, position: 0 };
     const nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
     if (cb) {
       ancestor.open.call(fs, nullDevice, 'r', (error, fd) => {
@@ -585,26 +533,27 @@ function payloadFileSync(pointer) {
     }
   }
 
-  fs.openSync = function openSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.openSync = function openSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.openSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.openSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.openSync.apply(fs, translateNth(arguments, 0, path_));
     }
-    return openFromSnapshot(f);
+
+    return openFromSnapshot(path_);
   };
 
-  fs.open = function open(f) {
-    if (!insideSnapshot(f)) {
+  fs.open = function open(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.open.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.open.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.open.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    openFromSnapshot(f, callback);
+    openFromSnapshot(path_, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -667,9 +616,7 @@ function payloadFileSync(pointer) {
         )
       );
     if (offset < 0) return cb2(new Error('Offset is out of bounds'));
-    if (offset >= buffer.length && NODE_VERSION_MAJOR >= 6) return cb2(null, 0);
-    if (offset >= buffer.length)
-      return cb2(new Error('Offset is out of bounds'));
+    if (offset >= buffer.length) return cb2(null, 0);
     if (offset + length > buffer.length && NODE_VERSION_MAJOR >= 14)
       return cb2(
         new Error(
@@ -805,14 +752,16 @@ function payloadFileSync(pointer) {
     }
   }
 
-  function readFileFromSnapshot(filename, cb) {
+  function readFileFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
 
-    const entity = findVirtualFileSystemEntry(filename);
-    if (!entity) return cb2(error_ENOENT('File', filename));
+    const path_vfs = normalizePath(path_);
+
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) return cb2(error_ENOENT('File', path_vfs));
 
     const entityLinks = entity[STORE_LINKS];
-    if (entityLinks) return cb2(error_EISDIR(filename));
+    if (entityLinks) return cb2(error_EISDIR(path_vfs));
 
     const entityContent = entity[STORE_CONTENT];
     if (entityContent) return readFileFromSnapshotSub(entityContent, cb);
@@ -835,16 +784,16 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-20'));
   }
 
-  fs.readFileSync = function readFileSync(f, options_) {
-    if (f === 'dirty-hack-for-testing-purposes') {
-      return f;
+  fs.readFileSync = function readFileSync(path_, options_) {
+    if (path_ === 'dirty-hack-for-testing-purposes') {
+      return path_;
     }
 
-    if (!insideSnapshot(f)) {
+    if (!insideSnapshot(path_)) {
       return ancestor.readFileSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.readFileSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.readFileSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readFileOptions(options_, false);
@@ -856,17 +805,17 @@ function payloadFileSync(pointer) {
     const { encoding } = options;
     assertEncoding(encoding);
 
-    let buffer = readFileFromSnapshot(f);
+    let buffer = readFileFromSnapshot(path_);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
   };
 
-  fs.readFile = function readFile(f, options_) {
-    if (!insideSnapshot(f)) {
+  fs.readFile = function readFile(path_, options_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.readFile.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.readFile.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.readFile.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readFileOptions(options_, true);
@@ -878,8 +827,8 @@ function payloadFileSync(pointer) {
     const { encoding } = options;
     assertEncoding(encoding);
 
-    var callback = dezalgo(maybeCallback(arguments));
-    readFileFromSnapshot(f, (error, buffer) => {
+    const callback = dezalgo(maybeCallback(arguments));
+    readFileFromSnapshot(path_, (error, buffer) => {
       if (error) return callback(error);
       if (encoding) buffer = buffer.toString(encoding);
       callback(null, buffer);
@@ -932,10 +881,9 @@ function payloadFileSync(pointer) {
   Dirent.prototype.isSymbolicLink = (fileOrFolderName) =>
     Boolean(SYMLINKS[fileOrFolderName]);
 
-  function getFileTypes(f, entries) {
+  function getFileTypes(path_, entries) {
     return entries.map((entry) => {
-      const ff = path.join(f, entry);
-      const entity = findVirtualFileSystemEntry(ff);
+      const entity = VIRTUAL_FILESYSTEM[path.join(path_, entry)];
       if (entity[STORE_BLOB] || entity[STORE_CONTENT])
         return new Dirent(entry, 1);
       if (entity[STORE_LINKS]) return new Dirent(entry, 2);
@@ -943,56 +891,69 @@ function payloadFileSync(pointer) {
     });
   }
 
-  function readdirRoot(file, cb) {
+  function readdirRoot(path_, cb) {
     if (cb) {
-      ancestor.readdir(file, (error, entries) => {
+      ancestor.readdir(path_, (error, entries) => {
         if (error) return cb(error);
         entries.push('snapshot');
         cb(null, entries);
       });
     } else {
-      const entries = ancestor.readdirSync(file);
+      const entries = ancestor.readdirSync(path_);
       entries.push('snapshot');
       return entries;
     }
   }
 
-  function readdirFromSnapshotSub(entityLinks, file, cb) {
+  function readdirFromSnapshotSub(entityLinks, path_, cb) {
     if (cb) {
       payloadFile(entityLinks, (error, buffer) => {
         if (error) return cb(error);
-        cb(null, JSON.parse(buffer).concat(readdirMountpoints(file)));
+        cb(null, JSON.parse(buffer).concat(readdirMountpoints(path_)));
       });
     } else {
       const buffer = payloadFileSync(entityLinks);
-      return JSON.parse(buffer).concat(readdirMountpoints(file));
+      return JSON.parse(buffer).concat(readdirMountpoints(path_));
     }
   }
 
-  function readdirFromSnapshot(folder, isRoot, cb) {
-    var cb2 = cb || rethrow;
-    if (isRoot) return readdirRoot(folder, cb);
+  function readdirFromSnapshot(path_, isRoot, cb) {
+    const cb2 = cb || rethrow;
+    if (isRoot) return readdirRoot(path_, cb);
 
-    const entity = findVirtualFileSystemEntry(folder);
+    const path_vfs = normalizePathAndFollowLink(path_);
 
-    if (!entity) return cb2(error_ENOENT('Directory', folder));
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) {
+      return cb2(error_ENOENT('Directory', path_vfs));
+    }
+
     const entityBlob = entity[STORE_BLOB];
-    if (entityBlob) return cb2(error_ENOTDIR(folder));
+    if (entityBlob) {
+      return cb2(error_ENOTDIR(path_vfs));
+    }
+
     const entityContent = entity[STORE_CONTENT];
-    if (entityContent) return cb2(error_ENOTDIR(folder));
+    if (entityContent) {
+      return cb2(error_ENOTDIR(path_vfs));
+    }
+
     const entityLinks = entity[STORE_LINKS];
-    if (entityLinks) return readdirFromSnapshotSub(entityLinks, folder, cb);
+    if (entityLinks) {
+      return readdirFromSnapshotSub(entityLinks, path_vfs, cb);
+    }
+
     return cb2(new Error('UNEXPECTED-25'));
   }
 
-  fs.readdirSync = function readdirSync(f, options_) {
-    const isRoot = isRootPath(f);
+  fs.readdirSync = function readdirSync(path_, options_) {
+    const isRoot = isRootPath(path_);
 
-    if (!insideSnapshot(f) && !isRoot) {
+    if (!insideSnapshot(path_) && !isRoot) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readdirOptions(options_, false);
@@ -1001,19 +962,19 @@ function payloadFileSync(pointer) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
-    let entries = readdirFromSnapshot(f, isRoot);
-    if (options.withFileTypes) entries = getFileTypes(f, entries);
+    let entries = readdirFromSnapshot(path_, isRoot);
+    if (options.withFileTypes) entries = getFileTypes(path_, entries);
     return entries;
   };
 
-  fs.readdir = function readdir(f, options_) {
-    const isRoot = isRootPath(f);
+  fs.readdir = function readdir(path_, options_) {
+    const isRoot = isRootPath(path_);
 
-    if (!insideSnapshot(f) && !isRoot) {
+    if (!insideSnapshot(path_) && !isRoot) {
       return ancestor.readdir.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.readdir.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.readdir.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readdirOptions(options_, true);
@@ -1023,9 +984,9 @@ function payloadFileSync(pointer) {
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(f, isRoot, (error, entries) => {
+    readdirFromSnapshot(path_, isRoot, (error, entries) => {
       if (error) return callback(error);
-      if (options.withFileTypes) entries = getFileTypes(f, entries);
+      if (options.withFileTypes) entries = getFileTypes(path_, entries);
       callback(null, entries);
     });
   };
@@ -1034,31 +995,31 @@ function payloadFileSync(pointer) {
   // realpath //////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  fs.realpathSync = function realpathSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.realpathSync = function realpathSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.realpathSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
+    if (insideMountpoint(path_)) {
       // app should not know real file name
-      return f;
     }
 
-    const realPath = realpathFromSnapshot(f);
-    return realPath;
+    return realpathFromSnapshot(path_);
   };
 
-  fs.realpath = function realpath(f) {
-    if (!insideSnapshot(f)) {
+  fs.realpath = function realpath(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.realpath.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
+    if (insideMountpoint(path_)) {
       // app should not know real file name
-      return f;
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    callback(null, realpathFromSnapshot(f));
+    callback(null, realpathFromSnapshot(path_));
   };
+
+  fs.realpathSync.native = fs.realpathSync;
+  fs.realpath.native = fs.realpath;
 
   // ///////////////////////////////////////////////////////////////
   // stat //////////////////////////////////////////////////////////
@@ -1113,10 +1074,10 @@ function payloadFileSync(pointer) {
     return s;
   }
 
-  function findNativeAddonForStat(f, cb) {
+  function findNativeAddonForStat(path_, cb) {
     const cb2 = cb || rethrow;
-    const foundPath = findNativeAddonSyncUnderRequire(f);
-    if (!foundPath) return cb2(error_ENOENT('File or directory', f));
+    const foundPath = findNativeAddonSyncUnderRequire(path_);
+    if (!foundPath) return cb2(error_ENOENT('File or directory', path_));
     if (cb) {
       ancestor.stat.call(fs, foundPath, cb);
     } else {
@@ -1136,63 +1097,64 @@ function payloadFileSync(pointer) {
     }
   }
 
-  function statFromSnapshot(filename, cb) {
+  function statFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
-    const entity = findVirtualFileSystemEntry(filename);
-    if (!entity) return findNativeAddonForStat(filename, cb);
+    const path_vfs = normalizePathAndFollowLink(path_);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) return findNativeAddonForStat(path_vfs, cb);
     const entityStat = entity[STORE_STAT];
     if (entityStat) return statFromSnapshotSub(entityStat, cb);
     return cb2(new Error('UNEXPECTED-35'));
   }
 
-  fs.statSync = function statSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.statSync = function statSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.statSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.statSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.statSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    return statFromSnapshot(f);
+    return statFromSnapshot(path_);
   };
 
-  fs.stat = function stat(f) {
-    if (!insideSnapshot(f)) {
+  fs.stat = function stat(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.stat.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.stat.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.stat.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    statFromSnapshot(f, callback);
+    statFromSnapshot(path_, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // lstat /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  fs.lstatSync = function lstatSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.lstatSync = function lstatSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.lstatSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.lstatSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.lstatSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    return statFromSnapshot(f);
+    return statFromSnapshot(path_);
   };
 
-  fs.lstat = function lstat(f) {
-    if (!insideSnapshot(f)) {
+  fs.lstat = function lstat(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.lstat.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.lstat.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.lstat.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    statFromSnapshot(f, callback);
+    statFromSnapshot(path_, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1228,74 +1190,75 @@ function payloadFileSync(pointer) {
   // exists ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function findNativeAddonForExists(f) {
-    const foundPath = findNativeAddonSyncFreeFromRequire(f);
+  function findNativeAddonForExists(path_) {
+    const foundPath = findNativeAddonSyncFreeFromRequire(path_);
     if (!foundPath) return false;
     return ancestor.existsSync.call(fs, foundPath);
   }
 
-  function existsFromSnapshot(f) {
-    const fShort = normalizePathAndFollowLink(f);
-    const entity = VIRTUAL_FILESYSTEM[fShort];
-    if (!entity) return findNativeAddonForExists(f);
+  function existsFromSnapshot(path_) {
+    const path_vfs = normalizePathAndFollowLink(path_);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) return findNativeAddonForExists(path_vfs);
     return true;
   }
 
-  fs.existsSync = function existsSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.existsSync = function existsSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.existsSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.existsSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.existsSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    return existsFromSnapshot(f);
+    return existsFromSnapshot(path_);
   };
 
-  fs.exists = function exists(f) {
-    if (!insideSnapshot(f)) {
+  fs.exists = function exists(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.exists.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.exists.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.exists.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    callback(existsFromSnapshot(f));
+    callback(existsFromSnapshot(path_));
   };
 
   // ///////////////////////////////////////////////////////////////
   // access ////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function accessFromSnapshot(filename, cb) {
+  function accessFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
-    const entity = findVirtualFileSystemEntry(filename);
-    if (!entity) return cb2(error_ENOENT('File or directory', filename));
+    const path_vfs = normalizePathAndFollowLink(path_);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) return cb2(error_ENOENT('File or directory', path_vfs));
     return cb2(null, undefined);
   }
 
-  fs.accessSync = function accessSync(f) {
-    if (!insideSnapshot(f)) {
+  fs.accessSync = function accessSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.accessSync.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.accessSync.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.accessSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    return accessFromSnapshot(f);
+    return accessFromSnapshot(path_);
   };
 
-  fs.access = function access(f) {
-    if (!insideSnapshot(f)) {
+  fs.access = function access(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.access.apply(fs, arguments);
     }
-    if (insideMountpoint(f)) {
-      return ancestor.access.apply(fs, translateNth(arguments, 0, f));
+    if (insideMountpoint(path_)) {
+      return ancestor.access.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const callback = dezalgo(maybeCallback(arguments));
-    accessFromSnapshot(f, callback);
+    accessFromSnapshot(path_, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1303,36 +1266,32 @@ function payloadFileSync(pointer) {
   // ///////////////////////////////////////////////////////////////
 
   function mkdirFailInSnapshot(path_, cb) {
-    var cb2 = cb || rethrow;
+    const cb2 = cb || rethrow;
     return cb2(
       new Error('Cannot mkdir in a snapshot. Try mountpoints instead.')
     );
   }
 
-  fs.mkdirSync = function mkdirSync(folderName) {
-    if (!insideSnapshot(folderName)) {
+  fs.mkdirSync = function mkdirSync(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.mkdirSync.apply(fs, arguments);
     }
-    if (insideMountpoint(folderName)) {
-      return ancestor.mkdirSync.apply(
-        fs,
-        translateNth(arguments, 0, folderName)
-      );
+    if (insideMountpoint(path_)) {
+      return ancestor.mkdirSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    return mkdirFailInSnapshot(folderName);
+    return mkdirFailInSnapshot(path_);
   };
 
-  fs.mkdir = function mkdir(folderName) {
-    if (!insideSnapshot(folderName)) {
+  fs.mkdir = function mkdir(path_) {
+    if (!insideSnapshot(path_)) {
       return ancestor.mkdir.apply(fs, arguments);
     }
-    if (insideMountpoint(folderName)) {
-      return ancestor.mkdir.apply(fs, translateNth(arguments, 0, folderName));
+    if (insideMountpoint(path_)) {
+      return ancestor.mkdir.apply(fs, translateNth(arguments, 0, path_));
     }
 
-    var callback = dezalgo(maybeCallback(arguments));
-    mkdirFailInSnapshot(folderName, callback);
+    mkdirFailInSnapshot(path_, dezalgo(maybeCallback(arguments)));
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -1340,17 +1299,16 @@ function payloadFileSync(pointer) {
   // ///////////////////////////////////////////////////////////////
 
   if (fs.promises !== undefined) {
-    var util = require('util');
-    fs.promises.open = util.promisify(fs.open);
-    fs.promises.read = util.promisify(fs.read);
-    fs.promises.write = util.promisify(fs.write);
-    fs.promises.readFile = util.promisify(fs.readFile);
-    fs.promises.readdir = util.promisify(fs.readdir);
-    fs.promises.realpath = util.promisify(fs.realpath);
-    fs.promises.stat = util.promisify(fs.stat);
-    fs.promises.lstat = util.promisify(fs.lstat);
-    fs.promises.fstat = util.promisify(fs.fstat);
-    fs.promises.access = util.promisify(fs.access);
+    fs.promises.open = promisify(fs.open);
+    fs.promises.read = promisify(fs.read);
+    fs.promises.write = promisify(fs.write);
+    fs.promises.readFile = promisify(fs.readFile);
+    fs.promises.readdir = promisify(fs.readdir);
+    fs.promises.realpath = promisify(fs.realpath);
+    fs.promises.stat = promisify(fs.stat);
+    fs.promises.lstat = promisify(fs.lstat);
+    fs.promises.fstat = promisify(fs.fstat);
+    fs.promises.access = promisify(fs.access);
   }
 
   // ///////////////////////////////////////////////////////////////
@@ -1366,8 +1324,8 @@ function payloadFileSync(pointer) {
     return f;
   }
 
-  function findNativeAddonForInternalModuleStat(f) {
-    const fNative = findNativeAddonSyncUnderRequire(f);
+  function findNativeAddonForInternalModuleStat(path_) {
+    const fNative = findNativeAddonSyncUnderRequire(path_);
     if (!fNative) return -ENOENT;
     return process.binding('fs').internalModuleStat(makeLong(fNative));
   }
@@ -1378,24 +1336,40 @@ function payloadFileSync(pointer) {
     // a file, 1 when it's a directory or < 0 on error (usually -ENOENT).
     // The speedup comes from not creating thousands of Stat and Error objects.
 
-    const f = revertMakingLong(long);
+    const path_ = revertMakingLong(long);
 
-    if (!insideSnapshot(f)) {
+    if (!insideSnapshot(path_)) {
       return process.binding('fs').internalModuleStat(long);
     }
-    if (insideMountpoint(f)) {
-      return process.binding('fs').internalModuleStat(makeLong(translate(f)));
+
+    if (insideMountpoint(path_)) {
+      return process
+        .binding('fs')
+        .internalModuleStat(makeLong(translate(path_)));
     }
 
-    const entity = findVirtualFileSystemEntry(f);
+    const path_vfs = normalizePathAndFollowLink(path_);
 
-    if (!entity) return findNativeAddonForInternalModuleStat(f);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
+    if (!entity) {
+      return findNativeAddonForInternalModuleStat(path_vfs);
+    }
+
     const entityBlob = entity[STORE_BLOB];
-    if (entityBlob) return 0;
+    if (entityBlob) {
+      return 0;
+    }
+
     const entityContent = entity[STORE_CONTENT];
-    if (entityContent) return 0;
+    if (entityContent) {
+      return 0;
+    }
+
     const entityLinks = entity[STORE_LINKS];
-    if (entityLinks) return 1;
+    if (entityLinks) {
+      return 1;
+    }
+
     return -ENOENT;
   };
 
@@ -1412,20 +1386,19 @@ function payloadFileSync(pointer) {
       (NODE_VERSION_MAJOR === 14 && NODE_VERSION_MINOR >= 5) ||
       NODE_VERSION_MAJOR >= 15;
 
-    const f = revertMakingLong(long);
+    const path_ = revertMakingLong(long);
     const bindingFs = process.binding('fs');
     const readFile = (
       bindingFs.internalModuleReadFile || bindingFs.internalModuleReadJSON
     ).bind(bindingFs);
-    if (!insideSnapshot(f)) {
+    if (!insideSnapshot(path_)) {
       return readFile(long);
     }
-    if (insideMountpoint(f)) {
-      return readFile(makeLong(translate(f)));
+    if (insideMountpoint(path_)) {
+      return readFile(makeLong(translate(path_)));
     }
 
-    const entity = findVirtualFileSystemEntry(f);
-
+    const entity = VIRTUAL_FILESYSTEM[normalizePathAndFollowLink(path_)];
     if (!entity) {
       return returnArray ? [undefined, false] : undefined;
     }
@@ -1434,6 +1407,7 @@ function payloadFileSync(pointer) {
     if (!entityContent) {
       return returnArray ? [undefined, false] : undefined;
     }
+
     return returnArray
       ? [payloadFileSync(entityContent).toString(), true]
       : payloadFileSync(entityContent).toString();
@@ -1447,21 +1421,21 @@ function payloadFileSync(pointer) {
 // /////////////////////////////////////////////////////////////////
 
 (() => {
-  const Module = require('module');
-  const ancestor = {};
-  ancestor.require = Module.prototype.require;
-  ancestor._compile = Module.prototype._compile;
-  ancestor._resolveFilename = Module._resolveFilename;
-  ancestor.runMain = Module.runMain;
+  const ancestor = {
+    require: Module.prototype.require,
+    _compile: Module.prototype._compile,
+    _resolveFilename: Module._resolveFilename,
+    runMain: Module.runMain,
+  };
 
-  Module.prototype.require = function require(f) {
+  Module.prototype.require = function require(path_) {
     try {
       return ancestor.require.apply(this, arguments);
     } catch (error) {
       if (
         (error.code === 'ENOENT' || error.code === 'MODULE_NOT_FOUND') &&
-        !insideSnapshot(f) &&
-        !path.isAbsolute(f)
+        !insideSnapshot(path_) &&
+        !path.isAbsolute(path_)
       ) {
         if (!error.pkg) {
           error.pkg = true;
@@ -1484,26 +1458,9 @@ function payloadFileSync(pointer) {
   let im;
   let makeRequireFunction;
 
-  if (NODE_VERSION_MAJOR === 0) {
-    makeRequireFunction = (self) => {
-      function rqfn(f) {
-        return self.require(f);
-      }
-      rqfn.resolve = function resolve(request) {
-        return Module._resolveFilename(request, self);
-      };
-      rqfn.main = process.mainModule;
-      rqfn.extensions = Module._extensions;
-      rqfn.cache = Module._cache;
-      return rqfn;
-    };
-  } else if (NODE_VERSION_MAJOR <= 9) {
+  if (NODE_VERSION_MAJOR <= 9) {
     im = require('internal/module');
-    if (NODE_VERSION_MAJOR <= 7) {
-      makeRequireFunction = (m) => im.makeRequireFunction.call(m);
-    } else {
-      makeRequireFunction = im.makeRequireFunction;
-    }
+    makeRequireFunction = im.makeRequireFunction;
   } else {
     im = require('internal/modules/cjs/helpers');
     makeRequireFunction = im.makeRequireFunction;
@@ -1519,7 +1476,8 @@ function payloadFileSync(pointer) {
       return ancestor._compile.apply(this, arguments);
     }
 
-    const entity = findVirtualFileSystemEntry(filename_);
+    const path_vfs = normalizePathAndFollowLink(filename_);
+    const entity = VIRTUAL_FILESYSTEM[path_vfs];
 
     if (!entity) {
       // let user try to "_compile" a packaged file
@@ -1531,24 +1489,23 @@ function payloadFileSync(pointer) {
 
     if (entityBlob) {
       const options = {
-        filename: filename_,
+        filename: path_vfs,
         lineOffset: 0,
         displayErrors: true,
         cachedData: payloadFileSync(entityBlob),
         sourceless: !entityContent,
       };
 
-      const { Script } = require('vm');
       const code = entityContent
-        ? require('module').wrap(payloadFileSync(entityContent))
+        ? Module.wrap(payloadFileSync(entityContent))
         : undefined;
 
       const script = new Script(code, options);
       const wrapper = script.runInThisContext(options);
       if (!wrapper) process.exit(4); // for example VERSION_MISMATCH
-      const dirname = path.dirname(filename_);
+      const dirname = path.dirname(path_vfs);
       const rqfn = makeRequireFunction(this);
-      const args = [this.exports, rqfn, this, filename_, dirname];
+      const args = [this.exports, rqfn, this, path_vfs, dirname];
       return wrapper.apply(this.exports, args);
     }
 
@@ -1565,6 +1522,7 @@ function payloadFileSync(pointer) {
   Module._resolveFilename = function _resolveFilename() {
     let filename;
     let flagWasOn = false;
+
     try {
       filename = ancestor._resolveFilename.apply(this, arguments);
     } catch (error) {
@@ -1581,6 +1539,7 @@ function payloadFileSync(pointer) {
         FLAG_ENABLE_PROJECT = false;
       }
     }
+
     if (!insideSnapshot(filename)) {
       return filename;
     }
@@ -1611,35 +1570,35 @@ function payloadFileSync(pointer) {
 // PATCH CHILD_PROCESS /////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 (() => {
-  var childProcess = require('child_process');
-  var ancestor = {};
-  ancestor.spawn = childProcess.spawn;
-  ancestor.spawnSync = childProcess.spawnSync;
-  ancestor.execFile = childProcess.execFile;
-  ancestor.execFileSync = childProcess.execFileSync;
-  ancestor.exec = childProcess.exec;
-  ancestor.execSync = childProcess.execSync;
+  const ancestor = {
+    spawn: childProcess.spawn,
+    spawnSync: childProcess.spawnSync,
+    execFile: childProcess.execFile,
+    execFileSync: childProcess.execFileSync,
+    exec: childProcess.exec,
+    execSync: childProcess.execSync,
+  };
 
   function setOptsEnv(args) {
-    var pos = args.length - 1;
+    let pos = args.length - 1;
     if (typeof args[pos] === 'function') pos -= 1;
     if (typeof args[pos] !== 'object' || Array.isArray(args[pos])) {
       pos += 1;
       args.splice(pos, 0, {});
     }
     const opts = args[pos];
-    if (!opts.env) opts.env = require('util')._extend({}, process.env);
+    if (!opts.env) opts.env = _extend({}, process.env);
     if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
 
   function startsWith2(args, index, name, impostor) {
-    var qsName = `"${name} `;
+    const qsName = `"${name} `;
     if (args[index].slice(0, qsName.length) === qsName) {
       args[index] = `"${impostor} ${args[index].slice(qsName.length)}`;
       return true;
     }
-    var sName = `${name} `;
+    const sName = `${name} `;
     if (args[index].slice(0, sName.length) === sName) {
       args[index] = `${impostor} ${args[index].slice(sName.length)}`;
       return true;
@@ -1652,10 +1611,10 @@ function payloadFileSync(pointer) {
   }
 
   function startsWith(args, index, name) {
-    var qName = `"${name}"`;
-    var qEXECPATH = `"${EXECPATH}"`;
-    var jsName = JSON.stringify(name);
-    var jsEXECPATH = JSON.stringify(EXECPATH);
+    const qName = `"${name}"`;
+    const qEXECPATH = `"${EXECPATH}"`;
+    const jsName = JSON.stringify(name);
+    const jsEXECPATH = JSON.stringify(EXECPATH);
     return (
       startsWith2(args, index, name, EXECPATH) ||
       startsWith2(args, index, qName, qEXECPATH) ||
@@ -1685,9 +1644,6 @@ function payloadFileSync(pointer) {
       args[0] === EXECPATH
     ) {
       args[0] = EXECPATH;
-      if (NODE_VERSION_MAJOR === 0) {
-        args[1] = args[1].filter((a) => a.slice(0, 13) !== '--debug-port=');
-      }
     } else {
       for (let i = 1; i < args[1].length; i += 1) {
         const mbc = args[1][i - 1];
@@ -1699,42 +1655,42 @@ function payloadFileSync(pointer) {
   }
 
   childProcess.spawn = function spawn() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawn.apply(childProcess, args);
   };
 
   childProcess.spawnSync = function spawnSync() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.spawnSync.apply(childProcess, args);
   };
 
   childProcess.execFile = function execFile() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFile.apply(childProcess, args);
   };
 
   childProcess.execFileSync = function execFileSync() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyShort(args);
     return ancestor.execFileSync.apply(childProcess, args);
   };
 
   childProcess.exec = function exec() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.exec.apply(childProcess, args);
   };
 
   childProcess.execSync = function execSync() {
-    var args = cloneArgs(arguments);
+    const args = cloneArgs(arguments);
     setOptsEnv(args);
     modifyLong(args, 0);
     return ancestor.execSync.apply(childProcess, args);
@@ -1745,78 +1701,75 @@ function payloadFileSync(pointer) {
 // PROMISIFY ///////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 (() => {
-  var util = require('util');
-  var { promisify } = util;
-  if (promisify) {
-    var { custom } = promisify;
-    var { customPromisifyArgs } = require('internal/util');
+  const { custom } = promisify;
+  const { customPromisifyArgs } = require('internal/util');
 
-    // /////////////////////////////////////////////////////////////
-    // FS //////////////////////////////////////////////////////////
-    // /////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////
+  // FS //////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////
 
-    Object.defineProperty(require('fs').exists, custom, {
-      value(f) {
-        return new Promise((resolve) => {
-          require('fs').exists(f, (exists) => {
-            resolve(exists);
-          });
+  Object.defineProperty(fs.exists, custom, {
+    value(path_) {
+      return new Promise((resolve) => {
+        fs.exists(path_, (exists) => {
+          resolve(exists);
         });
-      },
-    });
-
-    Object.defineProperty(require('fs').read, customPromisifyArgs, {
-      value: ['bytesRead', 'buffer'],
-    });
-
-    Object.defineProperty(require('fs').write, customPromisifyArgs, {
-      value: ['bytesWritten', 'buffer'],
-    });
-
-    // /////////////////////////////////////////////////////////////
-    // CHILD_PROCESS ///////////////////////////////////////////////
-    // /////////////////////////////////////////////////////////////
-
-    var customPromiseExecFunction = (o) => (...args) => {
-      let resolve;
-      let reject;
-      const p = new Promise((res, rej) => {
-        resolve = res;
-        reject = rej;
       });
+    },
+  });
 
-      p.child = o.apply(
-        undefined,
-        args.concat((error, stdout, stderr) => {
-          if (error !== null) {
-            error.stdout = stdout;
-            error.stderr = stderr;
-            reject(error);
-          } else {
-            resolve({ stdout, stderr });
-          }
-        })
-      );
+  Object.defineProperty(fs.read, customPromisifyArgs, {
+    value: ['bytesRead', 'buffer'],
+  });
 
-      return p;
-    };
+  Object.defineProperty(fs.write, customPromisifyArgs, {
+    value: ['bytesWritten', 'buffer'],
+  });
 
-    Object.defineProperty(require('child_process').exec, custom, {
-      value: customPromiseExecFunction(require('child_process').exec),
+  // /////////////////////////////////////////////////////////////
+  // CHILD_PROCESS ///////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////
+
+  const customPromiseExecFunction = (o) => (...args) => {
+    let resolve;
+    let reject;
+    const p = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
     });
 
-    Object.defineProperty(require('child_process').execFile, custom, {
-      value: customPromiseExecFunction(require('child_process').execFile),
-    });
-  }
+    p.child = o.apply(
+      undefined,
+      args.concat((error, stdout, stderr) => {
+        if (error !== null) {
+          error.stdout = stdout;
+          error.stderr = stderr;
+          reject(error);
+        } else {
+          resolve({ stdout, stderr });
+        }
+      })
+    );
+
+    return p;
+  };
+
+  Object.defineProperty(childProcess.exec, custom, {
+    value: customPromiseExecFunction(childProcess.exec),
+  });
+
+  Object.defineProperty(childProcess.execFile, custom, {
+    value: customPromiseExecFunction(childProcess.execFile),
+  });
 })();
 
 // /////////////////////////////////////////////////////////////////
 // PATCH PROCESS ///////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
 (() => {
-  var ancestor = {};
-  ancestor.dlopen = process.dlopen;
+  const ancestor = {
+    dlopen: process.dlopen,
+  };
 
   function revertMakingLong(f) {
     if (/^\\\\\?\\/.test(f)) return f.slice(4);
@@ -1892,12 +1845,9 @@ function payloadFileSync(pointer) {
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
-      const hash = require('crypto')
-        .createHash('sha256')
-        .update(moduleContent)
-        .digest('hex');
+      const hash = createHash('sha256').update(moduleContent).digest('hex');
 
-      const tmpFolder = path.join(require('os').tmpdir(), hash);
+      const tmpFolder = path.join(tmpdir(), hash);
       if (!fs.existsSync(tmpFolder)) {
         fs.mkdirSync(tmpFolder);
       }
