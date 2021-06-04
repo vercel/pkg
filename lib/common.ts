@@ -46,8 +46,22 @@ function removeTrailingSlashes(f: string) {
 
 const isUrl = (p: unknown): p is URL => hasURL && p instanceof URL;
 
+function pathToString(p: string | URL | Buffer, win: boolean): string {
+  let result: string;
+
+  if (Buffer.isBuffer(p)) {
+    result = p.toString();
+  } else if (isUrl(p)) {
+    result = win ? p.pathname.replace(/^\//, '') : p.pathname;
+  } else {
+    result = p;
+  }
+
+  return result;
+}
+
 export function isRootPath(p: string | URL | Buffer) {
-  let file = Buffer.isBuffer(p) ? p.toString() : isUrl(p) ? p.pathname : p;
+  let file = pathToString(p, false);
 
   if (file === '.') {
     file = path.resolve(file);
@@ -57,27 +71,15 @@ export function isRootPath(p: string | URL | Buffer) {
 }
 
 export function normalizePath(f: string | URL | Buffer) {
-  if (win32) {
-    let file = Buffer.isBuffer(f)
-      ? f.toString()
-      : isUrl(f)
-      ? f.pathname.replace(/^\//, '')
-      : f;
-
-    if (!/^.:$/.test(file)) {
-      file = path.normalize(file);
-    } // 'c:' -> 'c:.'
-
-    file = uppercaseDriveLetter(file);
-
-    return removeTrailingSlashes(file);
-  }
-
-  let file = Buffer.isBuffer(f) ? f.toString() : isUrl(f) ? f.pathname : f;
+  let file = pathToString(f, win32);
 
   if (!/^.:$/.test(file)) {
     file = path.normalize(file);
   } // 'c:' -> 'c:.'
+
+  if (win32) {
+    file = uppercaseDriveLetter(file);
+  }
 
   return removeTrailingSlashes(file);
 }
@@ -179,19 +181,13 @@ export function snapshotify(file: string, slash: string) {
 }
 
 export function insideSnapshot(f: Buffer | string | URL) {
+  f = pathToString(f, win32);
+
+  if (typeof f !== 'string') {
+    return false;
+  }
+
   if (win32) {
-    if (Buffer.isBuffer(f)) {
-      f = f.toString();
-    }
-
-    if (hasURL && f instanceof URL) {
-      f = f.pathname.replace(/^\//, '');
-    }
-    
-    if (typeof f !== 'string') {
-      return false;
-    }
-
     const slice112 = f.slice(1, 12);
 
     return (
@@ -202,18 +198,6 @@ export function insideSnapshot(f: Buffer | string | URL) {
       slice112 === ':\\snapshot' ||
       slice112 === ':/snapshot'
     );
-  }
-
-  if (Buffer.isBuffer(f)) {
-    f = f.toString();
-  }
-
-  if (hasURL && f instanceof URL) {
-    f = f.pathname;
-  }
-
-  if (typeof f !== 'string') {
-    return false;
   }
 
   const slice010 = f.slice(0, 10);

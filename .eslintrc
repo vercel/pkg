@@ -3,7 +3,6 @@
   "rules": {
     "no-bitwise": "off",
     "no-continue": "off",
-    "no-nested-ternary": "off",
     "no-await-in-loop": "off",
     "no-constant-condition": "off",
     "no-param-reassign": "off",
@@ -32,7 +31,6 @@
         "no-bitwise": "off",
         "no-constant-condition": "off",
         "no-continue": "off",
-        "no-nested-ternary": "off",
         "no-param-reassign": "off",
         "no-restricted-syntax": "off"
       }
