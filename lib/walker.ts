@@ -236,7 +236,7 @@ function stepDetect(
   try {
     detector.detect(body, (node, trying) => {
       const { toplevel } = marker;
-      let d = (detector.visitor_SUCCESSFUL(node) as unknown) as Derivative;
+      let d = (detector.visitorSuccessful(node) as unknown) as Derivative;
 
       if (d) {
         if (d.mustExclude) {
@@ -249,7 +249,7 @@ function stepDetect(
         return false;
       }
 
-      d = (detector.visitor_NONLITERAL(node) as unknown) as Derivative;
+      d = (detector.visitorNonLiteral(node) as unknown) as Derivative;
 
       if (d) {
         if (typeof d === 'object' && d.mustExclude) {
@@ -268,7 +268,7 @@ function stepDetect(
         return false;
       }
 
-      d = (detector.visitor_MALFORMED(node) as unknown) as Derivative;
+      d = (detector.visitorMalformed(node) as unknown) as Derivative;
 
       if (d) {
         // there is no 'mustExclude'
@@ -278,7 +278,7 @@ function stepDetect(
         return false;
       }
 
-      d = (detector.visitor_USESCWD(node) as unknown) as Derivative;
+      d = (detector.visitorUseSCWD(node) as unknown) as Derivative;
 
       if (d) {
         // there is no 'mustExclude'

@@ -6,7 +6,7 @@ const body = fs.readFileSync('./test-y-data.txt', 'utf8');
 
 detector.detect(body, function (node, trying) {
   let p;
-  p = detector.visitor_SUCCESSFUL(node, true);
+  p = detector.visitorSuccessful(node, true);
   if (p) {
     if (trying) {
       console.log('try { ' + p + '; } catch (_) {}');

@@ -13,20 +13,20 @@ function patchCommand(type: number, buf: Buffer, file: Buffer) {
 
     if (name === '__LINKEDIT') {
       const fileoff = buf.readBigUInt64LE(32);
-      const vmsize_patched = BigInt(file.length) - fileoff;
-      const filesize_patched = vmsize_patched;
+      const vmsizePatched = BigInt(file.length) - fileoff;
+      const filesizePatched = vmsizePatched;
 
-      buf.writeBigUInt64LE(vmsize_patched, 24);
-      buf.writeBigUInt64LE(filesize_patched, 40);
+      buf.writeBigUInt64LE(vmsizePatched, 24);
+      buf.writeBigUInt64LE(filesizePatched, 40);
     }
   }
 
   // symtab
   if (type === 0x2) {
     const stroff = buf.readUInt32LE(8);
-    const strsize_patched = file.length - stroff;
+    const strsizePatched = file.length - stroff;
 
-    buf.writeUInt32LE(strsize_patched, 12);
+    buf.writeUInt32LE(strsizePatched, 12);
   }
 }
 
