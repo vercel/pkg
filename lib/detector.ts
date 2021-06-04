@@ -116,7 +116,7 @@ function valid2(v2?: Was['v2']) {
   );
 }
 
-function visitor_REQUIRE_RESOLVE(n: babelTypes.Node) {
+function visitorRequireResolve(n: babelTypes.Node) {
   if (!babelTypes.isCallExpression(n)) {
     return null;
   }
@@ -145,7 +145,7 @@ function visitor_REQUIRE_RESOLVE(n: babelTypes.Node) {
   };
 }
 
-function visitor_REQUIRE(n: babelTypes.Node) {
+function visitorRequire(n: babelTypes.Node) {
   if (!babelTypes.isCallExpression(n)) {
     return null;
   }
@@ -168,7 +168,7 @@ function visitor_REQUIRE(n: babelTypes.Node) {
   };
 }
 
-function visitor_IMPORT(n: babelTypes.Node) {
+function visitorImport(n: babelTypes.Node) {
   if (!babelTypes.isImportDeclaration(n)) {
     return null;
   }
@@ -176,7 +176,7 @@ function visitor_IMPORT(n: babelTypes.Node) {
   return { v1: n.source.value, v3: reconstructSpecifiers(n.specifiers) };
 }
 
-function visitor_PATH_JOIN(n: babelTypes.Node) {
+function visitorPathJoin(n: babelTypes.Node) {
   if (!babelTypes.isCallExpression(n)) {
     return null;
   }
@@ -216,8 +216,8 @@ function visitor_PATH_JOIN(n: babelTypes.Node) {
   return { v1: getLiteralValue(n.arguments[1] as babelTypes.StringLiteral) };
 }
 
-export function visitor_SUCCESSFUL(node: babelTypes.Node, test = false) {
-  let was: Was | null = visitor_REQUIRE_RESOLVE(node);
+export function visitorSuccessful(node: babelTypes.Node, test = false) {
+  let was: Was | null = visitorRequireResolve(node);
 
   if (was) {
     if (test) {
@@ -236,7 +236,7 @@ export function visitor_SUCCESSFUL(node: babelTypes.Node, test = false) {
     };
   }
 
-  was = visitor_REQUIRE(node);
+  was = visitorRequire(node);
 
   if (was) {
     if (test) {
@@ -255,7 +255,7 @@ export function visitor_SUCCESSFUL(node: babelTypes.Node, test = false) {
     };
   }
 
-  was = visitor_IMPORT(node);
+  was = visitorImport(node);
 
   if (was) {
     if (test) {
@@ -265,7 +265,7 @@ export function visitor_SUCCESSFUL(node: babelTypes.Node, test = false) {
     return { alias: was.v1, aliasType: ALIAS_AS_RESOLVABLE };
   }
 
-  was = visitor_PATH_JOIN(node);
+  was = visitorPathJoin(node);
 
   if (was) {
     if (test) {
@@ -350,7 +350,7 @@ function nonLiteralRequire(n: babelTypes.Node) {
   };
 }
 
-export function visitor_NONLITERAL(n: babelTypes.Node) {
+export function visitorNonLiteral(n: babelTypes.Node) {
   const was = nonLiteralRequireResolve(n) || nonLiteralRequire(n);
 
   if (was) {
@@ -418,7 +418,7 @@ function isRequireResolve(n: babelTypes.Node) {
   return { v1: reconstruct(n.arguments[0]) };
 }
 
-export function visitor_MALFORMED(n: babelTypes.Node) {
+export function visitorMalformed(n: babelTypes.Node) {
   const was = isRequireResolve(n) || isRequire(n);
 
   if (was) {
@@ -428,7 +428,7 @@ export function visitor_MALFORMED(n: babelTypes.Node) {
   return null;
 }
 
-export function visitor_USESCWD(n: babelTypes.Node) {
+export function visitorUseSCWD(n: babelTypes.Node) {
   // eslint-disable-line camelcase
   if (!babelTypes.isCallExpression(n)) {
     return null;
