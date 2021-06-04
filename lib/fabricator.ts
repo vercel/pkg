@@ -83,7 +83,7 @@ export function fabricate(
   let stdout = Buffer.alloc(0);
 
   function onError(error: Error) {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     removeListeners();
     kill();
     cb(
@@ -94,7 +94,7 @@ export function fabricate(
   }
 
   function onClose(code: number) {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     removeListeners();
     kill();
     if (code !== 0) {
@@ -117,7 +117,7 @@ export function fabricate(
       if (stdout.length >= 4 + sizeOfBlob) {
         const blob = Buffer.alloc(sizeOfBlob);
         stdout.copy(blob, 0, 4, 4 + sizeOfBlob);
-        // eslint-disable-next-line no-use-before-define
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         removeListeners();
         return cb(undefined, blob);
       }

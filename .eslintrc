@@ -15,25 +15,26 @@
   "overrides": [
     {
       "files": ["*.ts"],
-      "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+      "extends": [
+        "airbnb-typescript/base",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+      ],
       "parser": "@typescript-eslint/parser",
-      "settings": {
-        "import/resolver": {
-          "typescript": {}
-        }
+      "parserOptions": {
+        "project": "./tsconfig.json"
       },
       "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "import/extensions": [
-          "error",
-          "ignorePackages",
-          {
-            "js": "never",
-            "jsx": "never",
-            "ts": "never",
-            "tsx": "never"
-          }
-        ]
+        "consistent-return": "off",
+        "import/prefer-default-export": "off",
+        "no-await-in-loop": "off",
+        "no-bitwise": "off",
+        "no-constant-condition": "off",
+        "no-continue": "off",
+        "no-nested-ternary": "off",
+        "no-param-reassign": "off",
+        "no-restricted-syntax": "off"
       }
     },
     {
