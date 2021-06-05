@@ -200,13 +200,15 @@ function replace(k) {
   return v;
 }
 
-function makeKey(filename, slash) {
+function findVirtualFileSystemKey(path_, slash) {
+  const normalizedPath = normalizePath(path_);
   if (!DOCOMPRESS) {
-    return filename;
+    return normalizedPath;
   }
-  const a = filename.split(slash).map(replace).join(separator);
-  return a || filename;
+  const a = normalizedPath.split(slash).map(replace).join(separator);
+  return a || normalizedPath;
 }
+
 Object.entries(DICT).forEach(([k, v]) => {
   dictRev[v] = k;
 });
@@ -226,30 +228,30 @@ const symlinksEntries = Object.entries(SYMLINKS);
 // separator for substitution depends on platform;
 const sepsep = DOCOMPRESS ? separator : path.sep;
 
-function normalizePathAndFollowLink(f) {
-  f = normalizePath(f);
-  f = makeKey(f, path.sep);
+function findVirtualFileSystemKeyAndFollowLinks(path_) {
+  let vfsKey = findVirtualFileSystemKey(path_, path.sep);
   let needToSubstitute = true;
   while (needToSubstitute) {
     needToSubstitute = false;
     for (const [k, v] of symlinksEntries) {
-      if (f.startsWith(`${k}${sepsep}`) || f === k) {
-        f = f.replace(k, v);
+      if (vfsKey.startsWith(`${k}${sepsep}`) || vfsKey === k) {
+        vfsKey = vfsKey.replace(k, v);
         needToSubstitute = true;
         break;
       }
     }
   }
-  return f;
+  return vfsKey;
 }
+
 function realpathFromSnapshot(path_) {
-  const realPath = toOriginal(normalizePathAndFollowLink(path_));
+  const realPath = toOriginal(findVirtualFileSystemKeyAndFollowLinks(path_));
   return realPath;
 }
 
 function findVirtualFileSystemEntry(path_) {
-  const fShort = normalizePathAndFollowLink(path_);
-  return VIRTUAL_FILESYSTEM[fShort];
+  const vfsKey = findVirtualFileSystemKeyAndFollowLinks(path_);
+  return VIRTUAL_FILESYSTEM[vfsKey];
 }
 
 // /////////////////////////////////////////////////////////////////
