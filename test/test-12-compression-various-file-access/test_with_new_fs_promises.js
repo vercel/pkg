@@ -11,7 +11,6 @@ if (MAJOR_VERSION >= 14) {
 } else {
   fs_promises = require('fs').promises;
 }
-fs_promises = require('fs').promises;
 
 // note: this file will be packed in the virtual file system by PKG
 const file = path.join(__dirname, 'myfile.txt');
@@ -26,12 +25,12 @@ async function withPromises() {
 
     if (MAJOR_VERSION >= 14) {
       // eslint-disable-line no-unused-vars
-      const { bytesRead } = await fd.read(buffer, 0, buffer.length, 0);
+      const { bytesRead } = await fd.read(buffer, 0, buffer.length, 10);
       if (process.env.DEBUG) {
         console.log('bytesRead = ', bytesRead);
       }
     } else {
-      await fd.read(buffer, 0, buffer.length, 0);
+      await fd.read(buffer, 0, buffer.length, 10);
     }
     console.log(buffer.toString());
   } catch (err) {

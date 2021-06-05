@@ -15,36 +15,31 @@ const ext = process.platform === 'win32' ? '.exe' : '';
 const output = 'output' + ext;
 
 async function runTest(input) {
+  const output_none = output + '_' + path.parse(input).name;
+  const output_gzip = 'gzip_' + output_none;
+
   const logPkgNone = utils.pkg.sync(
-    ['--target', target, '--compress', 'None', '--output', output, input],
+    ['--target', target, '--compress', 'None', '--output', output_none, input],
     { expect: 0 }
   );
   const logPkgGZip = utils.pkg.sync(
-    [
-      '--target',
-      target,
-      '--compress',
-      'GZIP',
-      '--output',
-      'gzip_' + output,
-      input,
-    ],
+    ['--target', target, '--compress', 'GZIP', '--output', output_gzip, input],
     { expect: 0 }
   );
 
   // -----------------------------------------------------------------------
-  // Execute programm outside pjg
+  // Execute program outside pjg
   const logRef = utils.spawn.sync('node', [path.join(__dirname, input)], {
     cwd: __dirname,
     expect: 0,
   });
 
-  const logNone = utils.spawn.sync(path.join(__dirname, output), [], {
+  const logNone = utils.spawn.sync(path.join(__dirname, output_none), [], {
     cwd: __dirname,
     expect: 0,
   });
 
-  const logGZip = utils.spawn.sync(path.join(__dirname, 'gzip_' + output), [], {
+  const logGZip = utils.spawn.sync(path.join(__dirname, output_gzip), [], {
     cwd: __dirname,
     expect: 0,
   });

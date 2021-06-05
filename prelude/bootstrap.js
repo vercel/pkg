@@ -26,12 +26,9 @@ const { promisify, _extend } = require('util');
 const { Script } = require('vm');
 const { tmpdir } = require('os');
 const util = require('util');
-
 const {
   brotliDecompress,
   brotliDecompressSync,
-  createBrotliDecompress,
-  createGunzip,
   gunzip,
   gunzipSync,
 } = require('zlib');
@@ -189,10 +186,8 @@ console.log(translateNth(["", "a+"], 0, "d:\\snapshot\\countly\\plugins-ext\\123
 */
 const dictRev = {};
 const separator = '/';
-let maxKey = Object.values(DICT).reduce((p, c) => {
-  const cc = parseInt(c, 36);
-  return cc > p ? cc : p;
-}, 0);
+let maxKey = Object.values(DICT).length;
+
 function replace(k) {
   let v = DICT[k];
   // we have found a part of a missing file => let record for latter use
@@ -346,7 +341,6 @@ function rethrow(error, arg) {
 // /////////////////////////////////////////////////////////////////
 // PAYLOAD /////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////
-
 if (typeof PAYLOAD_POSITION !== 'number' || typeof PAYLOAD_SIZE !== 'number') {
   throw new Error('MUST HAVE PAYLOAD');
 }
@@ -614,49 +608,73 @@ function payloadFileSync(pointer) {
     removeTemporaryFolderAndContent(tmpFolder);
   });
   function deflateSync(snapshotFilename) {
-    if (!tmpFolder) tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
+    if (!tmpFolder) {
+      tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
+    }
+
     const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
     // content is already unzipped !
+
     const hash = createHash('sha256').update(content).digest('hex');
     const fName = path.join(tmpFolder, hash);
     fs.writeFileSync(fName, content);
     return fName;
   }
-  function uncompressExternally(snapshotFilename) {
-    let t = temporaryFiles[snapshotFilename];
-    if (!t) {
-      const tmpFile = deflateSync(snapshotFilename);
-      t = { tmpFile };
-      temporaryFiles[snapshotFilename] = t;
+
+  // eslint-disable-next-line prefer-arrow-callback
+  const uncompressExternally = function uncompressExternally(dock) {
+    if (!dock.externalFilename) {
+      const snapshotFilename = dock.path;
+      let t = temporaryFiles[snapshotFilename];
+      if (!t) {
+        const tmpFile = deflateSync(snapshotFilename);
+        t = { tmpFile };
+        temporaryFiles[snapshotFilename] = t;
+      }
+      dock.externalFilename = t.tmpFile;
     }
-    return t.tmpFile;
+    return dock.externalFilename;
+  };
+
+  // eslint-disable-next-line prefer-arrow-callback
+  function uncompressExternallyPath(path_) {
+    const entity = findVirtualFileSystemEntry(path_);
+    const dock = { path: path_, entity, position: 0 };
+    return uncompressExternally(dock);
   }
-  function uncompressExternallyAndOpen(snapshotFilename) {
-    const externalFile = uncompressExternally(snapshotFilename);
+
+  function uncompressExternallyAndOpen(dock) {
+    const externalFile = uncompressExternally(dock);
     const fd = fs.openSync(externalFile, 'r');
     return fd;
   }
 
-  function openFromSnapshot(path_, cb) {
+  // eslint-disable-next-line prefer-arrow-callback
+  function openFromSnapshot(path_, uncompress, cb) {
     const cb2 = cb || rethrow;
     const entity = findVirtualFileSystemEntry(path_);
     if (!entity) return cb2(error_ENOENT('File or directory', path_));
     const dock = { path: path_, entity, position: 0 };
+
     const nullDevice = windows ? '\\\\.\\NUL' : '/dev/null';
     if (cb) {
       ancestor.open.call(fs, nullDevice, 'r', (error, fd) => {
         if (error) return cb(error);
+        if (uncompress) {
+          dock._externalFile = uncompressExternallyAndOpen(dock);
+        }
         docks[fd] = dock;
         cb(null, fd);
       });
     } else {
       const fd = ancestor.openSync.call(fs, nullDevice, 'r');
+      if (uncompress) {
+        dock._externalFile = uncompressExternallyAndOpen(dock);
+      }
       docks[fd] = dock;
       return fd;
     }
   }
-
-  let bypassCompressCheckWhenCallbyCreateReadStream = false;
 
   fs.createReadStream = function createReadStream(path_) {
     if (!insideSnapshot(path_)) {
@@ -668,16 +686,7 @@ function payloadFileSync(pointer) {
         translateNth(arguments, 0, path_)
       );
     }
-    bypassCompressCheckWhenCallbyCreateReadStream = true;
     const stream = ancestor.createReadStream.apply(fs, arguments);
-    bypassCompressCheckWhenCallbyCreateReadStream = false;
-
-    if (DOCOMPRESS === GZIP) {
-      return stream.pipe(createGunzip());
-    }
-    if (DOCOMPRESS === BROTLI) {
-      return stream.pipe(createBrotliDecompress());
-    }
     return stream;
   };
   fs.openSync = function openSync(path_) {
@@ -687,10 +696,7 @@ function payloadFileSync(pointer) {
     if (insideMountpoint(path_)) {
       return ancestor.openSync.apply(fs, translateNth(arguments, 0, path_));
     }
-    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
-      return uncompressExternallyAndOpen(path_);
-    }
-    return openFromSnapshot(path_);
+    return openFromSnapshot(path_, DOCOMPRESS);
   };
 
   fs.open = function open(path_) {
@@ -701,11 +707,7 @@ function payloadFileSync(pointer) {
       return ancestor.open.apply(fs, translateNth(arguments, 0, path_));
     }
     const callback = dezalgo(maybeCallback(arguments));
-    if (DOCOMPRESS && !bypassCompressCheckWhenCallbyCreateReadStream) {
-      const fd = uncompressExternallyAndOpen(path_);
-      return callback(null, fd);
-    }
-    openFromSnapshot(path_, callback);
+    openFromSnapshot(path_, DOCOMPRESS, callback);
   };
 
   // ///////////////////////////////////////////////////////////////
@@ -721,6 +723,18 @@ function payloadFileSync(pointer) {
     position,
     cb
   ) {
+    if (DOCOMPRESS) {
+      // note: source contains info about a compressed file and source[1] does not reflect
+      //       the actual size of the file.
+      //       so random access reading of a compressed virtual file, requires read from
+      //       an externally decompressed file
+      if (!dock._externalFile) {
+        dock._externalFile = uncompressExternallyAndOpen(dock);
+      } else {
+        position = position === undefined ? 0 : position;
+      }
+      return fs.read(dock._externalFile, buffer, offset, length, position, cb);
+    }
     let p;
     if (position !== null && position !== undefined) {
       p = position;
@@ -754,6 +768,27 @@ function payloadFileSync(pointer) {
   }
 
   function readFromSnapshot(fd, buffer, offset, length, position, cb) {
+    const dock = docks[fd];
+
+    if (dock && dock._externalFile) {
+      if (cb) {
+        return ancestor.read(
+          dock._externalFile,
+          buffer,
+          offset,
+          length,
+          position,
+          cb
+        );
+      }
+      return ancestor.readSync(
+        dock._externalFile,
+        buffer,
+        offset,
+        length,
+        position
+      );
+    }
     const cb2 = cb || rethrow;
     if (offset < 0 && NODE_VERSION_MAJOR >= 14)
       return cb2(
@@ -788,7 +823,6 @@ function payloadFileSync(pointer) {
     if (offset + length > buffer.length)
       return cb2(new Error('Length extends beyond buffer'));
 
-    const dock = docks[fd];
     const { entity } = dock;
     const entityLinks = entity[STORE_LINKS];
     if (entityLinks) return cb2(error_EISDIR(dock.path));
@@ -810,7 +844,6 @@ function payloadFileSync(pointer) {
     if (!docks[fd]) {
       return ancestor.readSync.apply(fs, arguments);
     }
-
     return readFromSnapshot(fd, buffer, offset, length, position);
   };
 
@@ -844,29 +877,32 @@ function payloadFileSync(pointer) {
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
-
     const callback = dezalgo(maybeCallback(arguments));
-    writeToSnapshot(callback);
+    return writeToSnapshot(callback);
   };
 
   // ///////////////////////////////////////////////////////////////
   // close /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function closeFromSnapshot(fd, cb) {
+  const closeFromSnapshot = (fd, cb) => {
+    const dock = docks[fd];
+    if (dock._externalFile) {
+      ancestor.closeSync(dock._externalFile);
+      dock._externalFile = undefined;
+    }
     delete docks[fd];
     if (cb) {
       ancestor.close.call(fs, fd, cb);
     } else {
       return ancestor.closeSync.call(fs, fd);
     }
-  }
+  };
 
   fs.closeSync = function closeSync(fd) {
     if (!docks[fd]) {
       return ancestor.closeSync.apply(fs, arguments);
     }
-
     return closeFromSnapshot(fd);
   };
 
@@ -1472,7 +1508,7 @@ function payloadFileSync(pointer) {
           translateNth(arguments, 0, path_)
         );
       }
-      const externalFile = uncompressExternally(path_);
+      const externalFile = uncompressExternallyPath(path_);
       arguments[0] = externalFile;
       const fd = await ancestor_promises.open.apply(this, arguments);
       if (typeof fd === 'object') {
@@ -1490,7 +1526,7 @@ function payloadFileSync(pointer) {
           translateNth(arguments, 0, path_)
         );
       }
-      const externalFile = uncompressExternally(path_);
+      const externalFile = uncompressExternallyPath(path_);
       arguments[0] = externalFile;
       return ancestor_promises.readFile.apply(this, arguments);
     };
@@ -1536,6 +1572,7 @@ function payloadFileSync(pointer) {
     return process.binding('fs').internalModuleStat(makeLong(fNative));
   }
 
+  // eslint-disable-next-line prefer-arrow-callback
   fs.internalModuleStat = function internalModuleStat(long) {
     // from node comments:
     // Used to speed up module loading. Returns 0 if the path refers to

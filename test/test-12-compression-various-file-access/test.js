@@ -37,9 +37,24 @@ async function withReadStream() {
   });
   console.log('withReadStream done !');
 }
+async function withReadStream2() {
+  const stream = fs.createReadStream(file, { start: 10, encoding: 'ascii' });
+  stream.on('data', (data) => {
+    console.log(data.toString());
+  });
+  await new Promise((resolve) => {
+    stream.on('end', resolve);
+  });
+  console.log('withReadStream done !');
+}
 
 (async () => {
+  console.log('--------------- withReadFileSync');
   await withReadFileSync();
+  console.log('--------------- withReadStream');
   await withReadStream();
+  console.log('--------------- withDirectAccess');
   await withDirectAccess();
+  console.log('--------------- withReadStream2');
+  await withReadStream2();
 })();
