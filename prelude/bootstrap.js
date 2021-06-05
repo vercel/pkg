@@ -613,13 +613,12 @@ function payloadFileSync(pointer) {
     if (!tmpFolder) {
       tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
     }
-
     const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
     // content is already unzipped !
 
     const hash = createHash('sha256').update(content).digest('hex');
     const fName = path.join(tmpFolder, hash);
-    fs.writeFileSync(fName, content);
+    fs.writeFileSync(fName, content, 'binary');
     return fName;
   }
 
@@ -662,7 +661,7 @@ function payloadFileSync(pointer) {
     if (cb) {
       ancestor.open.call(fs, nullDevice, 'r', (error, fd) => {
         if (error) return cb(error);
-        if (uncompress) {
+        if (DOCOMPRESS) {
           dock._externalFile = uncompressExternallyAndOpen(dock);
         }
         docks[fd] = dock;
@@ -670,7 +669,7 @@ function payloadFileSync(pointer) {
       });
     } else {
       const fd = ancestor.openSync.call(fs, nullDevice, 'r');
-      if (uncompress) {
+      if (DOCOMPRESS) {
         dock._externalFile = uncompressExternallyAndOpen(dock);
       }
       docks[fd] = dock;

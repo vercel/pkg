@@ -78,5 +78,6 @@ runTest(input1);
 console.log('  now testing with fs.promises');
 const input2 = 'test_with_new_fs_promises.js';
 runTest(input2);
+
 console.log('Done');
 process.exit(0);

@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const file = path.join(__dirname, 'myfile.txt');
+const binaryFile = path.join(__dirname, 'myfile.bin');
 
 function withReadFileSync() {
   const wholeFile = fs.readFileSync(file, 'ascii');
@@ -48,6 +49,31 @@ async function withReadStream2() {
   console.log('withReadStream done !');
 }
 
+async function readbinaryFile() {
+  const fd = fs.openSync(binaryFile, 'r');
+
+  const buf = Buffer.alloc(25);
+  fs.readSync(fd, buf, 0, buf.length, 10);
+  fs.closeSync(fd);
+
+  console.log(buf.toString('hex'));
+  console.log('readbinaryFile done !');
+}
+
+async function readbinaryFileWithStream() {
+  const stream = fs.createReadStream(binaryFile, {
+    encoding: 'hex',
+    start: 10,
+    end: 34,
+  });
+  stream.on('data', (data) => {
+    console.log(data.toString());
+  });
+  await new Promise((resolve) => {
+    stream.on('end', resolve);
+  });
+  console.log('readbinaryFileWithStream done !');
+}
 (async () => {
   console.log('--------------- withReadFileSync');
   await withReadFileSync();
@@ -57,4 +83,8 @@ async function withReadStream2() {
   await withDirectAccess();
   console.log('--------------- withReadStream2');
   await withReadStream2();
+  console.log('--------------- readbinaryFile');
+  await readbinaryFile();
+  console.log('--------------- readbinaryFileWithStream');
+  await readbinaryFileWithStream();
 })();
