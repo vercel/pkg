@@ -119,8 +119,8 @@ function injectSnapshot(file: string) {
       // C:\
       file = file.slice(0, -1);
     }
-
-    return `${file[0]}:\\snapshot${file.slice(2)}`;
+    // by convention, on windows we use C:\\snapshot
+    return `C:\\snapshot${file.slice(2)}`;
   }
 
   if (/^\//.test(file)) {
