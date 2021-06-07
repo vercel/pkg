@@ -12,8 +12,14 @@ assert(__dirname === process.cwd());
 /* eslint-disable no-unused-vars */
 const target = process.argv[2] || 'host';
 
+if (target !== 'host') {
+  // skipping test, this test would require recompiling for a different node version
+  return;
+}
+
+const doDebug = false;
+
 const ext = process.platform === 'win32' ? '.exe' : '';
-const cmd = process.platform === 'win32' ? '.cmd' : '';
 const output = './output' + ext;
 const input = './package.json';
 
@@ -21,11 +27,15 @@ const input = './package.json';
 // utils.vacuum.sync('./node_modules');
 
 const version = utils.exec.sync('node --version');
-console.log('node version = ', version);
+if (doDebug) {
+  console.log('node version = ', version);
+}
 
 // launch `yarn`
 const yarnlog = utils.exec.sync('yarn');
-console.log('yarn log :', yarnlog);
+if (doDebug) {
+  console.log('yarn log :', yarnlog);
+}
 
 // -----------------------------------------------------------------------
 // Execute programm outside pjg
@@ -48,7 +58,6 @@ function runTest(doCompress) {
     input,
     ...doCompress,
   ];
-  console.log('options', options.join(' '));
 
   utils.pkg.sync(options, {
     expect: 0,
@@ -56,10 +65,14 @@ function runTest(doCompress) {
 
   const log = utils.spawn.sync(path.join(__dirname, output), [], {
     cwd: __dirname,
-    // expect: 0,
+    expect: 0,
     stdio: ['inherit', 'pipe', 'pipe'],
   });
-  console.log(logRef.stdout);
+
+  if (doDebug) {
+    console.log(logRef.stdout);
+  }
+
   if (logRef.stdout !== log.stdout) {
     console.log('expecting', logRef.stdout);
     console.log('but got =', log.stdout);

@@ -11,6 +11,12 @@ assert(__dirname === process.cwd());
 
 /* eslint-disable no-unused-vars */
 const target = process.argv[2] || 'host';
+
+if (target !== 'host') {
+  // skipping test, this test would require recompiling for a different node version
+  return;
+}
+
 const ext = process.platform === 'win32' ? '.exe' : '';
 const output1 = './output1' + ext;
 const output2 = './output2' + ext;
