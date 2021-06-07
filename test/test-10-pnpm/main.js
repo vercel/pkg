@@ -48,6 +48,8 @@ const logPkg = utils.pkg.sync([
   '--target',
   target,
   '--debug',
+  '--compress',
+  'Brotli',
   '--output',
   output,
   input,
