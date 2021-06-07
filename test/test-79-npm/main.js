@@ -4,7 +4,9 @@
 
 'use strict';
 
-const UPM = false; // USE_PREINSTALLED_MODULES
+// note: you can set the env variable USE_PREINSTALLED_MODULES to prevent reconstruction
+//       of the npm cache folder.
+const UPM = process.env.USE_PREINSTALLED_MODULES || false; // USE_PREINSTALLED_MODULES
 
 const fs = require('fs');
 const path = require('path');
@@ -116,9 +118,12 @@ if (!UPM) {
   utils.pause(2);
 })();
 
+// note to developpers:
+// you can set the  env variable FILTER to something like "better-sqlite3/*.js"
+// to restrict this test to this single test case
 const inputs = globby
   .sync([
-    './*/*.js',
+    process.env.FILTER || './*/*.js',
     '!./*/*.config.js',
     '!./*/*.meta.js',
     '!./*/gulpfile.js',
