@@ -25,6 +25,60 @@ const { promisify, _extend } = require('util');
 const { Script } = require('vm');
 const { tmpdir } = require('os');
 
+/**
+ * note: developers may activate the doDebug flag to enable a trace in the console
+ *       at runtime.
+ *       this is particularly useful for the maintenance of the bootstrap.js file
+ *       as pkg doesn't allow debugging the packed code.
+ */
+const doDebug = false;
+
+let debugIndent = 1;
+const debugLog = doDebug
+  ? function cc() {
+      const a = [' '.padEnd(debugIndent * 2), ...arguments];
+      // eslint-disable-next-line no-console
+      console.log.apply(console, a);
+    }
+  : () => {};
+
+function debugWrap(f) {
+  if (!doDebug) {
+    return f;
+  }
+  return function a() {
+    // eslint-disable-next-line no-console
+    debugLog('entering function ', f.name);
+    debugIndent += 1;
+
+    const lastArgument = arguments[arguments.length - 1];
+    if (typeof lastArgument === 'function') {
+      arguments[arguments.length - 1] = function myCallback() {
+        debugIndent -= 1;
+        lastArgument.apply(null, arguments);
+      };
+      f.apply(this, arguments);
+    } else {
+      const ret = f.apply(this, arguments);
+      debugIndent -= 1;
+      return ret;
+    }
+  };
+}
+//  eslint-disable-next-line no-unused-vars
+function debugWrapAsync(f) {
+  if (!doDebug) {
+    return f;
+  }
+  return async function a() {
+    debugLog('entering async function ', f.name);
+    debugIndent += 1;
+    const ret = await f.apply(this, arguments);
+    debugIndent -= 1;
+    return ret;
+  };
+}
+
 const common = {};
 REQUIRE_COMMON(common);
 
@@ -513,7 +567,8 @@ function payloadFileSync(pointer) {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function openFromSnapshot(path_, cb) {
+  // eslint-disable-next-line prefer-arrow-callback
+  const openFromSnapshot = debugWrap(function openFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
     const path_vfs = normalizePathAndFollowLink(path_);
     const entity = VIRTUAL_FILESYSTEM[path_vfs];
@@ -531,9 +586,11 @@ function payloadFileSync(pointer) {
       docks[fd] = dock;
       return fd;
     }
-  }
+  });
 
-  fs.openSync = function openSync(path_) {
+  // eslint-disable-next-line prefer-arrow-callback
+  fs.openSync = debugWrap(function openSync(path_) {
+    debugLog('path = ', path_);
     if (!insideSnapshot(path_)) {
       return ancestor.openSync.apply(fs, arguments);
     }
@@ -542,9 +599,9 @@ function payloadFileSync(pointer) {
     }
 
     return openFromSnapshot(path_);
-  };
+  });
 
-  fs.open = function open(path_) {
+  fs.open = debugWrap(function open(path_) {
     if (!insideSnapshot(path_)) {
       return ancestor.open.apply(fs, arguments);
     }
@@ -554,7 +611,7 @@ function payloadFileSync(pointer) {
 
     const callback = dezalgo(maybeCallback(arguments));
     openFromSnapshot(path_, callback);
-  };
+  });
 
   // ///////////////////////////////////////////////////////////////
   // read //////////////////////////////////////////////////////////
@@ -654,22 +711,28 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-15'));
   }
 
-  fs.readSync = function readSync(fd, buffer, offset, length, position) {
+  fs.readSync = debugWrap(function readSync(
+    fd,
+    buffer,
+    offset,
+    length,
+    position
+  ) {
     if (!docks[fd]) {
       return ancestor.readSync.apply(fs, arguments);
     }
 
     return readFromSnapshot(fd, buffer, offset, length, position);
-  };
+  });
 
-  fs.read = function read(fd, buffer, offset, length, position) {
+  fs.read = debugWrap(function read(fd, buffer, offset, length, position) {
     if (!docks[fd]) {
       return ancestor.read.apply(fs, arguments);
     }
 
     const callback = dezalgo(maybeCallback(arguments));
     readFromSnapshot(fd, buffer, offset, length, position, callback);
-  };
+  });
 
   // ///////////////////////////////////////////////////////////////
   // write /////////////////////////////////////////////////////////
@@ -680,52 +743,52 @@ function payloadFileSync(pointer) {
     return cb2(new Error('Cannot write to packaged file'));
   }
 
-  fs.writeSync = function writeSync(fd) {
+  fs.writeSync = debugWrap(function writeSync(fd) {
     if (!docks[fd]) {
       return ancestor.writeSync.apply(fs, arguments);
     }
 
     return writeToSnapshot();
-  };
+  });
 
-  fs.write = function write(fd) {
+  fs.write = debugWrap(function write(fd) {
     if (!docks[fd]) {
       return ancestor.write.apply(fs, arguments);
     }
 
     const callback = dezalgo(maybeCallback(arguments));
     writeToSnapshot(callback);
-  };
+  });
 
   // ///////////////////////////////////////////////////////////////
   // close /////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function closeFromSnapshot(fd, cb) {
+  const closeFromSnapshot = debugWrap((fd, cb) => {
     delete docks[fd];
     if (cb) {
       ancestor.close.call(fs, fd, cb);
     } else {
       return ancestor.closeSync.call(fs, fd);
     }
-  }
+  });
 
-  fs.closeSync = function closeSync(fd) {
+  fs.closeSync = debugWrap(function closeSync(fd) {
     if (!docks[fd]) {
       return ancestor.closeSync.apply(fs, arguments);
     }
 
     return closeFromSnapshot(fd);
-  };
+  });
 
-  fs.close = function close(fd) {
+  fs.close = debugWrap(function close(fd) {
     if (!docks[fd]) {
       return ancestor.close.apply(fs, arguments);
     }
 
     const callback = dezalgo(maybeCallback(arguments));
     closeFromSnapshot(fd, callback);
-  };
+  });
 
   // ///////////////////////////////////////////////////////////////
   // readFile //////////////////////////////////////////////////////
@@ -784,7 +847,7 @@ function payloadFileSync(pointer) {
     return cb2(new Error('UNEXPECTED-20'));
   }
 
-  fs.readFileSync = function readFileSync(path_, options_) {
+  fs.readFileSync = debugWrap(function readFileSync(path_, options_) {
     if (path_ === 'dirty-hack-for-testing-purposes') {
       return path_;
     }
@@ -808,9 +871,9 @@ function payloadFileSync(pointer) {
     let buffer = readFileFromSnapshot(path_);
     if (encoding) buffer = buffer.toString(encoding);
     return buffer;
-  };
+  });
 
-  fs.readFile = function readFile(path_, options_) {
+  fs.readFile = debugWrap(function readFile(path_, options_) {
     if (!insideSnapshot(path_)) {
       return ancestor.readFile.apply(fs, arguments);
     }
@@ -833,7 +896,7 @@ function payloadFileSync(pointer) {
       if (encoding) buffer = buffer.toString(encoding);
       callback(null, buffer);
     });
-  };
+  });
 
   // ///////////////////////////////////////////////////////////////
   // writeFile /////////////////////////////////////////////////////
@@ -1330,7 +1393,7 @@ function payloadFileSync(pointer) {
     return process.binding('fs').internalModuleStat(makeLong(fNative));
   }
 
-  fs.internalModuleStat = function internalModuleStat(long) {
+  fs.internalModuleStat = debugWrap((long) => {
     // from node comments:
     // Used to speed up module loading. Returns 0 if the path refers to
     // a file, 1 when it's a directory or < 0 on error (usually -ENOENT).
@@ -1371,7 +1434,7 @@ function payloadFileSync(pointer) {
     }
 
     return -ENOENT;
-  };
+  });
 
   fs.internalModuleReadJSON = function internalModuleReadJSON(long) {
     // from node comments:
