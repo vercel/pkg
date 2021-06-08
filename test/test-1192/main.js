@@ -13,6 +13,7 @@ assert(__dirname === process.cwd());
 const target = process.argv[2] || 'host';
 
 if (target !== 'host') {
+  console.log('skipping test, as target=', target);
   // skipping test, this test would require recompiling for a different node version
   return;
 }
