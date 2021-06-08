@@ -157,7 +157,7 @@ export default function packer({
     }
   }
   const prelude =
-    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS) { 
+    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS, DICT, DOCOMPRESS) { 
         ${bootstrapText}${
       log.debugMode ? diagnosticText : ''
     }\n})(function (exports) {\n${commonText}\n},\n` +
@@ -166,6 +166,10 @@ export default function packer({
     `%DEFAULT_ENTRYPOINT%` +
     `\n,\n` +
     `%SYMLINKS%` +
+    '\n,\n' +
+    '%DICT%' +
+    '\n,\n' +
+    '%DOCOMPRESS%' +
     `\n);`;
 
   return { prelude, entrypoint, stripes };

@@ -9,7 +9,13 @@ const utils = require('./utils.js');
 const host = 'node' + process.version.match(/^v(\d+)/)[1];
 let target = process.argv[2] || 'host';
 if (target === 'host') target = host;
-const flavor = process.argv[3] || 'all';
+
+// note to developer , you can use
+//    FLAVOR=test-1191 npm test
+// if you only want to run all combination of this specific test case
+// ( the env variable FLAVOR takes precedence over the second argument passed to this main.js file)
+
+const flavor = process.env.FLAVOR || process.argv[3] || 'all';
 
 console.log('');
 console.log('*************************************');
@@ -42,7 +48,9 @@ function joinAndForward(d) {
 
 const list = [];
 
-if (flavor === 'only-npm') {
+if (flavor.match(/^test/)) {
+  list.push(joinAndForward(`${flavor}/main.js`));
+} else if (flavor === 'only-npm') {
   list.push(joinAndForward('test-79-npm/main.js'));
 } else {
   list.push(joinAndForward('**/main.js'));
@@ -51,8 +59,6 @@ if (flavor === 'only-npm') {
     list.push('!' + joinAndForward('test-46-multi-arch'));
     list.push('!' + joinAndForward('test-46-multi-arch-2'));
     list.push('!' + joinAndForward('test-79-npm'));
-    list.push('!' + joinAndForward('test-1191'));
-    list.push('!' + joinAndForward('test-1192'));
   }
 }
 

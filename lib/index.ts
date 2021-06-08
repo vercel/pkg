@@ -26,6 +26,7 @@ import refine from './refiner';
 import { shutdown } from './fabricator';
 import walk, { Marker, WalkerParams } from './walker';
 import { Target, NodeTarget, SymLinks } from './types';
+import { CompressType } from './compress_type';
 import { patchMachOExecutable } from './mach-o';
 
 const { version } = JSON.parse(
@@ -247,6 +248,8 @@ export async function exec(argv2: string[]) {
       't',
       'target',
       'targets',
+      'C',
+      'compress',
     ],
     default: { bytecode: true },
   });
@@ -273,6 +276,32 @@ export async function exec(argv2: string[]) {
   // forceBuild
 
   const forceBuild = argv.b || argv.build;
+
+  // doCompress
+  const algo = argv.C || argv.compress || 'None';
+
+  let doCompress: CompressType = CompressType.None;
+  switch (algo.toLowerCase()) {
+    case 'brotli':
+    case 'br':
+      doCompress = CompressType.Brotli;
+      break;
+    case 'gzip':
+    case 'gz':
+      doCompress = CompressType.GZip;
+      break;
+    case 'none':
+      break;
+    default:
+      // eslint-disable-next-line no-console
+      throw wasReported(
+        `Invalid compression algorithm ${algo} ( should be None, Brotli or Gzip)`
+      );
+  }
+  if (doCompress !== CompressType.None) {
+    // eslint-disable-next-line no-console
+    console.log('compression: ', CompressType[doCompress]);
+  }
 
   // _
 
@@ -631,6 +660,7 @@ export async function exec(argv2: string[]) {
       slash: target.platform === 'win' ? '\\' : '/',
       target: target as Target,
       symLinks,
+      doCompress,
     });
 
     if (target.platform !== 'win' && target.output) {

@@ -1,16 +1,12 @@
 {
-  "name": "test-pnpm",
+  "name": "test-12-compression-with-asset",
   "version": "1.0.0",
   "description": "",
-  "main": "test.js",
+  "main": "index.js",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bonjour": "3.5.0"
-  }
+  "license": "ISC"
 }
