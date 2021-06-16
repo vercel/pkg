@@ -63,6 +63,7 @@ export interface NodeTarget {
   arch: string;
   platform: keyof typeof platform;
   forceBuild?: boolean;
+  linuxStatic?: boolean;
 }
 
 export interface Target extends NodeTarget {

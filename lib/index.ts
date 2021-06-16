@@ -157,12 +157,15 @@ function stringifyTargetForOutput(
   return a.join('-');
 }
 
-function fabricatorForTarget({ nodeRange, arch }: NodeTarget) {
+function fabricatorForTarget({ nodeRange, arch, linuxStatic }: NodeTarget) {
   let fabPlatform = hostPlatform;
 
   if (
-    hostArch !== arch &&
-    (hostPlatform === 'linux' || hostPlatform === 'alpine')
+    linuxStatic === true ||
+    (
+      hostArch !== arch &&
+      (hostPlatform === 'linux' || hostPlatform === 'alpine')
+    )
   ) {
     // With linuxstatic, it is possible to generate bytecode for different
     // arch with simple QEMU configuration instead of the entire sysroot.
@@ -233,6 +236,7 @@ export async function exec(argv2: string[]) {
       'public',
       'v',
       'version',
+      'static',
     ],
     string: [
       '_',
@@ -276,6 +280,10 @@ export async function exec(argv2: string[]) {
   // forceBuild
 
   const forceBuild = argv.b || argv.build;
+
+  // linuxstatic
+
+  const linuxStatic = argv.static;
 
   // doCompress
   const algo = argv.C || argv.compress || 'None';
@@ -543,6 +551,7 @@ export async function exec(argv2: string[]) {
 
   for (const target of targets) {
     target.forceBuild = forceBuild;
+    target.linuxStatic = linuxStatic;
 
     await needWithDryRun(target);
 
