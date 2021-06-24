@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "5.2.1",
+  "version": "5.3.0",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
