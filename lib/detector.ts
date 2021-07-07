@@ -495,7 +495,7 @@ export function parse(body: string) {
   return babel.parse(body, {
     allowImportExportEverywhere: true,
     allowReturnOutsideFunction: true,
-    plugins: ['estree', 'bigInt', 'classPrivateProperties', 'classProperties'],
+    plugins: ['estree', 'bigInt', 'classPrivateProperties', 'classProperties', 'classPrivateMethods'],
   });
 }
 
