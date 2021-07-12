@@ -66,9 +66,13 @@ note that by default `pkg` has to run the executable of the
 
 `macos-arm64` is experimental. Be careful about the [mandatory code signing requirement](https://developer.apple.com/documentation/macos-release-notes/macos-big-sur-11_0_1-universal-apps-release-notes).
 The final executable has to be signed (ad-hoc signature is sufficient) with `codesign`
-utility of macOS, or the end-user has no way to permit it to run at all. `pkg` ad-hoc
-signs the final executable if you run `pkg` on macOS. Preferably, you should replace
-this signature with your own trusted Apple Developer ID.
+utility of macOS (or `ldid` utility on Linux). Otherwise, the executable will be killed
+by kernel and the end-user has no way to permit it to run at all. `pkg` tries to ad-hoc
+sign the final executable. If necessary, you can replace this signature with your own
+trusted Apple Developer ID.
+
+To be able to generate executables for all supported architectures and platforms, run
+`pkg` on a Linux host with binfmt (`QEMU` emulation) configured and `ldid` installed.
 
 ### Config
 
