@@ -1,3 +1,5 @@
+import { execFileSync } from 'child_process';
+
 function parseCStr(buf: Buffer) {
   for (let i = 0; i < buf.length; i += 1) {
     if (buf[i] === 0) {
@@ -55,4 +57,12 @@ function patchMachOExecutable(file: Buffer) {
   return file;
 }
 
-export { patchMachOExecutable };
+function signMachOExecutable(executable: string) {
+  try {
+    execFileSync('codesign', ['--sign', '-', executable], { stdio: 'inherit' });
+  } catch {
+    execFileSync('ldid', ['-S', executable], { stdio: 'inherit' });
+  }
+}
+
+export { patchMachOExecutable, signMachOExecutable };
