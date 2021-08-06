@@ -161,7 +161,8 @@ function fabricatorForTarget({ nodeRange, arch }: NodeTarget) {
 
   if (
     hostArch !== arch &&
-    (hostPlatform === 'linux' || hostPlatform === 'alpine')
+    (hostPlatform === 'linux' || hostPlatform === 'alpine') ||
+    hostArch === 'armv7'
   ) {
     // With linuxstatic, it is possible to generate bytecode for different
     // arch with simple QEMU configuration instead of the entire sysroot.
