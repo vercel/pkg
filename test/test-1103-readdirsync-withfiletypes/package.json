@@ -1,0 +1,6 @@
+{
+  "bin": "read.js",
+  "pkg": {
+    "scripts": "files/*.js"
+  }
+}

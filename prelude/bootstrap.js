@@ -1145,7 +1145,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, false);
 
-    if (!options || options.withFileTypes) {
+    if (!options) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
@@ -1166,7 +1166,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, true);
 
-    if (!options || options.withFileTypes) {
+    if (!options) {
       return ancestor.readdir.apply(fs, arguments);
     }
 
@@ -1969,29 +1969,31 @@ function payloadFileSync(pointer) {
   // CHILD_PROCESS ///////////////////////////////////////////////
   // /////////////////////////////////////////////////////////////
 
-  const customPromiseExecFunction = (o) => (...args) => {
-    let resolve;
-    let reject;
-    const p = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
+  const customPromiseExecFunction =
+    (o) =>
+    (...args) => {
+      let resolve;
+      let reject;
+      const p = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
 
-    p.child = o.apply(
-      undefined,
-      args.concat((error, stdout, stderr) => {
-        if (error !== null) {
-          error.stdout = stdout;
-          error.stderr = stderr;
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-      })
-    );
+      p.child = o.apply(
+        undefined,
+        args.concat((error, stdout, stderr) => {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          } else {
+            resolve({ stdout, stderr });
+          }
+        })
+      );
 
-    return p;
-  };
+      return p;
+    };
 
   Object.defineProperty(childProcess.exec, custom, {
     value: customPromiseExecFunction(childProcess.exec),
@@ -2020,7 +2022,8 @@ function payloadFileSync(pointer) {
     const modulePath = revertMakingLong(args[1]);
     const moduleBaseName = path.basename(modulePath);
     const moduleFolder = path.dirname(modulePath);
-    const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
+    const unknownModuleErrorRegex =
+      /([^:]+): cannot open shared object file: No such file or directory/;
 
     function tryImporting(_tmpFolder, previousErrorMessage) {
       try {
