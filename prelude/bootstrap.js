@@ -183,7 +183,7 @@ function copyFolderRecursiveSync(source, target) {
   // Copy
   if (fs.lstatSync(source).isDirectory()) {
     files = fs.readdirSync(source);
-    files.forEach(function (file) {
+    files.forEach((file) => {
       var curSource = path.join(source, file);
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
@@ -2056,7 +2056,6 @@ function payloadFileSync(pointer) {
     const modulePath = revertMakingLong(args[1]);
     const moduleBaseName = path.basename(modulePath);
     const moduleFolder = path.dirname(modulePath);
-    const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
 
     // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
     const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
