@@ -2078,7 +2078,7 @@ function payloadFileSync(pointer) {
       const hash = createHash('sha256').update(moduleContent).digest('hex');
 
       // Example: /tmp/<hash>
-      const tmpFolder = path.join(tmpdir(), hash);
+      const tmpFolder = path.join(tmpdir(), 'pkg', hash);
       if (!fs.existsSync(tmpFolder)) {
         // here we copy all files from the snapshot module folder to temporary folder
         // we keep the module folder structure to prevent issues with modules that are statically
