@@ -158,6 +158,42 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
+function copyFileSync(source, target) {
+  var targetFile = target;
+
+  // If target is a directory, a new file with the same name will be created
+  if (fs.existsSync(target)) {
+    if (fs.lstatSync(target).isDirectory()) {
+      targetFile = path.join(target, path.basename(source));
+    }
+  }
+
+  fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+
+function copyFolderRecursiveSync(source, target) {
+  var files = [];
+
+  // Check if folder needs to be created or integrated
+  var targetFolder = path.join(target, path.basename(source));
+  if (!fs.existsSync(targetFolder)) {
+    fs.mkdirSync(targetFolder);
+  }
+
+  // Copy
+  if (fs.lstatSync(source).isDirectory()) {
+    files = fs.readdirSync(source);
+    files.forEach(function (file) {
+      var curSource = path.join(source, file);
+      if (fs.lstatSync(curSource).isDirectory()) {
+        copyFolderRecursiveSync(curSource, targetFolder);
+      } else {
+        copyFileSync(curSource, targetFolder);
+      }
+    });
+  }
+}
+
 /*
 
 // TODO move to some test
@@ -2022,63 +2058,18 @@ function payloadFileSync(pointer) {
     const moduleFolder = path.dirname(modulePath);
     const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
 
-    function tryImporting(_tmpFolder, previousErrorMessage) {
-      try {
-        const res = ancestor.dlopen.apply(process, args);
-        return res;
-      } catch (e) {
-        if (e.message === previousErrorMessage) {
-          // we already tried to fix this and it didn't work, give up
-          throw e;
-        }
-        if (e.message.match(unknownModuleErrorRegex)) {
-          // this case triggers on linux, the error message give us a clue on what dynamic linking library
-          // is missing.
-          // some modules are packaged with dynamic linking and needs to open other files that should be in
-          // the same directory, in this case, we write this file in the same /tmp directory and try to
-          // import the module again
+    // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
+    const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
+    // Example: modulePackagePath = sharp/build/Release
+    const modulePackagePath = moduleFolder.match(modulePkgPathRegex)[1];
+    // Example: modulePackageName =  sharp
+    const modulePackageName = moduleFolder.match(modulePkgPathRegex)[2];
+    // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
+    const modulePkgFolder = moduleFolder.replace(
+      modulePackagePath,
+      modulePackageName
+    );
 
-          const moduleName = e.message.match(unknownModuleErrorRegex)[1];
-          const importModulePath = path.join(moduleFolder, moduleName);
-
-          if (!fs.existsSync(importModulePath)) {
-            throw new Error(
-              `INTERNAL ERROR this file doesn't exist in the virtual file system :${importModulePath}`
-            );
-          }
-          const moduleContent1 = fs.readFileSync(importModulePath);
-          const tmpModulePath1 = path.join(_tmpFolder, moduleName);
-
-          try {
-            fs.statSync(tmpModulePath1);
-          } catch (err) {
-            fs.writeFileSync(tmpModulePath1, moduleContent1, { mode: 0o555 });
-          }
-          return tryImporting(_tmpFolder, e.message);
-        }
-
-        // this case triggers on windows mainly.
-        // we copy all stuff that exists in the folder of the .node module
-        // into the temporary folders...
-        const files = fs.readdirSync(moduleFolder);
-        for (const file of files) {
-          if (file === moduleBaseName) {
-            // ignore the current module
-            continue;
-          }
-          const filenameSrc = path.join(moduleFolder, file);
-
-          if (fs.statSync(filenameSrc).isDirectory()) {
-            continue;
-          }
-          const filenameDst = path.join(_tmpFolder, file);
-          const content = fs.readFileSync(filenameSrc);
-
-          fs.writeFileSync(filenameDst, content, { mode: 0o555 });
-        }
-        return tryImporting(_tmpFolder, e.message);
-      }
-    }
     if (insideSnapshot(modulePath)) {
       const moduleContent = fs.readFileSync(modulePath);
 
@@ -2088,20 +2079,13 @@ function payloadFileSync(pointer) {
 
       const tmpFolder = path.join(tmpdir(), hash);
       if (!fs.existsSync(tmpFolder)) {
-        fs.mkdirSync(tmpFolder);
+        fs.mkdirSync(tmpFolder, { recursive: true });
+        copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
       }
-      const tmpModulePath = path.join(tmpFolder, moduleBaseName);
 
-      try {
-        fs.statSync(tmpModulePath);
-      } catch (e) {
-        // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o755 });
-      }
-      args[1] = tmpModulePath;
-      tryImporting(tmpFolder);
-    } else {
-      return ancestor.dlopen.apply(process, args);
+      args[1] = path.join(tmpFolder, modulePackagePath, moduleBaseName);
     }
+
+    return ancestor.dlopen.apply(process, args);
   };
 })();
