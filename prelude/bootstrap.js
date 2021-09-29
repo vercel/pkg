@@ -2074,14 +2074,20 @@ function payloadFileSync(pointer) {
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
+      // the hash is needed to be sure we reload the module in case it changes
       const hash = createHash('sha256').update(moduleContent).digest('hex');
 
+      // Example: /tmp/<hash>
       const tmpFolder = path.join(tmpdir(), hash);
       if (!fs.existsSync(tmpFolder)) {
+        // here we copy all files from the snapshot module folder to temporary folder
+        // we keep the module folder structure to prevent issues with modules that are statically
+        // linked using relative paths (Fix #1075)
         fs.mkdirSync(tmpFolder, { recursive: true });
         copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
       }
 
+      // replace the path with the new module path
       args[1] = path.join(tmpFolder, modulePackagePath, moduleBaseName);
     }
 
