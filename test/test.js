@@ -49,11 +49,14 @@ function joinAndForward(d) {
 const list = [];
 
 if (flavor.match(/^test/)) {
-  list.push(joinAndForward(`${flavor}/main.js`));
+  list.push(
+    joinAndForward(`${flavor}/main.js`),
+    joinAndForward(`${flavor}/main.cjs`)
+  );
 } else if (flavor === 'only-npm') {
   list.push(joinAndForward('test-79-npm/main.js'));
 } else {
-  list.push(joinAndForward('**/main.js'));
+  list.push(joinAndForward('**/main.js'), joinAndForward('**/main.cjs'));
   if (flavor === 'no-npm') {
     list.push('!' + joinAndForward('test-42-fetch-all'));
     list.push('!' + joinAndForward('test-46-multi-arch'));

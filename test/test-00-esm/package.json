@@ -1,0 +1,13 @@
+{
+  "name": "test-00-esm",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
