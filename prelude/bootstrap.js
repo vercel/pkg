@@ -159,7 +159,7 @@ function createMountpoint(interior, exterior) {
 }
 
 function copyFileSync(source, target) {
-  var targetFile = target;
+  let targetFile = target;
 
   // If target is a directory, a new file with the same name will be created
   if (fs.existsSync(target)) {
@@ -172,10 +172,10 @@ function copyFileSync(source, target) {
 }
 
 function copyFolderRecursiveSync(source, target) {
-  var files = [];
+  let files = [];
 
   // Check if folder needs to be created or integrated
-  var targetFolder = path.join(target, path.basename(source));
+  const targetFolder = path.join(target, path.basename(source));
   if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder);
   }
@@ -184,13 +184,20 @@ function copyFolderRecursiveSync(source, target) {
   if (fs.lstatSync(source).isDirectory()) {
     files = fs.readdirSync(source);
     files.forEach((file) => {
-      var curSource = path.join(source, file);
+      const curSource = path.join(source, file);
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
         copyFileSync(curSource, targetFolder);
       }
     });
+  }
+}
+
+function createDirRecursively(dir) {
+  if (!fs.existsSync(dir)) {
+    createDirRecursively(path.join(dir, '..'));
+    fs.mkdirSync(dir);
   }
 }
 
@@ -2077,13 +2084,13 @@ function payloadFileSync(pointer) {
       // the hash is needed to be sure we reload the module in case it changes
       const hash = createHash('sha256').update(moduleContent).digest('hex');
 
-      // Example: /tmp/<hash>
+      // Example: /tmp/pkg/<hash>
       const tmpFolder = path.join(tmpdir(), 'pkg', hash);
       if (!fs.existsSync(tmpFolder)) {
         // here we copy all files from the snapshot module folder to temporary folder
         // we keep the module folder structure to prevent issues with modules that are statically
         // linked using relative paths (Fix #1075)
-        fs.mkdirSync(tmpFolder, { recursive: true });
+        createDirRecursively(tmpFolder);
         copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
       }
 
