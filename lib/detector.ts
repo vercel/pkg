@@ -500,7 +500,13 @@ export function parse(body: string) {
 }
 
 export function detect(body: string, visitor: VisitorFunction) {
-  const json = parse(body);
+  let json
+
+  try {
+    json = parse(body);
+  } catch {
+    // ignore
+  }
 
   if (!json) {
     return;
