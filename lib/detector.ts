@@ -5,6 +5,8 @@ import { generate } from 'escodegen';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as babelTypes from '@babel/types';
 import * as babel from '@babel/parser';
+import { log } from './log';
+
 
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
 
@@ -504,8 +506,8 @@ export function detect(body: string, visitor: VisitorFunction) {
 
   try {
     json = parse(body);
-  } catch {
-    // ignore
+  } catch(error) {
+    log.warn(`Babel parse has failed: ${error.message}`);
   }
 
   if (!json) {
