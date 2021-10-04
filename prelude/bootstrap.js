@@ -2064,19 +2064,19 @@ function payloadFileSync(pointer) {
     const moduleBaseName = path.basename(modulePath);
     const moduleFolder = path.dirname(modulePath);
 
-    // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
-    const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
-    // Example: modulePackagePath = sharp/build/Release
-    const modulePackagePath = moduleFolder.match(modulePkgPathRegex)[1];
-    // Example: modulePackageName =  sharp
-    const modulePackageName = moduleFolder.match(modulePkgPathRegex)[2];
-    // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
-    const modulePkgFolder = moduleFolder.replace(
-      modulePackagePath,
-      modulePackageName
-    );
-
     if (insideSnapshot(modulePath)) {
+      // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
+      const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
+      // Example: modulePackagePath = sharp/build/Release
+      const modulePackagePath = moduleFolder.match(modulePkgPathRegex)[1];
+      // Example: modulePackageName =  sharp
+      const modulePackageName = moduleFolder.match(modulePkgPathRegex)[2];
+      // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
+      const modulePkgFolder = moduleFolder.replace(
+        modulePackagePath,
+        modulePackageName
+      );
+
       const moduleContent = fs.readFileSync(modulePath);
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
