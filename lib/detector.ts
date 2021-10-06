@@ -7,7 +7,6 @@ import * as babelTypes from '@babel/types';
 import * as babel from '@babel/parser';
 import { log } from './log';
 
-
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
 
 function isLiteral(
@@ -502,11 +501,11 @@ export function parse(body: string) {
 }
 
 export function detect(body: string, visitor: VisitorFunction) {
-  let json
+  let json;
 
   try {
     json = parse(body);
-  } catch(error) {
+  } catch (error) {
     log.warn(`Babel parse has failed: ${error.message}`);
   }
 
