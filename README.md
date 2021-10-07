@@ -225,11 +225,12 @@ The startup time of the application might be reduced slightly.
 
 ### Environment
 
-| Var            | Description                                                                               |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| PKG_CACHE_PATH | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache`   |
-| PKG_IGNORE_TAG | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
-| MAKE_JOB_COUNT | Allow configuring number of processes used for compiling                                  |
+| Var             | Description                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| PKG_CACHE_PATH  | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache`   |
+| PKG_IGNORE_TAG  | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
+| MAKE_JOB_COUNT  | Allow configuring number of processes used for compiling                                  |
+| SKIP_DICTIONARY | Skip `dictionaries` patches                                                               |
 
 Examples
 
