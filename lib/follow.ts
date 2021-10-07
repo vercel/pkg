@@ -4,6 +4,7 @@ import { core, sync, SyncOpts } from 'resolve';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
+import { CachedInputFileSystem, ResolverFactory } from 'enhanced-resolve';
 import { toNormalizedRealPath } from './common';
 
 Object.keys(core).forEach((key) => {
@@ -117,5 +118,42 @@ export function follow(x: string, opts: FollowOptions) {
         },
       })
     );
+  });
+}
+
+export function followESM(x: string, opts: FollowOptions) {
+  return new Promise<string>((resolve, reject) => {
+    const fileSystem = new CachedInputFileSystem(fs, 4000);
+
+    fileSystem.readFileSync = (file) => {
+      if (opts.ignoreFile && opts.ignoreFile === file) {
+        return Buffer.from(`{"main":"${PROOF}"}`);
+      }
+
+      if (opts.readFile) {
+        opts.readFile(file);
+      }
+
+      return fs.readFileSync(file);
+    }
+
+    const resolver = ResolverFactory.createResolver({
+      extensions: opts.extensions as string[],
+      fileSystem
+    });
+
+    const lookupStartPath :string = opts.basedir || __dirname;
+    const context = {};
+    const resolveContext = {};
+
+    resolver.resolve(context, lookupStartPath, x, resolveContext, (err, result) => {
+      if(!result || err) {
+        reject(err || Error(`Cannot resolve ${x}`))
+      } else {
+        resolve(result);
+      }
+    });
+
+    
   });
 }

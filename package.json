@@ -20,6 +20,7 @@
     "@babel/parser": "7.13.13",
     "@babel/types": "7.13.12",
     "chalk": "^4.1.0",
+    "enhanced-resolve": "5.8.3",
     "escodegen": "^2.0.0",
     "fs-extra": "^9.1.0",
     "globby": "^11.0.3",
