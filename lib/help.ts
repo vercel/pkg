@@ -31,7 +31,9 @@ export default function help() {
     ${chalk.cyan('$ pkg -t node14-win-arm64 index.js')}
   ${chalk.gray('–')} Makes executables for target machines of your choice
     ${chalk.cyan('$ pkg -t node12-linux,node14-linux,node14-win index.js')}
-  ${chalk.gray('–')} Bakes '--expose-gc' and '--max-heap-size=34' into executable
+  ${chalk.gray(
+    '–'
+  )} Bakes '--expose-gc' and '--max-heap-size=34' into executable
     ${chalk.cyan('$ pkg --options "expose-gc,max-heap-size=34" index.js')}
   ${chalk.gray('–')} Consider packageA and packageB to be public
     ${chalk.cyan('$ pkg --public-packages "packageA,packageB" index.js')}
