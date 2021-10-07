@@ -21,7 +21,7 @@ import {
   toNormalizedRealPath,
 } from './common';
 
-import { follow, followESM, natives } from './follow';
+import { follow, natives } from './follow';
 import { log, wasReported } from './log';
 import * as detector from './detector';
 import {
@@ -752,7 +752,7 @@ class Walker {
 
     const basedir = path.dirname(record.file);
     try {
-      newFile = await followESM(derivative.alias, {
+      newFile = await follow(derivative.alias, {
         basedir,
         // default is extensions: ['.js'], but
         // it is not enough because 'typos.json'
