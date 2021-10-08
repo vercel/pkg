@@ -24,7 +24,28 @@ This command line interface enables you to package your Node.js project into an 
 npm install -g pkg
 ```
 
-After installing it, run `pkg --help` without arguments to see list of options.
+After installing it, run `pkg --help` without arguments to see list of options:
+
+```bash
+pkg [options] <input>
+
+  Options:
+
+    -h, --help           output usage information
+    -v, --version        output pkg version
+    --no-dict            list packages name to ignore dictionaries
+    -t, --targets        comma-separated list of targets (see examples)
+    -c, --config         package.json or any json file with top-level config
+    --options            bake v8 options into executable to run with them on
+    -o, --output         output file name or template for several files
+    --out-path           path to save output one or more executables
+    -d, --debug          show more information during packaging process [off]
+    -b, --build          don't download prebuilt base binaries, build them
+    --public             speed up and disclose the sources of top-level project
+    --public-packages    force specified packages to be considered public
+    --no-bytecode        skip bytecode generation and include source files as plain js
+    -C, --compress       [default=None] compression algorithm = Brotli or GZip
+```
 
 The entrypoint of your project is a mandatory CLI argument. It may be:
 
@@ -225,12 +246,11 @@ The startup time of the application might be reduced slightly.
 
 ### Environment
 
-| Var             | Description                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------- |
-| PKG_CACHE_PATH  | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache`   |
-| PKG_IGNORE_TAG  | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
-| MAKE_JOB_COUNT  | Allow configuring number of processes used for compiling                                  |
-| SKIP_DICTIONARY | Skip `dictionaries` patches                                                               |
+| Var            | Description                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| PKG_CACHE_PATH | Used to specify a custom path for node binaries cache folder. Default is `~/.pkg-cache`   |
+| PKG_IGNORE_TAG | Allows to ignore additional folder created on `PKG_CACHE_PATH` matching pkg-fetch version |
+| MAKE_JOB_COUNT | Allow configuring number of processes used for compiling                                  |
 
 Examples
 
