@@ -2094,6 +2094,7 @@ function payloadFileSync(pointer) {
       }
 
       // replace the path with the new module path
+      // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
       args[1] = path.join(tmpFolder, modulePackagePath, moduleBaseName);
     }
 
