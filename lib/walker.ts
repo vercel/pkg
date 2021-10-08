@@ -313,6 +313,7 @@ function findCommonJunctionPoint(file: string, realFile: string) {
 export interface WalkerParams {
   publicToplevel?: boolean;
   publicPackages?: string[];
+  noDictionary?: string[];
 }
 
 class Walker {
@@ -1005,7 +1006,7 @@ class Walker {
   }
 
   async readDictionary(marker: Marker) {
-    if (process.env.SKIP_DICTIONARY) {
+    if (this.params.noDictionary?.[0] === '*') {
       return;
     }
     const dd = path.join(__dirname, '../dictionary');
@@ -1014,6 +1015,10 @@ class Walker {
     for (const file of files) {
       if (/\.js$/.test(file)) {
         const name = file.slice(0, -3);
+
+        if (this.params.noDictionary?.includes(file)) {
+          continue;
+        }
         // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
         const config = require(path.join(dd, file));
         this.dictionary[name] = config;

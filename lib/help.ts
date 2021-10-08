@@ -9,6 +9,7 @@ export default function help() {
 
     -h, --help           output usage information
     -v, --version        output pkg version
+    --no-dict            list packages name to ignore dictionaries
     -t, --targets        comma-separated list of targets (see examples)
     -c, --config         package.json or any json file with top-level config
     --options            bake v8 options into executable to run with them on

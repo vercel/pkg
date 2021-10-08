@@ -244,6 +244,7 @@ export async function exec(argv2: string[]) {
       'out-dir',
       'out-path',
       'public-packages',
+      'no-dict',
       't',
       'target',
       'targets',
@@ -623,6 +624,14 @@ export async function exec(argv2: string[]) {
 
     if (params.publicPackages?.indexOf('*') !== -1) {
       params.publicPackages = ['*'];
+    }
+  }
+
+  if (argv['no-dict']) {
+    params.noDictionary = argv['no-dict'].split(',');
+
+    if (params.noDictionary?.indexOf('*') !== -1) {
+      params.noDictionary = ['*'];
     }
   }
 
