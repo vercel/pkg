@@ -2012,29 +2012,31 @@ function payloadFileSync(pointer) {
   // CHILD_PROCESS ///////////////////////////////////////////////
   // /////////////////////////////////////////////////////////////
 
-  const customPromiseExecFunction = (o) => (...args) => {
-    let resolve;
-    let reject;
-    const p = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
+  const customPromiseExecFunction =
+    (o) =>
+    (...args) => {
+      let resolve;
+      let reject;
+      const p = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
 
-    p.child = o.apply(
-      undefined,
-      args.concat((error, stdout, stderr) => {
-        if (error !== null) {
-          error.stdout = stdout;
-          error.stderr = stderr;
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-      })
-    );
+      p.child = o.apply(
+        undefined,
+        args.concat((error, stdout, stderr) => {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          } else {
+            resolve({ stdout, stderr });
+          }
+        })
+      );
 
-    return p;
-  };
+      return p;
+    };
 
   Object.defineProperty(childProcess.exec, custom, {
     value: customPromiseExecFunction(childProcess.exec),
@@ -2066,16 +2068,13 @@ function payloadFileSync(pointer) {
 
     if (insideSnapshot(modulePath)) {
       // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
-      const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
+      const parts = moduleFolder.split(path.sep);
+      const mIndex = parts.indexOf('node_modules') + 1;
+
       // Example: modulePackagePath = sharp/build/Release
-      const modulePackagePath = moduleFolder.match(modulePkgPathRegex)[1];
-      // Example: modulePackageName =  sharp
-      const modulePackageName = moduleFolder.match(modulePkgPathRegex)[2];
+      const modulePackagePath = parts.slice(mIndex).join(path.sep);
       // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
-      const modulePkgFolder = moduleFolder.replace(
-        modulePackagePath,
-        modulePackageName
-      );
+      const modulePkgFolder = parts.slice(0, mIndex + 1).join(path.sep);
 
       const moduleContent = fs.readFileSync(modulePath);
 
