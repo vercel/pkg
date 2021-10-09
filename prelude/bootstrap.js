@@ -2012,29 +2012,31 @@ function payloadFileSync(pointer) {
   // CHILD_PROCESS ///////////////////////////////////////////////
   // /////////////////////////////////////////////////////////////
 
-  const customPromiseExecFunction = (o) => (...args) => {
-    let resolve;
-    let reject;
-    const p = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
+  const customPromiseExecFunction =
+    (o) =>
+    (...args) => {
+      let resolve;
+      let reject;
+      const p = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
 
-    p.child = o.apply(
-      undefined,
-      args.concat((error, stdout, stderr) => {
-        if (error !== null) {
-          error.stdout = stdout;
-          error.stderr = stderr;
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-      })
-    );
+      p.child = o.apply(
+        undefined,
+        args.concat((error, stdout, stderr) => {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          } else {
+            resolve({ stdout, stderr });
+          }
+        })
+      );
 
-    return p;
-  };
+      return p;
+    };
 
   Object.defineProperty(childProcess.exec, custom, {
     value: customPromiseExecFunction(childProcess.exec),
@@ -2065,18 +2067,6 @@ function payloadFileSync(pointer) {
     const moduleFolder = path.dirname(modulePath);
 
     if (insideSnapshot(modulePath)) {
-      // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
-      const modulePkgPathRegex = /.*?node_modules\/((.+?)\/.*)/;
-      // Example: modulePackagePath = sharp/build/Release
-      const modulePackagePath = moduleFolder.match(modulePkgPathRegex)[1];
-      // Example: modulePackageName =  sharp
-      const modulePackageName = moduleFolder.match(modulePkgPathRegex)[2];
-      // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
-      const modulePkgFolder = moduleFolder.replace(
-        modulePackagePath,
-        modulePackageName
-      );
-
       const moduleContent = fs.readFileSync(modulePath);
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
@@ -2086,16 +2076,38 @@ function payloadFileSync(pointer) {
 
       // Example: /tmp/pkg/<hash>
       const tmpFolder = path.join(tmpdir(), 'pkg', hash);
-      if (!fs.existsSync(tmpFolder)) {
-        // here we copy all files from the snapshot module folder to temporary folder
-        // we keep the module folder structure to prevent issues with modules that are statically
-        // linked using relative paths (Fix #1075)
-        createDirRecursively(tmpFolder);
-        copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
+
+      // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
+      const parts = moduleFolder.split(path.sep);
+      const mIndex = parts.indexOf('node_modules') + 1;
+
+      let newPath;
+
+      // it's a node addon file contained in node_modules folder
+      // we copy the entire module folder in tmp folder
+      if (mIndex > 0) {
+        // Example: modulePackagePath = sharp/build/Release
+        const modulePackagePath = parts.slice(mIndex).join(path.sep);
+        // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
+        const modulePkgFolder = parts.slice(0, mIndex + 1).join(path.sep);
+
+        if (!fs.existsSync(tmpFolder)) {
+          // here we copy all files from the snapshot module folder to temporary folder
+          // we keep the module folder structure to prevent issues with modules that are statically
+          // linked using relative paths (Fix #1075)
+          createDirRecursively(tmpFolder);
+          copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
+        }
+
+        // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
+        newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
+      } else {
+        // simple load the file in the temporary folder
+        newPath = path.join(tmpFolder, moduleBaseName);
       }
 
       // replace the path with the new module path
-      args[1] = path.join(tmpFolder, modulePackagePath, moduleBaseName);
+      args[1] = newPath;
     }
 
     return ancestor.dlopen.apply(process, args);
