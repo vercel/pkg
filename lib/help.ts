@@ -9,7 +9,6 @@ export default function help() {
 
     -h, --help           output usage information
     -v, --version        output pkg version
-    --no-dict            list packages name to ignore dictionaries
     -t, --targets        comma-separated list of targets (see examples)
     -c, --config         package.json or any json file with top-level config
     --options            bake v8 options into executable to run with them on
@@ -20,6 +19,7 @@ export default function help() {
     --public             speed up and disclose the sources of top-level project
     --public-packages    force specified packages to be considered public
     --no-bytecode        skip bytecode generation and include source files as plain js
+    --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict=* to disable all dictionaries
     -C, --compress       [default=None] compression algorithm = Brotli or GZip
 
   ${chalk.dim('Examples:')}
