@@ -16,7 +16,9 @@ import {
 import { log, wasReported } from './log';
 import { FileRecord, FileRecords, SymLinks } from './types';
 
-const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))
+const { version } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
+);
 
 const bootstrapText = fs
   .readFileSync(require.resolve('../prelude/bootstrap.js'), 'utf8')

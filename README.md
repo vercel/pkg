@@ -24,7 +24,28 @@ This command line interface enables you to package your Node.js project into an 
 npm install -g pkg
 ```
 
-After installing it, run `pkg --help` without arguments to see list of options.
+After installing it, run `pkg --help` without arguments to see list of options:
+
+```bash
+pkg [options] <input>
+
+  Options:
+
+    -h, --help           output usage information
+    -v, --version        output pkg version
+    -t, --targets        comma-separated list of targets (see examples)
+    -c, --config         package.json or any json file with top-level config
+    --options            bake v8 options into executable to run with them on
+    -o, --output         output file name or template for several files
+    --out-path           path to save output one or more executables
+    -d, --debug          show more information during packaging process [off]
+    -b, --build          don't download prebuilt base binaries, build them
+    --public             speed up and disclose the sources of top-level project
+    --public-packages    force specified packages to be considered public
+    --no-bytecode        skip bytecode generation and include source files as plain js
+    --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict * to disable all dictionaries
+    -C, --compress       [default=None] compression algorithm = Brotli or GZip
+```
 
 The entrypoint of your project is a mandatory CLI argument. It may be:
 
