@@ -251,6 +251,7 @@ interface ProducerOptions {
   target: Target;
   symLinks: SymLinks;
   doCompress: CompressType;
+  nativeBuild: boolean;
 }
 
 /**
@@ -314,6 +315,7 @@ export default function producer({
   target,
   symLinks,
   doCompress,
+  nativeBuild
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -448,7 +450,7 @@ export default function producer({
 
             assert.strictEqual(stripe.store, STORE_CONTENT); // others must be buffers from walker
 
-            if (isDotNODE(stripe.file)) {
+            if (isDotNODE(stripe.file) && nativeBuild) {
               try {
                 const platformFile = nativePrebuildInstall(target, stripe.file);
 
