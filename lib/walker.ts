@@ -72,7 +72,7 @@ const strictVerify = Boolean(process.env.PKG_STRICT_VER);
 const win32 = process.platform === 'win32';
 
 function unlikelyJavascript(file: string) {
-  return ['.css', '.html', '.json'].includes(path.extname(file));
+  return ['.css', '.html', '.json', '.vue'].includes(path.extname(file));
 }
 
 function isPublic(config: PackageJson) {
