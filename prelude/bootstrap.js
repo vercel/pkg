@@ -61,6 +61,7 @@ const NODE_VERSION_MINOR = process.version.match(/^v\d+.(\d+)/)[1] | 0;
 const ARGV0 = process.argv[0];
 const EXECPATH = process.execPath;
 let ENTRYPOINT = process.argv[1];
+let MOCK_NODE = false;
 
 if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };
@@ -1963,7 +1964,7 @@ function payloadFileSync(pointer) {
     }
     const opts = args[pos];
     if (!opts.env) opts.env = _extend({}, process.env);
-    if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
+    if (!MOCK_NODE || opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
 
@@ -2008,7 +2009,7 @@ function payloadFileSync(pointer) {
   }
 
   function modifyShort(args) {
-    if (!args[0]) return;
+    if (!MOCK_NODE || !args[0]) return;
     if (!Array.isArray(args[1])) {
       args.splice(1, 0, []);
     }
