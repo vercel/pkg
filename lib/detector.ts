@@ -506,7 +506,7 @@ export function detect(body: string, visitor: VisitorFunction) {
   try {
     json = parse(body);
   } catch (error) {
-    log.warn(`Babel parse has failed: ${error.message}`);
+    log.warn(`Babel parse has failed: ${(error as Error).message}`);
   }
 
   if (!json) {
