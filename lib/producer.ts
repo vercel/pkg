@@ -315,7 +315,7 @@ export default function producer({
   target,
   symLinks,
   doCompress,
-  nativeBuild
+  nativeBuild,
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -461,7 +461,10 @@ export default function producer({
                   );
                 }
               } catch (err) {
-                log.debug(`prebuild-install failed[${stripe.file}]:`, err);
+                log.debug(
+                  `prebuild-install failed[${stripe.file}]:`,
+                  (err as Error).message
+                );
               }
             }
             return cb(

@@ -201,8 +201,9 @@ async function stepRead(record: FileRecord) {
   try {
     body = await fs.readFile(record.file);
   } catch (error) {
-    log.error(`Cannot read file, ${error.code}`, record.file);
-    throw wasReported(error);
+    const exception = error as NodeJS.ErrnoException;
+    log.error(`Cannot read file, ${exception.code}`, record.file);
+    throw wasReported(exception.message);
   }
 
   record.body = body;
@@ -295,8 +296,8 @@ function stepDetect(
       return true; // can i go inside?
     });
   } catch (error) {
-    log.error(error.message, record.file);
-    throw wasReported(error);
+    log.error((error as Error).message, record.file);
+    throw wasReported((error as Error).message);
   }
 }
 
@@ -712,9 +713,10 @@ class Walker {
       stat = await fs.stat(file);
     } catch (error) {
       const { toplevel } = marker;
-      const debug = !toplevel && error.code === 'ENOENT';
+      const exception = error as NodeJS.ErrnoException;
+      const debug = !toplevel && exception.code === 'ENOENT';
       const level = debug ? 'debug' : 'warn';
-      log[level](`Cannot stat, ${error.code}`, [
+      log[level](`Cannot stat, ${exception.code}`, [
         file,
         `The file was required from '${record.file}'`,
       ]);
@@ -749,7 +751,7 @@ class Walker {
     };
 
     let newFile = '';
-    let failure;
+    let failure: Error | undefined;
 
     const basedir = path.dirname(record.file);
     try {
@@ -764,7 +766,7 @@ class Walker {
         packageFilter: catchPackageFilter,
       });
     } catch (error) {
-      failure = error;
+      failure = error as Error;
     }
 
     if (failure) {
@@ -970,8 +972,9 @@ class Walker {
       };
       record[STORE_STAT] = value;
     } catch (error) {
-      log.error(`Cannot stat, ${error.code}`, record.file);
-      throw wasReported(error);
+      const exception = error as NodeJS.ErrnoException;
+      log.error(`Cannot stat, ${exception.code}`, record.file);
+      throw wasReported(exception.message);
     }
 
     if (path.dirname(record.file) !== record.file) {
