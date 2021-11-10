@@ -1,0 +1,76 @@
+name: ⏮️ Regression report
+description: Report a bug not seen in an earlier version of pkg
+labels: 'template: regression'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a bug report! Please fill out this form as completely as possible.
+  - type: markdown
+    attributes:
+      value: If you leave out sections there is a high likelihood it will be moved to the GitHub Discussions "Question" section.
+  - type: markdown
+    attributes:
+      value: 'Please first search the repository for similar issues and discussions.'
+  - type: input
+    attributes:
+      label: What version of pkg are you using?
+      description: '`pkg --version` - For example: 5.4.1'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Which version(s) of pkg work for you?
+      description: '`pkg --version` - For example: < 5.4.1, 5.3.0, 4.5.0'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What version of Node.js are you using?
+      description: '`node --version` - For example: 16.0.0'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What operating system are you using?
+      description: 'For example: macOS, Windows, Ubuntu 20.04'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What CPU architecture are you using?
+      description: 'For example: x86_64, arm64, armv7, Intel 12900K, Apple M1'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What Node versions, OSs and CPU architectures are you building for?
+      description: 'For example: default, node12, node12-linux-x64, node14-win-arm64'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior, please provide a clear code snippets that always reproduces the issue or a GitHub repository. Screenshots can be provided in the issue body below.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: Before posting the issue go through the steps you've written down to make sure the steps provided are detailed and clear.
+  - type: markdown
+    attributes:
+      value: Contributors should be able to follow the steps provided in order to reproduce the bug.
+  - type: markdown
+    attributes:
+      value: These steps are used to add integration tests to ensure the same issue does not happen again. Thanks in advance!
