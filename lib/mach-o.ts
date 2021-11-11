@@ -61,7 +61,7 @@ function signMachOExecutable(executable: string) {
   try {
     execFileSync('codesign', ['--sign', '-', executable], { stdio: 'inherit' });
   } catch {
-    execFileSync('ldid', ['-S', executable], { stdio: 'inherit' });
+    execFileSync('ldid', ['-Cadhoc', '-S', executable], { stdio: 'inherit' });
   }
 }
 
