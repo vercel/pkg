@@ -158,6 +158,49 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
+function copyFileSync(source, target) {
+  let targetFile = target;
+
+  // If target is a directory, a new file with the same name will be created
+  if (fs.existsSync(target)) {
+    if (fs.lstatSync(target).isDirectory()) {
+      targetFile = path.join(target, path.basename(source));
+    }
+  }
+
+  fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+
+function copyFolderRecursiveSync(source, target) {
+  let files = [];
+
+  // Check if folder needs to be created or integrated
+  const targetFolder = path.join(target, path.basename(source));
+  if (!fs.existsSync(targetFolder)) {
+    fs.mkdirSync(targetFolder);
+  }
+
+  // Copy
+  if (fs.lstatSync(source).isDirectory()) {
+    files = fs.readdirSync(source);
+    files.forEach((file) => {
+      const curSource = path.join(source, file);
+      if (fs.lstatSync(curSource).isDirectory()) {
+        copyFolderRecursiveSync(curSource, targetFolder);
+      } else {
+        copyFileSync(curSource, targetFolder);
+      }
+    });
+  }
+}
+
+function createDirRecursively(dir) {
+  if (!fs.existsSync(dir)) {
+    createDirRecursively(path.join(dir, '..'));
+    fs.mkdirSync(dir);
+  }
+}
+
 /*
 
 // TODO move to some test
@@ -2052,59 +2095,50 @@ function payloadFileSync(pointer) {
           const moduleContent1 = fs.readFileSync(importModulePath);
           const tmpModulePath1 = path.join(_tmpFolder, moduleName);
 
-          try {
-            fs.statSync(tmpModulePath1);
-          } catch (err) {
-            fs.writeFileSync(tmpModulePath1, moduleContent1, { mode: 0o555 });
-          }
-          return tryImporting(_tmpFolder, e.message);
-        }
-
-        // this case triggers on windows mainly.
-        // we copy all stuff that exists in the folder of the .node module
-        // into the temporary folders...
-        const files = fs.readdirSync(moduleFolder);
-        for (const file of files) {
-          if (file === moduleBaseName) {
-            // ignore the current module
-            continue;
-          }
-          const filenameSrc = path.join(moduleFolder, file);
-
-          if (fs.statSync(filenameSrc).isDirectory()) {
-            continue;
-          }
-          const filenameDst = path.join(_tmpFolder, file);
-          const content = fs.readFileSync(filenameSrc);
-
-          fs.writeFileSync(filenameDst, content, { mode: 0o555 });
-        }
-        return tryImporting(_tmpFolder, e.message);
-      }
-    }
     if (insideSnapshot(modulePath)) {
       const moduleContent = fs.readFileSync(modulePath);
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
+      // the hash is needed to be sure we reload the module in case it changes
       const hash = createHash('sha256').update(moduleContent).digest('hex');
 
-      const tmpFolder = path.join(tmpdir(), hash);
-      if (!fs.existsSync(tmpFolder)) {
-        fs.mkdirSync(tmpFolder);
-      }
-      const tmpModulePath = path.join(tmpFolder, moduleBaseName);
+      // Example: /tmp/pkg/<hash>
+      const tmpFolder = path.join(tmpdir(), 'pkg', hash);
 
-      try {
-        fs.statSync(tmpModulePath);
-      } catch (e) {
-        // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o755 });
+      // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
+      const parts = moduleFolder.split(path.sep);
+      const mIndex = parts.indexOf('node_modules') + 1;
+
+      let newPath;
+
+      // it's a node addon file contained in node_modules folder
+      // we copy the entire module folder in tmp folder
+      if (mIndex > 0) {
+        // Example: modulePackagePath = sharp/build/Release
+        const modulePackagePath = parts.slice(mIndex).join(path.sep);
+        // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
+        const modulePkgFolder = parts.slice(0, mIndex + 1).join(path.sep);
+
+        if (!fs.existsSync(tmpFolder)) {
+          // here we copy all files from the snapshot module folder to temporary folder
+          // we keep the module folder structure to prevent issues with modules that are statically
+          // linked using relative paths (Fix #1075)
+          createDirRecursively(tmpFolder);
+          copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
+        }
+
+        // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
+        newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
+      } else {
+        // simple load the file in the temporary folder
+        newPath = path.join(tmpFolder, moduleBaseName);
       }
-      args[1] = tmpModulePath;
-      tryImporting(tmpFolder);
-    } else {
-      return ancestor.dlopen.apply(process, args);
+
+      // replace the path with the new module path
+      args[1] = newPath;
     }
+
+    return ancestor.dlopen.apply(process, args);
   };
 })();

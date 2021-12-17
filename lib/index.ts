@@ -225,6 +225,7 @@ export async function exec(argv2: string[]) {
       'b',
       'build',
       'bytecode',
+      'native-build',
       'd',
       'debug',
       'h',
@@ -244,13 +245,14 @@ export async function exec(argv2: string[]) {
       'out-dir',
       'out-path',
       'public-packages',
+      'no-dict',
       't',
       'target',
       'targets',
       'C',
       'compress',
     ],
-    default: { bytecode: true },
+    default: { bytecode: true, 'native-build': true },
   });
 
   if (argv.h || argv.help) {
@@ -540,6 +542,8 @@ export async function exec(argv2: string[]) {
 
   const { bytecode } = argv;
 
+  const nativeBuild = argv['native-build']
+
   for (const target of targets) {
     target.forceBuild = forceBuild;
 
@@ -626,6 +630,14 @@ export async function exec(argv2: string[]) {
     }
   }
 
+  if (argv['no-dict']) {
+    params.noDictionary = argv['no-dict'].split(',');
+
+    if (params.noDictionary?.indexOf('*') !== -1) {
+      params.noDictionary = ['*'];
+    }
+  }
+
   // records
 
   let records;
@@ -668,6 +680,7 @@ export async function exec(argv2: string[]) {
       target: target as Target,
       symLinks,
       doCompress,
+      nativeBuild
     });
 
     if (target.platform !== 'win' && target.output) {

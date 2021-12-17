@@ -61,9 +61,12 @@ export function follow(x: string, opts: FollowOptions) {
           try {
             stat = fs.statSync(file);
           } catch (e) {
-            if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR'))
+            const ex = e as NodeJS.ErrnoException;
+
+            if (ex && (ex.code === 'ENOENT' || ex.code === 'ENOTDIR'))
               return false;
-            throw e;
+
+            throw ex;
           }
 
           return stat.isFile() || stat.isFIFO();
@@ -81,11 +84,13 @@ export function follow(x: string, opts: FollowOptions) {
           try {
             stat = fs.statSync(directory);
           } catch (e) {
-            if (e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')) {
+            const ex = e as NodeJS.ErrnoException;
+
+            if (ex && (ex.code === 'ENOENT' || ex.code === 'ENOTDIR')) {
               return false;
             }
 
-            throw e;
+            throw ex;
           }
 
           return stat.isDirectory();
