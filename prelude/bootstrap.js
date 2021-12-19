@@ -13,6 +13,7 @@
 /* global DICT */
 /* global DOCOMPRESS */
 /* global SYMLINKS */
+/* global MOCK_NODE */
 
 'use strict';
 
@@ -61,7 +62,6 @@ const NODE_VERSION_MINOR = process.version.match(/^v\d+.(\d+)/)[1] | 0;
 const ARGV0 = process.argv[0];
 const EXECPATH = process.execPath;
 let ENTRYPOINT = process.argv[1];
-const MOCK_NODE = process.env.MOCK_NODE !== 'false';
 
 if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };

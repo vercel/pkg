@@ -680,7 +680,8 @@ export async function exec(argv2: string[]) {
       target: target as Target,
       symLinks,
       doCompress,
-      nativeBuild
+      nativeBuild,
+      mockNode: process.env.MOCK_NODE !== 'false'
     });
 
     if (target.platform !== 'win' && target.output) {

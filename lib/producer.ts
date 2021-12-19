@@ -252,6 +252,7 @@ interface ProducerOptions {
   symLinks: SymLinks;
   doCompress: CompressType;
   nativeBuild: boolean;
+  mockNode: boolean;
 }
 
 /**
@@ -316,6 +317,7 @@ export default function producer({
   symLinks,
   doCompress,
   nativeBuild,
+  mockNode,
 }: ProducerOptions) {
   return new Promise<void>((resolve, reject) => {
     if (!Buffer.alloc) {
@@ -487,21 +489,25 @@ export default function producer({
                       replaceDollarWise(
                         replaceDollarWise(
                           replaceDollarWise(
-                            prelude,
-                            '%VIRTUAL_FILESYSTEM%',
-                            JSON.stringify(vfs)
+                            replaceDollarWise(
+                              prelude,
+                              '%VIRTUAL_FILESYSTEM%',
+                              JSON.stringify(vfs)
+                            ),
+                            '%DEFAULT_ENTRYPOINT%',
+                            JSON.stringify(entrypoint)
                           ),
-                          '%DEFAULT_ENTRYPOINT%',
-                          JSON.stringify(entrypoint)
+                          '%SYMLINKS%',
+                          JSON.stringify(snapshotSymLinks)
                         ),
-                        '%SYMLINKS%',
-                        JSON.stringify(snapshotSymLinks)
+                        '%DICT%',
+                        JSON.stringify(fileDictionary)
                       ),
-                      '%DICT%',
-                      JSON.stringify(fileDictionary)
+                      '%DOCOMPRESS%',
+                      JSON.stringify(doCompress)
                     ),
-                    '%DOCOMPRESS%',
-                    JSON.stringify(doCompress)
+                    '%MOCK_NODE%',
+                    JSON.stringify(mockNode)
                   )
                 )
               )
