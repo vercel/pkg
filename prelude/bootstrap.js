@@ -61,7 +61,7 @@ const NODE_VERSION_MINOR = process.version.match(/^v\d+.(\d+)/)[1] | 0;
 const ARGV0 = process.argv[0];
 const EXECPATH = process.execPath;
 let ENTRYPOINT = process.argv[1];
-let MOCK_NODE = false;
+const MOCK_NODE = process.env.MOCK_NODE !== 'false';
 
 if (process.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') {
   return { undoPatch: true };
@@ -1999,7 +1999,7 @@ function payloadFileSync(pointer) {
   }
 
   function modifyLong(args, index) {
-    if (!args[index]) return;
+    if (!MOCK_NODE || !args[index]) return;
     return (
       startsWith(args, index, 'node') ||
       startsWith(args, index, ARGV0) ||
