@@ -303,7 +303,7 @@ function stepDetect(
 
 function findCommonJunctionPoint(file: string, realFile: string) {
   // find common denominator => where the link changes
-  while (toNormalizedRealPath(path.dirname(file)) === path.dirname(realFile)) {
+  while (path.basename(file) === path.basename(realFile)) {
     file = path.dirname(file);
     realFile = path.dirname(realFile);
   }
