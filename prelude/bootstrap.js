@@ -158,7 +158,7 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
-function copyFileSync(source, target) {
+function customCopyFile(source, target) {
   let targetFile = target;
 
   // If target is a directory, a new file with the same name will be created
@@ -188,7 +188,7 @@ function copyFolderRecursiveSync(source, target) {
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
-        copyFileSync(curSource, targetFolder);
+        customCopyFile(curSource, targetFolder);
       }
     });
   }
@@ -572,6 +572,8 @@ function payloadFileSync(pointer) {
     mkdirSync: fs.mkdirSync,
     mkdir: fs.mkdir,
     createReadStream: fs.createReadStream,
+    copyFileSync: fs.copyFileSync,
+    copyFile: fs.copyFile,
   };
 
   ancestor.realpathSync.native = fs.realpathSync;
@@ -1066,6 +1068,64 @@ function payloadFileSync(pointer) {
     });
   };
 
+  fs.copyFile = function copyFile(src, dest, flags, callback) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFile(src, dest, flags, callback);
+      return;
+    }
+    if (typeof flags === 'function') {
+      callback = flags;
+      flags = 0;
+    } else if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be a function');
+    }
+
+    fs.readFile(src, (readError, content) => {
+      if (readError) {
+        callback(readError);
+        return;
+      }
+      if (flags & fs.constants.COPYFILE_EXCL) {
+        fs.stat(dest, (statError) => {
+          if (!statError) {
+            callback(
+              Object.assign(new Error('File already exists'), {
+                code: 'EEXIST',
+              })
+            );
+            return;
+          }
+          if (statError.code !== 'ENOENT') {
+            callback(statError);
+            return;
+          }
+          fs.writeFile(dest, content, callback);
+        });
+      } else {
+        fs.writeFile(dest, content, callback);
+      }
+    });
+  };
+
+  fs.copyFileSync = function copyFileSync(src, dest, flags) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFileSync(src, dest, flags);
+      return;
+    }
+    const content = fs.readFileSync(src);
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      try {
+        fs.statSync(dest);
+      } catch (statError) {
+        if (statError.code !== 'ENOENT') throw statError;
+        fs.writeFileSync(dest, content);
+        return;
+      }
+      throw Object.assign(new Error('File already exists'), { code: 'EEXIST' });
+    }
+    fs.writeFileSync(dest, content);
+  };
+
   // ///////////////////////////////////////////////////////////////
   // writeFile /////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
@@ -1540,6 +1600,7 @@ function payloadFileSync(pointer) {
       lstat: fs.promises.lstat,
       fstat: fs.promises.fstat,
       access: fs.promises.access,
+      copyFile: fs.promises.copyFile,
     };
 
     fs.promises.open = async function open(path_) {
@@ -1586,6 +1647,7 @@ function payloadFileSync(pointer) {
 
     // this one use promisify on purpose
     fs.promises.readdir = util.promisify(fs.readdir);
+    fs.promises.copyFile = util.promisify(fs.copyFile);
 
     /*
     fs.promises.read = util.promisify(fs.read);
