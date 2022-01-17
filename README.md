@@ -26,7 +26,7 @@ npm install -g pkg
 
 After installing it, run `pkg --help` without arguments to see list of options:
 
-```bash
+```console
 pkg [options] <input>
 
   Options:
