@@ -1188,7 +1188,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, false);
 
-    if (!options) {
+    if (!options || options.withFileTypes) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
@@ -1209,7 +1209,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, true);
 
-    if (!options) {
+    if (!options || options.withFileTypes) {
       return ancestor.readdir.apply(fs, arguments);
     }
 
