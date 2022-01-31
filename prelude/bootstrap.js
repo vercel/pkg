@@ -2107,13 +2107,11 @@ function payloadFileSync(pointer) {
         // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
         const modulePkgFolder = parts.slice(0, mIndex + 1).join(path.sep);
 
-        if (!fs.existsSync(tmpFolder)) {
-          // here we copy all files from the snapshot module folder to temporary folder
-          // we keep the module folder structure to prevent issues with modules that are statically
-          // linked using relative paths (Fix #1075)
-          createDirRecursively(tmpFolder);
-          copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
-        }
+        // here we copy all files from the snapshot module folder to temporary folder
+        // we keep the module folder structure to prevent issues with modules that are statically
+        // linked using relative paths (Fix #1075)
+        createDirRecursively(tmpFolder);
+        copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
 
         // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
         newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
