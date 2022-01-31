@@ -17,15 +17,7 @@ const input = './read.js';
 const output = './run-time/test-output.exe';
 
 utils.mkdirp.sync(path.dirname(output));
-utils.pkg.sync([
-  '--target',
-  target,
-  '--assets',
-  'files/*.js',
-  '--output',
-  output,
-  '.',
-]);
+utils.pkg.sync(['--target', target, '--output', output, '.']);
 
 let left, right;
 left = utils.spawn.sync('node', [path.basename(input)], {
