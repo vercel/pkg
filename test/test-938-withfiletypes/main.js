@@ -27,14 +27,10 @@ utils.pkg.sync([
   '.',
 ]);
 
-let left, right;
-left = utils.spawn.sync('node', [path.basename(input)], {
-  cwd: path.dirname(input),
-});
-
+let right;
 right = utils.spawn.sync(output, [], {
   cwd: path.dirname(input),
 });
 
-assert.strictEqual(left, right);
+assert.strictEqual('ok\n', right);
 utils.vacuum.sync(path.dirname(output));
