@@ -1116,6 +1116,7 @@ function payloadFileSync(pointer) {
     return entries.map((entry) => {
       const ff = path.join(path_, entry);
       const entity = findVirtualFileSystemEntry(ff);
+      if (!entity) return undefined;
       if (entity[STORE_BLOB] || entity[STORE_CONTENT])
         return new Dirent(entry, 1);
       if (entity[STORE_LINKS]) return new Dirent(entry, 2);
@@ -1188,7 +1189,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, false);
 
-    if (!options) {
+    if (!options || !insideSnapshot(path_)) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
@@ -1209,7 +1210,7 @@ function payloadFileSync(pointer) {
 
     const options = readdirOptions(options_, true);
 
-    if (!options) {
+    if (!options || !insideSnapshot(path_)) {
       return ancestor.readdir.apply(fs, arguments);
     }
 
