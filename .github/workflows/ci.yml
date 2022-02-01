@@ -1,4 +1,19 @@
-name: CI
+protected.
+
+git@github.com:Iixixi/paradice-.git
+Step 1: From your project repository, bring in the changes and test.
+
+git fetch origin
+git checkout -b tests origin/tests
+git merge master
+Step 2: Merge the changes and update on GitHub.
+
+git checkout master
+git merge --no-ff tests
+git push origin master
+
+
+Name: ci
 
 on:
   push:
