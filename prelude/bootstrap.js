@@ -2116,7 +2116,10 @@ function payloadFileSync(pointer) {
         // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
         newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
       } else {
-        // simple load the file in the temporary folder
+        createDirRecursively(tmpFolder);
+        copyFileSync(modulePath, tmpFolder);
+
+        // load the copied file in the temporary folder
         newPath = path.join(tmpFolder, moduleBaseName);
       }
 
