@@ -169,9 +169,8 @@ function copyInChunks(
   const targetFile = fs_.openSync(target, 'w');
 
   let bytesRead = 1;
-  let buffer = Buffer.alloc(chunkSize);
-
   while (bytesRead > 0) {
+    const buffer = Buffer.alloc(chunkSize);
     bytesRead = fs_.readSync(sourceFile, buffer, 0, chunkSize);
     fs_.writeSync(targetFile, buffer, 0, bytesRead);
   }
