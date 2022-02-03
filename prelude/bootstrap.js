@@ -1116,6 +1116,7 @@ function payloadFileSync(pointer) {
     return entries.map((entry) => {
       const ff = path.join(path_, entry);
       const entity = findVirtualFileSystemEntry(ff);
+      if (!entity) return undefined;
       if (entity[STORE_BLOB] || entity[STORE_CONTENT])
         return new Dirent(entry, 1);
       if (entity[STORE_LINKS]) return new Dirent(entry, 2);
@@ -1123,16 +1124,24 @@ function payloadFileSync(pointer) {
     });
   }
 
-  function readdirRoot(path_, cb) {
-    if (cb) {
-      ancestor.readdir(path_, (error, entries) => {
-        if (error) return cb(error);
+  function readdirRoot(path_, options, cb) {
+    function addSnapshot(entries) {
+      if (options && options.withFileTypes) {
+        entries.push(new Dirent('snapshot', 2));
+      } else {
         entries.push('snapshot');
+      }
+    }
+
+    if (cb) {
+      ancestor.readdir(path_, options, (error, entries) => {
+        if (error) return cb(error);
+        addSnapshot(entries);
         cb(null, entries);
       });
     } else {
-      const entries = ancestor.readdirSync(path_);
-      entries.push('snapshot');
+      const entries = ancestor.readdirSync(path_, options);
+      addSnapshot(entries);
       return entries;
     }
   }
@@ -1149,10 +1158,8 @@ function payloadFileSync(pointer) {
     }
   }
 
-  function readdirFromSnapshot(path_, isRoot, cb) {
+  function readdirFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
-    if (isRoot) return readdirRoot(path_, cb);
-
     const entity = findVirtualFileSystemEntry(path_);
 
     if (!entity) {
@@ -1182,17 +1189,22 @@ function payloadFileSync(pointer) {
     if (!insideSnapshot(path_) && !isRoot) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
+
     if (insideMountpoint(path_)) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readdirOptions(options_, false);
 
-    if (!options || options.withFileTypes) {
+    if (isRoot) {
+      return readdirRoot(path_, options);
+    }
+
+    if (!options) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
-    let entries = readdirFromSnapshot(path_, isRoot);
+    let entries = readdirFromSnapshot(path_);
     if (options.withFileTypes) entries = getFileTypes(path_, entries);
     return entries;
   };
@@ -1208,13 +1220,17 @@ function payloadFileSync(pointer) {
     }
 
     const options = readdirOptions(options_, true);
+    const callback = dezalgo(maybeCallback(arguments));
 
-    if (!options || options.withFileTypes) {
+    if (isRoot) {
+      return readdirRoot(path_, options, callback);
+    }
+
+    if (!options) {
       return ancestor.readdir.apply(fs, arguments);
     }
 
-    const callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path_, isRoot, (error, entries) => {
+    readdirFromSnapshot(path_, (error, entries) => {
       if (error) return callback(error);
       if (options.withFileTypes) entries = getFileTypes(path_, entries);
       callback(null, entries);
@@ -2100,7 +2116,10 @@ function payloadFileSync(pointer) {
         // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
         newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
       } else {
-        // simple load the file in the temporary folder
+        createDirRecursively(tmpFolder);
+        copyFileSync(modulePath, tmpFolder);
+
+        // load the copied file in the temporary folder
         newPath = path.join(tmpFolder, moduleBaseName);
       }
 
