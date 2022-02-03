@@ -1,3 +1,37 @@
+Documentation	
+The exact name of the entity filing the report as specified in its charter, which is required by forms filed with the SEC.
+Label
+Engineering's
+Zachry Tyler Wood 
+Terse Label	
+Vscode
+Entry Registrant Name
+GitHub
+Period ending Date: 2021/09/28
+Type : Employer Id Item Type
+Documentation : The Tax Identification Number (TIN), also known as an Employer Identification Number (EIN), is a unique 9-digit value assigned by the IRS.
+Label : TIN,
+Terse Label : Entity Tax Identification Number
+Name : Regulation 12B
+Number : 240
+Publisher : SEC
+Section : 12
+Subsection : b-2
+Balance : Available
+Documentation	
+The exact name of the entity filing the report as specified in its charter, which is required by forms filed with the SEC.
+Zachry Tyler Wood :Documentation	
+The exact name of the entity filing the report as specified in its charter, which is required by forms filed with the SEC.
+Label	
+Entity Registrant Name
+Terse Label Coinbase
+Entry Registrant Fact ZachryTylerWood/vscode
+The exact name of the entity filing the report as specified in its charter, which is required by forms filed with the SEC.
+Label	VOLUME {{ {{[(((c)(r))[12753750[.00m]BITORE_34173)]}} }} 
+VALUE BTCUSD CCC BTC BTCS BCHS MORGAN STANLEY SMITH BARNEY INVESTMENTS HOLDINGS MANAGEMENT AGENCIES NA LLC NA GOOG META FB SNAP YOUTUBE AND EXCHANGE COMMISSION DEPARTMENT OF THE TREASURY TRUST AGRERMENT THE ANNONIMITY PREVIOUSLY REQUESTED 12753750
+Entity Registrant Name
+Terse Label	
+Entry Registrant: Zachry Tyler WoodName
 name: 🐞 Bug Report
 description: Create a bug report for pkg
 labels: 'template: bug'
