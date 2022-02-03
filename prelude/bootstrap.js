@@ -158,19 +158,28 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
-function copyFileSync(source, target) {
-  let targetFile = target;
+const DEFAULT_COPY_CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+function copyInChunks(
+  source,
+  target,
+  chunkSize = DEFAULT_COPY_CHUNK_SIZE,
+  fs_ = fs
+) {
+  const sourceFile = fs_.openSync(source, 'r');
+  const targetFile = fs_.openSync(target, 'w');
 
-  // If target is a directory, a new file with the same name will be created
-  if (fs.existsSync(target)) {
-    if (fs.lstatSync(target).isDirectory()) {
-      targetFile = path.join(target, path.basename(source));
-    }
+  let bytesRead = 1;
+  while (bytesRead > 0) {
+    const buffer = Buffer.alloc(chunkSize);
+    bytesRead = fs_.readSync(sourceFile, buffer, 0, chunkSize);
+    fs_.writeSync(targetFile, buffer, 0, bytesRead);
   }
 
-  fs.writeFileSync(targetFile, fs.readFileSync(source));
+  fs_.closeSync(sourceFile);
+  fs_.closeSync(targetFile);
 }
 
+// TODO: replace this with fs.cpSync when we drop Node < 16
 function copyFolderRecursiveSync(source, target) {
   let files = [];
 
@@ -188,7 +197,10 @@ function copyFolderRecursiveSync(source, target) {
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
-        copyFileSync(curSource, targetFolder);
+        fs.copyFileSync(
+          curSource,
+          path.join(targetFolder, path.basename(curSource))
+        );
       }
     });
   }
@@ -572,6 +584,8 @@ function payloadFileSync(pointer) {
     mkdirSync: fs.mkdirSync,
     mkdir: fs.mkdir,
     createReadStream: fs.createReadStream,
+    copyFileSync: fs.copyFileSync,
+    copyFile: fs.copyFile,
   };
 
   ancestor.realpathSync.native = fs.realpathSync;
@@ -1066,6 +1080,67 @@ function payloadFileSync(pointer) {
     });
   };
 
+  fs.copyFile = function copyFile(src, dest, flags, callback) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFile(src, dest, flags, callback);
+      return;
+    }
+    if (typeof flags === 'function') {
+      callback = flags;
+      flags = 0;
+    } else if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be a function');
+    }
+
+    function _streamCopy() {
+      fs.createReadStream(src)
+        .on('error', callback)
+        .pipe(fs.createWriteStream(dest))
+        .on('error', callback)
+        .on('finish', callback);
+    }
+
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      fs.stat(dest, (statError) => {
+        if (!statError) {
+          callback(
+            Object.assign(new Error('File already exists'), {
+              code: 'EEXIST',
+            })
+          );
+          return;
+        }
+        if (statError.code !== 'ENOENT') {
+          callback(statError);
+          return;
+        }
+        _streamCopy();
+      });
+    } else {
+      _streamCopy();
+    }
+  };
+
+  fs.copyFileSync = function copyFileSync(src, dest, flags) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFileSync(src, dest, flags);
+      return;
+    }
+
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      try {
+        fs.statSync(dest);
+      } catch (statError) {
+        if (statError.code !== 'ENOENT') throw statError;
+        copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
+        return;
+      }
+
+      throw Object.assign(new Error('File already exists'), { code: 'EEXIST' });
+    }
+    copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
+  };
+
   // ///////////////////////////////////////////////////////////////
   // writeFile /////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
@@ -1556,6 +1631,7 @@ function payloadFileSync(pointer) {
       lstat: fs.promises.lstat,
       fstat: fs.promises.fstat,
       access: fs.promises.access,
+      copyFile: fs.promises.copyFile,
     };
 
     fs.promises.open = async function open(path_) {
@@ -1602,6 +1678,7 @@ function payloadFileSync(pointer) {
 
     // this one use promisify on purpose
     fs.promises.readdir = util.promisify(fs.readdir);
+    fs.promises.copyFile = util.promisify(fs.copyFile);
 
     /*
     fs.promises.read = util.promisify(fs.read);
@@ -2093,6 +2170,8 @@ function payloadFileSync(pointer) {
       // Example: /tmp/pkg/<hash>
       const tmpFolder = path.join(tmpdir(), 'pkg', hash);
 
+      createDirRecursively(tmpFolder);
+
       // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
       const parts = moduleFolder.split(path.sep);
       const mIndex = parts.indexOf('node_modules') + 1;
@@ -2110,14 +2189,12 @@ function payloadFileSync(pointer) {
         // here we copy all files from the snapshot module folder to temporary folder
         // we keep the module folder structure to prevent issues with modules that are statically
         // linked using relative paths (Fix #1075)
-        createDirRecursively(tmpFolder);
         copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
 
         // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
         newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
       } else {
-        createDirRecursively(tmpFolder);
-        copyFileSync(modulePath, tmpFolder);
+        fs.copyFileSync(modulePath, path.join(tmpFolder, moduleBaseName));
 
         // load the copied file in the temporary folder
         newPath = path.join(tmpFolder, moduleBaseName);
