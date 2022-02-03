@@ -179,19 +179,7 @@ function copyInChunks(
   fs_.closeSync(targetFile);
 }
 
-function customCopyFile(source, target, chunkSize) {
-  let targetFile = target;
-
-  // If target is a directory, a new file with the same name will be created
-  if (fs.existsSync(target)) {
-    if (fs.lstatSync(target).isDirectory()) {
-      targetFile = path.join(target, path.basename(source));
-    }
-  }
-
-  copyInChunks(source, targetFile, chunkSize);
-}
-
+// TODO: replace this with fs.cpSync when we drop Node < 16
 function copyFolderRecursiveSync(source, target) {
   let files = [];
 
@@ -209,7 +197,10 @@ function copyFolderRecursiveSync(source, target) {
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
-        customCopyFile(curSource, targetFolder);
+        fs.copyFileSync(
+          curSource,
+          path.join(targetFolder, path.basename(curSource))
+        );
       }
     });
   }
