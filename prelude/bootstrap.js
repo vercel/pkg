@@ -158,7 +158,28 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
-function customCopyFile(source, target) {
+const DEFAULT_COPY_CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+function copyInChunks(
+  source,
+  target,
+  chunkSize = DEFAULT_COPY_CHUNK_SIZE,
+  fs_ = fs
+) {
+  const sourceFile = fs_.openSync(source, 'r');
+  const targetFile = fs_.openSync(target, 'w');
+
+  let bytesRead = 1;
+  while (bytesRead > 0) {
+    const buffer = Buffer.alloc(chunkSize);
+    bytesRead = fs_.readSync(sourceFile, buffer, 0, chunkSize);
+    fs_.writeSync(targetFile, buffer, 0, bytesRead);
+  }
+
+  fs_.closeSync(sourceFile);
+  fs_.closeSync(targetFile);
+}
+
+function customCopyFile(source, target, chunkSize) {
   let targetFile = target;
 
   // If target is a directory, a new file with the same name will be created
@@ -168,7 +189,7 @@ function customCopyFile(source, target) {
     }
   }
 
-  fs.writeFileSync(targetFile, fs.readFileSync(source));
+  copyInChunks(source, targetFile, chunkSize);
 }
 
 function copyFolderRecursiveSync(source, target) {
@@ -1080,31 +1101,33 @@ function payloadFileSync(pointer) {
       throw new TypeError('Callback must be a function');
     }
 
-    fs.readFile(src, (readError, content) => {
-      if (readError) {
-        callback(readError);
-        return;
-      }
-      if (flags & fs.constants.COPYFILE_EXCL) {
-        fs.stat(dest, (statError) => {
-          if (!statError) {
-            callback(
-              Object.assign(new Error('File already exists'), {
-                code: 'EEXIST',
-              })
-            );
-            return;
-          }
-          if (statError.code !== 'ENOENT') {
-            callback(statError);
-            return;
-          }
-          fs.writeFile(dest, content, callback);
-        });
-      } else {
-        fs.writeFile(dest, content, callback);
-      }
-    });
+    function _streamCopy() {
+      fs.createReadStream(src)
+        .on('error', callback)
+        .pipe(fs.createWriteStream(dest))
+        .on('error', callback)
+        .on('finish', callback);
+    }
+
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      fs.stat(dest, (statError) => {
+        if (!statError) {
+          callback(
+            Object.assign(new Error('File already exists'), {
+              code: 'EEXIST',
+            })
+          );
+          return;
+        }
+        if (statError.code !== 'ENOENT') {
+          callback(statError);
+          return;
+        }
+        _streamCopy();
+      });
+    } else {
+      _streamCopy();
+    }
   };
 
   fs.copyFileSync = function copyFileSync(src, dest, flags) {
@@ -1112,18 +1135,19 @@ function payloadFileSync(pointer) {
       ancestor.copyFileSync(src, dest, flags);
       return;
     }
-    const content = fs.readFileSync(src);
+
     if (flags & fs.constants.COPYFILE_EXCL) {
       try {
         fs.statSync(dest);
       } catch (statError) {
         if (statError.code !== 'ENOENT') throw statError;
-        fs.writeFileSync(dest, content);
+        copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
         return;
       }
+
       throw Object.assign(new Error('File already exists'), { code: 'EEXIST' });
     }
-    fs.writeFileSync(dest, content);
+    copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
   };
 
   // ///////////////////////////////////////////////////////////////
