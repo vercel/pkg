@@ -2029,6 +2029,66 @@ function payloadFileSync(pointer) {
     }
   }
 
+  function wrappedSpawnFunc(fn) {
+    return function wrappedSpawn(options) {
+      function cleanup(tmp) {
+        if (!fs.existsSync(tmp)) return;
+        const major = parseInt(process.versions.node.split('.')[0], 10);
+        if (major >= 16) {
+          fs.rmSync(tmp, { recursive: true });
+        } else if (major > 12) {
+          fs.rmdirSync(tmp, { recursive: true });
+        } else {
+          const files = fs.readdirSync(tmp);
+          for (const file of files) {
+            fs.unlinkSync(path.join(tmp, file));
+          }
+        }
+      }
+
+      function shouldRunUsingCmd(file) {
+        return (
+          process.platform === 'win32' &&
+          (file.endsWith('.cmd') || file.endsWith('.bat'))
+        );
+      }
+
+      const { cwd, file } = options;
+      const oldFile = path.join(cwd || '', file);
+      if (insideSnapshot(oldFile)) {
+        const tmp = fs.mkdtempSync(path.join(tmpdir(), 'pkg-'));
+        const newFile = path.resolve(tmp, path.basename(file));
+
+        if (shouldRunUsingCmd(file)) {
+          options.file = 'cmd.exe';
+          options.args = ['/c', newFile, ...options.args];
+        } else {
+          options.file = newFile;
+        }
+
+        fs.copyFileSync(file, newFile);
+        if (process.platform !== 'win32') {
+          fs.chmodSync(newFile, fs.constants.S_IRWXU);
+        }
+      }
+
+      const child = fn.call(this, options);
+      if (child instanceof childProcess.ChildProcess) {
+        child.on('exit', () => cleanup());
+      } else {
+        cleanup();
+      }
+
+      return child;
+    };
+  }
+
+  const spawnSyncBinding = process.binding('spawn_sync');
+  spawnSyncBinding.spawn = wrappedSpawnFunc(spawnSyncBinding.spawn);
+  childProcess.ChildProcess.prototype.spawn = wrappedSpawnFunc(
+    childProcess.ChildProcess.prototype.spawn
+  );
+
   childProcess.spawn = function spawn() {
     const args = cloneArgs(arguments);
     setOptsEnv(args);

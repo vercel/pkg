@@ -1,1 +1,2 @@
-echo "working as intended"
+@echo off
+echo working as intended

@@ -17,11 +17,11 @@ utils.mkdirp.sync(path.dirname(output));
 utils.pkg.sync(['--target', target, '--output', output, '.']);
 
 let left, right;
-left = utils.spawn.sync('node', [path.basename(input)], {
+right = utils.spawn.sync('node', [path.basename(input)], {
   cwd: path.dirname(input),
 });
 
-right = utils.spawn.sync(output, [], {
+left = utils.spawn.sync(output, [], {
   cwd: path.dirname(input),
 });
 
