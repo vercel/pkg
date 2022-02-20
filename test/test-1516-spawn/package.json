@@ -1,0 +1,6 @@
+{
+  "bin": "spawn.js",
+  "pkg": {
+    "scripts": "files/*"
+  }
+}
