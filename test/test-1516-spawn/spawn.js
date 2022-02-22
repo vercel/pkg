@@ -36,27 +36,33 @@ function execFile(path, args, opts) {
 }
 
 async function test() {
+  const isWindows = process.platform === 'win32';
+
+  let args = [];
   let filename = 'test.sh';
-  if (process.platform === 'win32') {
-    filename = 'test.bat';
+  if (isWindows) {
+    filename = 'cmd.exe';
+    args = ['/c', 'test.bat'];
   }
 
   const dir = join(__dirname, 'files');
   const files = readdirSync(dir);
-  console.log(files.join(', '));
-
   for (const file of ['test.sh', 'test.bat']) {
     if (!files.includes(file)) {
       throw new Error('Missing file in snapshot');
     }
   }
 
-  const path = join(dir, filename);
-  spawnSync(path, [], { stdio: 'inherit', detached: false });
-  await spawn(path, [], { stdio: 'inherit', detached: false });
+  const path = join(isWindows ? '' : dir, filename);
+  spawnSync(path, args, { stdio: 'inherit', detached: false });
+  await spawn(path, args, { stdio: 'inherit', detached: false });
 
-  execFileSync(path, [], { stdio: 'inherit', detached: false });
-  await execFile(path, [], { stdio: 'inherit', detached: false });
+  execFileSync(path, args, { stdio: 'inherit', detached: false });
+  await execFile(path, args, { stdio: 'inherit', detached: false });
+
+  if (isWindows) {
+    await spawn(join(dir, 'test.bat'), [], { stdio: 'inherit', shell: true });
+  }
 }
 
 test().catch(console.error);
