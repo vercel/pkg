@@ -2068,7 +2068,8 @@ function payloadFileSync(pointer) {
 
         fs.copyFileSync(file, newFile);
         if (process.platform !== 'win32') {
-          fs.chmodSync(newFile, fs.constants.S_IRWXU);
+          const stat = fs.statSync(oldFile);
+          fs.chmodSync(newFile, stat.mode);
         }
       }
 
