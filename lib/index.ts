@@ -268,11 +268,11 @@ export async function exec(argv2: string[]) {
     return;
   }
 
-  log.info(`pkg@${version}`);
-
   // debug
 
   log.debugMode = argv.d || argv.debug;
+
+  if ( log.debugMode ) log.info(`pkg@${version}`);
 
   // forceBuild
 
