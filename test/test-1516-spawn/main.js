@@ -10,6 +10,14 @@ assert(!module.parent);
 assert(__dirname === process.cwd());
 
 const target = process.argv[2] || 'host';
+utils.pkg.sync([
+  '--target',
+  target,
+  '--output',
+  './files/test.exe',
+  './files/test.js',
+]);
+
 const input = './spawn.js';
 const output = './run-time/test-output.exe';
 
@@ -27,3 +35,4 @@ left = utils.spawn.sync(output, [], {
 
 assert.strictEqual(left, right);
 utils.vacuum.sync(path.dirname(output));
+utils.vacuum.sync('./files/test.exe');

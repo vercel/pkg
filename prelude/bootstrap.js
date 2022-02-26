@@ -2033,32 +2033,29 @@ function payloadFileSync(pointer) {
     return function wrappedSpawn(options) {
       function cleanup(tmp) {
         if (!fs.existsSync(tmp)) return;
-        const major = parseInt(process.versions.node.split('.')[0], 10);
-        if (major >= 16) {
+        if (NODE_VERSION_MAJOR >= 16) {
           fs.rmSync(tmp, { recursive: true });
-        } else if (major > 12) {
+        } else if (NODE_VERSION_MAJOR > 12) {
           fs.rmdirSync(tmp, { recursive: true });
         } else {
           const files = fs.readdirSync(tmp);
           for (const file of files) {
             fs.unlinkSync(path.join(tmp, file));
           }
+          fs.unlinkSync(tmp);
         }
       }
 
-      function findBatArgIndex() {
-        return options.args.findIndex(
-          (arg) => arg.endsWith('.bat') || arg.endsWith('.cmd')
-        );
-      }
-
-      const batArgIdx = findBatArgIndex();
       function isShellSetAndInsideSnapshot() {
         return Boolean(
           options.shell &&
             insideSnapshot(path.join(options.cwd || '', options.file))
         );
       }
+
+      const batArgIdx = options.args.findIndex(
+        (arg) => arg.endsWith('.bat') || arg.endsWith('.cmd')
+      );
 
       function isBatAndInsideSnapshot() {
         if (process.platform !== 'win32') {
