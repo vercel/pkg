@@ -47,7 +47,7 @@ function hasAnyStore(record: FileRecord) {
 interface PackerOptions {
   records: FileRecords;
   entrypoint: string;
-  bytecode: string;
+  bytecode: boolean;
   symLinks: SymLinks;
 }
 
@@ -159,7 +159,7 @@ export default function packer({
     }
   }
   const prelude =
-    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS, DICT, DOCOMPRESS) { 
+    `return (function (REQUIRE_COMMON, VIRTUAL_FILESYSTEM, DEFAULT_ENTRYPOINT, SYMLINKS, DICT, DOCOMPRESS) {
         ${bootstrapText}${
       log.debugMode ? diagnosticText : ''
     }\n})(function (exports) {\n${commonText}\n},\n` +
