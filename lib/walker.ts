@@ -847,7 +847,7 @@ class Walker {
     for (const derivative of derivatives) {
       if (natives[derivative.alias]) continue;
       if (derivative.alias.startsWith('node:')) {
-        if (natives[derivative.alias.substr(5)]) continue;
+        if (natives[derivative.alias.slice(5)]) continue;
       }
       
       switch (derivative.aliasType) {
