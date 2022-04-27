@@ -1,7 +1,6 @@
 /* eslint-disable require-atomic-updates */
 
 import assert from 'assert';
-import { execSync } from 'child_process';
 import {
   existsSync,
   mkdirp,
@@ -27,7 +26,7 @@ import { shutdown } from './fabricator';
 import walk, { Marker, WalkerParams } from './walker';
 import { Target, NodeTarget, SymLinks } from './types';
 import { CompressType } from './compress_type';
-import { patchMachOExecutable } from './mach-o';
+import { patchMachOExecutable, signMachOExecutable } from './mach-o';
 
 const { version } = JSON.parse(
   readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
@@ -226,6 +225,7 @@ export async function exec(argv2: string[]) {
       'b',
       'build',
       'bytecode',
+      'native-build',
       'd',
       'debug',
       'h',
@@ -245,13 +245,14 @@ export async function exec(argv2: string[]) {
       'out-dir',
       'out-path',
       'public-packages',
+      'no-dict',
       't',
       'target',
       'targets',
       'C',
       'compress',
     ],
-    default: { bytecode: true },
+    default: { bytecode: true, 'native-build': true },
   });
 
   if (argv.h || argv.help) {
@@ -463,9 +464,9 @@ export async function exec(argv2: string[]) {
     throw wasReported(`Something is wrong near ${JSON.stringify(sTargets)}`);
   }
 
-  let targets = (parseTargets(
+  let targets = parseTargets(
     sTargets.split(',').filter((t) => t)
-  ) as unknown) as Array<NodeTarget & Partial<Target>>;
+  ) as unknown as Array<NodeTarget & Partial<Target>>;
 
   if (!targets.length) {
     let jsonTargets;
@@ -541,6 +542,8 @@ export async function exec(argv2: string[]) {
 
   const { bytecode } = argv;
 
+  const nativeBuild = argv['native-build']
+
   for (const target of targets) {
     target.forceBuild = forceBuild;
 
@@ -573,7 +576,15 @@ export async function exec(argv2: string[]) {
         const signedBinaryPath = `${f.binaryPath}-signed`;
         await remove(signedBinaryPath);
         copyFileSync(f.binaryPath, signedBinaryPath);
-        execSync(`codesign --sign - ${signedBinaryPath}`);
+        try {
+          signMachOExecutable(signedBinaryPath);
+        } catch {
+          throw wasReported('Cannot generate bytecode', [
+            'pkg fails to run "codesign" utility. Due to the mandatory signing',
+            'requirement of macOS, executables must be signed. Please ensure the',
+            'utility is installed and properly configured.',
+          ]);
+        }
         f.binaryPath = signedBinaryPath;
       }
 
@@ -619,6 +630,14 @@ export async function exec(argv2: string[]) {
     }
   }
 
+  if (argv['no-dict']) {
+    params.noDictionary = argv['no-dict'].split(',');
+
+    if (params.noDictionary?.indexOf('*') !== -1) {
+      params.noDictionary = ['*'];
+    }
+  }
+
   // records
 
   let records;
@@ -661,6 +680,7 @@ export async function exec(argv2: string[]) {
       target: target as Target,
       symLinks,
       doCompress,
+      nativeBuild
     });
 
     if (target.platform !== 'win' && target.output) {
@@ -669,18 +689,22 @@ export async function exec(argv2: string[]) {
         const buf = patchMachOExecutable(readFileSync(target.output));
         writeFileSync(target.output, buf);
 
-        if (hostPlatform === 'macos') {
+        try {
           // sign executable ad-hoc to workaround the new mandatory signing requirement
           // users can always replace the signature if necessary
-          execSync(`codesign --sign - ${target.output}`);
-        } else if (target.arch === 'arm64') {
-          log.warn('Unable to sign the macOS executable on non-macOS host', [
-            'Due to the mandatory code signing requirement, before the',
-            'executable is distributed to end users, it must be signed with',
-            'the "codesign" utility of macOS, otherwise, it will be immediately',
-            'killed by kernel on launch. An ad-hoc signature is sufficient.',
-            'To do that, "codesign --sign - <executable>" on a Mac.',
-          ]);
+          signMachOExecutable(target.output);
+        } catch {
+          if (target.arch === 'arm64') {
+            log.warn('Unable to sign the macOS executable', [
+              'Due to the mandatory code signing requirement, before the',
+              'executable is distributed to end users, it must be signed.',
+              'Otherwise, it will be immediately killed by kernel on launch.',
+              'An ad-hoc signature is sufficient.',
+              'To do that, run pkg on a Mac, or transfer the executable to a Mac',
+              'and run "codesign --sign - <executable>", or (if you use Linux)',
+              'install "ldid" utility to PATH and then run pkg again',
+            ]);
+          }
         }
       }
 

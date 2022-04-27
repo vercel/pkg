@@ -1,0 +1,7 @@
+contact_links:
+  - name: 💡 Feature Request
+    url: https://github.com/vercel/pkg/discussions/new
+    about: Share ideas for new features
+  - name: ❓ Question
+    url: https://github.com/vercel/pkg/discussions/new
+    about: General questions

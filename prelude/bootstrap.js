@@ -158,6 +158,61 @@ function createMountpoint(interior, exterior) {
   mountpoints.push({ interior, exterior });
 }
 
+const DEFAULT_COPY_CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
+function copyInChunks(
+  source,
+  target,
+  chunkSize = DEFAULT_COPY_CHUNK_SIZE,
+  fs_ = fs
+) {
+  const sourceFile = fs_.openSync(source, 'r');
+  const targetFile = fs_.openSync(target, 'w');
+
+  let bytesRead = 1;
+  while (bytesRead > 0) {
+    const buffer = Buffer.alloc(chunkSize);
+    bytesRead = fs_.readSync(sourceFile, buffer, 0, chunkSize);
+    fs_.writeSync(targetFile, buffer, 0, bytesRead);
+  }
+
+  fs_.closeSync(sourceFile);
+  fs_.closeSync(targetFile);
+}
+
+// TODO: replace this with fs.cpSync when we drop Node < 16
+function copyFolderRecursiveSync(source, target) {
+  let files = [];
+
+  // Check if folder needs to be created or integrated
+  const targetFolder = path.join(target, path.basename(source));
+  if (!fs.existsSync(targetFolder)) {
+    fs.mkdirSync(targetFolder);
+  }
+
+  // Copy
+  if (fs.lstatSync(source).isDirectory()) {
+    files = fs.readdirSync(source);
+    files.forEach((file) => {
+      const curSource = path.join(source, file);
+      if (fs.lstatSync(curSource).isDirectory()) {
+        copyFolderRecursiveSync(curSource, targetFolder);
+      } else {
+        fs.copyFileSync(
+          curSource,
+          path.join(targetFolder, path.basename(curSource))
+        );
+      }
+    });
+  }
+}
+
+function createDirRecursively(dir) {
+  if (!fs.existsSync(dir)) {
+    createDirRecursively(path.join(dir, '..'));
+    fs.mkdirSync(dir);
+  }
+}
+
 /*
 
 // TODO move to some test
@@ -529,6 +584,8 @@ function payloadFileSync(pointer) {
     mkdirSync: fs.mkdirSync,
     mkdir: fs.mkdir,
     createReadStream: fs.createReadStream,
+    copyFileSync: fs.copyFileSync,
+    copyFile: fs.copyFile,
   };
 
   ancestor.realpathSync.native = fs.realpathSync;
@@ -1023,6 +1080,67 @@ function payloadFileSync(pointer) {
     });
   };
 
+  fs.copyFile = function copyFile(src, dest, flags, callback) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFile(src, dest, flags, callback);
+      return;
+    }
+    if (typeof flags === 'function') {
+      callback = flags;
+      flags = 0;
+    } else if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be a function');
+    }
+
+    function _streamCopy() {
+      fs.createReadStream(src)
+        .on('error', callback)
+        .pipe(fs.createWriteStream(dest))
+        .on('error', callback)
+        .on('finish', callback);
+    }
+
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      fs.stat(dest, (statError) => {
+        if (!statError) {
+          callback(
+            Object.assign(new Error('File already exists'), {
+              code: 'EEXIST',
+            })
+          );
+          return;
+        }
+        if (statError.code !== 'ENOENT') {
+          callback(statError);
+          return;
+        }
+        _streamCopy();
+      });
+    } else {
+      _streamCopy();
+    }
+  };
+
+  fs.copyFileSync = function copyFileSync(src, dest, flags) {
+    if (!insideSnapshot(path.resolve(src))) {
+      ancestor.copyFileSync(src, dest, flags);
+      return;
+    }
+
+    if (flags & fs.constants.COPYFILE_EXCL) {
+      try {
+        fs.statSync(dest);
+      } catch (statError) {
+        if (statError.code !== 'ENOENT') throw statError;
+        copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
+        return;
+      }
+
+      throw Object.assign(new Error('File already exists'), { code: 'EEXIST' });
+    }
+    copyInChunks(src, dest, DEFAULT_COPY_CHUNK_SIZE, fs);
+  };
+
   // ///////////////////////////////////////////////////////////////
   // writeFile /////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
@@ -1073,6 +1191,7 @@ function payloadFileSync(pointer) {
     return entries.map((entry) => {
       const ff = path.join(path_, entry);
       const entity = findVirtualFileSystemEntry(ff);
+      if (!entity) return undefined;
       if (entity[STORE_BLOB] || entity[STORE_CONTENT])
         return new Dirent(entry, 1);
       if (entity[STORE_LINKS]) return new Dirent(entry, 2);
@@ -1080,16 +1199,24 @@ function payloadFileSync(pointer) {
     });
   }
 
-  function readdirRoot(path_, cb) {
-    if (cb) {
-      ancestor.readdir(path_, (error, entries) => {
-        if (error) return cb(error);
+  function readdirRoot(path_, options, cb) {
+    function addSnapshot(entries) {
+      if (options && options.withFileTypes) {
+        entries.push(new Dirent('snapshot', 2));
+      } else {
         entries.push('snapshot');
+      }
+    }
+
+    if (cb) {
+      ancestor.readdir(path_, options, (error, entries) => {
+        if (error) return cb(error);
+        addSnapshot(entries);
         cb(null, entries);
       });
     } else {
-      const entries = ancestor.readdirSync(path_);
-      entries.push('snapshot');
+      const entries = ancestor.readdirSync(path_, options);
+      addSnapshot(entries);
       return entries;
     }
   }
@@ -1106,10 +1233,8 @@ function payloadFileSync(pointer) {
     }
   }
 
-  function readdirFromSnapshot(path_, isRoot, cb) {
+  function readdirFromSnapshot(path_, cb) {
     const cb2 = cb || rethrow;
-    if (isRoot) return readdirRoot(path_, cb);
-
     const entity = findVirtualFileSystemEntry(path_);
 
     if (!entity) {
@@ -1139,17 +1264,22 @@ function payloadFileSync(pointer) {
     if (!insideSnapshot(path_) && !isRoot) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
+
     if (insideMountpoint(path_)) {
       return ancestor.readdirSync.apply(fs, translateNth(arguments, 0, path_));
     }
 
     const options = readdirOptions(options_, false);
 
-    if (!options || options.withFileTypes) {
+    if (isRoot) {
+      return readdirRoot(path_, options);
+    }
+
+    if (!options) {
       return ancestor.readdirSync.apply(fs, arguments);
     }
 
-    let entries = readdirFromSnapshot(path_, isRoot);
+    let entries = readdirFromSnapshot(path_);
     if (options.withFileTypes) entries = getFileTypes(path_, entries);
     return entries;
   };
@@ -1165,13 +1295,17 @@ function payloadFileSync(pointer) {
     }
 
     const options = readdirOptions(options_, true);
+    const callback = dezalgo(maybeCallback(arguments));
 
-    if (!options || options.withFileTypes) {
+    if (isRoot) {
+      return readdirRoot(path_, options, callback);
+    }
+
+    if (!options) {
       return ancestor.readdir.apply(fs, arguments);
     }
 
-    const callback = dezalgo(maybeCallback(arguments));
-    readdirFromSnapshot(path_, isRoot, (error, entries) => {
+    readdirFromSnapshot(path_, (error, entries) => {
       if (error) return callback(error);
       if (options.withFileTypes) entries = getFileTypes(path_, entries);
       callback(null, entries);
@@ -1497,6 +1631,7 @@ function payloadFileSync(pointer) {
       lstat: fs.promises.lstat,
       fstat: fs.promises.fstat,
       access: fs.promises.access,
+      copyFile: fs.promises.copyFile,
     };
 
     fs.promises.open = async function open(path_) {
@@ -1543,12 +1678,13 @@ function payloadFileSync(pointer) {
 
     // this one use promisify on purpose
     fs.promises.readdir = util.promisify(fs.readdir);
+    fs.promises.copyFile = util.promisify(fs.copyFile);
+    fs.promises.stat = util.promisify(fs.stat);
+    fs.promises.lstat = util.promisify(fs.lstat);
 
     /*
     fs.promises.read = util.promisify(fs.read);
     fs.promises.realpath = util.promisify(fs.realpath);
-    fs.promises.stat = util.promisify(fs.stat);
-    fs.promises.lstat = util.promisify(fs.lstat);
     fs.promises.fstat = util.promisify(fs.fstat);
     fs.promises.access = util.promisify(fs.access);
   */
@@ -1969,29 +2105,31 @@ function payloadFileSync(pointer) {
   // CHILD_PROCESS ///////////////////////////////////////////////
   // /////////////////////////////////////////////////////////////
 
-  const customPromiseExecFunction = (o) => (...args) => {
-    let resolve;
-    let reject;
-    const p = new Promise((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
+  const customPromiseExecFunction =
+    (o) =>
+    (...args) => {
+      let resolve;
+      let reject;
+      const p = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
 
-    p.child = o.apply(
-      undefined,
-      args.concat((error, stdout, stderr) => {
-        if (error !== null) {
-          error.stdout = stdout;
-          error.stderr = stderr;
-          reject(error);
-        } else {
-          resolve({ stdout, stderr });
-        }
-      })
-    );
+      p.child = o.apply(
+        undefined,
+        args.concat((error, stdout, stderr) => {
+          if (error !== null) {
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          } else {
+            resolve({ stdout, stderr });
+          }
+        })
+      );
 
-    return p;
-  };
+      return p;
+    };
 
   Object.defineProperty(childProcess.exec, custom, {
     value: customPromiseExecFunction(childProcess.exec),
@@ -2020,88 +2158,56 @@ function payloadFileSync(pointer) {
     const modulePath = revertMakingLong(args[1]);
     const moduleBaseName = path.basename(modulePath);
     const moduleFolder = path.dirname(modulePath);
-    const unknownModuleErrorRegex = /([^:]+): cannot open shared object file: No such file or directory/;
 
-    function tryImporting(_tmpFolder, previousErrorMessage) {
-      try {
-        const res = ancestor.dlopen.apply(process, args);
-        return res;
-      } catch (e) {
-        if (e.message === previousErrorMessage) {
-          // we already tried to fix this and it didn't work, give up
-          throw e;
-        }
-        if (e.message.match(unknownModuleErrorRegex)) {
-          // this case triggers on linux, the error message give us a clue on what dynamic linking library
-          // is missing.
-          // some modules are packaged with dynamic linking and needs to open other files that should be in
-          // the same directory, in this case, we write this file in the same /tmp directory and try to
-          // import the module again
-
-          const moduleName = e.message.match(unknownModuleErrorRegex)[1];
-          const importModulePath = path.join(moduleFolder, moduleName);
-
-          if (!fs.existsSync(importModulePath)) {
-            throw new Error(
-              `INTERNAL ERROR this file doesn't exist in the virtual file system :${importModulePath}`
-            );
-          }
-          const moduleContent1 = fs.readFileSync(importModulePath);
-          const tmpModulePath1 = path.join(_tmpFolder, moduleName);
-
-          try {
-            fs.statSync(tmpModulePath1);
-          } catch (err) {
-            fs.writeFileSync(tmpModulePath1, moduleContent1, { mode: 0o555 });
-          }
-          return tryImporting(_tmpFolder, e.message);
-        }
-
-        // this case triggers on windows mainly.
-        // we copy all stuff that exists in the folder of the .node module
-        // into the temporary folders...
-        const files = fs.readdirSync(moduleFolder);
-        for (const file of files) {
-          if (file === moduleBaseName) {
-            // ignore the current module
-            continue;
-          }
-          const filenameSrc = path.join(moduleFolder, file);
-
-          if (fs.statSync(filenameSrc).isDirectory()) {
-            continue;
-          }
-          const filenameDst = path.join(_tmpFolder, file);
-          const content = fs.readFileSync(filenameSrc);
-
-          fs.writeFileSync(filenameDst, content, { mode: 0o555 });
-        }
-        return tryImporting(_tmpFolder, e.message);
-      }
-    }
     if (insideSnapshot(modulePath)) {
       const moduleContent = fs.readFileSync(modulePath);
 
       // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
       // we need to write the file somewhere on disk first and then load it
+      // the hash is needed to be sure we reload the module in case it changes
       const hash = createHash('sha256').update(moduleContent).digest('hex');
 
-      const tmpFolder = path.join(tmpdir(), hash);
-      if (!fs.existsSync(tmpFolder)) {
-        fs.mkdirSync(tmpFolder);
-      }
-      const tmpModulePath = path.join(tmpFolder, moduleBaseName);
+      // Example: /tmp/pkg/<hash>
+      const tmpFolder = path.join(tmpdir(), 'pkg', hash);
 
-      try {
-        fs.statSync(tmpModulePath);
-      } catch (e) {
-        // Most likely this means the module is not on disk yet
-        fs.writeFileSync(tmpModulePath, moduleContent, { mode: 0o755 });
+      createDirRecursively(tmpFolder);
+
+      // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
+      const parts = moduleFolder.split(path.sep);
+      const mIndex = parts.indexOf('node_modules') + 1;
+
+      let newPath;
+
+      // it's a node addon file contained in node_modules folder
+      // we copy the entire module folder in tmp folder
+      if (mIndex > 0) {
+        // Example: modulePackagePath = sharp/build/Release
+        const modulePackagePath = parts.slice(mIndex).join(path.sep);
+        // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
+        const modulePkgFolder = parts.slice(0, mIndex + 1).join(path.sep);
+
+        // here we copy all files from the snapshot module folder to temporary folder
+        // we keep the module folder structure to prevent issues with modules that are statically
+        // linked using relative paths (Fix #1075)
+        copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
+
+        // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
+        newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
+      } else {
+        const tmpModulePath = path.join(tmpFolder, moduleBaseName);
+
+        if (!fs.existsSync(tmpModulePath)) {
+          fs.copyFileSync(modulePath, tmpModulePath);
+        }
+
+        // load the copied file in the temporary folder
+        newPath = tmpModulePath;
       }
-      args[1] = tmpModulePath;
-      tryImporting(tmpFolder);
-    } else {
-      return ancestor.dlopen.apply(process, args);
+
+      // replace the path with the new module path
+      args[1] = newPath;
     }
+
+    return ancestor.dlopen.apply(process, args);
   };
 })();

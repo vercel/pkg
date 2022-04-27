@@ -1,0 +1,8 @@
+{
+  "bin": "copy.js",
+  "pkg": {
+    "assets": [
+      "input/**/*"
+    ]
+  }
+}
