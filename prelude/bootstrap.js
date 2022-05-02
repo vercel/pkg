@@ -198,6 +198,12 @@ function copyFolderRecursiveSync(source, target) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
         const curTarget = path.join(targetFolder, path.basename(curSource));
+        // Check if the target file already exists and skip the copy in such a case to
+        // 1. avoid an exception that the file cannot be written if it is already opened
+        //    by a running instance of the pkg-packaged app
+        // 2. speed up the second, third, etc. app start if (in best case) all files
+        //    are already existing
+        // See https://github.com/vercel/pkg/issues/1589 for more details.
         if (!fs.existsSync(curTarget)) {
           fs.copyFileSync(curSource, curTarget);
         }
