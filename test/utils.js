@@ -169,13 +169,15 @@ module.exports.filesAfter = function (b, n) {
 module.exports.shouldSkipPnpm = function () {
   const REQUIRED_MAJOR_VERSION = 14;
   const REQUIRED_MINOR_VERSION = 19;
-  
+
   const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
   const MINOR_VERSION = parseInt(process.version.match(/v[0-9]+\.([0-9]+)/)[1], 10);
-  if (MAJOR_VERSION < REQUIRED_MAJOR_VERSION || (MAJOR_VERSION === REQUIRED_MAJOR_VERSION && MINOR_VERSION < REQUIRED_MINOR_VERSION)) {
+
+  const isDisallowedMajor = MAJOR_VERSION < REQUIRED_MAJOR_VERSION
+  if (isDisallowedMajor || (isDisallowedMajor && MINOR_VERSION < REQUIRED_MINOR_VERSION)) {
     const need = `${REQUIRED_MAJOR_VERSION}.${REQUIRED_MINOR_VERSION}`;
     const got = `${MAJOR_VERSION}.${MINOR_VERSION}`;
-    console.log(`skiping test as it requires nodejs >= ${need} and got`, got);
+    console.log(`skiping test as it requires nodejs >= ${need} and got ${got}`);
     return true;
   }
 
