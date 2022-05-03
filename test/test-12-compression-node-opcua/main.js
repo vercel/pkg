@@ -16,9 +16,7 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-// ignore this test if nodejs <= 10 , as recent version of PNPM do not support nodejs=10
-const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
-if (MAJOR_VERSION < 12) {
+if (utils.shouldSkipPnpm()) {
   return;
 }
 

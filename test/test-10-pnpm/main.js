@@ -7,14 +7,7 @@ const path = require('path');
 const assert = require('assert');
 const utils = require('../utils.js');
 
-// ignore this test if nodejs <= 14.19 , as recent version of PNPM do not support nodejs=14.19
-const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
-const MINOR_VERSION = parseInt(process.version.match(/v[0-9]+\.([0-9]+)/)[1], 10);
-if (MAJOR_VERSION < 14 || (MAJOR_VERSION === 14 && MINOR_VERSION < 19)) {
-  console.log(
-    'skiping test as it requires nodejs >= 14.19 and got',
-    `${MAJOR_VERSION}.${MINOR_VERSION}`
-  );
+if (utils.shouldSkipPnpm()) {
   return;
 }
 
