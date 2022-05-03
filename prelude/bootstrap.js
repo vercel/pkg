@@ -2276,10 +2276,14 @@ function payloadFileSync(pointer) {
         // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
         newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
       } else {
-        fs.copyFileSync(modulePath, path.join(tmpFolder, moduleBaseName));
+        const tmpModulePath = path.join(tmpFolder, moduleBaseName);
+
+        if (!fs.existsSync(tmpModulePath)) {
+          fs.copyFileSync(modulePath, tmpModulePath);
+        }
 
         // load the copied file in the temporary folder
-        newPath = path.join(tmpFolder, moduleBaseName);
+        newPath = tmpModulePath;
       }
 
       // replace the path with the new module path
