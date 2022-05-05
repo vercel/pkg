@@ -762,8 +762,8 @@ class Walker {
         // is not taken in require('./typos')
         // in 'normalize-package-data/lib/fixer.js'
         extensions: ['.js', '.json', '.node'],
-        readFile: catchReadFile,
-        packageFilter: catchPackageFilter,
+        catchReadFile,
+        catchPackageFilter,
       });
     } catch (error) {
       failure = error as Error;
