@@ -165,3 +165,22 @@ module.exports.filesAfter = function (b, n) {
     module.exports.vacuum.sync(ni);
   }
 };
+
+module.exports.shouldSkipPnpm = function () {
+  const REQUIRED_MAJOR_VERSION = 14;
+  const REQUIRED_MINOR_VERSION = 19;
+
+  const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
+  const MINOR_VERSION = parseInt(process.version.match(/v[0-9]+\.([0-9]+)/)[1], 10);
+
+  const isDisallowedMajor = MAJOR_VERSION < REQUIRED_MAJOR_VERSION
+  const isDisallowedMinor = MAJOR_VERSION === REQUIRED_MAJOR_VERSION && MINOR_VERSION < REQUIRED_MINOR_VERSION;
+  if (isDisallowedMajor || isDisallowedMinor) {
+    const need = `${REQUIRED_MAJOR_VERSION}.${REQUIRED_MINOR_VERSION}`;
+    const got = `${MAJOR_VERSION}.${MINOR_VERSION}`;
+    console.log(`skiping test as it requires nodejs >= ${need} and got ${got}`);
+    return true;
+  }
+
+  return false;
+}
