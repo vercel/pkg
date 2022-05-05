@@ -326,10 +326,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
-"@types/multistream@2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@types/multistream/-/multistream-2.1.2.tgz#c168a7765cc33926cd93e895bd7d461c5235eca7"
-  integrity sha512-Q0LINZC7Q2HE+M7uMh2QZp54F/4wz+8Vs6IEXCmeboxb3EScvqczARXPmGjP8GrEbLf68haIUjfWuQw9/kB63w==
+"@types/multistream@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@types/multistream/-/multistream-4.1.0.tgz#517770a32e5715fdda87904a6da7d179142feba4"
+  integrity sha512-KiMkWve/Uu0qwCtNO6ZflMLjglkXsAdLdIwb31o5YQBbevdH2DF7inqebCli+F9am8McvEqCE4GXNOUZe8jOAg==
   dependencies:
     "@types/node" "*"
 
