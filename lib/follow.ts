@@ -1,10 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { core, sync, SyncOpts } from 'resolve';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import { toNormalizedRealPath } from './common';
+
+import type { PackageJson } from './types';
 
 Object.keys(core).forEach((key) => {
   // 'resolve' hardcodes the list to host's one, but i need
@@ -35,10 +35,10 @@ function parentDirectoriesContain(parent: string, directory: string) {
   }
 }
 
-interface FollowOptions
-  extends Pick<SyncOpts, 'basedir' | 'extensions' | 'packageFilter'> {
+interface FollowOptions extends Pick<SyncOpts, 'basedir' | 'extensions'> {
   ignoreFile?: string;
-  readFile?: (file: string) => void;
+  catchReadFile?: (file: string) => void;
+  catchPackageFilter?: (config: PackageJson, base: string, dir: string) => void;
 }
 
 export function follow(x: string, opts: FollowOptions) {
@@ -100,15 +100,15 @@ export function follow(x: string, opts: FollowOptions) {
             return Buffer.from(`{"main":"${PROOF}"}`);
           }
 
-          if (opts.readFile) {
-            opts.readFile(file);
+          if (opts.catchReadFile) {
+            opts.catchReadFile(file);
           }
 
           return fs.readFileSync(file);
         },
-        packageFilter: (config, base) => {
-          if (opts.packageFilter) {
-            opts.packageFilter(config, base);
+        packageFilter: (config, base, dir) => {
+          if (opts.catchPackageFilter) {
+            opts.catchPackageFilter(config, base, dir);
           }
 
           return config;
