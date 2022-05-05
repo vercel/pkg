@@ -1,19 +1,9 @@
-import { core, sync, SyncOpts } from 'resolve';
-import assert from 'assert';
+import { sync, SyncOpts } from 'resolve';
 import fs from 'fs';
 import path from 'path';
 import { toNormalizedRealPath } from './common';
 
 import type { PackageJson } from './types';
-
-Object.keys(core).forEach((key) => {
-  // 'resolve' hardcodes the list to host's one, but i need
-  // to be able to allow 'worker_threads' (target 12) on host 8
-  assert(typeof core[key] === 'boolean');
-  core[key] = true;
-});
-
-export const natives = core;
 
 const PROOF = 'a-proof-that-main-is-captured.js';
 
