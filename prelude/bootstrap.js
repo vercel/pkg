@@ -181,34 +181,71 @@ function copyInChunks(
 
 // TODO: replace this with fs.cpSync when we drop Node < 16
 function copyFolderRecursiveSync(source, target) {
-  let files = [];
-
-  // Check if folder needs to be created or integrated
+  // Build target folder
   const targetFolder = path.join(target, path.basename(source));
+
+  // Check if target folder needs to be created or integrated
   if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder);
   }
 
   // Copy
   if (fs.lstatSync(source).isDirectory()) {
-    files = fs.readdirSync(source);
-    files.forEach((file) => {
+    const files = fs.readdirSync(source);
+
+    for (const file of files) {
+      // Build source name
       const curSource = path.join(source, file);
+
+      // Call this function recursively as long as source is a directory
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
       } else {
-        const curTarget = path.join(targetFolder, path.basename(curSource));
-        // Check if the target file already exists and skip the copy in such a case to
-        // 1. avoid an exception that the file cannot be written if it is already opened
-        //    by a running instance of the pkg-packaged app
-        // 2. speed up the second, third, etc. app start if (in best case) all files
-        //    are already existing
+        // Current source is a file, it must be available on the real filesystem
+        // instead of the virtual snapshot file system to load it by process.dlopen.
+        //
+        // Before we try to copy we do some checks.
         // See https://github.com/vercel/pkg/issues/1589 for more details.
-        if (!fs.existsSync(curTarget)) {
-          fs.copyFileSync(curSource, curTarget);
+
+        // Build target file name
+        const curTarget = path.join(targetFolder, path.basename(curSource));
+
+        if (fs.existsSync(curTarget)) {
+          // Target file already exists, read source and target file...
+          const curSourceContent = fs.readFileSync(curSource, {
+            encoding: 'binary',
+          });
+          const curTargetContent = fs.readFileSync(curTarget, {
+            encoding: 'binary',
+          });
+
+          // ...and calculate checksum from source and target file
+          const curSourceHash = createHash('sha256')
+            .update(curSourceContent)
+            .digest('hex');
+          const curTargetHash = createHash('sha256')
+            .update(curTargetContent)
+            .digest('hex');
+
+          // If checksums are equal then there is nothing to do here
+          // ==> target already exists and is up-to-date
+          if (curSourceHash === curTargetHash) {
+            return;
+          }
         }
+
+        // Target must be copied because it either does not exist or is outdated.
+        // Due to the possibility that mutliple instances of this app start simultaneously,
+        // the copy action might fail. Only one starting instance gets write access.
+        //
+        // We don't catch any error here because it does not make sense to go ahead and to
+        // try to load the file while another instance has not yet finished the copy action.
+        // If the app start fails then the user should try to start the app later again.
+        // Unfortunately, we cannot implement delayed retries ourselves because process.dlopen
+        // is a synchronous function, promises are not supported.
+        fs.copyFileSync(curSource, curTarget);
       }
-    });
+    }
   }
 }
 
