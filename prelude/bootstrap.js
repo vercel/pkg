@@ -17,7 +17,7 @@
 'use strict';
 
 const childProcess = require('child_process');
-const { createHash } = require('crypto');
+const { randomFillSync } = require('crypto');
 const fs = require('fs');
 const { isRegExp } = require('util').types;
 const Module = require('module');
@@ -210,6 +210,29 @@ function createDirRecursively(dir) {
   if (!fs.existsSync(dir)) {
     createDirRecursively(path.join(dir, '..'));
     fs.mkdirSync(dir);
+  }
+}
+
+const tmpFolder = (() => {
+  const buf = Buffer.alloc(16);
+  randomFillSync(buf);
+  return path.join(tmpdir(), 'pkg', `${process.pid}.${buf.toString('hex')}`);
+})();
+
+function removeTemporaryFolderAndContent(folder) {
+  if (!folder) return;
+  if (NODE_VERSION_MAJOR <= 14) {
+    if (NODE_VERSION_MAJOR <= 10) {
+      // folder must be empty
+      for (const f of fs.readdirSync(folder)) {
+        fs.unlinkSync(path.join(folder, f));
+      }
+      fs.rmdirSync(folder);
+    } else {
+      fs.rmdirSync(folder, { recursive: true });
+    }
+  } else {
+    fs.rmSync(folder, { recursive: true });
   }
 }
 
@@ -644,37 +667,18 @@ function payloadFileSync(pointer) {
   // open //////////////////////////////////////////////////////////
   // ///////////////////////////////////////////////////////////////
 
-  function removeTemporaryFolderAndContent(folder) {
-    if (!folder) return;
-    if (NODE_VERSION_MAJOR <= 14) {
-      if (NODE_VERSION_MAJOR <= 10) {
-        // folder must be empty
-        for (const f of fs.readdirSync(folder)) {
-          fs.unlinkSync(path.join(folder, f));
-        }
-        fs.rmdirSync(folder);
-      } else {
-        fs.rmdirSync(folder, { recursive: true });
-      }
-    } else {
-      fs.rmSync(folder, { recursive: true });
-    }
-  }
   const temporaryFiles = {};
-  const os = require('os');
-  let tmpFolder = '';
+
   process.on('beforeExit', () => {
     removeTemporaryFolderAndContent(tmpFolder);
   });
-  function deflateSync(snapshotFilename) {
-    if (!tmpFolder) {
-      tmpFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-'));
-    }
-    const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
-    // content is already unzipped !
 
-    const hash = createHash('sha256').update(content).digest('hex');
-    const fName = path.join(tmpFolder, hash);
+  function deflateSync(snapshotFilename) {
+    const content = fs.readFileSync(snapshotFilename, { encoding: 'binary' });
+    const fName = path.join(tmpFolder, snapshotFilename);
+
+    createDirRecursively(path.dirname(fName));
+
     fs.writeFileSync(fName, content, 'binary');
     return fName;
   }
@@ -2160,18 +2164,6 @@ function payloadFileSync(pointer) {
     const moduleFolder = path.dirname(modulePath);
 
     if (insideSnapshot(modulePath)) {
-      const moduleContent = fs.readFileSync(modulePath);
-
-      // Node addon files and .so cannot be read with fs directly, they are loaded with process.dlopen which needs a filesystem path
-      // we need to write the file somewhere on disk first and then load it
-      // the hash is needed to be sure we reload the module in case it changes
-      const hash = createHash('sha256').update(moduleContent).digest('hex');
-
-      // Example: /tmp/pkg/<hash>
-      const tmpFolder = path.join(tmpdir(), 'pkg', hash);
-
-      createDirRecursively(tmpFolder);
-
       // Example: moduleFolder = /snapshot/appname/node_modules/sharp/build/Release
       const parts = moduleFolder.split(path.sep);
       const mIndex = parts.indexOf('node_modules') + 1;
@@ -2181,6 +2173,8 @@ function payloadFileSync(pointer) {
       // it's a node addon file contained in node_modules folder
       // we copy the entire module folder in tmp folder
       if (mIndex > 0) {
+        createDirRecursively(path.join(tmpFolder, 'node_modules'));
+
         // Example: modulePackagePath = sharp/build/Release
         const modulePackagePath = parts.slice(mIndex).join(path.sep);
         // Example: modulePkgFolder = /snapshot/appname/node_modules/sharp
@@ -2189,11 +2183,21 @@ function payloadFileSync(pointer) {
         // here we copy all files from the snapshot module folder to temporary folder
         // we keep the module folder structure to prevent issues with modules that are statically
         // linked using relative paths (Fix #1075)
-        copyFolderRecursiveSync(modulePkgFolder, tmpFolder);
+        copyFolderRecursiveSync(
+          modulePkgFolder,
+          path.join(tmpFolder, 'node_modules')
+        );
 
-        // Example: /tmp/pkg/<hash>/sharp/build/Release/sharp.node
-        newPath = path.join(tmpFolder, modulePackagePath, moduleBaseName);
+        // Example: /tmp/pkg/<hash>/node_modules/sharp/build/Release/sharp.node
+        newPath = path.join(
+          tmpFolder,
+          'node_modules',
+          modulePackagePath,
+          moduleBaseName
+        );
       } else {
+        createDirRecursively(tmpFolder);
+
         const tmpModulePath = path.join(tmpFolder, moduleBaseName);
 
         if (!fs.existsSync(tmpModulePath)) {
