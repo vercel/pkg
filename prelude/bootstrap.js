@@ -230,7 +230,7 @@ function copyFolderRecursiveSync(source, target) {
           // If checksums are equal then there is nothing to do here
           // ==> target already exists and is up-to-date
           if (curSourceHash === curTargetHash) {
-            return;
+            continue;
           }
         }
 
