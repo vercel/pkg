@@ -258,7 +258,7 @@ See [pkg-fetch](https://github.com/vercel/pkg-fetch) for more info.
 
 ### Compression
 
-Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the exectable.
+Pass `--compress Brotli` or `--compress GZip` to `pkg` to compress further the content of the files store in the executable.
 
 This option can reduce the size of the embedded file system by up to 60%.
 
