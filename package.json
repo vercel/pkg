@@ -1,15 +1,17 @@
 {
   "name": "pkg",
-  "version": "5.5.2",
+  "version": "5.7.0",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
   "repository": "vercel/pkg",
+  "types": "lib-es5/index.d.ts",
   "bin": {
     "pkg": "lib-es5/bin.js"
   },
   "files": [
     "lib-es5/*.js",
+    "lib-es5/index.d.ts",
     "dictionary/*.js",
     "prelude/*.js"
   ],
@@ -17,45 +19,45 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@babel/parser": "7.16.2",
-    "@babel/types": "7.16.0",
+    "@babel/parser": "7.17.10",
+    "@babel/types": "7.17.10",
     "chalk": "^4.1.2",
     "escodegen": "^2.0.0",
     "fs-extra": "^9.1.0",
-    "globby": "^11.0.4",
+    "globby": "^11.1.0",
     "into-stream": "^6.0.0",
-    "minimist": "^1.2.5",
+    "is-core-module": "2.9.0",
+    "minimist": "^1.2.6",
     "multistream": "^4.1.0",
-    "pkg-fetch": "3.2.6",
+    "pkg-fetch": "3.4.1",
     "prebuild-install": "6.1.4",
-    "progress": "^2.0.3",
-    "resolve": "^1.20.0",
-    "stream-meter": "^1.0.4",
-    "tslib": "2.3.1"
+    "resolve": "^1.22.0",
+    "stream-meter": "^1.0.4"
   },
   "devDependencies": {
-    "@babel/core": "7.16.0",
+    "@babel/core": "7.17.10",
     "@types/escodegen": "0.0.7",
     "@types/fs-extra": "9.0.13",
+    "@types/is-core-module": "2.2.0",
     "@types/minimist": "1.2.2",
-    "@types/multistream": "2.1.1",
-    "@types/node": "14.17.32",
-    "@types/resolve": "1.20.1",
+    "@types/multistream": "4.1.0",
+    "@types/node": "14.18.16",
+    "@types/resolve": "1.20.2",
     "@types/stream-meter": "0.0.22",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-config-airbnb-typescript": "12.3.1",
-    "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-import": "2.25.2",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.26.0",
     "json-stable-stringify": "^1.0.1",
     "lint-staged": "^10.5.4",
     "mkdirp": "^1.0.4",
-    "prettier": "2.4.1",
+    "prettier": "2.6.2",
     "rimraf": "^3.0.2",
     "simple-git-hooks": ">=2.7.0",
-    "typescript": "4.4.4"
+    "typescript": "4.6.4"
   },
   "peerDependencies": {
     "node-notifier": ">=9.0.1"
