@@ -9,7 +9,7 @@ import { log } from './log';
 
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
 
-const babelPlugins = process.env.PKG_BABEL_PLUGINS?.split(',') ?? []
+const babelPlugins: string[] = process.env.PKG_BABEL_PLUGINS?.split(',') ?? []
 
 function isLiteral(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
