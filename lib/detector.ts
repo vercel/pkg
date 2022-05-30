@@ -9,6 +9,8 @@ import { log } from './log';
 
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
 
+const babelPlugins = process.env.PKG_BABEL_PLUGINS?.split(',') ?? []
+
 function isLiteral(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any
@@ -496,7 +498,7 @@ export function parse(body: string) {
   return babel.parse(body, {
     allowImportExportEverywhere: true,
     allowReturnOutsideFunction: true,
-    plugins: ['estree', 'bigInt', 'classPrivateProperties', 'classProperties'],
+    plugins: ['estree', 'bigInt', 'classPrivateProperties', 'classProperties', ...babelPlugins],
   });
 }
 
