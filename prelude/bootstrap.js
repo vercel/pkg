@@ -1995,9 +1995,10 @@ function payloadFileSync(pointer) {
     execFileSync: childProcess.execFileSync,
     exec: childProcess.exec,
     execSync: childProcess.execSync,
+    fork: childProcess.fork,
   };
 
-  function setOptsEnv(args) {
+  function setOptsEnv(args, forked = false) {
     let pos = args.length - 1;
     if (typeof args[pos] === 'function') pos -= 1;
     if (typeof args[pos] !== 'object' || Array.isArray(args[pos])) {
@@ -2006,6 +2007,24 @@ function payloadFileSync(pointer) {
     }
     const opts = args[pos];
     if (!opts.env) opts.env = _extend({}, process.env);
+
+    if (forked) {
+      opts.env.PKG_IS_FORKED = 'TRUE';
+    } else if (args[0] === EXECPATH) {
+      // https://github.com/vercel/pkg/issues/1356
+      if (!opts.env.PKG_IS_FORKED) {
+        if (Array.isArray(args[1])) {
+          // child_process.fork(modulePath, args)
+          args[1] = [DEFAULT_ENTRYPOINT, ...args[1]];
+        } else {
+          // child_process.fork(modulePath, options])
+          const options = args[1];
+          args[1] = [DEFAULT_ENTRYPOINT];
+          args[2] = options;
+        }
+      }
+    }
+
     if (opts.env.PKG_EXECPATH === 'PKG_INVOKE_NODEJS') return;
     opts.env.PKG_EXECPATH = EXECPATH;
   }
@@ -2071,6 +2090,12 @@ function payloadFileSync(pointer) {
       }
     }
   }
+
+  childProcess.fork = function fork() {
+    const args = cloneArgs(arguments);
+    setOptsEnv(args, true);
+    return ancestor.fork.apply(childProcess, args);
+  };
 
   childProcess.spawn = function spawn() {
     const args = cloneArgs(arguments);
