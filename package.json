@@ -19,10 +19,10 @@
     "singleQuote": true
   },
   "dependencies": {
+    "@babel/generator": "7.18.2",
     "@babel/parser": "7.18.4",
     "@babel/types": "7.18.4",
     "chalk": "^4.1.2",
-    "escodegen": "^2.0.0",
     "fs-extra": "^9.1.0",
     "globby": "^11.1.0",
     "into-stream": "^6.0.0",
