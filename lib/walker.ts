@@ -2,6 +2,7 @@
 
 import assert from 'assert';
 import fs from 'fs-extra';
+import isCore from 'is-core-module';
 import globby from 'globby';
 import path from 'path';
 import chalk from 'chalk';
@@ -21,7 +22,7 @@ import {
   toNormalizedRealPath,
 } from './common';
 
-import { follow, natives } from './follow';
+import { follow } from './follow';
 import { log, wasReported } from './log';
 import * as detector from './detector';
 import {
@@ -762,8 +763,8 @@ class Walker {
         // is not taken in require('./typos')
         // in 'normalize-package-data/lib/fixer.js'
         extensions: ['.js', '.json', '.node'],
-        readFile: catchReadFile,
-        packageFilter: catchPackageFilter,
+        catchReadFile,
+        catchPackageFilter,
       });
     } catch (error) {
       failure = error as Error;
@@ -845,11 +846,9 @@ class Walker {
     derivatives: Derivative[]
   ) {
     for (const derivative of derivatives) {
-      if (natives[derivative.alias]) continue;
-      if (derivative.alias.startsWith('node:')) {
-        if (natives[derivative.alias.slice(5)]) continue;
-      }
-      
+      // TODO: actually use the target node version
+      if (isCore(derivative.alias, '99.0.0')) continue;
+
       switch (derivative.aliasType) {
         case ALIAS_AS_RELATIVE:
           await this.stepDerivatives_ALIAS_AS_RELATIVE(

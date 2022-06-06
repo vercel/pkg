@@ -1,19 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { core, sync, SyncOpts } from 'resolve';
-import assert from 'assert';
+import { sync, SyncOpts } from 'resolve';
 import fs from 'fs';
 import path from 'path';
 import { toNormalizedRealPath } from './common';
 
-Object.keys(core).forEach((key) => {
-  // 'resolve' hardcodes the list to host's one, but i need
-  // to be able to allow 'worker_threads' (target 12) on host 8
-  assert(typeof core[key] === 'boolean');
-  core[key] = true;
-});
-
-export const natives = core;
+import type { PackageJson } from './types';
 
 const PROOF = 'a-proof-that-main-is-captured.js';
 
@@ -35,10 +25,10 @@ function parentDirectoriesContain(parent: string, directory: string) {
   }
 }
 
-interface FollowOptions
-  extends Pick<SyncOpts, 'basedir' | 'extensions' | 'packageFilter'> {
+interface FollowOptions extends Pick<SyncOpts, 'basedir' | 'extensions'> {
   ignoreFile?: string;
-  readFile?: (file: string) => void;
+  catchReadFile?: (file: string) => void;
+  catchPackageFilter?: (config: PackageJson, base: string, dir: string) => void;
 }
 
 export function follow(x: string, opts: FollowOptions) {
@@ -100,15 +90,15 @@ export function follow(x: string, opts: FollowOptions) {
             return Buffer.from(`{"main":"${PROOF}"}`);
           }
 
-          if (opts.readFile) {
-            opts.readFile(file);
+          if (opts.catchReadFile) {
+            opts.catchReadFile(file);
           }
 
           return fs.readFileSync(file);
         },
-        packageFilter: (config, base) => {
-          if (opts.packageFilter) {
-            opts.packageFilter(config, base);
+        packageFilter: (config, base, dir) => {
+          if (opts.catchPackageFilter) {
+            opts.catchPackageFilter(config, base, dir);
           }
 
           return config;
