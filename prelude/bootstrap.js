@@ -77,8 +77,17 @@ if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
 if (process.send) {
   // if process.send is set, it means the process was forked,
   // and the runtime file is the third argument
-  process.argv[1] = process.argv[2];
-  process.argv.splice(2, 1);
+
+  for (let i = 2; i < process.argv.length; i += 1) {
+    if (process.argv[i].indexOf('--') === 0) {
+      // arguments to node. move PKG_DUMMY_ENTRYPOINT up
+      const tmp = process.argv[i - 1];
+      process.argv[i - 1] = process.argv[i];
+      process.argv[i] = tmp;
+    } else {
+      break;
+    }
+  }
 } else if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv.splice(1, 1);
 
@@ -91,6 +100,15 @@ if (process.send) {
 }
 
 [, ENTRYPOINT] = process.argv;
+
+const index = process.argv.findIndex((x) => x === 'PKG_DUMMY_ENTRYPOINT');
+if (index !== -1) {
+  // TODO: document/refactor this
+  process.argv.splice(index, 1);
+  process.argv[index] = path.resolve(process.argv[index]);
+  ENTRYPOINT = process.argv[index];
+}
+
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
