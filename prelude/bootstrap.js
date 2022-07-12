@@ -101,12 +101,14 @@ if (process.send) {
 
 [, ENTRYPOINT] = process.argv;
 
-const index = process.argv.findIndex((x) => x === 'PKG_DUMMY_ENTRYPOINT');
-if (index !== -1) {
+const dummyPointIndex = process.argv.findIndex(
+  (x) => x === 'PKG_DUMMY_ENTRYPOINT'
+);
+if (dummyPointIndex !== -1) {
   // TODO: document/refactor this
-  process.argv.splice(index, 1);
-  process.argv[index] = path.resolve(process.argv[index]);
-  ENTRYPOINT = process.argv[index];
+  process.argv.splice(dummyPointIndex, 1);
+  process.argv[dummyPointIndex] = path.resolve(process.argv[dummyPointIndex]);
+  ENTRYPOINT = process.argv[dummyPointIndex];
 }
 
 delete process.env.PKG_EXECPATH;
