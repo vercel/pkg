@@ -156,7 +156,7 @@ export function fabricateTwice(
 ) {
   fabricate(bakes, fabricator, snap, body, (error, buffer) => {
     // node0 can not produce second time, even if first time produced fine,
-    // probably because of 'filename' cache. also, there are wierd cases
+    // probably because of 'filename' cache. also, there are weird cases
     // when node4 can not compile as well, for example file 'lib/js-yaml/dumper.js'
     // of package js-yaml@3.9.0 does not get bytecode second time on node4-win-x64
     if (error) return fabricate(bakes, fabricator, snap, body, cb);
