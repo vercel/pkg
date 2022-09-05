@@ -2,6 +2,7 @@
 
 module.exports = {
   pkg: {
+    assets: ['build/Release/ffi_bindings.node'],
     patches: {
       // This patch reimplements the file extraction logic found in the
       // `prelude/bootstrap.js` file's dlopen() function. This is needed
