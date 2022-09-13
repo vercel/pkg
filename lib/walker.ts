@@ -670,29 +670,30 @@ class Walker {
   }
 
   stepPatch(record: FileRecord) {
-    const patch = this.patches[record.file];
+    const patches = this.patches[record.file];
 
-    if (!patch) {
+    if (!patches) {
       return;
     }
 
     let body = (record.body || '').toString('utf8');
 
-    for (let i = 0; i < patch.length; i += 2) {
-      if (typeof patch[i] === 'object') {
-        if (patch[i].do === 'erase') {
-          body = patch[i + 1];
-        } else if (patch[i].do === 'prepend') {
-          body = patch[i + 1] + body;
-        } else if (patch[i].do === 'append') {
-          body += patch[i + 1];
+    for (let i = 0; i < patches.length; i += 2) {
+      const patch = patches[i];
+      if (typeof patch === 'object') {
+        if (patch.do === 'erase') {
+          body = patches[i + 1] as string;
+        } else if (patch.do === 'prepend') {
+          body = patches[i + 1] + body;
+        } else if (patch.do === 'append') {
+          body += patches[i + 1];
         }
-      } else if (typeof patch[i] === 'string') {
+      } else if (typeof patch === 'string') {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
         // function escapeRegExp
-        const esc = patch[i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const esc = patch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regexp = new RegExp(esc, 'g');
-        body = body.replace(regexp, patch[i + 1]);
+        body = body.replace(regexp, patches[i + 1] as string);
       }
     }
 

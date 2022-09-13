@@ -1,19 +1,4 @@
-import type { ConfigDictionary } from './types';
-import type { log } from './log';
-
-interface PkgOptions {
-  assets?: string[];
-  deployFiles?: string[][];
-  dictionary: ConfigDictionary;
-  files?: string[];
-  patches?: Record<
-    string,
-    Array<string | { do: 'erase' | 'prepend' | 'append' }>
-  >;
-  scripts?: string[];
-
-  log?(logger: typeof log, context: Record<string, string>): void;
-}
+import type { PkgOptions } from './types';
 
 interface ConfigItem {
   dependencies?: Record<string, string | undefined>;

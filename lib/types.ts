@@ -11,34 +11,29 @@ export interface FileRecord {
 
 export type FileRecords = Record<string, FileRecord>;
 
-type License =
-  | string
-  | {
-      type: string;
-    };
+type License = string | { type: string };
 
-export type Patches = Record<
-  string,
-  string & { do: 'erase' | 'prepend' | 'append' }[]
->;
+export interface Patches {
+  [key: string]: Array<string | { do: 'erase' | 'prepend' | 'append' }>;
+}
 
-export type ConfigDictionary = Record<
-  string,
-  {
+export interface ConfigDictionary {
+  [key: string]: {
     dependencies?: Record<string, string | undefined>;
     pkg?: {
       dependencies?: Record<string, string | undefined>;
     };
-  }
->;
+  };
+}
 
 export interface PkgOptions {
-  scripts?: string[];
-  log?: (logger: typeof log, context: Record<string, string>) => void;
   assets?: string[];
-  deployFiles?: string[];
-  patches?: Patches;
+  deployFiles?: string[][];
   dictionary: ConfigDictionary;
+  files?: string[];
+  log?(logger: typeof log, context: Record<string, string>): void;
+  patches?: Patches;
+  scripts?: string[];
 }
 
 export interface PackageJson {
