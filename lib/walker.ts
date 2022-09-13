@@ -1015,7 +1015,7 @@ class Walker {
       return;
     }
 
-    const dictionary = await import('./dictionary');
+    const { default: dictionary } = await import('./dictionary');
     for (const [name, config] of Object.entries(dictionary)) {
       if (this.params.noDictionary?.includes(name)) continue;
       this.dictionary[name] = config as ConfigDictionary;

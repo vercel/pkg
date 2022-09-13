@@ -1,4 +1,26 @@
-export default {
+import type { ConfigDictionary } from './types';
+import type { log } from './log';
+
+interface PkgOptions {
+  assets?: string[];
+  deployFiles?: string[][];
+  dictionary: ConfigDictionary;
+  files?: string[];
+  patches?: Record<
+    string,
+    Array<string | { do: 'erase' | 'prepend' | 'append' }>
+  >;
+  scripts?: string[];
+
+  log?(logger: typeof log, context: Record<string, string>): void;
+}
+
+interface ConfigItem {
+  dependencies?: Record<string, string | undefined>;
+  pkg?: Partial<PkgOptions>;
+}
+
+const dictionary: Record<string, ConfigItem> = {
   'angular-bridge': {},
   'any-promise': {},
   async: {},
@@ -811,7 +833,7 @@ export default {
   stylus: {
     pkg: {
       assets: ['lib/**/*.styl'],
-      log(log: typeof console, opts: { packagePath: unknown }) {
+      log(log, opts) {
         log.warn(
           'Add { paths: [ __dirname ] } to stylus options to resolve imports',
           [opts.packagePath]
@@ -935,3 +957,5 @@ export default {
     },
   },
 };
+
+export default dictionary;
