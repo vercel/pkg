@@ -25,10 +25,10 @@ export type Patches = Record<
 export type ConfigDictionary = Record<
   string,
   {
+    dependencies?: Record<string, string | undefined>;
     pkg?: {
-      dependencies?: Record<string, string>;
+      dependencies?: Record<string, string | undefined>;
     };
-    dependencies?: Record<string, string>;
   }
 >;
 
