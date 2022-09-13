@@ -1014,34 +1014,16 @@ class Walker {
     if (this.params.noDictionary?.[0] === '*') {
       return;
     }
-    const dd = path.join(__dirname, '../dictionary');
-    const files = await fs.readdir(dd);
 
-    for (const file of files) {
-      if (/\.js$/.test(file)) {
-        const name = file.slice(0, -3);
-
-        if (this.params.noDictionary?.includes(file)) {
-          continue;
-        }
-        // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
-        const config = require(path.join(dd, file));
-        this.dictionary[name] = config;
-      }
+    const dictionary = await import('./dictionary');
+    for (const [name, config] of Object.entries(dictionary)) {
+      if (this.params.noDictionary?.includes(name)) continue;
+      this.dictionary[name] = config as ConfigDictionary;
     }
 
-    const pkgConfig = marker.config?.pkg;
-
-    if (pkgConfig) {
-      const { dictionary } = pkgConfig;
-
-      if (dictionary) {
-        for (const name in dictionary) {
-          if (dictionary[name]) {
-            this.dictionary[name] = { pkg: dictionary[name] };
-          }
-        }
-      }
+    const pkgDictionary = marker.config?.pkg?.dictionary || {};
+    for (const [name, config] of Object.entries(pkgDictionary)) {
+      if (config) this.dictionary[name] = { pkg: config };
     }
   }
 
