@@ -39,6 +39,7 @@ export interface PkgOptions {
 export interface PackageJson {
   name?: string;
   private?: boolean;
+  // TODO remove invalid metadata - https://docs.npmjs.com/cli/v8/configuring-npm/package-json#license
   licenses?: License;
   license?: License;
   main?: string;
