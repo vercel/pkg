@@ -6,18 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-let configs = fs.readdirSync('../../dictionary');
-configs = configs
-  .filter(function (config) {
-    return config !== '.eslintrc.json';
-  })
-  .map(function (config) {
-    assert.strictEqual(config.slice(-3), '.js');
-    return config.slice(0, -3);
-  });
+const configs = Object.keys(require('../../lib-es5/dictionary').default);
 
-let tests = fs.readdirSync('../test-79-npm');
-tests = tests.filter(function (test) {
+const tests = fs.readdirSync('../test-79-npm').filter(function (test) {
   if (test === '_isolator') return false;
   const full = path.join('../test-79-npm', test);
   return fs.statSync(full).isDirectory();
