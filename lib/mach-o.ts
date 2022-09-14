@@ -59,7 +59,7 @@ function patchMachOExecutable(file: Buffer) {
 
 function signMachOExecutable(executable: string) {
   try {
-    execFileSync('codesign', ['--sign', '-', executable], { stdio: 'inherit' });
+    execFileSync('codesign', ['-f', '--sign', '-', executable], { stdio: 'inherit' });
   } catch {
     execFileSync('ldid', ['-Cadhoc', '-S', executable], { stdio: 'inherit' });
   }
