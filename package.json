@@ -12,7 +12,6 @@
   "files": [
     "lib-es5/*.js",
     "lib-es5/index.d.ts",
-    "dictionary/*.js",
     "prelude/*.js"
   ],
   "prettier": {
