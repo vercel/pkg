@@ -326,9 +326,9 @@ inputs.some(function (input) {
     }
 
     if (meta.deployFilesFrom) {
+      const dict = require('../../lib-es5/dictionary');
       meta.deployFilesFrom.some(function (dictName) {
-        const dict = require('../../dictionary/' + dictName);
-        dict.pkg.deployFiles.some(function (deployFile) {
+        dict[dictName].pkg.deployFiles.some(function (deployFile) {
           const deployFrom = 'node_modules/' + dictName + '/' + deployFile[0];
           const deployTo = deployFile[1];
           deployFilesRelative.push([deployFrom, deployTo]);
