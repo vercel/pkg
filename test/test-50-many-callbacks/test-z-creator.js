@@ -1,7 +1,5 @@
 'use strict';
 
-// eslint-disable no-useless-concat
-
 let s = "console.log('test');\n";
 
 for (let i = 0; i < 100; i += 1) {
