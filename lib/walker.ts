@@ -1,7 +1,7 @@
 /* eslint-disable require-atomic-updates */
 
 import assert from 'assert';
-import fs from 'fs-extra';
+import fs from 'fs/promises';
 import isCore from 'is-core-module';
 import globby from 'globby';
 import path from 'path';

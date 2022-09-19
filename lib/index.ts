@@ -2,15 +2,14 @@
 
 import assert from 'assert';
 import {
-  existsSync,
-  mkdirp,
-  readFile,
-  remove,
-  stat,
-  readFileSync,
-  writeFileSync,
   copyFileSync,
-} from 'fs-extra';
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from 'fs';
 import minimist from 'minimist';
 import { need, system } from 'pkg-fetch';
 import path from 'path';
@@ -324,7 +323,7 @@ export async function exec(argv2: string[]) {
     throw wasReported('Input file does not exist', [input]);
   }
 
-  if ((await stat(input)).isDirectory()) {
+  if (statSync(input).isDirectory()) {
     input = path.join(input, 'package.json');
     if (!existsSync(input)) {
       throw wasReported('Input file does not exist', [input]);
@@ -337,7 +336,7 @@ export async function exec(argv2: string[]) {
   let inputJsonName;
 
   if (isConfiguration(input)) {
-    inputJson = JSON.parse(await readFile(input, 'utf-8'));
+    inputJson = JSON.parse(readFileSync(input, 'utf-8'));
     inputJsonName = inputJson.name;
 
     if (inputJsonName) {
@@ -574,7 +573,7 @@ export async function exec(argv2: string[]) {
         // ad-hoc sign the base binary temporarily to generate bytecode
         // due to the new mandatory signing requirement
         const signedBinaryPath = `${f.binaryPath}-signed`;
-        await remove(signedBinaryPath);
+        unlinkSync(signedBinaryPath);
         copyFileSync(f.binaryPath, signedBinaryPath);
         try {
           signMachOExecutable(signedBinaryPath);
@@ -662,15 +661,15 @@ export async function exec(argv2: string[]) {
 
   for (const target of targets) {
     if (target.output && existsSync(target.output)) {
-      if ((await stat(target.output)).isFile()) {
-        await remove(target.output);
+      if (statSync(target.output).isFile()) {
+        unlinkSync(target.output);
       } else {
         throw wasReported('Refusing to overwrite non-file output', [
           target.output,
         ]);
       }
-    } else if (target.output) {
-      await mkdirp(path.dirname(target.output));
+    } else if (target.output && !existsSync(path.dirname(target.output))) {
+      mkdirSync(path.dirname(target.output));
     }
 
     await producer({

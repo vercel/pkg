@@ -2,7 +2,7 @@ import { createBrotliCompress, createGzip } from 'zlib';
 import Multistream from 'multistream';
 import assert from 'assert';
 import { execFileSync } from 'child_process';
-import fs from 'fs-extra';
+import fs from 'fs';
 import intoStream from 'into-stream';
 import path from 'path';
 import streamMeter from 'stream-meter';
@@ -244,7 +244,7 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
   fs.copyFileSync(nodeFile, nativeFile);
 
   // put the backed up file back
-  fs.moveSync(`${nodeFile}.bak`, nodeFile, { overwrite: true });
+  fs.renameSync(`${nodeFile}.bak`, nodeFile);
 
   return nativeFile;
 }

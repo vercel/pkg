@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 
 import assert from 'assert';
-import fs from 'fs-extra';
+import fs from 'fs';
 import path from 'path';
 
 import {
