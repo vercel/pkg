@@ -79,7 +79,7 @@
     "test:10": "node test/test.js node10 no-npm",
     "test:12": "node test/test.js node12 no-npm",
     "test:14": "node test/test.js node14 no-npm",
-    "test:host": "node test/test.js host no-npm"
+    "test:host": "node test/test.js host only-npm"
   },
   "greenkeeper": {
     "emails": false,
