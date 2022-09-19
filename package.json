@@ -75,7 +75,7 @@
     "lint:fix": "npm run lint -- --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
-    "test": "npm run build && npm run test:node14 && npm run test:node12 && npm run test:node10 && npm run test:host",
+    "test": "npm run build && npm run test:14 && npm run test:12 && npm run test:10 && npm run test:host",
     "test:10": "node test/test.js node10 no-npm",
     "test:12": "node test/test.js node12 no-npm",
     "test:14": "node test/test.js node14 no-npm",
