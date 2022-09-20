@@ -540,7 +540,7 @@ export async function exec(argv2: string[]) {
 
   const { bytecode } = argv;
 
-  const nativeBuild = argv['native-build']
+  const nativeBuild = argv['native-build'];
 
   for (const target of targets) {
     target.forceBuild = forceBuild;
@@ -678,7 +678,7 @@ export async function exec(argv2: string[]) {
       target: target as Target,
       symLinks,
       doCompress,
-      nativeBuild
+      nativeBuild,
     });
 
     if (target.platform !== 'win' && target.output) {
