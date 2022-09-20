@@ -18,7 +18,7 @@ require(/**/ async + 75.25 /**/);
 require(/**/ __dirname + '/' + async /**/); // eslint-disable-line no-path-concat
 require(/**/ __dirname + '/' + async + 35.5 /**/); // eslint-disable-line no-path-concat
 
-require(/**/ [async, 'js'].join('.') /**/); // eslint-disable-line array-bracket-spacing
+require(/**/ [async, 'js'].join('.') /**/);
 // TODO require({ async: "js" }.join("."));
 
 require(/**/ async[0] /**/);

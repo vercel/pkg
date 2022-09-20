@@ -218,7 +218,6 @@ async function needViaCache(target: NodeTarget) {
 }
 
 export async function exec(argv2: string[]) {
-  // eslint-disable-line complexity
   const argv = minimist(argv2, {
     boolean: [
       'b',
@@ -293,7 +292,6 @@ export async function exec(argv2: string[]) {
     case 'none':
       break;
     default:
-      // eslint-disable-next-line no-console
       throw wasReported(
         `Invalid compression algorithm ${algo} ( should be None, Brotli or Gzip)`
       );
@@ -541,7 +539,7 @@ export async function exec(argv2: string[]) {
 
   const { bytecode } = argv;
 
-  const nativeBuild = argv['native-build']
+  const nativeBuild = argv['native-build'];
 
   for (const target of targets) {
     target.forceBuild = forceBuild;
@@ -679,7 +677,7 @@ export async function exec(argv2: string[]) {
       target: target as Target,
       symLinks,
       doCompress,
-      nativeBuild
+      nativeBuild,
     });
 
     if (target.platform !== 'win' && target.output) {

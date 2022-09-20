@@ -71,8 +71,10 @@
     "clean": "rimraf lib-es5",
     "build": "npm run clean && tsc",
     "start": "tsc --watch",
-    "lint": "eslint lib prelude test",
-    "lint:fix": "npm run lint -- --fix",
+    "lint": "npm run lint:style && npm run lint:code",
+    "lint:style": "prettier -c \"{lib,prelude,test}/**/*.{ts,js}\"",
+    "lint:code": "eslint lib prelude test",
+    "fix": "npm run lint:style -- -w && npm run lint:code -- --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
     "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
