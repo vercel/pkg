@@ -21,7 +21,7 @@
   "dependencies": {
     "@babel/generator": "7.18.2",
     "@babel/parser": "7.18.4",
-    "@babel/types": "7.18.4",
+    "@babel/types": "7.19.0",
     "chalk": "^4.1.2",
     "fs-extra": "^9.1.0",
     "globby": "^11.1.0",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
+    "@types/babel__generator": "7.6.4",
     "@types/escodegen": "0.0.7",
     "@types/fs-extra": "9.0.13",
     "@types/is-core-module": "2.2.0",
