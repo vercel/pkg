@@ -77,7 +77,11 @@
     "fix": "npm run lint:style -- -w && npm run lint:code -- --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
-    "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
+    "test": "npm run build && npm run test:14 && npm run test:12 && npm run test:10 && npm run test:host",
+    "test:10": "node test/test.js node10 no-npm",
+    "test:12": "node test/test.js node12 no-npm",
+    "test:14": "node test/test.js node14 no-npm",
+    "test:host": "node test/test.js host only-npm"
   },
   "greenkeeper": {
     "emails": false,
