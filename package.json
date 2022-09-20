@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -29,7 +29,7 @@
     "is-core-module": "2.9.0",
     "minimist": "^1.2.6",
     "multistream": "^4.1.0",
-    "pkg-fetch": "3.4.1",
+    "pkg-fetch": "3.4.2",
     "prebuild-install": "6.1.4",
     "resolve": "^1.22.0",
     "stream-meter": "^1.0.4"

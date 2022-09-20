@@ -221,19 +221,24 @@ function nativePrebuildInstall(target: Target, nodeFile: string) {
     fs.copyFileSync(nodeFile, `${nodeFile}.bak`);
   }
 
+  const napiVersions = JSON.parse(
+    fs.readFileSync(path.join(dir, 'package.json'), { encoding: 'utf-8' })
+  )?.binary?.napi_versions;
+
+  const options = [
+    '--platform',
+    platform[target.platform],
+    '--arch',
+    target.arch,
+  ];
+
+  if (napiVersions == null) {
+    // TODO: consider target node version and supported n-api version
+    options.push('--target', nodeVersion);
+  }
+
   // run prebuild
-  execFileSync(
-    prebuildInstall,
-    [
-      '--target',
-      nodeVersion,
-      '--platform',
-      platform[target.platform],
-      '--arch',
-      target.arch,
-    ],
-    { cwd: dir }
-  );
+  execFileSync(prebuildInstall, options, { cwd: dir });
 
   // move the prebuild to a new name with a platform/version extension
   fs.copyFileSync(nodeFile, nativeFile);
