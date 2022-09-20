@@ -22,7 +22,6 @@ function hasParent(file: string, records: FileRecords) {
 }
 
 function purgeTopDirectories(records: FileRecords) {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     let found = false;
 
