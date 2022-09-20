@@ -739,7 +739,6 @@ class Walker {
     marker: Marker,
     derivative: Derivative
   ) {
-    // eslint-disable-line camelcase
     const newPackages: { packageJson: string; marker?: Marker }[] = [];
 
     const catchReadFile = (file: string) => {
@@ -872,7 +871,6 @@ class Walker {
   }
 
   async step_STORE_ANY(record: FileRecord, marker: Marker, store: number) {
-    // eslint-disable-line camelcase
     if (strictVerify) {
       assert(record.file === toNormalizedRealPath(record.file));
     }

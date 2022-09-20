@@ -41,8 +41,10 @@ const script = `
   process.stdin.resume();
 `;
 
-const children: Record<string, ChildProcessByStdio<Writable, Readable, null>> =
-  {};
+const children: Record<
+  string,
+  ChildProcessByStdio<Writable, Readable, null>
+> = {};
 
 export function fabricate(
   bakes: string[],

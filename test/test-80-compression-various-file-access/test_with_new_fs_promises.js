@@ -24,7 +24,6 @@ async function withPromises() {
     const buffer = Buffer.alloc(1000);
 
     if (MAJOR_VERSION >= 14) {
-      // eslint-disable-line no-unused-vars
       const { bytesRead } = await fd.read(buffer, 0, buffer.length, 10);
       if (process.env.DEBUG) {
         console.log('bytesRead = ', bytesRead);
