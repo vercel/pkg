@@ -1,6 +1,5 @@
 'use strict';
 
-// eslint-disable no-useless-concat
 let s =
   'function EventEmitter () {\n' +
   '  this.listeners = [];\n' +
