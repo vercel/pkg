@@ -16,27 +16,17 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2.1.5
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.pkg-cache/
-          key: ${{  matrix.os }}-${{ matrix.node-version }}
+          key: ${{ matrix.os }}-${{ matrix.node-version }}
 
-      - name: Install deps
-        run: yarn install
-
-      - name: Lint
-        if: matrix['node-version'] == '16.x' && matrix['os'] == 'ubuntu-latest'
+      - run: yarn install
+      - if: matrix['node-version'] == '16.x' && matrix['os'] == 'ubuntu-latest'
         run: yarn lint
-
-      - name: Build
-        run: yarn build
-
-      - name: Test
-        run: yarn test
+      - run: yarn build
+      - run: yarn test
