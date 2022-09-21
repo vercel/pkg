@@ -171,10 +171,15 @@ module.exports.shouldSkipPnpm = function () {
   const REQUIRED_MINOR_VERSION = 19;
 
   const MAJOR_VERSION = parseInt(process.version.match(/v([0-9]+)/)[1], 10);
-  const MINOR_VERSION = parseInt(process.version.match(/v[0-9]+\.([0-9]+)/)[1], 10);
+  const MINOR_VERSION = parseInt(
+    process.version.match(/v[0-9]+\.([0-9]+)/)[1],
+    10
+  );
 
-  const isDisallowedMajor = MAJOR_VERSION < REQUIRED_MAJOR_VERSION
-  const isDisallowedMinor = MAJOR_VERSION === REQUIRED_MAJOR_VERSION && MINOR_VERSION < REQUIRED_MINOR_VERSION;
+  const isDisallowedMajor = MAJOR_VERSION < REQUIRED_MAJOR_VERSION;
+  const isDisallowedMinor =
+    MAJOR_VERSION === REQUIRED_MAJOR_VERSION &&
+    MINOR_VERSION < REQUIRED_MINOR_VERSION;
   if (isDisallowedMajor || isDisallowedMinor) {
     const need = `${REQUIRED_MAJOR_VERSION}.${REQUIRED_MINOR_VERSION}`;
     const got = `${MAJOR_VERSION}.${MINOR_VERSION}`;
@@ -183,4 +188,4 @@ module.exports.shouldSkipPnpm = function () {
   }
 
   return false;
-}
+};
