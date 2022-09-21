@@ -84,12 +84,6 @@
     "test:14": "node test/test.js node14 no-npm",
     "test:host": "node test/test.js host only-npm"
   },
-  "greenkeeper": {
-    "emails": false,
-    "ignore": [
-      "pkg-fetch"
-    ]
-  },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
   },
