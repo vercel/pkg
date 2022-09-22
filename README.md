@@ -46,6 +46,7 @@ pkg [options] <input>
     --no-native-build    skip native addons build
     --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict * to disable all dictionaries
     -C, --compress       [default=None] compression algorithm = Brotli or GZip
+    --force-no-src       regex match to force source removal (even from node_modules)
 
   Examples:
 
@@ -67,6 +68,8 @@ pkg [options] <input>
     $ pkg --options expose-gc index.js
   – reduce size of the data packed inside the executable with GZip
     $ pkg --compress GZip index.js
+  - Force source removal even from node_modules
+    $ pkg --force-no-src "^.+(acme1|acme2)-.+(.js|.ts|.map)$" -o run package.json
 ```
 
 The entrypoint of your project is a mandatory CLI argument. It may be:
