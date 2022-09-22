@@ -22,6 +22,7 @@ export default function help() {
     --no-native-build    skip native addons build
     --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict * to disable all dictionaries
     -C, --compress       [default=None] compression algorithm = Brotli or GZip
+    --force-no-src       regex match to force source removal (even from node_modules)
 
   ${chalk.dim('Examples:')}
 
@@ -47,5 +48,9 @@ export default function help() {
     '–'
   )} reduce size of the data packed inside the executable with GZip
     ${chalk.cyan('$ pkg --compress GZip index.js')}
+  ${chalk.gray('–')} Force source removal even from node_modules
+    ${chalk.cyan(
+      '$ pkg --force-no-src "^.+(acme1|acme2)-.+(.js|.ts|.map)$" -o run package.json'
+    )}
 `);
 }

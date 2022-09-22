@@ -250,6 +250,7 @@ export async function exec(argv2: string[]) {
       'targets',
       'C',
       'compress',
+      'force-no-src',
     ],
     default: { bytecode: true, 'native-build': true },
   });
@@ -653,6 +654,17 @@ export async function exec(argv2: string[]) {
   entrypoint = refineResult.entrypoint;
   records = refineResult.records;
   symLinks = refineResult.symLinks;
+
+  // Force no src. Set a regex at command line to force removal even from node_modules
+  if (argv['force-no-src']) {
+    const regExp = new RegExp(argv['force-no-src']);
+    for (const record of Object.values(records)) {
+      if (record.file.match(regExp)) {
+        delete record['1'];
+        log.debug(`force-no-src: ${record.file}`);
+      }
+    }
+  }
 
   const backpack = packer({ records, entrypoint, bytecode, symLinks });
 
