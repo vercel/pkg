@@ -60,14 +60,6 @@
     "simple-git-hooks": ">=2.8.0",
     "typescript": "4.7.2"
   },
-  "peerDependencies": {
-    "node-notifier": ">=9.0.1"
-  },
-  "peerDependenciesMeta": {
-    "node-notifier": {
-      "optional": true
-    }
-  },
   "scripts": {
     "clean": "rimraf lib-es5",
     "build": "npm run clean && tsc",
