@@ -347,11 +347,6 @@
   dependencies:
     "@babel/types" "^7.0.0"
 
-"@types/escodegen@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@types/escodegen/-/escodegen-0.0.7.tgz#a1c3e3dfd76da89f01d7d196eebe227ebe4b6eec"
-  integrity sha512-46oENdSRNEJXCNrPJoC3vRolZJpfeEm7yvATkd2bCncKFG0PUEyfBCaoacfpcXH4Y5RRuqdVj3J7TI+wwn2SbQ==
-
 "@types/fs-extra@9.0.13":
   version "9.0.13"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.13.tgz#7594fbae04fe7f1918ce8b3d213f74ff44ac1f45"
