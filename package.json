@@ -21,7 +21,7 @@
   "dependencies": {
     "@babel/generator": "7.18.2",
     "@babel/parser": "7.18.4",
-    "@babel/types": "7.18.4",
+    "@babel/types": "7.19.0",
     "chalk": "^4.1.2",
     "globby": "^11.1.0",
     "into-stream": "^6.0.0",
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
+    "@types/babel__generator": "7.6.4",
     "@types/escodegen": "0.0.7",
     "@types/fs-extra": "9.0.13",
     "@types/is-core-module": "2.2.0",
@@ -77,13 +78,11 @@
     "fix": "npm run lint:style -- -w && npm run lint:code -- --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
-    "test": "npm run build && node test/test.js node14 no-npm && node test/test.js node12 no-npm && node test/test.js node10 no-npm && node test/test.js host only-npm"
-  },
-  "greenkeeper": {
-    "emails": false,
-    "ignore": [
-      "pkg-fetch"
-    ]
+    "test": "npm run build && npm run test:14 && npm run test:12 && npm run test:10 && npm run test:host",
+    "test:10": "node test/test.js node10 no-npm",
+    "test:12": "node test/test.js node12 no-npm",
+    "test:14": "node test/test.js node14 no-npm",
+    "test:host": "node test/test.js host only-npm"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
