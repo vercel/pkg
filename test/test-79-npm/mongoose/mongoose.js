@@ -11,7 +11,7 @@ kitty.save(function (error1) {
   if (error1) return;
   Cat.find({})
     .$where(function () {
-      return this.name.slice(0, 3) === 'Tuz'; // eslint-disable-line no-invalid-this
+      return this.name.slice(0, 3) === 'Tuz';
     })
     .exec(function (error2, cats) {
       if (process.pkg) {
