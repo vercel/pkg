@@ -74,7 +74,10 @@ if (NODE_VERSION_MAJOR < 12 || require('worker_threads').isMainThread) {
   }
 }
 
-if (process.env.PKG_EXECPATH === EXECPATH && process.env.PGK_NODE_SUBPROCESS !== 'false') {
+if (
+  process.env.PKG_EXECPATH === EXECPATH &&
+  process.env.PGK_NODE_SUBPROCESS !== 'false'
+) {
   process.argv.splice(1, 1);
 
   if (process.argv[1] && process.argv[1] !== '-') {
