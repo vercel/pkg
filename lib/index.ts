@@ -691,7 +691,7 @@ export async function exec(argv2: string[]) {
         try {
           // sign executable ad-hoc to workaround the new mandatory signing requirement
           // users can always replace the signature if necessary
-          signMachOExecutable(target.output, argv["codesign-identity"]);
+          signMachOExecutable(target.output, argv['codesign-identity']);
         } catch {
           if (target.arch === 'arm64') {
             log.warn('Unable to sign the macOS executable', [
