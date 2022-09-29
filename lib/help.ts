@@ -22,6 +22,7 @@ export default function help() {
     --no-native-build    skip native addons build
     --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict * to disable all dictionaries
     -C, --compress       [default=None] compression algorithm = Brotli or GZip
+    --codesign-identity  codesign identity to use for signing executables (default: "-" for ad-hoc signing)
 
   ${chalk.dim('Examples:')}
 
