@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as babelTypes from '@babel/types';
 import * as babel from '@babel/parser';
 import generate from '@babel/generator';
@@ -84,7 +83,6 @@ function reconstruct(node: babelTypes.Node) {
   let v = generate(node, { comments: false }).code.replace(/\n/g, '');
   let v2;
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     v2 = v.replace(/\[ /g, '[').replace(/ \]/g, ']').replace(/ {2}/g, ' ');
 
@@ -436,7 +434,6 @@ export function visitorMalformed(n: babelTypes.Node) {
 }
 
 export function visitorUseSCWD(n: babelTypes.Node) {
-  // eslint-disable-line camelcase
   if (!babelTypes.isCallExpression(n)) {
     return null;
   }
