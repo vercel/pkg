@@ -39,7 +39,7 @@ if (doDebug) {
 }
 
 // -----------------------------------------------------------------------
-// Execute programm outside pjg
+// Execute program outside pjg
 const logRef = utils.spawn.sync(
   'node',
   [path.join(__dirname, 'src/index.js')],
