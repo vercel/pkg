@@ -20,12 +20,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: yarn
+
       - uses: actions/cache@v3
         with:
           path: ~/.pkg-cache/
           key: ${{ matrix.os }}-${{ matrix.node-version }}
 
-      - run: yarn install
+      - run: yarn install --immutable
       - if: matrix['node-version'] == '16.x' && matrix['os'] == 'ubuntu-latest'
         run: yarn lint
       - run: yarn build
