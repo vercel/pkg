@@ -186,7 +186,14 @@ function copyFolderRecursiveSync(source, target) {
 
   // Check if target folder needs to be created or integrated
   if (!fs.existsSync(targetFolder)) {
-    fs.mkdirSync(targetFolder);
+    try {
+      fs.mkdirSync(targetFolder);
+    } catch (ex) {
+      // If two executables unpack concurrently at the same time, they could both land in the mkdirSync.
+      //
+      // See https://github.com/vercel/pkg/issues/1829 for mode details.
+      if (!fs.existsSync(targetFolder)) throw ex;
+    }
   }
 
   // Copy
@@ -252,7 +259,14 @@ function copyFolderRecursiveSync(source, target) {
 function createDirRecursively(dir) {
   if (!fs.existsSync(dir)) {
     createDirRecursively(path.join(dir, '..'));
-    fs.mkdirSync(dir);
+    try {
+      fs.mkdirSync(dir);
+    } catch (ex) {
+      // If two executables unpack concurrently at the same time, they could both land in the mkdirSync.
+      //
+      // See https://github.com/vercel/pkg/issues/1829 for mode details.
+      if (!fs.existsSync(dir)) throw ex;
+    }
   }
 }
 
