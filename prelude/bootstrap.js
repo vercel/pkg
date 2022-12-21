@@ -179,6 +179,19 @@ function copyInChunks(
   fs_.closeSync(targetFile);
 }
 
+// If two executables unpack concurrently at the same time, they could both land in the mkdirSync.
+// This function is created to provide an entry point to create a folder in case where
+// mkdir could be entered twice concurrently on the same filesystem.
+//
+// See https://github.com/vercel/pkg/issues/1829 for mode details.
+function mkdirConcurrentlySync(folder) {
+  try {
+    fs.mkdirSync(folder);
+  } catch (ex) {
+    if (!fs.existsSync(folder)) throw ex;
+  }
+}
+
 // TODO: replace this with fs.cpSync when we drop Node < 16
 function copyFolderRecursiveSync(source, target) {
   // Build target folder
@@ -186,14 +199,7 @@ function copyFolderRecursiveSync(source, target) {
 
   // Check if target folder needs to be created or integrated
   if (!fs.existsSync(targetFolder)) {
-    try {
-      fs.mkdirSync(targetFolder);
-    } catch (ex) {
-      // If two executables unpack concurrently at the same time, they could both land in the mkdirSync.
-      //
-      // See https://github.com/vercel/pkg/issues/1829 for mode details.
-      if (!fs.existsSync(targetFolder)) throw ex;
-    }
+    mkdirConcurrentlySync(targetFolder);
   }
 
   // Copy
@@ -259,14 +265,7 @@ function copyFolderRecursiveSync(source, target) {
 function createDirRecursively(dir) {
   if (!fs.existsSync(dir)) {
     createDirRecursively(path.join(dir, '..'));
-    try {
-      fs.mkdirSync(dir);
-    } catch (ex) {
-      // If two executables unpack concurrently at the same time, they could both land in the mkdirSync.
-      //
-      // See https://github.com/vercel/pkg/issues/1829 for mode details.
-      if (!fs.existsSync(dir)) throw ex;
-    }
+    mkdirConcurrentlySync(dir);
   }
 }
 
