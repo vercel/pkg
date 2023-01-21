@@ -237,8 +237,12 @@ function stepDetect(
 
   try {
     detector.detect(body, (node, trying) => {
-      const { toplevel } = marker;
-      let d = detector.visitorSuccessful(node) as unknown as Derivative;
+      const { toplevel, configPath } = marker;
+      let d = detector.visitorSuccessful(
+        node,
+        false,
+        configPath
+      ) as unknown as Derivative;
 
       if (d) {
         if (d.mustExclude) {

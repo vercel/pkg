@@ -2,8 +2,36 @@ import * as babelTypes from '@babel/types';
 import * as babel from '@babel/parser';
 import generate from '@babel/generator';
 import { log } from './log';
+import * as fs from 'fs';
 
 import { ALIAS_AS_RELATIVE, ALIAS_AS_RESOLVABLE } from './common';
+import path from 'path';
+
+let data: Object;
+
+function getModuleAlias(configPath: string): Object {
+  if (!data && fs.existsSync(configPath)) {
+    try {
+      const readData: string = fs.readFileSync(configPath, 'utf8');
+
+      data = JSON.parse(readData);
+
+      type ObjectKey = keyof typeof data;
+      const myVar = '_moduleAliases' as ObjectKey;
+
+      const getAlias = data[myVar];
+
+      data = getAlias;
+    } catch {
+      console.log('error load config', configPath);
+    }
+  }
+  return data;
+}
+
+function setLiteralValue(node: babelTypes.StringLiteral, value: any) {
+  node.value = value;
+}
 
 function isLiteral(node: babelTypes.Node): node is babelTypes.Literal {
   if (node == null) {
@@ -150,7 +178,7 @@ function visitorRequireResolve(n: babelTypes.Node) {
   };
 }
 
-function visitorRequire(n: babelTypes.Node) {
+function visitorRequire(n: babelTypes.Node, configPath: string) {
   if (!babelTypes.isCallExpression(n)) {
     return null;
   }
@@ -165,6 +193,25 @@ function visitorRequire(n: babelTypes.Node) {
 
   if (!n.arguments || !isLiteral(n.arguments[0])) {
     return null;
+  }
+
+  const data: Object = getModuleAlias(configPath);
+
+  const value = getLiteralValue(n.arguments[0]);
+
+  if (data && value) {
+    type ObjectKey = keyof typeof data;
+    const checkPath = (value as String).replace('\\', '/').split('/');
+
+    const myVar = checkPath[0] as ObjectKey;
+
+    const getPathFromAlias = path.dirname(configPath) + path.sep + data[myVar];
+
+    const literal = n.arguments[0] as babelTypes.StringLiteral;
+
+    if (data[myVar]) {
+      setLiteralValue(literal, getPathFromAlias);
+    }
   }
 
   return {
@@ -221,7 +268,11 @@ function visitorPathJoin(n: babelTypes.Node) {
   return { v1: getLiteralValue(n.arguments[1] as babelTypes.StringLiteral) };
 }
 
-export function visitorSuccessful(node: babelTypes.Node, test = false) {
+export function visitorSuccessful(
+  node: babelTypes.Node,
+  test = false,
+  configPath: string
+) {
   let was: Was | null = visitorRequireResolve(node);
 
   if (was) {
@@ -241,7 +292,7 @@ export function visitorSuccessful(node: babelTypes.Node, test = false) {
     };
   }
 
-  was = visitorRequire(node);
+  was = visitorRequire(node, configPath);
 
   if (was) {
     if (test) {
