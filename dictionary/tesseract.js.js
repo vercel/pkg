@@ -2,6 +2,6 @@
 
 module.exports = {
   pkg: {
-    scripts: ['src/node/worker.js'],
+    scripts: ['src/worker-script/node/index.js'],
   },
 };
