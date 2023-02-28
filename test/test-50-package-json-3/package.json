@@ -3,8 +3,11 @@
   "pkg": {
     "patches": {
       "test-x-index.js": [
-        "require(__dirname + '/' + dataPath);",
-        "require(process.cwd() + '/' + dataPath);"
+        {
+          "command": "replace",
+          "from": "require(__dirname + '/' + dataPath);",
+          "to": "require(process.cwd() + '/' + dataPath);"
+        }
       ]
     }
   }
