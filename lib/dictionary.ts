@@ -47,7 +47,13 @@ const dictionary: Record<string, ConfigItem> = {
   bunyan: {
     pkg: {
       patches: {
-        'lib/bunyan.js': ["mv = require('mv' + '');", "mv = require('mv');"],
+        'lib/bunyan.js': [
+          {
+            command: 'replace',
+            from: "'mv' + '');",
+            to: "mv = require('mv');",
+          },
+        ],
       },
     },
   },
@@ -92,7 +98,7 @@ const dictionary: Record<string, ConfigItem> = {
       patches: {
         // author is mistaken to point package.json.main to
         // src/index.js (that is es6) instead of dist/index.js (es5)
-        'src/index.js': [{ do: 'erase' }, ''],
+        'src/index.js': [{ command: 'erase', source: '' }],
       },
     },
   },
@@ -110,12 +116,18 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'build/scripts.js': [
-          "path.join(__dirname, '..', 'scripts')",
-          "path.join(path.dirname(process.execPath), 'drivelist')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, '..', 'scripts')",
+            to: "path.join(path.dirname(process.execPath), 'drivelist')",
+          },
         ],
         'lib/scripts.js': [
-          "path.join(__dirname, '..', 'scripts')",
-          "path.join(path.dirname(process.execPath), 'drivelist')", // for 4.0.0
+          {
+            command: 'replace',
+            from: "path.join(__dirname, '..', 'scripts')",
+            to: "path.join(path.dirname(process.execPath), 'drivelist')", // for 4.0.0
+          },
         ],
       },
       deployFiles: [
@@ -133,8 +145,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          'path.join(__dirname, fs',
-          "path.join(path.dirname(process.execPath), 'electron', fs",
+          {
+            command: 'replace',
+            from: 'path.join(__dirname, fs',
+            to: "path.join(path.dirname(process.execPath), 'electron', fs",
+          },
         ],
       },
       deployFiles: [
@@ -175,12 +190,18 @@ const dictionary: Record<string, ConfigItem> = {
       ],
       patches: {
         'lib/stream/xlsx/workbook-writer.js': [
-          "require.resolve('../../xlsx/xml/theme1.xml')",
-          "require('path').join(__dirname, '../../xlsx/xml/theme1.xml')",
+          {
+            command: 'replace',
+            from: "require.resolve('../../xlsx/xml/theme1.xml')",
+            to: "require('path').join(__dirname, '../../xlsx/xml/theme1.xml')",
+          },
         ],
         'lib/xlsx/xlsx.js': [
-          "require.resolve('./xml/theme1.xml')",
-          "require('path').join(__dirname, './xml/theme1.xml')",
+          {
+            command: 'replace',
+            from: "require.resolve('./xml/theme1.xml')",
+            to: "require('path').join(__dirname, './xml/theme1.xml')",
+          },
         ],
       },
     },
@@ -189,8 +210,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "path.join(__dirname, 'vendor', 'exiftool.exe')",
-          "path.join(path.dirname(process.execPath), 'exiftool.exe')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, 'vendor', 'exiftool.exe')",
+            to: "path.join(path.dirname(process.execPath), 'exiftool.exe')",
+          },
         ],
       },
       deployFiles: [['vendor/exiftool.exe', 'exiftool.exe']],
@@ -200,8 +224,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "path.join(__dirname, 'vendor', 'exiftool')",
-          "path.join(path.dirname(process.execPath), 'exiftool')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, 'vendor', 'exiftool')",
+            to: "path.join(path.dirname(process.execPath), 'exiftool')",
+          },
         ],
       },
       deployFiles: [['vendor/exiftool', 'exiftool']],
@@ -211,8 +238,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/express-load.js': [
-          'entity = path.resolve(',
-          'entity = process.pkg.path.resolve(',
+          {
+            command: 'replace',
+            from: 'entity = path.resolve(',
+            to: 'entity = process.pkg.path.resolve(',
+          },
         ],
       },
     },
@@ -222,10 +252,16 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/view.js': [
-          'path = join(this.root, path)',
-          'path = process.pkg.path.resolve(this.root, path)', // for 3.x
-          'loc = resolve(root, name)',
-          'loc = process.pkg.path.resolve(root, name)', // for 4.x
+          {
+            command: 'replace',
+            from: 'path = join(this.root, path)',
+            to: 'path = process.pkg.path.resolve(this.root, path)', // for 3.x
+          },
+          {
+            command: 'replace',
+            from: 'loc = resolve(root, name)',
+            to: 'loc = process.pkg.path.resolve(root, name)', // for 4.x
+          },
         ],
       },
     },
@@ -263,8 +299,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "require.resolve('./compiler.jar')",
-          "require('path').join(require('path').dirname(process.execPath), 'compiler/compiler.jar')",
+          {
+            command: 'replace',
+            from: "require.resolve('./compiler.jar')",
+            to: "require('path').join(require('path').dirname(process.execPath), 'compiler/compiler.jar')",
+          },
         ],
       },
       deployFiles: [['compiler.jar', 'compiler/compiler.jar']],
@@ -274,8 +313,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/node/closure-compiler.js': [
-          "require.resolve('../../compiler.jar')",
-          "require('path').join(require('path').dirname(process.execPath), 'compiler/compiler.jar')",
+          {
+            command: 'replace',
+            from: "require.resolve('../../compiler.jar')",
+            to: "require('path').join(require('path').dirname(process.execPath), 'compiler/compiler.jar')",
+          },
         ],
       },
       deployFiles: [['compiler.jar', 'compiler/compiler.jar']],
@@ -291,15 +333,18 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'graceful-fs.js': [
-          { do: 'prepend' },
-          'if ((function() {\n' +
-            "  var version = require('./package.json').version;\n" +
-            "  var major = parseInt(version.split('.')[0]);\n" +
-            '  if (major < 4) {\n' +
-            "    module.exports = require('fs');\n" +
-            '    return true;\n' +
-            '  }\n' +
-            '})()) return;\n',
+          {
+            command: 'prepend',
+            source:
+              'if ((function() {\n' +
+              "  var version = require('./package.json').version;\n" +
+              "  var major = parseInt(version.split('.')[0]);\n" +
+              '  if (major < 4) {\n' +
+              "    module.exports = require('fs');\n" +
+              '    return true;\n' +
+              '  }\n' +
+              '})()) return;\n',
+          },
         ],
       },
     },
@@ -327,12 +372,21 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'j.js': [
-          "require('xl'+'sx')",
-          "require('xlsx')",
-          "require('xl'+'sjs')",
-          "require('xlsjs')",
-          "require('ha'+'rb')",
-          "require('harb')",
+          {
+            command: 'replace',
+            from: "require('xl'+'sx')",
+            to: "require('xlsx')",
+          },
+          {
+            command: 'replace',
+            from: "require('xl'+'sjs')",
+            to: "require('xlsjs')",
+          },
+          {
+            command: 'replace',
+            from: "require('ha'+'rb')",
+            to: "require('harb')",
+          },
         ],
       },
     },
@@ -358,8 +412,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'binding.js': [
-          '__dirname',
-          "require('path').dirname(process.execPath)",
+          {
+            command: 'replace',
+            from: '__dirname',
+            to: "require('path').dirname(process.execPath)",
+          },
         ],
       },
       deployFiles: [['prebuilds', 'prebuilds', 'directory']],
@@ -370,8 +427,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          'resolve.sync(this.moduleName, {basedir: configBase || cwd, paths: paths})',
-          'resolve.sync(this.moduleName, {basedir: configBase || require.main.filename, paths: paths})',
+          {
+            command: 'replace',
+            from: 'resolve.sync(this.moduleName, {basedir: configBase || cwd, paths: paths})',
+            to: 'resolve.sync(this.moduleName, {basedir: configBase || require.main.filename, paths: paths})',
+          },
         ],
       },
     },
@@ -399,12 +459,16 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'dist/worker-pool.js': [
-          'error.stack = message.error.stack;',
-          'error.stack = message.error.stack;\n' +
-            'if (error.stack.indexOf("SyntaxError") >= 0) {' +
-            'error.stack = "Pkg: Try to specify your ' +
-            "javascript file in 'assets' in config.\\n\" + error.stack;" +
-            '};',
+          {
+            command: 'replace',
+            from: 'error.stack = message.error.stack;',
+            to:
+              'error.stack = message.error.stack;\n' +
+              'if (error.stack.indexOf("SyntaxError") >= 0) {' +
+              'error.stack = "Pkg: Try to specify your ' +
+              "javascript file in 'assets' in config.\\n\" + error.stack;" +
+              '};',
+          },
         ],
       },
     },
@@ -424,18 +488,26 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/error.js': [
-          'return err;',
-          'if (err.message.indexOf("SyntaxError") >= 0) {' +
-            'err.message = "Pkg: Try to specify your ' +
-            "javascript file in 'assets' in config. \" + err.message;" +
-            '};\n' +
-            'return err;',
-          'if (Error.captureStackTrace) {',
-          'if (this.message.indexOf("SyntaxError") >= 0) {' +
-            'this.message = "Pkg: Try to specify your ' +
-            "javascript file in 'assets' in config. \" + this.message;" +
-            '};\n' +
-            'if (Error.captureStackTrace) {',
+          {
+            command: 'replace',
+            from: 'return err;',
+            to:
+              'if (err.message.indexOf("SyntaxError") >= 0) {' +
+              'err.message = "Pkg: Try to specify your ' +
+              "javascript file in 'assets' in config. \" + err.message;" +
+              '};\n' +
+              'return err;',
+          },
+          {
+            command: 'replace',
+            from: 'if (Error.captureStackTrace) {',
+            to:
+              'if (this.message.indexOf("SyntaxError") >= 0) {' +
+              'this.message = "Pkg: Try to specify your ' +
+              "javascript file in 'assets' in config. \" + this.message;" +
+              '};\n' +
+              'if (Error.captureStackTrace) {',
+          },
         ],
       },
     },
@@ -478,8 +550,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/nightmare.js': [
-          "path.join(__dirname, 'runner.js')",
-          "path.join(path.dirname(process.execPath), 'nightmare/runner.js')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, 'runner.js')",
+            to: "path.join(path.dirname(process.execPath), 'nightmare/runner.js')",
+          },
         ],
       },
       deployFiles: [
@@ -500,16 +575,25 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'notifiers/balloon.js': [
-          "__dirname, '../vendor/notifu/notifu'",
-          "path.dirname(process.execPath), 'notifier/notifu'",
+          {
+            command: 'replace',
+            from: "__dirname, '../vendor/notifu/notifu'",
+            to: "path.dirname(process.execPath), 'notifier/notifu'",
+          },
         ],
         'notifiers/notificationcenter.js': [
-          "__dirname,\n  '../vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier'",
-          "path.dirname(process.execPath), 'notifier/terminal-notifier'",
+          {
+            command: 'replace',
+            from: "__dirname,\n  '../vendor/terminal-notifier.app/Contents/MacOS/terminal-notifier'",
+            to: "path.dirname(process.execPath), 'notifier/terminal-notifier'",
+          },
         ],
         'notifiers/toaster.js': [
-          "__dirname, '../vendor/snoreToast/snoretoast'",
-          "path.dirname(process.execPath), 'notifier/snoretoast'",
+          {
+            command: 'replace',
+            from: "__dirname, '../vendor/snoreToast/snoretoast'",
+            to: "path.dirname(process.execPath), 'notifier/snoretoast'",
+          },
         ],
       },
       deployFiles: [
@@ -566,8 +650,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "path.join(__dirname, 'xdg-open')",
-          "path.join(path.dirname(process.execPath), 'xdg-open')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, 'xdg-open')",
+            to: "path.join(path.dirname(process.execPath), 'xdg-open')",
+          },
         ],
       },
       deployFiles: [['xdg-open', 'xdg-open']],
@@ -577,8 +664,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "path.join(__dirname, 'xdg-open')",
-          "path.join(path.dirname(process.execPath), 'xdg-open')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, 'xdg-open')",
+            to: "path.join(path.dirname(process.execPath), 'xdg-open')",
+          },
         ],
       },
       deployFiles: [['xdg-open', 'xdg-open']],
@@ -613,8 +703,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/phantom.js': [
-          "__dirname + '/shim/index.js'",
-          "_path2.default.join(_path2.default.dirname(process.execPath), 'phantom/index.js')",
+          {
+            command: 'replace',
+            from: "__dirname + '/shim/index.js'",
+            to: "_path2.default.join(_path2.default.dirname(process.execPath), 'phantom/index.js')",
+          },
         ],
       },
       deployFiles: [
@@ -630,8 +723,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/phantomjs.js': [
-          '__dirname, location.location',
-          "path.dirname(process.execPath), 'phantom', path.basename(location.location)",
+          {
+            command: 'replace',
+            from: '__dirname, location.location',
+            to: "path.dirname(process.execPath), 'phantom', path.basename(location.location)",
+          },
         ],
       },
       deployFiles: [
@@ -670,8 +766,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'utils/ChromiumDownloader.js': [
-          "path.join(__dirname, '..', '.local-chromium')",
-          "path.join(path.dirname(process.execPath), 'puppeteer')",
+          {
+            command: 'replace',
+            from: "path.join(__dirname, '..', '.local-chromium')",
+            to: "path.join(path.dirname(process.execPath), 'puppeteer')",
+          },
         ],
       },
       deployFiles: [['.local-chromium', 'puppeteer', 'directory']],
@@ -684,8 +783,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/utils.js': [
-          'process.cwd()',
-          "require('path').dirname(require.main.filename)",
+          {
+            command: 'replace',
+            from: 'process.cwd()',
+            to: "require('path').dirname(require.main.filename)",
+          },
         ],
       },
     },
@@ -710,28 +812,42 @@ const dictionary: Record<string, ConfigItem> = {
       scripts: ['lib/**/*.js'],
       patches: {
         'lib/hooks/moduleloader/index.js': [
-          "require('coffee-script/register')",
-          '',
+          {
+            command: 'replace',
+            from: "require('coffee-script/register')",
+            to: '',
+          },
         ],
         'lib/app/configuration/index.js': [
-          'hook = require(hookBundled);',
-          'hook = require(hookBundled);' +
-            // force to take the whole package
-            "require('sails-hook-sockets');",
+          {
+            command: 'replace',
+            from: 'hook = require(hookBundled);',
+            to:
+              'hook = require(hookBundled);' +
+              // force to take the whole package
+              "require('sails-hook-sockets');",
+          },
         ],
         'lib/hooks/grunt/index.js': [
-          'var child = ChildProcess.fork(',
-          '\n' +
-            "sails.log.warn('*******************************************************************');\n" +
-            "sails.log.warn('** Pkg: Grunt hook is temporarily disabled in pkg-ed app         **');\n" +
-            "sails.log.warn('** Instead it should be run before compilation to prepare files  **');\n" +
-            "sails.log.warn('*******************************************************************');\n" +
-            "sails.emit('hook:grunt:done');\n" +
-            'return cb_afterTaskStarted();(',
+          {
+            command: 'replace',
+            from: 'var child = ChildProcess.fork(',
+            to:
+              '\n' +
+              "sails.log.warn('*******************************************************************');\n" +
+              "sails.log.warn('** Pkg: Grunt hook is temporarily disabled in pkg-ed app         **');\n" +
+              "sails.log.warn('** Instead it should be run before compilation to prepare files  **');\n" +
+              "sails.log.warn('*******************************************************************');\n" +
+              "sails.emit('hook:grunt:done');\n" +
+              'return cb_afterTaskStarted();(',
+          },
         ],
         'lib/hooks/orm/backwards-compatibility/upgrade-datastore.js': [
-          'if (!fs.existsSync(modulePath)) {',
-          'try { require(modulePath); } catch (e) {',
+          {
+            command: 'replace',
+            from: 'if (!fs.existsSync(modulePath)) {',
+            to: 'try { require(modulePath); } catch (e) {',
+          },
         ],
       },
     },
@@ -776,8 +892,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/index.js': [
-          "require.resolve('socket.io-client/dist/socket.io.js.map')",
-          "require.resolve('socket.io-client/dist/socket.io.js.map', 'must-exclude')",
+          {
+            command: 'replace',
+            from: "require.resolve('socket.io-client/dist/socket.io.js.map')",
+            to: "require.resolve('socket.io-client/dist/socket.io.js.map', 'must-exclude')",
+          },
         ],
       },
     },
@@ -799,14 +918,19 @@ const dictionary: Record<string, ConfigItem> = {
       assets: ['steam_language/**/*'],
       patches: {
         'steam_language_parser/index.js': [
-          'process.chdir',
-          '// process.chdir',
-          "'steammsg.steamd'",
-          "require('path').join(__dirname, '../steam_language', 'steammsg.steamd')",
+          { command: 'replace', from: 'process.chdir', to: '// process.chdir' },
+          {
+            command: 'replace',
+            from: "'steammsg.steamd'",
+            to: "require('path').join(__dirname, '../steam_language', 'steammsg.steamd')",
+          },
         ],
         'steam_language_parser/parser/token_analyzer.js': [
-          'text.value',
-          "require('path').join(__dirname, '../../steam_language', text.value)",
+          {
+            command: 'replace',
+            from: 'text.value',
+            to: "require('path').join(__dirname, '../../steam_language', text.value)",
+          },
         ],
       },
     },
@@ -867,12 +991,16 @@ const dictionary: Record<string, ConfigItem> = {
       ],
       patches: {
         'index.js': [
-          "var rfile = require('rfile');",
-          'var rfile = function(f) { ' +
-            "require('fs').readFileSync(" + // for 2.1.0
-            'require.resolve(f)' +
-            '); ' +
-            '};',
+          {
+            command: 'replace',
+            from: "var rfile = require('rfile');",
+            to:
+              'var rfile = function(f) { ' +
+              "require('fs').readFileSync(" + // for 2.1.0
+              'require.resolve(f)' +
+              '); ' +
+              '};',
+          },
         ],
       },
     },
@@ -889,9 +1017,13 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'index.js': [
-          "execFile(process.execPath, ['--v8-options'],",
-          "execFile(process.execPath, ['--v8-options'], " +
-            "{ env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } },",
+          {
+            command: 'replace',
+            from: "execFile(process.execPath, ['--v8-options'],",
+            to:
+              "execFile(process.execPath, ['--v8-options'], " +
+              "{ env: { PKG_EXECPATH: 'PKG_INVOKE_NODEJS' } },",
+          },
         ],
       },
     },
@@ -918,12 +1050,21 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'xlsx.js': [
-          "require('js'+'zip')",
-          "require('jszip')",
-          "require('./js'+'zip')",
-          "require('./jszip')",
-          "require('./od' + 's')",
-          "require('./ods')",
+          {
+            command: 'replace',
+            from: "require('js'+'zip')",
+            to: "require('jszip')",
+          },
+          {
+            command: 'replace',
+            from: "require('./js'+'zip')",
+            to: "require('./jszip')",
+          },
+          {
+            command: 'replace',
+            from: "require('./od' + 's')",
+            to: "require('./ods')",
+          },
         ],
       },
     },
@@ -934,8 +1075,11 @@ const dictionary: Record<string, ConfigItem> = {
     pkg: {
       patches: {
         'lib/native.js': [
-          'path.join(__dirname, "..")',
-          'path.dirname(process.execPath)',
+          {
+            command: 'replace',
+            from: 'path.join(__dirname, "..")',
+            to: 'path.dirname(process.execPath)',
+          },
         ],
       },
       deployFiles: [['prebuilds', 'prebuilds', 'directory']],

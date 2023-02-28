@@ -604,10 +604,8 @@ class Walker {
       }
     }
 
-    const pkgConfig = config.pkg;
-
-    if (pkgConfig) {
-      const { patches } = pkgConfig;
+    if (config.pkg) {
+      const { patches, deployFiles } = config.pkg;
 
       if (patches) {
         for (const key in patches) {
@@ -617,8 +615,6 @@ class Walker {
           }
         }
       }
-
-      const { deployFiles } = pkgConfig;
 
       if (deployFiles) {
         marker.hasDeployFiles = true;
@@ -636,8 +632,8 @@ class Walker {
         }
       }
 
-      if (pkgConfig.log) {
-        pkgConfig.log(log, { packagePath: base });
+      if (config.pkg.log) {
+        config.pkg.log(log, { packagePath: base });
       }
     }
 
@@ -660,40 +656,31 @@ class Walker {
   }
 
   hasPatch(record: FileRecord) {
-    const patch = this.patches[record.file];
-
-    if (!patch) {
-      return;
-    }
-
-    return true;
+    return !!this.patches[record.file];
   }
 
   stepPatch(record: FileRecord) {
-    const patches = this.patches[record.file];
-
-    if (!patches) {
-      return;
-    }
-
     let body = (record.body || '').toString('utf8');
 
-    for (let i = 0; i < patches.length; i += 2) {
-      const patch = patches[i];
-      if (typeof patch === 'object') {
-        if (patch.do === 'erase') {
-          body = patches[i + 1] as string;
-        } else if (patch.do === 'prepend') {
-          body = patches[i + 1] + body;
-        } else if (patch.do === 'append') {
-          body += patches[i + 1];
+    for (const patch of this.patches[record.file]) {
+      switch (patch.command) {
+        case 'replace': {
+          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+          const escaped = patch.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          body = body.replace(new RegExp(escaped, 'g'), patch.to);
+          break;
         }
-      } else if (typeof patch === 'string') {
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-        // function escapeRegExp
-        const esc = patch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regexp = new RegExp(esc, 'g');
-        body = body.replace(regexp, patches[i + 1] as string);
+        case 'append':
+          body += patch.source;
+          break;
+        case 'erase':
+          body = patch.source;
+          break;
+        case 'prepend':
+          body = patch.source + body;
+          break;
+        default:
+          break;
       }
     }
 

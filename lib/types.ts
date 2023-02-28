@@ -14,14 +14,17 @@ export type FileRecords = Record<string, FileRecord>;
 type License = string | { type: string };
 
 export interface Patches {
-  [key: string]: Array<string | { do: 'erase' | 'prepend' | 'append' }>;
+  [filename: string]: Array<
+    | { command: 'replace'; from: string; to: string }
+    | { command: 'append' | 'erase' | 'prepend'; source: string }
+  >;
 }
 
 export interface ConfigDictionary {
   [key: string]: {
-    dependencies?: Record<string, string | undefined>;
+    dependencies?: Record<string, string>;
     pkg?: {
-      dependencies?: Record<string, string | undefined>;
+      dependencies?: Record<string, string>;
     };
   };
 }
