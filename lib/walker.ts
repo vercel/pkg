@@ -664,24 +664,16 @@ class Walker {
     let body = (record.body || '').toString('utf8');
 
     for (const patch of this.patches[record.file]) {
-      switch (patch.command) {
-        case 'replace': {
-          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
-          const escaped = patch.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          body = body.replace(new RegExp(escaped, 'g'), patch.to);
-          break;
-        }
-        case 'append':
-          body += patch.source;
-          break;
-        case 'erase':
-          body = patch.source;
-          break;
-        case 'prepend':
-          body = patch.source + body;
-          break;
-        default:
-          break;
+      if (patch.command === 'replace') {
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+        const escaped = patch.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        body = body.replace(new RegExp(escaped, 'g'), patch.to);
+      } else if (patch.command === 'append') {
+        body += patch.source;
+      } else if (patch.command === 'erase') {
+        body = patch.source;
+      } else if (patch.command === 'prepend') {
+        body = patch.source + body;
       }
     }
 
