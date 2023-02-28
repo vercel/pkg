@@ -660,6 +660,7 @@ class Walker {
   }
 
   stepPatch(record: FileRecord) {
+    if (!this.patches[record.file]) return;
     let body = (record.body || '').toString('utf8');
 
     for (const patch of this.patches[record.file]) {
