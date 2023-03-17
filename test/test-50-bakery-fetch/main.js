@@ -22,6 +22,14 @@ fetch
     arch: fetch.system.hostArch,
   })
   .then(function (needed) {
+    if (process.platform === 'darwin') {
+      utils.spawn.sync(
+        'codesign',
+        ['-fds', '-', './' + path.basename(needed)],
+        { cwd: path.dirname(needed) }
+      );
+    }
+
     right = utils.spawn.sync(
       './' + path.basename(needed),
       ['--expose-gc', '-e', 'if (global.gc) console.log("ok");'],
