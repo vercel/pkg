@@ -232,6 +232,7 @@ export async function exec(argv2: string[]) {
       'public',
       'v',
       'version',
+      'signature',
     ],
     string: [
       '_',
@@ -251,7 +252,7 @@ export async function exec(argv2: string[]) {
       'C',
       'compress',
     ],
-    default: { bytecode: true, 'native-build': true },
+    default: { bytecode: true, 'native-build': true, signature: true },
   });
 
   if (argv.h || argv.help) {
@@ -682,7 +683,7 @@ export async function exec(argv2: string[]) {
     });
 
     if (target.platform !== 'win' && target.output) {
-      if (target.platform === 'macos') {
+      if (argv.signature && target.platform === 'macos') {
         // patch executable to allow code signing
         const buf = patchMachOExecutable(readFileSync(target.output));
         writeFileSync(target.output, buf);

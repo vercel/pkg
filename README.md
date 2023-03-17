@@ -44,6 +44,7 @@ pkg [options] <input>
     --public-packages    force specified packages to be considered public
     --no-bytecode        skip bytecode generation and include source files as plain js
     --no-native-build    skip native addons build
+    --no-signature       skip signature of the final executable on macos
     --no-dict            comma-separated list of packages names to ignore dictionaries. Use --no-dict * to disable all dictionaries
     -C, --compress       [default=None] compression algorithm = Brotli or GZip
 
