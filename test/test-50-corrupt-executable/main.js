@@ -10,11 +10,6 @@ const utils = require('../utils.js');
 assert(!module.parent);
 assert(__dirname === process.cwd());
 
-// TODO : understand why the damage is not impacting macos build
-if (process.platform === 'darwin') {
-  return;
-}
-
 const host = 'node' + process.version.match(/^v(\d+)/)[1];
 const target = process.argv[2] || host;
 const input = './test-x-index.js';
@@ -22,7 +17,15 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync(['--target', target, '--output', output, input]);
+// on macos damaging the binary should happen prior to the signature
+utils.pkg.sync([
+  '--no-signature',
+  '--target',
+  target,
+  '--output',
+  output,
+  input,
+]);
 
 const damage = fs.readFileSync(output);
 const boundary = 4096;
@@ -33,6 +36,16 @@ damage[damage.length - 2 * boundary + 10] = 0x2;
 damage[damage.length - 3 * boundary + 10] = 0x2;
 damage[damage.length - 4 * boundary + 10] = 0x2;
 fs.writeFileSync(output, damage);
+
+if (process.platform === 'darwin') {
+  utils.spawn.sync(
+    'codesign',
+    ['--no-strict', '-fs', '-', './' + path.basename(output)],
+    {
+      cwd: path.dirname(output),
+    }
+  );
+}
 
 right = utils.spawn.sync('./' + path.basename(output), [], {
   cwd: path.dirname(output),
