@@ -55,9 +55,9 @@ pkg [options] <input>
   – Takes package.json from cwd and follows 'bin' entry
     $ pkg .
   – Makes executable for particular target machine
-    $ pkg -t node14-win-arm64 index.js
+    $ pkg -t node16-win-arm64 index.js
   – Makes executables for target machines of your choice
-    $ pkg -t node12-linux,node14-linux,node14-win index.js
+    $ pkg -t node16-linux,node18-linux,node16-win index.js
   – Bakes '--expose-gc' and '--max-heap-size=34' into executable
     $ pkg --options "expose-gc,max-heap-size=34" index.js
   – Consider packageA and packageB to be public
@@ -84,7 +84,7 @@ The entrypoint of your project is a mandatory CLI argument. It may be:
 `pkg` can generate executables for several target machines at a
 time. You can specify a comma-separated list of targets via `--targets`
 option. A canonical target consists of 3 elements, separated by
-dashes, for example `node12-macos-x64` or `node14-linux-arm64`:
+dashes, for example `node18-macos-x64` or `node14-linux-arm64`:
 
 - **nodeRange** (node8), node10, node12, node14, node16 or latest
 - **platform** alpine, linux, linuxstatic, win, macos, (freebsd)
