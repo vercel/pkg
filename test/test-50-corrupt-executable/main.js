@@ -17,7 +17,15 @@ const output = './test-output.exe';
 
 let right;
 
-utils.pkg.sync(['--target', target, '--output', output, input]);
+// on macos damaging the binary should happen prior to the signature
+utils.pkg.sync([
+  '--no-signature',
+  '--target',
+  target,
+  '--output',
+  output,
+  input,
+]);
 
 const damage = fs.readFileSync(output);
 const boundary = 4096;
@@ -28,6 +36,16 @@ damage[damage.length - 2 * boundary + 10] = 0x2;
 damage[damage.length - 3 * boundary + 10] = 0x2;
 damage[damage.length - 4 * boundary + 10] = 0x2;
 fs.writeFileSync(output, damage);
+
+if (process.platform === 'darwin') {
+  utils.spawn.sync(
+    'codesign',
+    ['--no-strict', '-fs', '-', './' + path.basename(output)],
+    {
+      cwd: path.dirname(output),
+    }
+  );
+}
 
 right = utils.spawn.sync('./' + path.basename(output), [], {
   cwd: path.dirname(output),
