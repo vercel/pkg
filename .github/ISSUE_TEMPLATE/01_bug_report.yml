@@ -38,7 +38,7 @@ body:
   - type: input
     attributes:
       label: What Node versions, OSs and CPU architectures are you building for?
-      description: 'For example: default, node12, node12-linux-x64, node14-win-arm64'
+      description: 'For example: default, node18, node18-linux-x64, node16-win-arm64'
     validations:
       required: true
   - type: textarea
