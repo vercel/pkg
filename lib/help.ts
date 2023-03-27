@@ -32,7 +32,7 @@ export default function help() {
   ${chalk.gray('–')} Makes executable for particular target machine
     ${chalk.cyan('$ pkg -t node14-win-arm64 index.js')}
   ${chalk.gray('–')} Makes executables for target machines of your choice
-    ${chalk.cyan('$ pkg -t node12-linux,node14-linux,node14-win index.js')}
+    ${chalk.cyan('$ pkg -t node16-linux,node18-linux,node18-win index.js')}
   ${chalk.gray(
     '–'
   )} Bakes '--expose-gc' and '--max-heap-size=34' into executable

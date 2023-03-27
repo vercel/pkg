@@ -20,6 +20,7 @@ const output2 = './test-output-2.exe';
 
 utils.pkg.sync([
   '--public',
+  '--no-signature', // the signature will make the build not reproducible
   '--no-bytecode',
   '--target',
   target,
@@ -30,6 +31,7 @@ utils.pkg.sync([
 
 utils.pkg.sync([
   '--public',
+  '--no-signature',
   '--no-bytecode',
   '--target',
   target,
