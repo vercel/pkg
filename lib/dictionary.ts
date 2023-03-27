@@ -960,7 +960,7 @@ const dictionary: Record<string, ConfigItem> = {
   tabtab: {},
   'tesseract.js': {
     pkg: {
-      scripts: ['src/node/worker.js'],
+      scripts: ['src/worker-script/node/index.js'],
     },
   },
   throng: {},
