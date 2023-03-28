@@ -37,7 +37,6 @@
   "devDependencies": {
     "@babel/core": "7.18.2",
     "@types/babel__generator": "7.6.4",
-    "@types/escodegen": "0.0.7",
     "@types/fs-extra": "9.0.13",
     "@types/is-core-module": "2.2.0",
     "@types/minimist": "1.2.2",
@@ -59,14 +58,6 @@
     "rimraf": "^3.0.2",
     "simple-git-hooks": ">=2.8.0",
     "typescript": "4.7.2"
-  },
-  "peerDependencies": {
-    "node-notifier": ">=9.0.1"
-  },
-  "peerDependenciesMeta": {
-    "node-notifier": {
-      "optional": true
-    }
   },
   "scripts": {
     "clean": "rimraf lib-es5",
