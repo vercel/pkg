@@ -1882,7 +1882,11 @@ function payloadFileSync(pointer) {
     im = require('internal/module');
     makeRequireFunction = im.makeRequireFunction;
   } else {
-    im = require('internal/modules/cjs/helpers');
+    if (NODE_VERSION_MAJOR <= 18) {
+      im = require('internal/modules/cjs/helpers');
+    } else {
+      im = require('internal/modules/helpers');
+    }
     makeRequireFunction = im.makeRequireFunction;
     // TODO esm modules along with cjs
   }

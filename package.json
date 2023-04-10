@@ -1,6 +1,6 @@
 {
   "name": "pkg",
-  "version": "5.8.0",
+  "version": "5.8.1",
   "description": "Package your Node.js project into an executable",
   "main": "lib-es5/index.js",
   "license": "MIT",
@@ -37,7 +37,6 @@
   "devDependencies": {
     "@babel/core": "7.18.2",
     "@types/babel__generator": "7.6.4",
-    "@types/escodegen": "0.0.7",
     "@types/fs-extra": "9.0.13",
     "@types/is-core-module": "2.2.0",
     "@types/minimist": "1.2.2",
@@ -60,14 +59,6 @@
     "simple-git-hooks": ">=2.8.0",
     "typescript": "4.7.2"
   },
-  "peerDependencies": {
-    "node-notifier": ">=9.0.1"
-  },
-  "peerDependenciesMeta": {
-    "node-notifier": {
-      "optional": true
-    }
-  },
   "scripts": {
     "clean": "rimraf lib-es5",
     "build": "npm run clean && tsc",
@@ -78,9 +69,9 @@
     "fix": "npm run lint:style -- -w && npm run lint:code -- --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
-    "test": "npm run build && npm run test:14 && npm run test:12 && npm run test:10 && npm run test:host",
-    "test:10": "node test/test.js node10 no-npm",
-    "test:12": "node test/test.js node12 no-npm",
+    "test": "npm run build && npm run test:18 && npm run test:16 && npm run test:14 && npm run test:host",
+    "test:18": "node test/test.js node18 no-npm",
+    "test:16": "node test/test.js node16 no-npm",
     "test:14": "node test/test.js node14 no-npm",
     "test:host": "node test/test.js host only-npm"
   },
