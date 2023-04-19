@@ -14,7 +14,7 @@ import {
   STORE_CONTENT,
   STORE_LINKS,
   STORE_STAT,
-  isDotJS,
+  isJavascriptFilename,
   isDotJSON,
   isDotNODE,
   isPackageJson,
@@ -477,7 +477,7 @@ class Walker {
           const stat = await fs.stat(script);
 
           if (stat.isFile()) {
-            if (!isDotJS(script) && !isDotJSON(script) && !isDotNODE(script)) {
+            if (!isJavascriptFilename(script) && !isDotJSON(script) && !isDotNODE(script)) {
               log.warn("Non-javascript file is specified in 'scripts'.", [
                 'Pkg will probably fail to parse. Specify *.js in glob.',
                 script,
@@ -531,7 +531,7 @@ class Walker {
               this.appendBlobOrContent({
                 file,
                 marker,
-                store: isDotJS(file) ? STORE_BLOB : STORE_CONTENT,
+                store: isJavascriptFilename(file) ? STORE_BLOB : STORE_CONTENT,
                 reason: configPath,
               });
             } else {

@@ -9,7 +9,7 @@ import {
   STORE_CONTENT,
   STORE_LINKS,
   STORE_STAT,
-  isDotJS,
+  isJavascriptFilename,
   isDotJSON,
 } from './common';
 
@@ -139,7 +139,7 @@ export default function packer({
         }
 
         if (record[STORE_CONTENT]) {
-          const disclosed = isDotJS(file) || isDotJSON(file);
+          const disclosed = isJavascriptFilename(file) || isDotJSON(file);
           log.debug(
             disclosed
               ? 'The file was included as DISCLOSED code (with sources)'

@@ -88,8 +88,9 @@ export function isPackageJson(file: string) {
   return path.basename(file) === 'package.json';
 }
 
-export function isDotJS(file: string) {
-  return path.extname(file) === '.js';
+export function isJavascriptFilename(file: string) {
+  const ext = path.extname(file)
+  return ext === '.js' || ext === '.cjs' || ext === '.mjs'
 }
 
 export function isDotJSON(file: string) {
