@@ -773,6 +773,8 @@ function payloadFileSync(pointer) {
       return fd;
     }
   }
+  
+  fs._ancestor = ancestor;
 
   fs.createReadStream = function createReadStream(path_) {
     if (!insideSnapshot(path_)) {
@@ -1844,6 +1846,8 @@ function payloadFileSync(pointer) {
     _resolveFilename: Module._resolveFilename,
     runMain: Module.runMain,
   };
+  
+  Module.prototype._ancestor = ancestor;
 
   Module.prototype.require = function require(path_) {
     try {
@@ -2071,6 +2075,8 @@ function payloadFileSync(pointer) {
       }
     }
   }
+  
+  childProcess._ancestor = ancestor;
 
   childProcess.spawn = function spawn() {
     const args = cloneArgs(arguments);
@@ -2195,6 +2201,8 @@ function payloadFileSync(pointer) {
     if (/^\\\\\?\\/.test(f)) return f.slice(4);
     return f;
   }
+  
+  process._ancestor = ancestor;
 
   process.dlopen = function dlopen() {
     const args = cloneArgs(arguments);
