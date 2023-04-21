@@ -167,6 +167,7 @@ module.exports.filesAfter = function (b, n) {
 };
 
 module.exports.shouldSkipPnpm = function () {
+  // pnpm 8 requires at least Node.js v16.14
   const REQUIRED_MAJOR_VERSION = 16;
   const REQUIRED_MINOR_VERSION = 14;
 
