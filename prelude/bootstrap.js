@@ -1419,6 +1419,8 @@ function payloadFileSync(pointer) {
     delete s.isSocketValue;
     delete s.isSymbolicLinkValue;
 
+    s.isBlockDevice = noop;
+    s.isCharacterDevice = noop;
     s.isFile = function isFile() {
       return isFileValue;
     };
@@ -1431,9 +1433,7 @@ function payloadFileSync(pointer) {
     s.isSymbolicLink = function isSymbolicLink() {
       return isSymbolicLinkValue;
     };
-    s.isFIFO = function isFIFO() {
-      return false;
-    };
+    s.isFIFO = noop;
 
     return s;
   }
