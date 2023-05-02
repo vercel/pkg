@@ -2083,10 +2083,10 @@ picomatch@^2.2.3:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
   integrity sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==
 
-pkg-fetch@3.4.2:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.4.2.tgz#6f68ebc54842b73f8c0808959a9df3739dcb28b7"
-  integrity sha512-0+uijmzYcnhC0hStDjm/cl2VYdrmVVBpe7Q8k9YBojxmR5tG8mvR9/nooQq3QSXiQqORDVOTY3XqMEqJVIzkHA==
+pkg-fetch@3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/pkg-fetch/-/pkg-fetch-3.5.2.tgz#33e0d4f3b0c371fa9c133a10a081d5955d104376"
+  integrity sha512-KlRF3cDS4J5PRTKh5dkF5s+CYKa+4eUXzymWqTKPU/p3WmYlWZu7AS0dH8moPxg+QcJNB4/wu1wVO2a0Asv2Dw==
   dependencies:
     chalk "^4.1.2"
     fs-extra "^9.1.0"
