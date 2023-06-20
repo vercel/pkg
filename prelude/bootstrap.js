@@ -80,14 +80,12 @@ if (process.env.PKG_EXECPATH === EXECPATH) {
   if (process.argv[1] && process.argv[1] !== '-') {
     // https://github.com/nodejs/node/blob/1a96d83a223ff9f05f7d942fb84440d323f7b596/lib/internal/bootstrap/node.js#L269
     process.argv[1] = path.resolve(process.argv[1]);
-  } else {
-    process.argv[1] = DEFAULT_ENTRYPOINT;
   }
 } else {
   process.argv[1] = DEFAULT_ENTRYPOINT;
 }
 
-[, ENTRYPOINT] = process.argv;
+[, ENTRYPOINT = DEFAULT_ENTRYPOINT] = process.argv;
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
