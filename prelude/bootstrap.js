@@ -85,7 +85,7 @@ if (process.env.PKG_EXECPATH === EXECPATH) {
   process.argv[1] = DEFAULT_ENTRYPOINT;
 }
 
-[, ENTRYPOINT] = process.argv;
+[, ENTRYPOINT = DEFAULT_ENTRYPOINT] = process.argv;
 delete process.env.PKG_EXECPATH;
 
 // /////////////////////////////////////////////////////////////////
