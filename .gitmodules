@@ -1,0 +1,3 @@
+[submodule "examples/prisma-example"]
+	path = examples/prisma-example
+	url = git@github.com:ParseDark/hello-prisma.git
