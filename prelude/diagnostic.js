@@ -4,14 +4,42 @@
 
 'use strict';
 
+function humanSize(bytes) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
+  if (bytes === 0) {
+    return 'n/a';
+  }
+
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+  if (i === 0) {
+    return `${bytes} ${sizes[i]}`;
+  }
+
+  return `${(bytes / 1024 ** i).toFixed(1)} ${sizes[i]}`;
+}
+
 (function installDiagnostic() {
   const fs = require('fs');
   const path = require('path');
   const win32 = process.platform === 'win32';
 
+  // set a size limit of 5MB
+  const sizeLimit = process.env.SIZE_LIMIT_PKG
+    ? parseInt(process.env.SIZE_LIMIT_PKG, 10)
+    : 5 * 1024 * 1024;
+  // set a size limit of 10MB
+  const folderLimit = process.env.FOLDER_LIMIT_PKG
+    ? parseInt(process.env.FOLDER_LIMIT_PKG, 10)
+    : 10 * 1024 * 1024;
+
   if (process.env.DEBUG_PKG === '2') {
     console.log(Object.entries(DICT));
   }
+
+  const overSized = [];
+
   function dumpLevel(filename, level, tree) {
     let totalSize = 0;
     const d = fs.readdirSync(filename);
@@ -21,22 +49,33 @@
       const isSymbolicLink2 = f !== realPath;
 
       const s = fs.statSync(f);
-      totalSize += s.size;
 
       if (s.isDirectory() && !isSymbolicLink2) {
         const tree1 = [];
-        totalSize += dumpLevel(f, level + 1, tree1);
+        const startIndex = overSized.length;
+        const folderSize = dumpLevel(f, level + 1, tree1);
+        totalSize += folderSize;
         const str =
           (' '.padStart(level * 2, ' ') + d[j]).padEnd(40, ' ') +
-          (totalSize.toString().padStart(10, ' ') +
+          (humanSize(folderSize).padStart(10, ' ') +
             (isSymbolicLink2 ? `=> ${realPath}` : ' '));
         tree.push(str);
         tree1.forEach((x) => tree.push(x));
+
+        if (folderSize > folderLimit) {
+          overSized.splice(startIndex, 0, str);
+        }
       } else {
+        totalSize += s.size;
         const str =
           (' '.padStart(level * 2, ' ') + d[j]).padEnd(40, ' ') +
-          (s.size.toString().padStart(10, ' ') +
+          (humanSize(s.size).padStart(10, ' ') +
             (isSymbolicLink2 ? `=> ${realPath}` : ' '));
+
+        if (s.size > sizeLimit) {
+          overSized.push(str);
+        }
+
         tree.push(str);
       }
     }
@@ -62,7 +101,13 @@
     const totalSize = dumpLevel(startFolder, 1, tree);
     console.log(tree.join('\n'));
 
-    console.log('Total size = ', totalSize);
+    console.log('Total size = ', humanSize(totalSize));
+
+    if (overSized.length > 0) {
+      console.log('------------------------------- oversized files');
+      console.log(overSized.join('\n'));
+    }
+
     if (process.env.DEBUG_PKG === '2') {
       wrap(fs, 'openSync');
       wrap(fs, 'open');
