@@ -208,6 +208,12 @@ Pass `--debug` to `pkg` to get a log of packaging process.
 If you have issues with some particular file (seems not packaged
 into executable), it may be useful to look through the log.
 
+In order to get more detailed logs on startup, after you packaged your application using `--debug`, you can start your application with the environment variable `DEBUG_PKG` set to `1` or `2` if you want more verbose debugging. This will load `prelude/diagnostic.js` that will print the snapshot tree and the symlink table, when set to `2` it will also mock `fs` in order to print logs when a method is called.
+
+This is useful to see what's included in your bundle and detect possible missing files or large files that could be removed from it in order to reduce the size of the executable.
+
+You can also use `SIZE_LIMIT_PKG` and `FOLDER_LIMIT_PKG` to print files/folders that are larger than the specified size limit (in bytes). By default, the size limit is set to 5MB for files and 10MB for folders.
+
 ### Bytecode (reproducibility)
 
 By default, your source code is precompiled to v8 bytecode before being written
