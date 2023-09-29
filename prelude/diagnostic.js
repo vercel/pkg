@@ -25,11 +25,9 @@ function humanSize(bytes) {
   const path = require('path');
   const win32 = process.platform === 'win32';
 
-  // set a size limit of 5MB
   const sizeLimit = process.env.SIZE_LIMIT_PKG
     ? parseInt(process.env.SIZE_LIMIT_PKG, 10)
     : 5 * 1024 * 1024;
-  // set a size limit of 10MB
   const folderLimit = process.env.FOLDER_LIMIT_PKG
     ? parseInt(process.env.FOLDER_LIMIT_PKG, 10)
     : 10 * 1024 * 1024;
