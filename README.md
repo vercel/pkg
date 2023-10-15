@@ -425,3 +425,15 @@ or
     C:\> output.exe
 
 Note: make sure not to use --debug flag in production.
+
+## Nix development environment
+
+Nix users can contribute within an instant development environment
+
+```shell
+nix develop -c $SHELL
+```
+
+```shell
+npm install
+```
