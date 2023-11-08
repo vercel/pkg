@@ -235,7 +235,7 @@ function copyFolderRecursiveSync(source, target) {
         }
 
         // Target must be copied because it either does not exist or is outdated.
-        // Due to the possibility that mutliple instances of this app start simultaneously,
+        // Due to the possibility that multiple instances of this app start simultaneously,
         // the copy action might fail. Only one starting instance gets write access.
         //
         // We don't catch any error here because it does not make sense to go ahead and to
