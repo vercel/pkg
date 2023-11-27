@@ -688,7 +688,7 @@ function payloadFileSync(pointer) {
   // ///////////////////////////////////////////////////////////////
 
   function removeTemporaryFolderAndContent(folder) {
-    if (!folder) return;
+    if (!folder || !fs.existsSync(folder)) return;
     if (NODE_VERSION_MAJOR <= 14) {
       if (NODE_VERSION_MAJOR <= 10) {
         // folder must be empty
