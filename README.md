@@ -1,8 +1,7 @@
-**Disclaimer: `pkg` was created for use within containers and is not intended for use in serverless environments. For those using Vercel, this means that there is no requirement to use `pkg` in your projects as the benefits it provides are not applicable to the platform.**
+# `pkg`
 
-![](https://res.cloudinary.com/zeit-inc/image/upload/v1509936789/repositories/pkg/pkg-repo-banner-new.png)
-
-[![Build Status](https://github.com/vercel/pkg/actions/workflows/ci.yml/badge.svg)](https://github.com/vercel/pkg/actions/workflows/ci.yml)
+> [!IMPORTANT]  
+> `pkg` has been deprecated with `5.8.1` as the last release. There are a number of successful forked versions of `pkg` already with various feature additions. Further, we’re excited about Node.js 21’s support for [single executable applications](https://nodejs.org/api/single-executable-applications.html). Thank you for the support and contributions over the years. The repository will remain open and archived.
 
 This command line interface enables you to package your Node.js project into an executable that can be run even on devices without Node.js installed.
 
